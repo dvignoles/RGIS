@@ -178,6 +178,7 @@ static void *_CMthreadWork (void *dataPtr) {
 	CMthreadTeam_p team = (CMthreadTeam_p) data->TeamPtr;
 	CMthreadJob_p  job;
     struct timeb tbs;
+    struct timespec req, rem;
     long long startTime;
 
     pthread_mutex_lock (&(team->SMutex));
@@ -198,11 +199,14 @@ static void *_CMthreadWork (void *dataPtr) {
                         job->SortedTasks[taskId]->Completed = 1;
                     }
                 }
-                do {
+                req.tv_sec  = 0;
+                req.tv_nsec = 2;
+                while (completed < threadNum) {
                     completed = 0;
                     for (taskId = end - threadNum;taskId < end;++taskId)
                         completed += job->SortedTasks [taskId]->Completed;
-                } while (completed < threadNum);
+                    if (completed < threadNum) nanosleep(&req , &rem);
+                }
             }
             ftime (&tbs);
             data->Time += (tbs.time * 1000 + tbs.millitm - startTime);

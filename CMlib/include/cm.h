@@ -118,7 +118,6 @@ typedef struct CMthreadTask_s {
 typedef struct CMthreadTaskGroup_s {
     size_t Start;
     size_t End;
-    size_t TravelCount;
 } CMthreadTaskGroup_t, *CMthreadTaskGroup_p;
 
 typedef struct CMthreadJob_s {

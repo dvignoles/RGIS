@@ -29,12 +29,13 @@ int main(int argv, char *argc[]) {
         CMthreadTeamDestroy(&team);
         return (CMfailed);
     }
-    _taskNum = taskNum - 1;
+ /*   _taskNum = taskNum - 1;
     for (taskId = 0; taskId < taskNum; ++taskId) {
         _taskId = (taskId | 0x0000000f);
         CMthreadJobTaskDependent(job, taskId, _taskId < taskNum ? &_taskId : &_taskNum, 1);
     }
 
+ */
     for (timeLoop = 0; timeLoop < loopNum; ++timeLoop) {
         printf("Time %d\n", (int) timeLoop);
         CMthreadJobExecute(&team, job);
