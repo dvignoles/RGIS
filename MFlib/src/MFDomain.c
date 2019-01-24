@@ -15,10 +15,10 @@ bfekete@ccny.cuny.edu
 #include <cm.h>
 #include <MF.h>
 
-void MFDomainFree (MFDomain_t *domain) {
+void MFDomainFree (MFDomain_p domain) {
 	int objID;
 
-	if (domain->Objects != (MFObject_t *) NULL) {
+	if (domain->Objects != (MFObject_p) NULL) {
 		for (objID = 0;objID < domain->ObjNum;++objID) {
 			if (domain->Objects [objID].DLinks != (size_t *) NULL) free (domain->Objects [objID].DLinks);
 			if (domain->Objects [objID].ULinks != (size_t *) NULL) free (domain->Objects [objID].ULinks);
@@ -30,26 +30,26 @@ void MFDomainFree (MFDomain_t *domain) {
 	free (domain);	
 }
 
-MFDomain_t *MFDomainRead (FILE *inFile) {
+MFDomain_p MFDomainRead (FILE *inFile) {
 	int objID, i;
-	MFDomain_t *domain;
+	MFDomain_p domain;
 
-	if ((domain = (MFDomain_t *) calloc (1,sizeof (MFDomain_t))) == (MFDomain_t *) NULL) return ((MFDomain_t *) NULL);
-	domain->Objects = (MFObject_t *) NULL;
+	if ((domain = (MFDomain_p) calloc (1,sizeof (MFDomain_t))) == (MFDomain_p) NULL) return ((MFDomain_p) NULL);
+	domain->Objects = (MFObject_p) NULL;
 
-	if (fread (domain,sizeof (MFDomain_t) - sizeof (MFObject_t *),1,inFile) != 1) {
+	if (fread (domain,sizeof (MFDomain_t) - sizeof (MFObject_p),1,inFile) != 1) {
 		CMmsgPrint (CMmsgSysError,"File Reading Error in: %s:%d",__FILE__,__LINE__);
 		MFDomainFree (domain);
-		return ((MFDomain_t *) NULL);
+		return ((MFDomain_p) NULL);
 	}
 	if (domain->Swap != 1) {
 		MFSwapHalfWord (&(domain->Type));		
 		MFSwapWord (&(domain->ObjNum));
 	}
-	if ((domain->Objects = (MFObject_t *) calloc (domain->ObjNum,sizeof (MFObject_t))) == (MFObject_t *) NULL) {
+	if ((domain->Objects = (MFObject_p) calloc (domain->ObjNum,sizeof (MFObject_t))) == (MFObject_p) NULL) {
 		CMmsgPrint (CMmsgSysError,"Memory Allocation Error in: %s:%d",__FILE__,__LINE__);
 		MFDomainFree (domain);
-		return ((MFDomain_t *) NULL);
+		return ((MFDomain_p) NULL);
 	}
 	for (objID = 0;objID < domain->ObjNum;++objID) {
 		domain->Objects [objID].DLinks = (size_t *) NULL;
@@ -58,10 +58,10 @@ MFDomain_t *MFDomainRead (FILE *inFile) {
 		domain->Objects [objID].UWeights = (float *) NULL;
 	}
 	for (objID = 0;objID < domain->ObjNum;++objID) {
-		if (fread (domain->Objects + objID,sizeof (MFObject_t) - 2 * sizeof (MFObject_t *),1,inFile) != 1) {
+		if (fread (domain->Objects + objID,sizeof (MFObject_t) - 2 * sizeof (MFObject_p),1,inFile) != 1) {
 			CMmsgPrint (CMmsgSysError,"File Reading Error in: %s:%d",__FILE__,__LINE__);
 			MFDomainFree (domain);
-			return ((MFDomain_t *) NULL);
+			return ((MFDomain_p) NULL);
 		}
 		if (domain->Swap != 1) {
 			MFSwapWord (&(domain->Objects [objID].ID));		
@@ -79,13 +79,13 @@ MFDomain_t *MFDomainRead (FILE *inFile) {
 			if (domain->Objects [objID].DLinks == (size_t *) NULL) {
 				CMmsgPrint (CMmsgSysError,"Memory Allocation Error in: %s:%d",__FILE__,__LINE__);
 				MFDomainFree (domain);
-				return ((MFDomain_t *) NULL);
+				return ((MFDomain_p) NULL);
 			}
 			domain->Objects [objID].DWeights = (float *) calloc (domain->Objects [objID].DLinkNum,sizeof (float));
 			if (domain->Objects [objID].DWeights == (float*) NULL) {
 				CMmsgPrint (CMmsgSysError,"Memory Allocation Error in: %s:%d",__FILE__,__LINE__);
 				MFDomainFree (domain);
-				return ((MFDomain_t *) NULL);
+				return ((MFDomain_p) NULL);
 			}
 			if (fread (domain->Objects [objID].DLinks,sizeof (size_t),domain->Objects [objID].DLinkNum,inFile) == domain->Objects [objID].DLinkNum) {
 				if (domain->Swap != 1)
@@ -100,7 +100,7 @@ MFDomain_t *MFDomainRead (FILE *inFile) {
 			else {
 				CMmsgPrint (CMmsgSysError,"File Reading Error in: %s:%d",__FILE__,__LINE__);
 				MFDomainFree (domain);
-				return ((MFDomain_t *) NULL);
+				return ((MFDomain_p) NULL);
 			}
 		}
 		if (domain->Objects [objID].ULinkNum > 0) {
@@ -108,13 +108,13 @@ MFDomain_t *MFDomainRead (FILE *inFile) {
 			if (domain->Objects [objID].ULinks == (size_t *) NULL) {
 				CMmsgPrint (CMmsgSysError,"Memory Allocation Error in: %s:%d",__FILE__,__LINE__);
 				MFDomainFree (domain);
-				return ((MFDomain_t *) NULL);
+				return ((MFDomain_p) NULL);
 			}
 			domain->Objects [objID].UWeights = (float *) calloc (domain->Objects [objID].ULinkNum,sizeof (float));
 			if (domain->Objects [objID].UWeights == (float*) NULL) {
 				CMmsgPrint (CMmsgSysError,"Memory Allocation Error in: %s:%d",__FILE__,__LINE__);
 				MFDomainFree (domain);
-				return ((MFDomain_t *) NULL);
+				return ((MFDomain_p) NULL);
 			}
 			if (fread (domain->Objects [objID].ULinks,sizeof (size_t),domain->Objects [objID].ULinkNum,inFile) == domain->Objects [objID].ULinkNum) {
 				if (domain->Swap != 1)
@@ -129,14 +129,14 @@ MFDomain_t *MFDomainRead (FILE *inFile) {
 			else {
 				CMmsgPrint (CMmsgSysError,"File Reading Error in: %s:%d",__FILE__,__LINE__);
 				MFDomainFree (domain);
-				return ((MFDomain_t *) NULL);
+				return ((MFDomain_p) NULL);
 			}
 		}
 	}
 	return (domain);
 }
 
-int MFDomainSetBifurcations(MFDomain_t *domain, const char *path) {
+int MFDomainSetBifurcations(MFDomain_p domain, const char *path) {
     char line[1024];
     int fromID, toID, dlink, dlink0, ulink, objID;
     float weight, sum;
@@ -307,17 +307,17 @@ int MFDomainSetBifurcations(MFDomain_t *domain, const char *path) {
     return (CMsucceeded);
 }
 
-int MFDomainWrite (MFDomain_t *domain,FILE *outFile) {
+int MFDomainWrite (MFDomain_p domain,FILE *outFile) {
 	int objID;
 
 	domain->Swap = 1;
-	if (fwrite (domain,sizeof (MFDomain_t) - sizeof (MFObject_t *),1,outFile) != 1) {
+	if (fwrite (domain,sizeof (MFDomain_t) - sizeof (MFObject_p),1,outFile) != 1) {
 		CMmsgPrint (CMmsgSysError,"File Writing Error in: %s:%d",__FILE__,__LINE__);
 		return (CMfailed);
 	}
 
 	for (objID = 0;objID < domain->ObjNum;++objID) {
-		if (fwrite (domain->Objects + objID,sizeof (MFObject_t) - 2 * sizeof (MFObject_t *),1,outFile) != 1) {
+		if (fwrite (domain->Objects + objID,sizeof (MFObject_t) - 2 * sizeof (MFObject_p),1,outFile) != 1) {
 			CMmsgPrint (CMmsgSysError,"File Writng Error in: %s:%d",__FILE__,__LINE__);
 			return (CMfailed);
 		}

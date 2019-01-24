@@ -18,7 +18,7 @@ bfekete@ccny.cuny.edu
 #include <MF.h>
 #include <time.h>
 
-static MFDomain_t *_MFDomain    = (MFDomain_t *) NULL;
+static MFDomain_p _MFDomain    = (MFDomain_p) NULL;
 static MFFunction *_MFFunctions = (MFFunction *) NULL;
 static int _MFFunctionNum = 0;
 
@@ -65,7 +65,7 @@ float MFModelGetLength (int itemID) {
 
 int MFModelGetDownLink (int itemID,size_t linkNum) {
 	if (itemID < 0) return (CMfailed);
-	if (_MFDomain != (MFDomain_t *) NULL) return (CMfailed);
+	if (_MFDomain != (MFDomain_p) NULL) return (CMfailed);
 	if (_MFDomain->ObjNum <= itemID)  return (CMfailed);
 	if (_MFDomain->Objects [itemID].DLinkNum <= linkNum) return (CMfailed);
 
@@ -78,19 +78,19 @@ typedef struct varEntry_s {
 	bool InUse;
 	char *Name;
 	char *Path;
-} varEntry_t;
+} varEntry_t, *varEntry_p;
 
-static varEntry_t *_MFModelVarEntryNew (varEntry_t *varEntries, int entryID, const char *name, const char *path) {
-	varEntries = (varEntry_t *) realloc (varEntries,sizeof (varEntry_t)  * (entryID + 1));
-	if (varEntries == (varEntry_t *) NULL) {
+static varEntry_p _MFModelVarEntryNew (varEntry_p varEntries, int entryID, const char *name, const char *path) {
+	varEntries = (varEntry_p) realloc (varEntries,sizeof (varEntry_t)  * (entryID + 1));
+	if (varEntries == (varEntry_p) NULL) {
 		CMmsgPrint (CMmsgSysError,"Memory Allocation Error in: %s:%d",__FILE__,__LINE__);
-		return ((varEntry_t *) NULL);
+		return ((varEntry_p) NULL);
 	}
 	varEntries [entryID].Name  = (char *) malloc (strlen (name) + 1);
 	varEntries [entryID].Path  = (char *) malloc (strlen (path) + 1);
 	if ((varEntries [entryID].Name == (char *) NULL) || (varEntries [entryID].Path == (char *) NULL)) {
 		CMmsgPrint (CMmsgSysError,"Memory Allocation Error in: %s:%d",__FILE__,__LINE__);
-        return ((varEntry_t *) NULL);
+        return ((varEntry_p) NULL);
 	}
 	strcpy (varEntries [entryID].Name, name);
 	strcpy (varEntries [entryID].Path, path);
@@ -100,14 +100,14 @@ static varEntry_t *_MFModelVarEntryNew (varEntry_t *varEntries, int entryID, con
 	return (varEntries);
 }
 
-static varEntry_t *_MFModelVarEntryFind (varEntry_t *varEntries, int varEntryNum, const char *name) {
+static varEntry_p _MFModelVarEntryFind (varEntry_p varEntries, int varEntryNum, const char *name) {
 	int i;
 
 	for (i = 0; i < varEntryNum; ++i) if (strcmp (varEntries [i].Name,name) == 0) return (varEntries + i);
-	return ((varEntry_t *) NULL);
+	return ((varEntry_p) NULL);
 }
 
-static void _MFModelVarEntriesFree (varEntry_t *varEntries, int varEntryNum) {
+static void _MFModelVarEntriesFree (varEntry_p varEntries, int varEntryNum) {
 	int i;
 	if (varEntryNum > 0) {
 		for (i = 0; i < varEntryNum; ++i) {
@@ -120,10 +120,10 @@ static void _MFModelVarEntriesFree (varEntry_t *varEntries, int varEntryNum) {
 
 static void _MFModelVarPrintOut (const char *label) {
     int varID;
-    MFVariable_t *var;
+    MFVariable_p var;
 
     CMmsgPrint (CMmsgInfo, "ID  %10s %30s[%10s] %6s %5s NStep %3s %4s %8s Output", label, "Variable","Unit","Type", "TStep", "Set", "Flux", "Initial");
-    for (var = MFVarGetByID (varID = 1);var != (MFVariable_t *) NULL;var = MFVarGetByID (++varID))
+    for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID))
         if ((strncmp (var->Name,"__",2) != 0) || var->Initial)
             CMmsgPrint (CMmsgInfo, "%3i %10s %30s[%10s] %6s %5s %5d %3s %4s %8s %6s",
                         varID,var->InDate,var->Name,var->Unit,MFVarTypeString (var->Type),MFDateTimeStepString (var->TStep),var->NStep,
@@ -134,12 +134,12 @@ static int _MFModelParse (int argc, char *argv [],int argNum, int (*mainDefFunc)
 	bool resolved = true;
 	int argPos, ret, help = false;
 	int i, varID;
-	varEntry_t *inputVars  = (varEntry_t *) NULL;
-	varEntry_t *outputVars = (varEntry_t *) NULL;
-	varEntry_t *stateVars  = (varEntry_t *) NULL;
-	varEntry_t *varEntry;
+	varEntry_p inputVars  = (varEntry_p) NULL;
+	varEntry_p outputVars = (varEntry_p) NULL;
+	varEntry_p stateVars  = (varEntry_p) NULL;
+	varEntry_p varEntry;
 	int inputVarNum = 0, outputVarNum = 0, stateVarNum = 0;
-	MFVariable_t *var;
+	MFVariable_p var;
     bool _MFOptionTestInUse ();
 
 	*testOnly = false;
@@ -156,7 +156,7 @@ static int _MFModelParse (int argc, char *argv [],int argNum, int (*mainDefFunc)
 			}
 			argv [argPos][i] = '\0';
             inputVars = _MFModelVarEntryNew (inputVars, inputVarNum, argv [argPos],argv [argPos] + i + 1);
-            if (inputVars == (varEntry_t *) NULL) return (CMfailed); else inputVarNum++;
+            if (inputVars == (varEntry_p) NULL) return (CMfailed); else inputVarNum++;
             if ((argNum = CMargShiftLeft(argPos,argv,argNum)) <= argPos) break;
 			continue;
 		}
@@ -172,7 +172,7 @@ static int _MFModelParse (int argc, char *argv [],int argNum, int (*mainDefFunc)
 			}
 			argv [argPos][i] = '\0';
 			outputVars = _MFModelVarEntryNew (outputVars, outputVarNum, argv [argPos],argv [argPos] + i + 1);
-			if (outputVars == (varEntry_t *) NULL) return (CMfailed); else outputVarNum++;
+			if (outputVars == (varEntry_p) NULL) return (CMfailed); else outputVarNum++;
 			if ((argNum = CMargShiftLeft(argPos,argv,argNum)) <= argPos) break;
 			continue;
 	 	}
@@ -189,7 +189,7 @@ static int _MFModelParse (int argc, char *argv [],int argNum, int (*mainDefFunc)
 			argv [argPos][i] = '\0';
             CMmsgPrint  (CMmsgDebug,"Output variable [%s]: %s at: %s:%d",argv [argPos],argv[argPos]+i+1,__FILE__,__LINE__);
 			stateVars = _MFModelVarEntryNew (stateVars, stateVarNum, argv [argPos],argv [argPos] + i + 1);
-			if (stateVars == (varEntry_t *) NULL) return (CMfailed); else stateVarNum++;
+			if (stateVars == (varEntry_p) NULL) return (CMfailed); else stateVarNum++;
 			if ((argNum = CMargShiftLeft(argPos,argv,argNum)) <= argPos) break;
 			continue;
 	 	}
@@ -289,8 +289,8 @@ static int _MFModelParse (int argc, char *argv [],int argNum, int (*mainDefFunc)
 		return (CMfailed);
 	}
 
-	for (var = MFVarGetByID (varID = 1);var != (MFVariable_t *) NULL;var = MFVarGetByID (++varID)) {
-		if ((varEntry = _MFModelVarEntryFind (inputVars,  inputVarNum,  var->Name))  != (varEntry_t *) NULL) {
+	for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID)) {
+		if ((varEntry = _MFModelVarEntryFind (inputVars,  inputVarNum,  var->Name))  != (varEntry_p) NULL) {
             if (var->Initial) {
                 var->InputPath = varEntry->Path;
                 varEntry->InUse = true;
@@ -311,11 +311,11 @@ static int _MFModelParse (int argc, char *argv [],int argNum, int (*mainDefFunc)
             if (!testOnly) CMmsgPrint (CMmsgInfo,"Unresolved variable: %s", var->Name);
             resolved = false;
 		}
-		if ((varEntry = _MFModelVarEntryFind (outputVars, outputVarNum, var->Name)) != (varEntry_t *) NULL) {
+		if ((varEntry = _MFModelVarEntryFind (outputVars, outputVarNum, var->Name)) != (varEntry_p) NULL) {
 			varEntry->InUse = true;
 			var->OutputPath = varEntry->Path;
 		}
-		if ((varEntry = _MFModelVarEntryFind (stateVars,  stateVarNum,  var->Name)) != (varEntry_t *) NULL) {
+		if ((varEntry = _MFModelVarEntryFind (stateVars,  stateVarNum,  var->Name)) != (varEntry_p) NULL) {
             if (var->Initial) {
                 varEntry->InUse = true;
                 var->StatePath = varEntry->Path;
@@ -350,10 +350,10 @@ static int _MFModelParse (int argc, char *argv [],int argNum, int (*mainDefFunc)
 
 static void _MFUserFunc (size_t threadId, size_t objectId, void *commonPtr) {
 	int iFunc, varID, link, uLink;
-	MFVariable_t *var;
+	MFVariable_p var;
 	float value, weight;
 
-	for (var = MFVarGetByID (varID = 1);var != (MFVariable_t *) NULL;var = MFVarGetByID (++varID))
+	for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID))
 		if (var->Route) {
 // I -think- all WBM routed variables are considered to be extensive. Intensive variables are
 // computed within modules I THINK!. Weighing code here assumes this.
@@ -374,18 +374,18 @@ typedef struct MFsingleIO_s {
     pthread_cond_t  Cond;
     bool            Cont;
     int             Ret;
-} MFsingleIO_t;
+} MFsingleIO_t, *MFsingleIO_p;
 
 static void *_MFInputSingleThreadWork (void *dataPtr) {
     int varID;
-    MFsingleIO_t *io = (MFsingleIO_t *) dataPtr;
-    MFVariable_t *var;
+    MFsingleIO_p io = (MFsingleIO_p) dataPtr;
+    MFVariable_p var;
 
     pthread_mutex_lock(&(io->Mutex));
     while (io->Cont) {
         io->Ret = CMsucceeded;
-        for (var = MFVarGetByID (varID = 1);var != (MFVariable_t *) NULL;var = MFVarGetByID (++varID)) {
-            if (var->InStream != (MFDataStream_t *) NULL)
+        for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID)) {
+            if (var->InStream != (MFDataStream_p) NULL)
                 if (MFdsRecordRead(var) == CMfailed) io->Ret = CMfailed;
         }
         pthread_cond_wait (&(io->Cond), &(io->Mutex));
@@ -396,15 +396,15 @@ static void *_MFInputSingleThreadWork (void *dataPtr) {
 
 static void *_MFOutputSingleThreadWork (void *dataPtr) {
     int varID;
-    MFsingleIO_t *io = (MFsingleIO_t *) dataPtr;
-    MFVariable_t *var;
+    MFsingleIO_p io = (MFsingleIO_p) dataPtr;
+    MFVariable_p var;
 
     pthread_mutex_lock(&(io->Mutex));
     do {
         pthread_cond_wait (&(io->Cond), &(io->Mutex));
         io->Ret = CMsucceeded;
-        for (var = MFVarGetByID (varID = 1);var != (MFVariable_t *) NULL;var = MFVarGetByID (++varID))
-            if (var->OutStream != (MFDataStream_t *) NULL)
+        for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID))
+            if (var->OutStream != (MFDataStream_p) NULL)
                 if (MFdsRecordWrite(var) == CMfailed) io->Ret = CMfailed;
     } while (io->Cont);
     pthread_mutex_unlock(&(io->Mutex));
@@ -412,7 +412,7 @@ static void *_MFOutputSingleThreadWork (void *dataPtr) {
 }
 
 static void *_MFInputMultiThreadWork (void *dataPtr) {
-    MFVariable_t *var = (MFVariable_t *) dataPtr;
+    MFVariable_p var = (MFVariable_p) dataPtr;
 
     pthread_mutex_lock(&(var->InMutex));
     while (var->Read) {
@@ -424,7 +424,7 @@ static void *_MFInputMultiThreadWork (void *dataPtr) {
 }
 
 static void *_MFOutputMultiThreadWork (void *dataPtr) {
-    MFVariable_t *var = (MFVariable_t *) dataPtr;
+    MFVariable_p var = (MFVariable_p) dataPtr;
 
     pthread_mutex_lock(&(var->OutMutex));
     do {
@@ -440,13 +440,13 @@ enum { MFparIOnone, MFparIOsingle, MFparIOmulti };
 int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
 	FILE *inFile;
 	int i, varID, ret = CMsucceeded, timeStep;
-    size_t *dlinks, taskId;
+    size_t * dlinks, taskId;
 	char *startDate = (char *) NULL, *endDate = (char *) NULL, *domainFileName = (char *) NULL;
     const char *bifurFileName = (char *) NULL;
 	char dateCur [MFDateStringLength], dateNext [MFDateStringLength], *climatologyStr;
 	bool testOnly;
     void *buffer, *status;
-	MFVariable_t *var;
+	MFVariable_p var;
 	time_t sec;
 	size_t threadsNum = CMthreadProcessorNum ();
 	CMthreadTeam_t team;
@@ -489,21 +489,21 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
 		CMmsgPrint (CMmsgAppError,"%s: Template Coverage [%s] Opening error!",CMfileName (argv [0]),argv [1]);
 		return (CMfailed);
 	}
-	if ((_MFDomain = MFDomainRead (inFile)) == (MFDomain_t *) NULL)	return (CMfailed);
+	if ((_MFDomain = MFDomainRead (inFile)) == (MFDomain_p) NULL)	return (CMfailed);
     if ((bifurFileName = MFOptionGet(MFBifurcationOpt)) != (char *) NULL) {
         if (MFDomainSetBifurcations(_MFDomain, bifurFileName) == CMfailed) return (CMfailed);
     }
 
-	for (var = MFVarGetByID (varID = 1);var != (MFVariable_t *) NULL;var = MFVarGetByID (++varID)) {
+	for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID)) {
 		var->ItemNum = _MFDomain->ObjNum;
         if (var->InputPath != (char *) NULL) {
-            if ((var->InStream = MFDataStreamOpen(var->InputPath, "r")) == (MFDataStream_t *) NULL) return (CMfailed);
+            if ((var->InStream = MFDataStreamOpen(var->InputPath, "r")) == (MFDataStream_p) NULL) return (CMfailed);
             if (var->Initial) {
                 strcpy (var->InDate, climatologyStr);
                 var->Read = true;
                 if (MFdsRecordRead(var)              == CMfailed) return (CMfailed);
                 if (MFDataStreamClose(var->InStream) == CMfailed) return (CMfailed);
-                var->InStream   = (MFDataStream_t *) NULL;
+                var->InStream   = (MFDataStream_p) NULL;
                 var->ProcBuffer = var->InBuffer;
             }
             else {
@@ -549,7 +549,7 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
         }
         if (var->Flux) sprintf (var->Unit + strlen(var->Unit), "/%s", MFDateTimeStepUnit(var->TStep));
         if (var->OutputPath != (char *) NULL) {
-            if ((var->OutStream = MFDataStreamOpen(var->OutputPath,"w")) == (MFDataStream_t *) NULL) return (CMfailed);
+            if ((var->OutStream = MFDataStreamOpen(var->OutputPath,"w")) == (MFDataStream_p) NULL) return (CMfailed);
             if (parallelIO == MFparIOnone) var->OutBuffer = var->ProcBuffer;
         }
 	}
@@ -591,8 +591,8 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
             case MFparIOsingle:
                 pthread_mutex_lock(&(inIO.Mutex));
                 if (inIO.Ret == CMfailed) return (CMfailed);
-                for (var = MFVarGetByID (varID = 1); var != (MFVariable_t *) NULL; var = MFVarGetByID(++varID)) {
-                    if (var->InStream != (MFDataStream_t *) NULL) {
+                for (var = MFVarGetByID (varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID)) {
+                    if (var->InStream != (MFDataStream_p) NULL) {
                         memcpy (var->ProcBuffer, var->InBuffer, var->ItemNum * MFVarItemSize(var->Type));
                         strcpy (var->InDate,  dateNext);
                     }
@@ -603,8 +603,8 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
                 pthread_mutex_unlock  (&(inIO.Mutex));
                 break;
             case MFparIOmulti:
-                for (var = MFVarGetByID(varID = 1); var != (MFVariable_t *) NULL; var = MFVarGetByID(++varID))
-                    if (var->InStream != (MFDataStream_t *) NULL) {
+                for (var = MFVarGetByID(varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID))
+                    if (var->InStream != (MFDataStream_p) NULL) {
                         pthread_mutex_lock(&(var->InMutex));
                         if (var->ReadRet == CMfailed) {
                             CMmsgPrint(CMmsgAppError, "Variable (%s) Reading error!", var->Name);
@@ -627,8 +627,8 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
             case MFparIOsingle:
                 pthread_mutex_lock(&(outIO.Mutex));
                 if (outIO.Ret == CMfailed) return (CMfailed);
-                for (var = MFVarGetByID(varID = 1); var != (MFVariable_t *) NULL; var = MFVarGetByID(++varID))
-                    if (var->OutStream != (MFDataStream_t *) NULL) {
+                for (var = MFVarGetByID(varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID))
+                    if (var->OutStream != (MFDataStream_p) NULL) {
                         if ((var->OutBuffer == (void *) NULL) || (var->OutBuffer == var->ProcBuffer)) {
                             if ((var->OutBuffer = (void *) malloc(var->ItemNum * MFVarItemSize(var->Type))) == (void *) NULL) {
                                 CMmsgPrint(CMmsgSysError, "Variable [%s] allocation error (%s:%d)!", var->Name,__FILE__,__LINE__);
@@ -643,8 +643,8 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
                 pthread_mutex_unlock (&(outIO.Mutex));
                 break;
             case MFparIOmulti:
-                for (var = MFVarGetByID(varID = 1); var != (MFVariable_t *) NULL; var = MFVarGetByID(++varID)) {
-                    if (var->OutStream != (MFDataStream_t *) NULL) {
+                for (var = MFVarGetByID(varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID)) {
+                    if (var->OutStream != (MFDataStream_p) NULL) {
                         if ((var->OutBuffer == (void *) NULL) || (var->OutBuffer == var->ProcBuffer)) {
                             if ((var->OutBuffer = (void *) malloc(var->ItemNum * MFVarItemSize(var->Type))) ==
                                 (void *) NULL) {
@@ -675,15 +675,15 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
                 }
                 break;
             default:
-                for (var = MFVarGetByID(varID = 1); var != (MFVariable_t *) NULL; var = MFVarGetByID(++varID)) {
+                for (var = MFVarGetByID(varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID)) {
                     strcpy (var->OutDate, dateCur);
-                    if (var->OutStream != (MFDataStream_t *) NULL) {
+                    if (var->OutStream != (MFDataStream_p) NULL) {
                         if ((ret = MFdsRecordWrite(var)) == CMfailed) {
                             CMmsgPrint(CMmsgAppError, "Variable (%s) writing error!", var->Name);
                             return (CMfailed);
                         }
                     }
-                    if (var->InStream != (MFDataStream_t *) NULL) {
+                    if (var->InStream != (MFDataStream_p) NULL) {
                         if ((MFDateCompare(startDate, dateNext) < 0) && (MFDateCompare(dateNext,endDate) <= 0)) {
                             strcpy (var->InDate, dateNext);
                             if ((ret = MFdsRecordRead(var)) == CMfailed) {
@@ -708,18 +708,18 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
             pthread_join (outIO.Thread, &status);
             break;
         case MFparIOmulti:
-            for (var = MFVarGetByID (varID = 1);var != (MFVariable_t *) NULL;var = MFVarGetByID (++varID)) {
-                if (var->InStream  != (MFDataStream_t *) NULL) pthread_join (var->InThread,  &status);
-                if (var->OutStream != (MFDataStream_t *) NULL) pthread_join (var->OutThread, &status);
+            for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID)) {
+                if (var->InStream  != (MFDataStream_p) NULL) pthread_join (var->InThread,  &status);
+                if (var->OutStream != (MFDataStream_p) NULL) pthread_join (var->OutThread, &status);
             }
             break;
         default: break;
     }
-	for (var = MFVarGetByID (varID = 1);var != (MFVariable_t *) NULL;var = MFVarGetByID (++varID)) {
-		if (var->InStream  != (MFDataStream_t *) NULL) MFDataStreamClose (var->InStream);
-		if (var->OutStream != (MFDataStream_t *) NULL) MFDataStreamClose (var->OutStream);
+	for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID)) {
+		if (var->InStream  != (MFDataStream_p) NULL) MFDataStreamClose (var->InStream);
+		if (var->OutStream != (MFDataStream_p) NULL) MFDataStreamClose (var->OutStream);
         if (var->StatePath != (char *) NULL) {
-            if ((var->OutStream = MFDataStreamOpen (var->StatePath,"w")) == (MFDataStream_t *) NULL) ret = CMfailed;
+            if ((var->OutStream = MFDataStreamOpen (var->StatePath,"w")) == (MFDataStream_p) NULL) ret = CMfailed;
             var->OutBuffer = var->ProcBuffer;
             strcpy (var->OutDate,dateCur);
 			if (MFdsRecordWrite(var) == CMfailed) {

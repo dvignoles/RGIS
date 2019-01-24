@@ -20,9 +20,9 @@ typedef struct MFOption_s {
 	char *Name;
 	char *Content;
 	bool InUse;
-} MFOption_t;
+} MFOption_t, *MFOption_p;
 
-static MFOption_t *_MFOptions = (MFOption_t *) NULL;
+static MFOption_p _MFOptions = (MFOption_p) NULL;
 static int _MFOptionNum = 0;
 
 bool _MFOptionTestInUse () {
@@ -45,7 +45,7 @@ static int _MFOptionNew (const char *name,const char *content) {
 			CMmsgPrint (CMmsgWarning,"Waring: Ignoring redefinition of option [%s]!",name);
 			return (CMfailed);
 		}
-	if ((_MFOptions = (MFOption_t *) realloc (_MFOptions,(_MFOptionNum + 1) * sizeof (MFOption_t))) == (MFOption_t *) NULL) {
+	if ((_MFOptions = (MFOption_p) realloc (_MFOptions,(_MFOptionNum + 1) * sizeof (MFOption_t))) == (MFOption_p) NULL) {
 		CMmsgPrint (CMmsgSysError,"Memory allocation error in: %s:%d",__FILE__,__LINE__);
 		return (CMfailed);
 	}

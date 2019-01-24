@@ -15,26 +15,26 @@ bfekete@ccny.cuny.edu
 #include <cm.h>
 #include <MF.h>
 
-MFDataStream_t *MFDataStreamOpen (const char *path, const char *mode) {
-	MFDataStream_t *dStream;
+MFDataStream_p MFDataStreamOpen (const char *path, const char *mode) {
+	MFDataStream_p dStream;
 
-	if (path == (char *) NULL) return ((MFDataStream_t *) NULL);
-	if ((dStream = (MFDataStream_t *) malloc (sizeof (MFDataStream_t))) == (MFDataStream_t *) NULL) {
+	if (path == (char *) NULL) return ((MFDataStream_p) NULL);
+	if ((dStream = (MFDataStream_p) malloc (sizeof (MFDataStream_t))) == (MFDataStream_p) NULL) {
 		CMmsgPrint (CMmsgSysError,"Memory allocation error in: %s:%d\n",__FILE__,__LINE__);
-		return (MFDataStream_t *) NULL;
+		return (MFDataStream_p) NULL;
 	}
 	if      (strncmp (path,MFconstStr,strlen (MFconstStr)) == 0) {
 		if (strcmp (mode,"r") == 0) { dStream->Type = MFConst; return (dStream); }
 		CMmsgPrint (CMmsgAppError,"Error: Invalid output data stream [%s] in: %s:%d\n",path + strlen (MFconstStr),__FILE__,__LINE__);
 		free (dStream);
-		dStream = (MFDataStream_t *) NULL;
+		dStream = (MFDataStream_p) NULL;
 	}
 	if       (strncmp (path,MFpipeStr,strlen (MFpipeStr)) == 0) {
 		dStream->Type = MFPipe;
 		if ((dStream->Handle.File = popen (path + strlen (MFpipeStr),mode)) == (FILE *) NULL) {
 			CMmsgPrint (CMmsgSysError,"Error: Opening datastream pipe [%s] in: %s:%d\n",path + strlen (MFpipeStr),__FILE__,__LINE__);
 			free (dStream);
-			dStream = (MFDataStream_t *) NULL;
+			dStream = (MFDataStream_p) NULL;
 		}
 	}
 	else if (strncmp (path,MFfileStr, strlen (MFfileStr)) == 0) {
@@ -42,20 +42,20 @@ MFDataStream_t *MFDataStreamOpen (const char *path, const char *mode) {
 		if ((dStream->Handle.File = fopen (path + strlen (MFfileStr),mode)) == (FILE *) NULL) {
 			CMmsgPrint (CMmsgSysError,"Error: Opening datastream file [%s] in: %s:%d\n",path + strlen (MFfileStr),__FILE__,__LINE__);
 			free (dStream);
-			dStream = (MFDataStream_t *) NULL;
+			dStream = (MFDataStream_p) NULL;
 		}
 	}
 	else {
 		CMmsgPrint (CMmsgAppError,"Error: Unknown datastream type [%s]!\n",path);
 		free (dStream);
-		dStream = (MFDataStream_t *) NULL;
+		dStream = (MFDataStream_p) NULL;
 	}
 	return (dStream);
 }
 
-int MFDataStreamClose (MFDataStream_t *dStream)
+int MFDataStreamClose (MFDataStream_p dStream)
 	{
-	if ((dStream == (MFDataStream_t *) NULL) || (dStream->Handle.File == (FILE *) NULL)) return (CMsucceeded);
+	if ((dStream == (MFDataStream_p) NULL) || (dStream->Handle.File == (FILE *) NULL)) return (CMsucceeded);
 	switch (dStream->Type) {
 		case MFFile: return (fclose (dStream->Handle.File));
 		case MFPipe: return (pclose (dStream->Handle.File));
@@ -63,7 +63,7 @@ int MFDataStreamClose (MFDataStream_t *dStream)
 	return (CMsucceeded);
 }
 
-CMreturn MFdsHeaderRead (MFdsHeader_t *header,FILE *inFile) {
+CMreturn MFdsHeaderRead (MFdsHeader_p header,FILE *inFile) {
 	MFdsHeader_t inHeader;
 
 	if ((inFile == (FILE *) NULL) || (fread (&inHeader,sizeof (MFdsHeader_t),1,inFile) != 1)) return (CMfailed);
@@ -83,7 +83,7 @@ CMreturn MFdsHeaderRead (MFdsHeader_t *header,FILE *inFile) {
 	return (CMsucceeded);
 }
 
-CMreturn MFdsHeaderWrite (MFdsHeader_t *header,FILE *outFile) {
+CMreturn MFdsHeaderWrite (MFdsHeader_p header,FILE *outFile) {
 
 	if (outFile == (FILE *) NULL) return (CMfailed);
 
@@ -95,7 +95,7 @@ CMreturn MFdsHeaderWrite (MFdsHeader_t *header,FILE *outFile) {
 	return (CMsucceeded);
 }
 
-CMreturn MFdsRecordRead (MFVariable_t *var) {
+CMreturn MFdsRecordRead (MFVariable_p var) {
 	int i, sLen, readNum = 0;
 	MFdsHeader_t header;
 
@@ -254,7 +254,7 @@ CMreturn MFdsRecordRead (MFVariable_t *var) {
 	return (CMsucceeded);
 }
 
-CMreturn MFdsRecordWrite (MFVariable_t *var) {
+CMreturn MFdsRecordWrite (MFVariable_p var) {
 	MFdsHeader_t header;
 
 	header.Type    = var->Type;

@@ -16,11 +16,11 @@ bfekete@ccny.cuny.edu
 #include <cm.h>
 #include <MF.h>
 
-static MFVariable_t *_MFVariables = (MFVariable_t *) NULL;
+static MFVariable_p _MFVariables = (MFVariable_p) NULL;
 static int _MFVariableNum = 0;
 
-MFVariable_t *MFVarGetByID (int id) {
-	return ((id > 0) && (id <= _MFVariableNum) ? _MFVariables + id - 1: (MFVariable_t *) NULL); // TODO assert() !!
+MFVariable_p MFVarGetByID (int id) {
+	return ((id > 0) && (id <= _MFVariableNum) ? _MFVariables + id - 1: (MFVariable_p) NULL); // TODO assert() !!
 }
 
 char *MFVarTypeString (int type) {
@@ -38,12 +38,12 @@ char *MFVarTypeString (int type) {
 	return ("");
 }
 
-static MFVariable_t *_MFVarNewEntry (const char *name) {
-	MFVariable_t *var;
-	_MFVariables = (MFVariable_t *) realloc (_MFVariables,(_MFVariableNum + 1) * sizeof (MFVariable_t));
-	if (_MFVariables == (MFVariable_t *) NULL) {
+static MFVariable_p _MFVarNewEntry (const char *name) {
+	MFVariable_p var;
+	_MFVariables = (MFVariable_p) realloc (_MFVariables,(_MFVariableNum + 1) * sizeof (MFVariable_t));
+	if (_MFVariables == (MFVariable_p) NULL) {
 	 	CMmsgPrint (CMmsgSysError,"Error: Memory allocation error in: %s:%d",__FILE__,__LINE__);
-		return ((MFVariable_t *) NULL);
+		return ((MFVariable_p) NULL);
 	}
 	var = _MFVariables + _MFVariableNum;
 	var->ID = _MFVariableNum + 1;
@@ -60,8 +60,8 @@ static MFVariable_t *_MFVarNewEntry (const char *name) {
 	var->InputPath  = (char *) NULL;
 	var->OutputPath = (char *) NULL;
 	var->StatePath  = (char *) NULL;
-	var->InStream   = (MFDataStream_t *) NULL;
-	var->OutStream  = (MFDataStream_t *) NULL;
+	var->InStream   = (MFDataStream_p) NULL;
+	var->OutStream  = (MFDataStream_p) NULL;
 	var->TStep      = MFTimeStepYear;
     var->NStep      = 1;
 	var->Set        = false;
@@ -76,20 +76,20 @@ static MFVariable_t *_MFVarNewEntry (const char *name) {
 	return (var);
 }
 
-static MFVariable_t *_MFVarFindEntry (const char *name) {
+static MFVariable_p _MFVarFindEntry (const char *name) {
 	int i;
 
 	for (i = 0;i < _MFVariableNum;++i) if (strcmp (_MFVariables [i].Name,name) == 0) break;
 	if (i < _MFVariableNum) return (_MFVariables + i);
-	return ((MFVariable_t *) NULL);
+	return ((MFVariable_p) NULL);
 }
 
 
 int MFVarGetID (char *name,char *unit,int type, bool flux, bool initial) {
-	MFVariable_t *var;
+	MFVariable_p var;
 
-	if ((var = _MFVarFindEntry (name)) == (MFVariable_t *) NULL) {
-		if ((var = _MFVarNewEntry (name)) == (MFVariable_t *) NULL)
+	if ((var = _MFVarFindEntry (name)) == (MFVariable_p) NULL) {
+		if ((var = _MFVarNewEntry (name)) == (MFVariable_p) NULL)
 			return (CMfailed);
 		if (type == MFRoute) var->Route = true;
 		var->Type = type == MFInput ? MFInput : MFOutput;
@@ -141,7 +141,7 @@ int MFVarGetID (char *name,char *unit,int type, bool flux, bool initial) {
 	return (var->ID);
 }
 
-static bool _MFVarTestMissingVal (MFVariable_t *var,int itemID)
+static bool _MFVarTestMissingVal (MFVariable_p var,int itemID)
 	{
 	switch (var->Type) {
 		case MFByte:   return ((int) (((char *)  var->ProcBuffer) [itemID]) == var->Missing.Int);
@@ -156,9 +156,9 @@ static bool _MFVarTestMissingVal (MFVariable_t *var,int itemID)
 
 bool MFVarTestMissingVal (int id,int itemID)
 	{
-	MFVariable_t *var;
+	MFVariable_p var;
 
-	if ((var = MFVarGetByID (id)) == (MFVariable_t *) NULL)  {
+	if ((var = MFVarGetByID (id)) == (MFVariable_p) NULL)  {
 		CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%d] in: %s:%d",id,__FILE__,__LINE__);
 		return (true);
 	}
@@ -171,9 +171,9 @@ bool MFVarTestMissingVal (int id,int itemID)
 
 void MFVarSetMissingVal (int id, int itemID)
 	{
-	MFVariable_t *var;
+	MFVariable_p var;
 
-	if (((var = MFVarGetByID (id)) == (MFVariable_t *) NULL) || (itemID < 0) || (itemID >= var->ItemNum)) {
+	if (((var = MFVarGetByID (id)) == (MFVariable_p) NULL) || (itemID < 0) || (itemID >= var->ItemNum)) {
 		CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%d,%d] in: %s:%d\n",id,itemID,__FILE__,__LINE__);
 		return;
 	}
@@ -187,9 +187,9 @@ void MFVarSetMissingVal (int id, int itemID)
 }
 
 void MFVarSetFloat (int id,int itemID,double val) {
-	MFVariable_t *var;
+	MFVariable_p var;
 
-	if (((var = MFVarGetByID (id)) == (MFVariable_t *) NULL) || (itemID < 0) || (itemID >= var->ItemNum)) {
+	if (((var = MFVarGetByID (id)) == (MFVariable_p) NULL) || (itemID < 0) || (itemID >= var->ItemNum)) {
 		CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%d,%d] in: MFVarSetFloat ()\n",id,itemID);
 		return;
 	}
@@ -210,9 +210,9 @@ void MFVarSetFloat (int id,int itemID,double val) {
 
 double MFVarGetFloat (int id,int itemID,double missingVal) {
 	double val;
-	MFVariable_t *var;
+	MFVariable_p var;
 
-	if (((var = MFVarGetByID (id)) == (MFVariable_t *) NULL) || (itemID < 0) || (itemID >= var->ItemNum)) {
+	if (((var = MFVarGetByID (id)) == (MFVariable_p) NULL) || (itemID < 0) || (itemID >= var->ItemNum)) {
 		CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%d,%d] in: MFVarGetFloat ()\n",id,itemID);
 		return (MFDefaultMissingFloat);
 	}
@@ -233,9 +233,9 @@ double MFVarGetFloat (int id,int itemID,double missingVal) {
 }
 
 void MFVarSetInt (int id,int itemID,int val) {
-	MFVariable_t *var;
+	MFVariable_p var;
 
-	if (((var = MFVarGetByID (id)) == (MFVariable_t *) NULL) || (itemID < 0) || (itemID >= var->ItemNum)) {
+	if (((var = MFVarGetByID (id)) == (MFVariable_p) NULL) || (itemID < 0) || (itemID >= var->ItemNum)) {
 		CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%d,%d] in: %s:%d\n",id,itemID,__FILE__,__LINE__);
 		return;
 	}
@@ -256,9 +256,9 @@ void MFVarSetInt (int id,int itemID,int val) {
 
 int MFVarGetInt (int id,int itemID, int missingVal) {
 	int val;
-	MFVariable_t *var;
+	MFVariable_p var;
 
-	if (((var = MFVarGetByID (id)) == (MFVariable_t *) NULL) || (itemID < 0) || (itemID >= var->ItemNum)) {
+	if (((var = MFVarGetByID (id)) == (MFVariable_p) NULL) || (itemID < 0) || (itemID >= var->ItemNum)) {
 		CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%d,%d] in: %s:%d\n",id,itemID,__FILE__,__LINE__);
 		return (MFDefaultMissingInt);
 	}

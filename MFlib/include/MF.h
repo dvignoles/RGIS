@@ -68,7 +68,7 @@ typedef struct MFDataStream_s {
     pthread_t Thread;
     pthread_mutex_t Mutex;
     pthread_cond_t Cond;
-} MFDataStream_t;
+} MFDataStream_t, *MFDataStream_p;
 
 typedef struct MFdsHeader_s {
     short Swap, Type;
@@ -78,7 +78,7 @@ typedef struct MFdsHeader_s {
         double Float;
     } Missing;
     char Date[MFDateStringLength];
-} MFdsHeader_t;
+} MFdsHeader_t, *MFdsHeader_p;
 
 #define MFconstStr "const:"
 #define MFfileStr  "file:"
@@ -108,7 +108,7 @@ typedef struct MFVariable_s {
     pthread_cond_t  InCond,    OutCond;
     int             ReadRet,   WriteRet;
     bool   Read,    LastWrite;
-} MFVariable_t;
+} MFVariable_t, *MFVariable_p;
 
 typedef void (*MFFunction)(int);
 
@@ -160,13 +160,13 @@ typedef struct MFObject_s {
     float Area, Length;
     size_t *DLinks, *ULinks;
     float *DWeights, *UWeights;
-} MFObject_t;
+} MFObject_t, *MFObject_p;
 
 typedef struct MFDomain_s {
     short Swap, Type;
     int ObjNum;
     MFObject_t *Objects;
-} MFDomain_t;
+} MFDomain_t, *MFDomain_p;
 
 MFDomain_t *MFDomainRead (FILE *);
 int  MFDomainWrite(MFDomain_t *, FILE *);
