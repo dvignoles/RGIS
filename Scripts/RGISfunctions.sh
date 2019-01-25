@@ -1521,7 +1521,7 @@ function RGISdirectory ()
 function RGISfileExtension ()
 {
 	local variable="${1}"
-	case "$$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
+	case "$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
 		(network)
 			local extension="gdbn"
 		;;
