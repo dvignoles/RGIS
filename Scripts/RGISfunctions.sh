@@ -1525,7 +1525,7 @@ function RGISfileExtension ()
 		(network)
 			local extension="gdbn"
 		;;
-		(confluence)
+		(confluence|crossing-*)
 			local extension="gdbp"
 		;;
 		(continents|countries|states|counties|ocean_basins|subbasin|hydro_unit)
