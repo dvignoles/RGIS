@@ -72,9 +72,9 @@ function RGIScase ()
 
 function RGISlookupSubject ()
 {
-	local variable=$(echo "${1}" | tr "[A-Z]" "[a-z]")
+    local variable="${1}"
 
-	case "${variable}" in
+	case "$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
 		(air_temperature)                            #  0
 			echo "AirTemperature"
 		;;
@@ -377,9 +377,9 @@ function RGISlookupSubject ()
 
 function _RGISlookupFullName ()
 {
-	local variable=$(echo "${1}" | tr "[A-Z]" "[a-z]")
+    local variable="${1}"
 
-	case "${variable}" in
+	case "$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
 		(air_temperature)                             #  0
 			echo "Air Temperature"
 		;;
@@ -682,9 +682,9 @@ function _RGISlookupFullName ()
 
 function RGISlookupShadeset ()
 {
-	local variable=$(echo "${1}" | tr "[A-Z]" "[a-z]")
+    local variable="${1}"
 
-	case "${variable}" in
+	case "$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
 		(air_temperature|max_air_temperature|min_air_temperature) # 0 1 2
 			echo "blue-to-red"
 		;;
@@ -975,9 +975,9 @@ function RGISlookupShadeset ()
 
 function RGISlookupAggrMethod ()
 {
-	local variable=$(echo "${1}" | tr "[A-Z]" "[a-z]")
+    local variable="${1}"
 
-	case "${variable}" in
+	case "$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
 		(air_temperature|max_air_temperature|min_air_temperature)  # 0 1 2
 			echo "avg"
 		;;
