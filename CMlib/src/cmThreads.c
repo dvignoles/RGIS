@@ -320,7 +320,7 @@ void CMthreadTeamDestroy (CMthreadTeam_p team) { // Does not free the team point
     void *status;
     struct timeb tbs;
 
-    if (team->ThreadNum > 0) {
+    if (team->ThreadNum > 1) {
         team->JobPtr = (CMthreadJob_p) NULL;
         pthread_mutex_lock     (&(team->SMutex));
         pthread_cond_broadcast (&(team->SCond));
