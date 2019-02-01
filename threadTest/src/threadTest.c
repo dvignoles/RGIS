@@ -1,6 +1,6 @@
 #include <cm.h>
 
-static size_t _Iteration = 10000;
+static size_t _Iteration = 1000000;
 
 static void _UserFunc(size_t threadId, size_t taskId, void *commonPtr) {
     size_t count;
@@ -9,7 +9,7 @@ static void _UserFunc(size_t threadId, size_t taskId, void *commonPtr) {
 
 int main(int argv, char *argc[]) {
     int ret, threadNum = 1;
-    size_t loopNum = 4, timeLoop, taskNum = 10000, taskId;
+    size_t loopNum = 2, timeLoop, taskNum = 10000, taskId;
     size_t _taskId, _taskNum;
     CMthreadTeam_t team;
     CMthreadJob_p job;
@@ -29,13 +29,7 @@ int main(int argv, char *argc[]) {
         CMthreadTeamDestroy(&team);
         return (CMfailed);
     }
- /*   _taskNum = taskNum - 1;
-    for (taskId = 0; taskId < taskNum; ++taskId) {
-        _taskId = (taskId | 0x0000000f);
-        CMthreadJobTaskDependent(job, taskId, _taskId < taskNum ? &_taskId : &_taskNum, 1);
-    }
 
- */
     for (timeLoop = 0; timeLoop < loopNum; ++timeLoop) {
         printf("Time %d\n", (int) timeLoop);
         CMthreadJobExecute(&team, job);
