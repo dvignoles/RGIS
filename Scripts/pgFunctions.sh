@@ -109,19 +109,16 @@ function PGuserName () # Changes username or returns its value
 	fi
 }
 
-function PGuserPassword () # Returns the password from the ~/.pgpass file for a given user. When the database omitted it will pick the first entry for the user.
+function PGuserPassword () # Returns the password from the ~/.pgpass file for a given user.
 {
     	local userName="${1}"
-        local   dbName="${2}"
         local passFile="${HOME}/.pgpass"
 
         if [[ "${userName}" == "" ]]; then local userName="${_GHAASpgUserName}"; fi
-        if [[   "${dbName}" == "" ]]; then local   dbName=".*";         fi
 
         if [[ -f "${passFile}" ]]
         then
-            echo "${_GHAASpgHostName}:${_GHAASpgPortID}:${dbName}"
-            echo "$(cat "${passFile}" | grep "${_GHAASpgHostName}:${_GHAASpgPortID}:${dbName}" | tee grep.txt | sed "s|${_GHAASpgHostName}:${_GHAASpgPortID}:${dbName}:\(.*\):\(.*\)|\2|" | tee sed.txt | head -n 1)"
+            echo "$(cat "${passFile}" | grep "${_GHAASpgHostName}:${_GHAASpgPortID}:.*:${userName}:.*" | sed "s|${_GHAASpgHostName}:${_GHAASpgPortID}:.*:${userName}:\(.*\)|\1|" | head -n 1)"
         else
             echo ""
         fi
@@ -170,23 +167,84 @@ function PGdbName ()
 	local userName="${2}"
 
     if [[ "${userName}" == "" ]]; then local userName="$(PGuserName)"; fi
-    if [[ "${dbName}"   == "" ]]; then local   dbName="${userName}";   fi
-    local sslString="host=${_GHAASpgHostName} dbname=${dbName} user=${userName}"
-	if [[ "${_GHAASpgSSLhostCA}"     != "" ]]; then local sslString="${sslString} sslmode=verify-ca sslrootcert=${_GHAASpgSSLhostCA}";  fi
-	if [[ "${_GHAASpgSSLclientCert}" != "" ]]; then local sslString="${sslString} sslcert=${_GHAASpgSSLclientCert}"; fi
-    if [[ "${_GHAASpgSSLclientKey}"  != "" ]]; then local sslString="${sslString} sslkey=${_GHAASpgSSLclientKey}"; fi
 
+    local sslString="host=${_GHAASpgHostName} dbname=${dbName} user=${userName}"
+    local userPassword="$(PGuserPassword "${userName}")"
+    if [[ "${userPassword}"          != "" ]]; then local sslString="${sslString} password=${userPassword}";                            fi
+	if [[ "${_GHAASpgSSLhostCA}"     != "" ]]; then local sslString="${sslString} sslmode=verify-ca sslrootcert=${_GHAASpgSSLhostCA}";  fi
+	if [[ "${_GHAASpgSSLclientCert}" != "" ]]; then local sslString="${sslString} sslcert=${_GHAASpgSSLclientCert}";                    fi
+    if [[ "${_GHAASpgSSLclientKey}"  != "" ]]; then local sslString="${sslString} sslkey=${_GHAASpgSSLclientKey}";                      fi
     echo "${sslString}"
 }
 
-function PGpolygonColorize ()
+function PGattribTableSQL ()
+{
+	local    caseVal="${1}"
+	local     schema="$(RGIScase "${caseVal}" "${2}")"
+	local    tblname="$(RGIScase "${caseVal}" "${3}")"
+	local    idField="$(RGIScase "${caseVal}" "${4}")"
+	local       geom="${5}"
+
+	echo "DROP TABLE IF EXISTS \"public\".\"temp_tb\";
+          CREATE TABLE \"public\".\"temp_tb\" AS (SELECT * FROM \"${schema}\".\"${tblname}\");
+          ALTER TABLE \"public\".\"temp_tb\" DROP \"geom\";
+ 		  COPY \"public\".\"temp_tb\" TO STDOUT
+ 		  DELIMITER AS '	' NULL AS '-9999' CSV HEADER QUOTE AS '\"';
+ 		  DROP TABLE \"public\".\"temp_tb\";"
+}
+
+function PGpolygonColorizeSQL ()
 {
     local   caseVal="${1}"
-    local    dbName="$(RGIScase "${caseVal}" "${2}")"
-    local    schema="$(RGIScase "${caseVal}" "${3}")"
-    local   tblName="$(RGIScase "${caseVal}" "${4}")"
-    local     field="$(RGIScase "${caseVal}" "${5}")"
+    local    schema="$(RGIScase "${caseVal}" "${2}")"
+    local   tblName="$(RGIScase "${caseVal}" "${3}")"
+    local   geomFLD="$(RGIScase "${caseVal}" "${4}")"
+    local     idFLD="$(RGIScase "${caseVal}" "${5}")"
+    local  colorFLD="$(RGIScase "${caseVal}" "${6}")"
 
+    echo   "DO \$COLORIZE\$
+            DECLARE
+                polygons CURSOR FOR
+                    SELECT \"LeftPoly\".\"${idFLD}\", \"LeftPoly\".\"${geomFLD}\", \"LeftPoly\".\"${colorFLD}\" AS \"${colorFLD}\",
+                            CASE WHEN \"LeftPoly\".\"${colorFLD}\" >  4 THEN \"LeftPoly\".\"${colorFLD}\" - 4
+                                WHEN \"LeftPoly\".\"${colorFLD}\" <= 4 THEN 0 END AS \"hcolor\",
+                            COUNT (\"RightPoly\".\"${colorFLD}\") AS \"tmpNCol\", COUNT (\"LeftPoly\".\"${idFLD}\") AS \"NumNeighbour\"
+                    FROM     \"${schema}\".\"${tblName}\" AS \"LeftPoly\", \"${schema}\".\"${tblName}\" AS \"RightPoly\"
+                    WHERE \"LeftPoly\".\"${idFLD}\" != \"RightPoly\".\"${idFLD}\"
+                    AND    St_Dimension (St_Intersection (\"LeftPoly\".\"${geomFLD}\",\"RightPoly\".\"${geomFLD}\")) > 0
+                    GROUP BY \"LeftPoly\".\"${idFLD}\", \"LeftPoly\".\"${geomFLD}\", \"LeftPoly\".\"${colorFLD}\"
+                    ORDER BY \"hcolor\" DESC, \"tmpNCol\" DESC, \"NumNeighbour\" DESC, \"${colorFLD}\" DESC;
+                colorVAL integer;
+            BEGIN
+                ALTER TABLE \"${schema}\".\"${tblName}\" ADD COLUMN \"${colorFLD}\" INTEGER, ADD COLUMN \"newCOLOR\" INTEGER;
+                UPDATE      \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = 0, \"newCOLOR\" = 0;
+                FOR poly IN polygons LOOP
+                    colorVAL = (SELECT MIN (\"tmpCOLORS\".\"COLOR\")
+                                FROM (SELECT \"public\".\"tmpCOLORS\".\"tmpCOLOR\", COUNT (\"Adjacent_Polygons\".\"${idFLD}\") AS \"NumPoly\"
+                                      FROM \"public\".\"tmpCOLORS\"
+                                      LEFT JOIN (SELECT \"${schema}\".\"${tblName}\".\"${idFLD}\",
+                                                        \"${schema}\".\"${tblName}\".\"${geomFLD}\",
+                                                        \"${schema}\".\"${tblName}\".\"newCOLOR\"
+                                                 FROM   \"${schema}\".\"${tblName}\"
+                                                 WHERE  \"${schema}\".\"${tblName}\".\"${idFLD}\" != \"poly\".\"${idFLD}\"
+                                                 AND  St_Dimension (St_Intersection (\"${schema}\".\"${tblName}\".\"${geomFLD}\", \"poly\".\"${geomFLD}\")) > 0) AS \"Adjacent_Polygons\"
+                                ON  \"public\".\"tmpCOLORS\".\"COLOR\" = \"Adjacent_Polygons\".\"newCOLOR\"
+                                GROUP BY \"public\".\"tmpCOLORS\".\"tmpCOLOR\") AS \"tmpCOLORS\"
+                                WHERE \"tmpCOLORS\".\"tmpCOLOR\" != 0 AND \"NumPoly\" = 0);
+                UPDATE \"${schema}\".\"${tblName}\" SET \"newCOLOR\" = colorVAL WHERE \"${idFLD}\" = \"poly\".\"${idFLD}\";
+            END LOOP;
+            UPDATE \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = \"newCOLOR\";
+            UPDATE \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = 1 WHERE \"${colorFLD}\" = 0;
+            ALTER TABLE \"${schema}\".\"${tblName}\" DROP COLUMN \"newCOLOR\";
+          END;
+          CREATE TABLE \"public\".\"tmpCOLORS\" (\"tmpCOLOR\" INTEGER NOT NULL CONSTRAINT \"tmpCOLOR_pkey\" PRIMARY KEY);
+          INSERT INTO  \"public\".\"tmpCOLORS\" (\"tmpCOLOR\") VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12);
+          \$COLORIZE\$;
+          SELECT   \"${schema}\".\"${tblName}\".\"${colorFLD}\", COUNT (\"${schema}\".\"${tblName}\".\"${idFLD}\")
+          FROM     \"${schema}\".\"${tblName}\"
+          GROUP BY \"${schema}\".\"${tblName}\".\"${colorFLD}\"
+          ORDER BY \"${schema}\".\"${tblName}\".\"${colorFLD}\";
+          DROP TABLE \"public\".\"tmpCOLORS\";"
 }
 
 function PGrasterDimension ()
@@ -240,24 +298,6 @@ function PGrasterDimension ()
 	echo $(echo "(${coord1} - ${coord0}) * 3600 / ${seconds}" | bc)
 }
 
-function PGattribTable ()
-{
-	local    caseVal="${1}"
-	local   database="$(RGIScase "${caseVal}" "${2}")"
-	local     schema="$(RGIScase "${caseVal}" "${3}")"
-	local    tblname="$(RGIScase "${caseVal}" "${4}")"
-	local    idField="$(RGIScase "${caseVal}" "${5}")"
-	local       geom="${7}"
-
-	echo "DROP TABLE IF EXISTS \"public\".\"temp_tb\";
-          CREATE TABLE \"public\".\"temp_tb\" AS (SELECT * FROM \"${schema}\".\"${tblname}\");
-          ALTER TABLE \"public\".\"temp_tb\" DROP \"geom\";
- 		  COPY \"public\".\"temp_tb\" TO STDOUT
- 		  DELIMITER AS '	' NULL AS '-9999' CSV HEADER QUOTE AS '\"';
- 		  DROP TABLE \"public\".\"temp_tb\";" |\
-	psql -q "$(PGdbName "${database}")"
-}
-
 function PGrasterize ()
 {
 	local    caseVal="${1}"
@@ -295,7 +335,8 @@ function PGrasterize ()
 	 echo "${rgisFile}" 
 	 echo "0") | grdImport -b "${rgisFile%.gdbd*}.grd"
 	rm  "${rgisFile%.gdbd*}.tif" "${rgisFile%.gdbd*}.grd.aux.xml" "${rgisFile%.gdbd*}.prj" "${rgisFile%.gdbd*}.grd"
-	PGattribTable "sensitive" "${dbName}" "${schema}" "${tblname}" "${idField}" "${geom}" |\
+	PGattribTableSQL "sensitive" "${schema}" "${tblname}" "${idField}" "${geom}" |\
+	psql -q "$(PGdbName "${dbName}")" |\
 	table2rgis - "${rgisFile%.gdbd*}.gdbt"
 
 	tblJoinTables -t "${schema} ${tblname}" -u "Zones" -a "${rgisFile%.gdbd*}.gdbt" -e "DBItems" -o "DBItems" -r "GridValue" -j "${idField}" "${rgisFile}" - |\
