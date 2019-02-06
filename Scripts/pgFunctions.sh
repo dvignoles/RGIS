@@ -11,35 +11,7 @@ source "${GHAASDIR}/Scripts/RGISfunctions.sh"
 
 if [[ "${PGHOST}" != "" ]]; then export _GHAASpgHostName="${PGHOST}"; else export _GHAASpgHostName="localhost";  fi
 if [[ "${PGPORT}" != "" ]]; then export   _GHAASpgPortID="${PGPORT}"; else export _GHAASpgPortID="5432";         fi
-if [[ "${SSLDIR}" != "" ]]; then export   _GHAASpgSSLdir="${SSLDIR}"; elif [ -e "${HOME}/.pgssl" ]; then export _GHAASpgSSLdir="${HOME}/.pgssl"; else _GHAASpgSSLdir=""; fi
-if [[ "${_GHAASpgSSLdir}" != "" ]]
-then
-    if [[ -e "${_GHAASpgSSLdir}/${_GHAASpgHostName}-ca.pem" ]]
-    then
-        export _GHAASpgSSLhostCA="${_GHAASpgSSLdir}/${_GHAASpgHostName}-ca.pem"
-    else
-        export _GHAASpgSSLhostCA=""
-    fi
-    if [[ -e "${_GHAASpgSSLdir}/client-cert.pem" ]]
-    then
-        export _GHAASpgSSLclientCert="${_GHAASpgSSLdir}/client-cert.pem"
-    else
-        export _GHAASpgSSLclientCert=""
-    fi
-    if [[ -e "${_GHAASpgSSLdir}/client-key.pem" ]]
-    then
-        export _GHAASpgSSLclientKey="${_GHAASpgSSLdir}/client-key.pem"
-    else
-        export _GHAASpgSSLclientKey=""
-    fi
-else
-    export _GHAASpgSSLhostCA=""
-    export _GHAASpgSSLclientCert=""
-    export _GHAASpgSSLclientKey=""
-fi
-
-if [[ "${PGUSER}" != "" ]]
-then export _GHAASpgUserName="${PGUSER}"
+if [[ "${PGUSER}" != "" ]]; then export _GHAASpgUserName="${PGUSER}"
 else
     if [[ -e "${HOME}/.pgpass" ]]
     then
@@ -49,47 +21,95 @@ else
     fi
 fi
 
-function PGhostName () # Changes the hostname when provided as argument and returns the hostname
+export     _GHAASpgSSLhostCA=""
+export _GHAASpgSSLclientCert=""
+export  _GHAASpgSSLclientKey=""
+
+function PGsslDir ()
+{
+    local   sslDir="${1}"
+
+    if [[ "${sslDir}" != "" ]]; then local sslDir="${HOME}/.pgssl"; fi
+    if [[   -e "${sslDir}"  ]]
+    then
+        export _GHAASpgSSLdir="${sslDir}"
+        PGhostName "${_GHAASpgHostName}"
+    else
+        _GHAASpgSSLdir=""
+        echo "Non existing ssl directory: ${sslDir}" > /dev/stderr
+    fi
+}
+
+function PGhostName () # Changes the hostname or returns its value
 {
     local hostName="${1}"
 
 	if [[ "${hostName}" == "" ]]
 	then
-	    local hostName="${_GHAASpgHostName}"
+	    echo "${_GHAASpgHostName}"
 	else
 	    export _GHAASpgHostName="${hostName}"
+        if [[ -e "${_GHAASpgSSLdir}" ]]
+        then
+            if [[ -e "${_GHAASpgSSLdir}/${hostName}-ca.pem" ]]
+            then
+                export _GHAASpgSSLhostCA="${_GHAASpgSSLdir}/${hostName}-ca.pem"
+                PGuserName "${_GHAASpgUserName}"
+            else
+                export _GHAASpgSSLhostCA=""
+            fi
+        else
+            export _GHAASpgSSLhostCA=""
+        fi
 	fi
-
-	echo "${hostName}"
 }
 
-function PGport () # Changes port when provided as argument and returns the port
+function PGport () # Changes port or returns its value
 {
     local portID="${1}"
 
 	if [[ "${portID}" == "" ]]
 	then
-	    local portID="${_GHAASpgPortID}"
+	    echo "${_GHAASpgPortID}"
 	else
 	    export _GHAASpgPortID="${protID}"
 	fi
-	echo "${portID}"
 }
 
-function PGuserName () # Changes username when it is defined as argument otherwise returns the username
+function PGuserName () # Changes username or returns its value
 {
 	local userName="${1}"
 
 	if [[ "${userName}" == "" ]]
 	then
-	    local  userName="${_GHAASpgUserName}"
+	    echo "${_GHAASpgUserName}"
 	else
 	    export _GHAASpgUserName="${userName}"
+        if [[ -e "${_GHAASpgSSLdir}" ]]
+        then
+            if [[ -e "${_GHAASpgSSLdir}/${userName}-cert.pem" ]]
+            then
+                export _GHAASpgSSLclientCert="${_GHAASpgSSLdir}/${userName}-cert.pem"
+            else
+                export _GHAASpgSSLclientCert=""
+                echo "Missing user certificate: ${userName}-cert.pem" > /dev/stderr
+            fi
+
+            if [[ -e "${_GHAASpgSSLdir}/${userName}-key.pem" ]]
+            then
+                export _GHAASpgSSLclientKey="${_GHAASpgSSLdir}/${userName}-key.pem"
+            else
+                export _GHAASpgSSLclientKey=""
+                echo "Missing user key: f${userName}-key.pem" > /dev/stderr
+            fi
+        else
+            export _GHAASpgSSLclientCert=""
+            export  _GHAASpgSSLclientKey=""
+        fi
 	fi
-	echo "${userName}"
 }
 
-function PGuserPassword () # Returns the password from the ~/.pgpass file for a given user. When the database ommitted it will pick the first entry for the user.
+function PGuserPassword () # Returns the password from the ~/.pgpass file for a given user. When the database omitted it will pick the first entry for the user.
 {
     	local userName="${1}"
         local   dbName="${2}"
@@ -107,6 +127,43 @@ function PGuserPassword () # Returns the password from the ~/.pgpass file for a 
         fi
 }
 
+function PGsslHostCA () # Changes the host CA or returns its value
+{
+	local hostCA="${1}"
+
+	if [[ "${hostCA}" == "" ]]
+	then
+    	echo "${_GHAASpgSSLhostCA}"
+	else
+	    export _GHAASpgSSLhostCA="${hostCA}"
+	fi
+}
+
+function PGsslClientCert () # Changes the client certificate or returns its value
+{
+	local clientCert="${1}"
+
+	if [[ "${clientCert}" == "" ]]
+	then
+    	echo "${_GHAASpgSSLclientCert}"
+	else
+	    export _GHAASpgSSLclientCert="${clientCert}"
+	fi
+}
+
+function PGsslClientKey () # Changes the client key or returns its value
+{
+	local clientKey="${1}"
+
+	if [[ "${clientKey}" == "" ]]
+	then
+	    local  clientKey="${_GHAASpgSSLclientKey}"
+    	echo "${clientKey}"
+	else
+	    export _GHAASpgSSLclientKey="${clientKey}"
+	fi
+}
+
 function PGdbName ()
 {
 	local   dbName="${1}"
@@ -114,12 +171,22 @@ function PGdbName ()
 
     if [[ "${userName}" == "" ]]; then local userName="$(PGuserName)"; fi
     if [[ "${dbName}"   == "" ]]; then local   dbName="${userName}";   fi
-    local sslString="dbname=${dbName} user=${userName}"
-    if [[ "${_GHAASpgSSLclientKey}"  != "" ]]; then local sslString="sslkey=${_GHAASpgSSLclientKey}   ${sslString}"; fi
-	if [[ "${_GHAASpgSSLclientCert}" != "" ]]; then local sslString="sslcert=${_GHAASpgSSLclientCert} ${sslString}"; fi
-	if [[ "${_GHAASpgSSLhostCA}"     != "" ]]; then local sslString="sslmode=verify-ca sslrootcert=${_GHAASpgSSLhostCA} ${sslString}";  fi
+    local sslString="host=${_GHAASpgHostName} dbname=${dbName} user=${userName}"
+	if [[ "${_GHAASpgSSLhostCA}"     != "" ]]; then local sslString="${sslString} sslmode=verify-ca sslrootcert=${_GHAASpgSSLhostCA}";  fi
+	if [[ "${_GHAASpgSSLclientCert}" != "" ]]; then local sslString="${sslString} sslcert=${_GHAASpgSSLclientCert}"; fi
+    if [[ "${_GHAASpgSSLclientKey}"  != "" ]]; then local sslString="${sslString} sslkey=${_GHAASpgSSLclientKey}"; fi
 
     echo "${sslString}"
+}
+
+function PGpolygonColorize ()
+{
+    local   caseVal="${1}"
+    local    dbName="$(RGIScase "${caseVal}" "${2}")"
+    local    schema="$(RGIScase "${caseVal}" "${3}")"
+    local   tblName="$(RGIScase "${caseVal}" "${4}")"
+    local     field="$(RGIScase "${caseVal}" "${5}")"
+
 }
 
 function PGrasterDimension ()
@@ -191,52 +258,6 @@ function PGattribTable ()
 	psql -q "$(PGdbName "${database}")"
 }
 
-function RGISsetHeader ()
-{
-	local   rgisArchiv="${1}"
-	local       domain="${2}"
-	local      subject="${3}"
-	local      product="${4}"
-	local   resolution="${5}"
-	local    tStepType="${6}"
-	local        tStep="$(echo "${7}" | tr "[A-Z]" "[a-z]")"
-	local    timeRange="${8}"
-	local      version="${9}"
-	local        title="${8}"
-	local      comment="${10}"
-    local     citation="${11}"
-	local  institution="${12}"
-	local   sourceInst="${13}"
-	local sourcePerson="${14}"
-	
-	rgisFile="$(RGISfilePath "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}" "${timeRange}")"
-	if [[ "${rgisFile}" == "" ]]
-	then
-		echo "Missing ${rgisFile} in RGISsetHeader"
-		return 0
-	fi
-	if [[ "$(which finger)" == "" ]]
-	then
-		local person="Annonymous"
-	else 
-		local person=$(finger $(env | grep "LOGNAME" | sed "s:LOGNAME=::") | grep Name | sed -e "s|.*Name: ||")
-	fi
-
-	if [[ "${tStepType}"    == "" ]]; then local tStepType="static";  fi
-	if [[ "${tStep}"        == "" ]]; then local     tStep="";        fi
-	if [[ "${timeRange}"    == "" ]]; then local timeRange="";        fi
-	if [[ "${version}"      == "" ]]; then local   version="pre0.01"; fi
-
-
-	if [[ "${title}"        == "" ]]; then local        title="$(RGIStitle "${domain}" "${subject}" "${product}" "${resolution}" "static" "" "" "${version}")"; fi
-	if [[ "${comment}"      == "" ]]; then local      comment="${domain} $(_RGISlookupFullName "${subject}") from ${product} at ${resolution}"; fi
-	if [[ "${citation}"     == "" ]]; then local     citation="Pirated ${subject} from ${product}"; fi
-	if [[ "${institution}"  == "" ]]; then local  institution="Advanced Science Research Center at the Graduate Center, CUNY"; fi
-	if [[ "${sourceInst}"   == "" ]]; then local   sourceInst="City College of New York"; fi
-	if [[ "${sourcePerson}" == "" ]]; then local sourcePerson="${person}"; fi
-	setHeader  -t "${title}" -d "${domain}" -u "${subject}" -y "on" -c "${comment}" -i "${citation}" -n "${institution}" -o "${sourceInst}" -p "${sourcePerson}" -v "${version}" "${rgisFile}" "${rgisFile}"
-}
-
 function PGrasterize ()
 {
 	local    caseVal="${1}"
@@ -282,3 +303,5 @@ function PGrasterize ()
 	rm "${rgisFile%.gdbd*}.gdbt"
 	RGISsetHeader "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}" "static" 
 }
+
+if [[ "${GHAASSSLDIR}" != "" ]]; then PGsslDir "${GHAASSSLDIR}"; else export _GHAASpgSSLdir=""; fi

@@ -1767,6 +1767,53 @@ function RGISAppend ()
 	grdAppendLayers -t "${title}" -d "${domain}" -u "${subject}" -v "${version}" -o "${filename}" ${files}
 }
 
+function RGISsetHeader ()
+{
+	local      archive="${1}"
+	local       domain="${2}"
+	local      subject="${3}"
+	local      product="${4}"
+	local   resolution="${5}"
+	local    tStepType="${6}"
+	local        tStep="${7}"
+	local    timeRange="${8}"
+	local      version="${9}"
+	local        title="${8}"
+	local      comment="${10}"
+    local     citation="${11}"
+	local  institution="${12}"
+	local   sourceInst="${13}"
+	local sourcePerson="${14}"
+
+	rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" ${tStepType} ${tStep} ${timeRange})"
+	if [[ "${rgisFile}" == "" ]]
+	then
+		echo "Missing ${rgisFile} in RGISsetHeader"
+		return 0
+	fi
+	if [[ "$(which finger)" == "" ]]
+	then
+		local person="Annonymous"
+	else
+		local person=$(finger $(env | grep "LOGNAME" | sed "s:LOGNAME=::") | grep Name | sed -e "s|.*Name: ||")
+	fi
+
+    local subString=""
+	if [[ "${tStepType}"    == "" ]]; then local tStepType="static";  fi
+	if [[ "${tStep}"        == "" ]]; then local     tStep="";        else local subString="${subString}, ${tStep}";     fi
+	if [[ "${timeRange}"    == "" ]]; then local timeRange="";        else local subString="${subString}, ${timeRange}"; fi
+	if [[ "${version}"      == "" ]]; then local   version="pre0.01"; fi
+	local subString="${resolution}, ${subString}"
+
+	if [[ "${title}"        == "" ]]; then local        title="$(RGIStitle "${domain}" "${subject}" "${product}" \("${subString}"\) "${version}")"; fi
+	if [[ "${comment}"      == "" ]]; then local      comment="${domain} $(_RGISlookupFullName "${subject}") from ${product} at ${resolution}"; fi
+	if [[ "${citation}"     == "" ]]; then local     citation="Pirated ${subject} from ${product}"; fi
+	if [[ "${institution}"  == "" ]]; then local  institution="Advanced Science Research Center at the Graduate Center, CUNY"; fi
+	if [[ "${sourceInst}"   == "" ]]; then local   sourceInst="City College of New York"; fi
+	if [[ "${sourcePerson}" == "" ]]; then local sourcePerson="${person}"; fi
+	setHeader  -t "${title}" -d "${domain}" -u "${subject}" -y "on" -c "${comment}" -i "${citation}" -n "${institution}" -o "${sourceInst}" -p "${sourcePerson}" -v "${version}" "${rgisFile}" "${rgisFile}"
+}
+
 function RGISAggregateTS ()
 {
 	local    archive="${1}"
