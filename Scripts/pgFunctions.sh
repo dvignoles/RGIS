@@ -27,7 +27,7 @@ export  _GHAASpgSSLclientKey=""
 
 function PGsslDir ()
 {
-    local   sslDir="${1}"
+    local   sslDir="${1}"; shift
 
     if [[ "${sslDir}" != "" ]]; then local sslDir="${HOME}/.pgssl"; fi
     if [[   -e "${sslDir}"  ]]
@@ -42,7 +42,7 @@ function PGsslDir ()
 
 function PGhostName () # Changes the hostname or returns its value
 {
-    local hostName="${1}"
+    local hostName="${1}"; shift
 
 	if [[ "${hostName}" == "" ]]
 	then
@@ -66,7 +66,7 @@ function PGhostName () # Changes the hostname or returns its value
 
 function PGport () # Changes port or returns its value
 {
-    local portID="${1}"
+    local portID="${1}"; shift
 
 	if [[ "${portID}" == "" ]]
 	then
@@ -78,7 +78,7 @@ function PGport () # Changes port or returns its value
 
 function PGuserName () # Changes username or returns its value
 {
-	local userName="${1}"
+	local userName="${1}"; sheft
 
 	if [[ "${userName}" == "" ]]
 	then
@@ -111,7 +111,7 @@ function PGuserName () # Changes username or returns its value
 
 function PGuserPassword () # Returns the password from the ~/.pgpass file for a given user.
 {
-    	local userName="${1}"
+    	local userName="${1}"; shift
         local passFile="${HOME}/.pgpass"
 
         if [[ "${userName}" == "" ]]; then local userName="${_GHAASpgUserName}"; fi
@@ -126,7 +126,7 @@ function PGuserPassword () # Returns the password from the ~/.pgpass file for a 
 
 function PGsslHostCA () # Changes the host CA or returns its value
 {
-	local hostCA="${1}"
+	local hostCA="${1}"; shift
 
 	if [[ "${hostCA}" == "" ]]
 	then
@@ -138,7 +138,7 @@ function PGsslHostCA () # Changes the host CA or returns its value
 
 function PGsslClientCert () # Changes the client certificate or returns its value
 {
-	local clientCert="${1}"
+	local clientCert="${1}"; shift
 
 	if [[ "${clientCert}" == "" ]]
 	then
@@ -150,7 +150,7 @@ function PGsslClientCert () # Changes the client certificate or returns its valu
 
 function PGsslClientKey () # Changes the client key or returns its value
 {
-	local clientKey="${1}"
+	local clientKey="${1}"; shift
 
 	if [[ "${clientKey}" == "" ]]
 	then
@@ -163,8 +163,8 @@ function PGsslClientKey () # Changes the client key or returns its value
 
 function PGdbName ()
 {
-	local   dbName="${1}"
-	local userName="${2}"
+	local   dbName="${1}"; shift
+	local userName="${1}"; shift
 
     if [[ "${userName}" == "" ]]; then local userName="$(PGuserName)"; fi
 
@@ -179,10 +179,10 @@ function PGdbName ()
 
 function PGattribTableSQL ()
 {
-	local    caseVal="${1}"
-	local     schema="$(RGIScase "${caseVal}" "${2}")"
-	local    tblname="$(RGIScase "${caseVal}" "${3}")"
-	local    idField="$(RGIScase "${caseVal}" "${4}")"
+	local    caseVal="${1}";                            shift
+	local     schema="$(RGIScase "${caseVal}" "${1}")"; shift
+	local    tblname="$(RGIScase "${caseVal}" "${1}")"; shift
+	local    idField="$(RGIScase "${caseVal}" "${1}")"; shift
 	local       geom="${5}"
 
 	echo "DROP TABLE IF EXISTS \"public\".\"temp_tb\";
@@ -195,12 +195,12 @@ function PGattribTableSQL ()
 
 function PGpolygonColorizeSQL ()
 {
-    local   caseVal="${1}"
-    local    schema="$(RGIScase "${caseVal}" "${2}")"
-    local   tblName="$(RGIScase "${caseVal}" "${3}")"
-    local   geomFLD="$(RGIScase "${caseVal}" "${4}")"
-    local     idFLD="$(RGIScase "${caseVal}" "${5}")"
-    local  colorFLD="$(RGIScase "${caseVal}" "${6}")"
+    local   caseVal="${1}";                            shift
+    local    schema="$(RGIScase "${caseVal}" "${1}")"; shift
+    local   tblName="$(RGIScase "${caseVal}" "${1}")"; shift
+    local   geomFLD="$(RGIScase "${caseVal}" "${1}")"; shift
+    local     idFLD="$(RGIScase "${caseVal}" "${1}")"; shift
+    local  colorFLD="$(RGIScase "${caseVal}" "${1}")"; shift
 
     echo   "DO \$COLORIZE\$
             DECLARE
@@ -249,9 +249,9 @@ function PGpolygonColorizeSQL ()
 
 function PGrasterDimension ()
 {
-	local resolution="${1}"
-	local     coord0="${2}"
-	local     coord1="${3}"
+	local resolution="${1}"; shift
+	local     coord0="${1}"; shift
+	local     coord1="${1}"; shift
 	 
 	case "${resolution}" in
 	("15sec")
@@ -300,22 +300,22 @@ function PGrasterDimension ()
 
 function PGrasterize ()
 {
-	local    caseVal="${1}"
-	local     dbName="$(RGIScase "${caseVal}" "${2}")"
-	local     schema="$(RGIScase "${caseVal}" "${3}")"
-	local    tblname="$(RGIScase "${caseVal}" "${4}")"
-	local    idField="$(RGIScase "${caseVal}" "${5}")"
-	local    initVal="$(RGIScase "${caseVal}" "${6}")"
-	local       geom="$(RGIScase "${caseVal}" "${7}")"
-	local rgisArchiv="${8}"
-	local     domain="${9}"
-	local    subject="${10}"
-	local    product="${11}"
-	local resolution="${12}"
-	local extent_llx="${13}"
-	local extent_lly="${14}"
-	local extent_urx="${15}"
-	local extent_ury="${16}"
+	local    caseVal="${1}";                            shift
+	local     dbName="$(RGIScase "${caseVal}" "${1}")"; shift
+	local     schema="$(RGIScase "${caseVal}" "${1}")"; shift
+	local    tblname="$(RGIScase "${caseVal}" "${1}")"; shift
+	local    idField="$(RGIScase "${caseVal}" "${1}")"; shift
+	local    initVal="$(RGIScase "${caseVal}" "${1}")"; shift
+	local       geom="$(RGIScase "${caseVal}" "${1}")"; shift
+	local rgisArchiv="${1}"; shoft
+	local     domain="${1}"; shoft
+	local    subject="${1}"; shoft
+	local    product="${1}"; shoft
+	local resolution="${1}"; shoft
+	local extent_llx="${1}"; shoft
+	local extent_lly="${1}"; shoft
+	local extent_urx="${1}"; shoft
+	local extent_ury="${1}"; shoft
 
 	local rgisFile="$(RGISfilePath "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}" "static")"
 
