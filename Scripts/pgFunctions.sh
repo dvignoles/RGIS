@@ -216,6 +216,8 @@ function PGpolygonColorizeSQL ()
                     ORDER BY \"hcolor\" DESC, \"tmpNCol\" DESC, \"NumNeighbour\" DESC, \"${colorFLD}\" DESC;
                 colorVAL integer;
             BEGIN
+                CREATE TABLE \"public\".\"tmpCOLORS\" (\"tmpCOLOR\" INTEGER NOT NULL CONSTRAINT \"tmpCOLOR_pkey\" PRIMARY KEY);
+                INSERT INTO  \"public\".\"tmpCOLORS\" (\"tmpCOLOR\") VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12);
                 ALTER TABLE \"${schema}\".\"${tblName}\" ADD COLUMN \"${colorFLD}\" INTEGER, ADD COLUMN \"newCOLOR\" INTEGER;
                 UPDATE      \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = 0, \"newCOLOR\" = 0;
                 FOR poly IN polygons LOOP
@@ -231,20 +233,18 @@ function PGpolygonColorizeSQL ()
                                 ON  \"public\".\"tmpCOLORS\".\"COLOR\" = \"Adjacent_Polygons\".\"newCOLOR\"
                                 GROUP BY \"public\".\"tmpCOLORS\".\"tmpCOLOR\") AS \"tmpCOLORS\"
                                 WHERE \"tmpCOLORS\".\"tmpCOLOR\" != 0 AND \"NumPoly\" = 0);
-                UPDATE \"${schema}\".\"${tblName}\" SET \"newCOLOR\" = colorVAL WHERE \"${idFLD}\" = \"poly\".\"${idFLD}\";
-            END LOOP;
-            UPDATE \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = \"newCOLOR\";
-            UPDATE \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = 1 WHERE \"${colorFLD}\" = 0;
-            ALTER TABLE \"${schema}\".\"${tblName}\" DROP COLUMN \"newCOLOR\";
-          END;
-          CREATE TABLE \"public\".\"tmpCOLORS\" (\"tmpCOLOR\" INTEGER NOT NULL CONSTRAINT \"tmpCOLOR_pkey\" PRIMARY KEY);
-          INSERT INTO  \"public\".\"tmpCOLORS\" (\"tmpCOLOR\") VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12);
+                    UPDATE \"${schema}\".\"${tblName}\" SET \"newCOLOR\" = colorVAL WHERE \"${idFLD}\" = \"poly\".\"${idFLD}\";
+                END LOOP;
+                UPDATE \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = \"newCOLOR\";
+                UPDATE \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = 1 WHERE \"${colorFLD}\" = 0;
+                ALTER TABLE \"${schema}\".\"${tblName}\" DROP COLUMN \"newCOLOR\";
+                DROP TABLE \"public\".\"tmpCOLORS\";
+            END;
           \$COLORIZE\$;
           SELECT   \"${schema}\".\"${tblName}\".\"${colorFLD}\", COUNT (\"${schema}\".\"${tblName}\".\"${idFLD}\")
           FROM     \"${schema}\".\"${tblName}\"
           GROUP BY \"${schema}\".\"${tblName}\".\"${colorFLD}\"
-          ORDER BY \"${schema}\".\"${tblName}\".\"${colorFLD}\";
-          DROP TABLE \"public\".\"tmpCOLORS\";"
+          ORDER BY \"${schema}\".\"${tblName}\".\"${colorFLD}\";"
 }
 
 function PGrasterDimension ()
