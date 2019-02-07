@@ -803,6 +803,8 @@ public:
         DownStreamSearch(record, action, (DBNetworkACTION) NULL, (void *) NULL);
     }
 
+    DBObjRecord *CellAdd(DBObjRecord *);
+
     DBObjRecord *CellAdd(DBPosition);
 
     DBObjRecord *CellAdd(DBCoordinate coord) {

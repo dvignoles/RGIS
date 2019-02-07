@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
 
         for (recID = 0; recID < saveTable->ItemNum(); ++recID) {
             record = saveTable->Item(recID);
-            if ((ret = operand->Int(record)) == true) {
+            if (operand->Int(record) == true) {
                 if (!fromSelection) continue;
                 if ((record->Flags() & DBObjectFlagSelected) == DBObjectFlagSelected) continue;
             }

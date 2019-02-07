@@ -633,7 +633,7 @@ void DBObjTableField::FormatDecimals(DBInt decimals) {
 
 DBObjTable::DBObjTable(DBObjTable &tableObj) : DBObjectLIST<DBObjRecord>(*((DBObjectLIST<DBObjRecord> *) &tableObj)) {
     RecordLengthVAR = tableObj.RecordLengthVAR;
-    FieldPTR = new DBObjectLIST<DBObjTableField>(*(tableObj.FieldPTR));
+    FieldPTR  = new DBObjectLIST<DBObjTableField>(*(tableObj.FieldPTR));
     MethodPTR = new DBObjectLIST<DBObjRecord>(*(tableObj.MethodPTR));
 }
 

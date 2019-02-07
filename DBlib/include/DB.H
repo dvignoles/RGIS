@@ -749,9 +749,9 @@ public:
         memcpy((char *) NULL + DataPTR, (char *) NULL + record.DataPTR, record.LengthVAR);
     }
 
-    ~DBObjRecord() { if (DataPTR != (DBAddress) NULL) free((char *) NULL + DataPTR); }
+    ~DBObjRecord() { if (DataPTR != (DBAddress) NULL) free((void *) DataPTR); }
 
-    void *Data() const { return ((char *) NULL + DataPTR); }
+    void *Data() const { return ((void *) DataPTR); }
 
     size_t Length() const { return (LengthVAR); }
 
@@ -761,7 +761,7 @@ public:
             LengthVAR = DataPTR == (DBAddress) NULL ? 0 : length;
         }
         else {
-            free((char *) NULL + DataPTR);
+            free((void *) DataPTR);
             DataPTR = (DBAddress) NULL;
             LengthVAR = 0;
         }
@@ -857,7 +857,7 @@ public:
     void Add(Object *object) {
         if (ItemsPTR == (DBAddress) NULL) {
             ItemsPTR = (DBAddress) ((char *) malloc((NumVAR + 1) * sizeof(Object *)) - (char *) NULL);
-            ListPTR = (DBAddress) ((char *) malloc((NumVAR + 1) * sizeof(Object *)) - (char *) NULL);
+            ListPTR  = (DBAddress) ((char *) malloc((NumVAR + 1) * sizeof(Object *)) - (char *) NULL);
         }
         else {
             ItemsPTR = (DBAddress) ((char *) realloc((char *) NULL + ItemsPTR, (NumVAR + 1) * sizeof(Object *)) -
@@ -920,10 +920,10 @@ public:
 
     void RemoveAll() {
         if (NumVAR > 0) {
-            free((char *) NULL + ItemsPTR);
-            free((char *) NULL + ListPTR);
+            free((void *) ItemsPTR);
+            free((void *) ListPTR);
         }
-        ItemsPTR = ListPTR = (DBAddress) NULL;
+        ItemsPTR   = ListPTR = (DBAddress) NULL;
         CurrentVAR = NumVAR = 0;
     }
 
@@ -938,13 +938,13 @@ public:
 
     void DeleteAll() {
         DBInt i;
-        for (i = 0; i < (DBInt) NumVAR; ++i) delete ((Object **) ((char *) NULL + ItemsPTR))[i];
+        for (i = 0; i < (DBInt) NumVAR; ++i) delete ((Object **) ItemsPTR) [i];
         RemoveAll();
     }
 
     Object *First(DBInt *indexVAR, DBInt startVal) {
         *indexVAR = startVal < NumVAR ? startVal : NumVAR;
-        return (*indexVAR < NumVAR ? ((Object **) ((char *) NULL + ListPTR))[*indexVAR] : (Object *) NULL);
+        return (*indexVAR < NumVAR ? ((Object **) ListPTR)[*indexVAR] : (Object *) NULL);
     }
 
     Object *First(DBInt *indexVAR) { return (First(indexVAR, 0)); }
@@ -958,8 +958,8 @@ public:
     Object *Last(DBInt *indexVAR) { return (First(indexVAR, NumVAR - 1)); }
 
     Object *Next(DBInt *indexVAR, DBInt dir) {
-        if (dir) { if ((++(*indexVAR)) < NumVAR) return (((Object **) ((char *) NULL + ListPTR))[*indexVAR]); }
-        else { if ((--(*indexVAR)) >= 0) return (((Object **) ((char *) NULL + ListPTR))[*indexVAR]); }
+        if (dir) { if ((++(*indexVAR)) < NumVAR) return (((Object **) ListPTR)[*indexVAR]); }
+        else { if ((--(*indexVAR)) >= 0) return (((Object **) ListPTR)[*indexVAR]); }
         return ((Object *) NULL);
     }
 
@@ -1346,13 +1346,13 @@ private:
 
 public:
     DBObjTable() : DBObjectLIST<DBObjRecord>("", sizeof(DBObjTable)) {
-        FieldPTR = new DBObjectLIST<DBObjTableField>("Table Fields", sizeof(DBObjectLIST<DBObjTableField>));
+        FieldPTR  = new DBObjectLIST<DBObjTableField>("Table Fields", sizeof(DBObjectLIST<DBObjTableField>));
         MethodPTR = new DBObjectLIST<DBObjRecord>("Method List", sizeof(DBObjectLIST<DBObjRecord>));
         RecordLengthVAR = 0;
     };
 
     DBObjTable(const char *name) : DBObjectLIST<DBObjRecord>(name, sizeof(DBObjTable)) {
-        FieldPTR = new DBObjectLIST<DBObjTableField>("Table Fields", sizeof(DBObjectLIST<DBObjTableField>));
+        FieldPTR  = new DBObjectLIST<DBObjTableField>("Table Fields", sizeof(DBObjectLIST<DBObjTableField>));
         MethodPTR = new DBObjectLIST<DBObjRecord>("Method List", sizeof(DBObjectLIST<DBObjRecord>));
         RecordLengthVAR = 0;
     };
@@ -1658,10 +1658,10 @@ class DBObjData : public DBObject, public DBDataHeader {
 private:
     char FileNameSTR[DBDataFileNameLen];
     DBObjData *LinkedDataPTR;
-    DBObjectLIST<DBObjTable> *TablesPTR;
+    DBObjectLIST<DBObjTable>  *TablesPTR;
     DBObjectLIST<DBObjRecord> *ArraysPTR;
     DBObjectLIST<DBObjRecord> *DocsPTR;
-    DBObjectLIST<DBObject> *DispPTR;
+    DBObjectLIST<DBObject>    *DispPTR;
 
     void Initialize();
 

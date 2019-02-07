@@ -260,6 +260,18 @@ bool DBNetworkUnselect(DBNetworkIF *netIF, DBObjRecord *cellRec, void *dataPtr) 
     netIF = (DBNetworkIF *) NULL;
     return (true);
 }
+DBObjRecord *DBNetworkIF::CellAdd(DBObjRecord *cellRec) {
+    DBPosition pos;
+
+    pos = CellPosition(cellRec);
+    if (pos.Col < 0) return ((DBObjRecord *) NULL);
+    if (pos.Row < 0) return ((DBObjRecord *) NULL);
+    if (pos.Col >= ColNum()) return ((DBObjRecord *) NULL);
+    if (pos.Row >= RowNum()) return ((DBObjRecord *) NULL);
+
+    ((DBInt *) DataRec->Data())[(size_t) pos.Row * ColNum() + (size_t) pos.Col] = cellRec->RowID();
+    return (cellRec);
+}
 
 DBObjRecord *DBNetworkIF::CellAdd(DBPosition pos) {
     char nameSTR[DBStringLength];
@@ -416,7 +428,7 @@ DBInt DBNetworkIF::Build() {
     for (i = 0; i < CellNum(); ++i) {
         cellRec = CellTable->Item(i);
         DBPause(i * 10 / CellNum());
-        if (Cell(CellPosition(cellRec)) == (DBObjRecord *) NULL) continue;
+        if (Cell(CellPosition(cellRec))  == (DBObjRecord *) NULL) continue;
         else if (ToCell(ToCell(cellRec)) == cellRec) ToCellFLD->Int(cellRec, DBNull);
     }
     DBPause(10);
@@ -637,7 +649,7 @@ DBInt DBNetworkIF::Build() {
     DBPause(100);
     if (DistToMouth()) SetDistToMouth();
     if (DistToOcean()) SetDistToOcean();
-    if (Magnitude()) SetMagnitude();
+    if (Magnitude())   SetMagnitude();
     return (DBSuccess);
 }
 

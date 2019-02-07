@@ -78,7 +78,7 @@ function PGport () # Changes port or returns its value
 
 function PGuserName () # Changes username or returns its value
 {
-	local userName="${1}"; sheft
+	local userName="${1}"; shift
 
 	if [[ "${userName}" == "" ]]
 	then
@@ -202,26 +202,31 @@ function PGpolygonColorizeSQL ()
     local     idFLD="$(RGIScase "${caseVal}" "${1}")"; shift
     local  colorFLD="$(RGIScase "${caseVal}" "${1}")"; shift
 
-    echo   "DO \$COLORIZE\$
+    echo   "DROP TABLE IF EXISTS \"public\".\"tmpCOLORS\";
+            CREATE TABLE \"public\".\"tmpCOLORS\" (\"tmpCOLOR\" INTEGER NOT NULL CONSTRAINT \"tmpCOLOR_pkey\" PRIMARY KEY);
+            INSERT INTO  \"public\".\"tmpCOLORS\" (\"tmpCOLOR\") VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12);
+            ALTER TABLE \"${schema}\".\"${tblName}\" DROP COLUMN IF EXISTS \"${colorFLD}\",
+                                                     DROP COLUMN IF EXISTS \"newCOLOR\";
+            ALTER TABLE \"${schema}\".\"${tblName}\" ADD COLUMN \"${colorFLD}\" INTEGER,
+                                                     ADD COLUMN \"newCOLOR\" INTEGER;
+            UPDATE      \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = 0, \"newCOLOR\" = 0;
+            DO \$COLORIZE\$
             DECLARE
                 polygons CURSOR FOR
                     SELECT \"LeftPoly\".\"${idFLD}\", \"LeftPoly\".\"${geomFLD}\", \"LeftPoly\".\"${colorFLD}\" AS \"${colorFLD}\",
                             CASE WHEN \"LeftPoly\".\"${colorFLD}\" >  4 THEN \"LeftPoly\".\"${colorFLD}\" - 4
-                                WHEN \"LeftPoly\".\"${colorFLD}\" <= 4 THEN 0 END AS \"hcolor\",
+                                 WHEN \"LeftPoly\".\"${colorFLD}\" <= 4 THEN 0 END AS \"hcolor\",
                             COUNT (\"RightPoly\".\"${colorFLD}\") AS \"tmpNCol\", COUNT (\"LeftPoly\".\"${idFLD}\") AS \"NumNeighbour\"
-                    FROM     \"${schema}\".\"${tblName}\" AS \"LeftPoly\", \"${schema}\".\"${tblName}\" AS \"RightPoly\"
+                    FROM     \"${schema}\".\"${tblName}\" AS \"LeftPoly\",
+                             \"${schema}\".\"${tblName}\" AS \"RightPoly\"
                     WHERE \"LeftPoly\".\"${idFLD}\" != \"RightPoly\".\"${idFLD}\"
                     AND    St_Dimension (St_Intersection (\"LeftPoly\".\"${geomFLD}\",\"RightPoly\".\"${geomFLD}\")) > 0
                     GROUP BY \"LeftPoly\".\"${idFLD}\", \"LeftPoly\".\"${geomFLD}\", \"LeftPoly\".\"${colorFLD}\"
                     ORDER BY \"hcolor\" DESC, \"tmpNCol\" DESC, \"NumNeighbour\" DESC, \"${colorFLD}\" DESC;
                 colorVAL integer;
             BEGIN
-                CREATE TABLE \"public\".\"tmpCOLORS\" (\"tmpCOLOR\" INTEGER NOT NULL CONSTRAINT \"tmpCOLOR_pkey\" PRIMARY KEY);
-                INSERT INTO  \"public\".\"tmpCOLORS\" (\"tmpCOLOR\") VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12);
-                ALTER TABLE \"${schema}\".\"${tblName}\" ADD COLUMN \"${colorFLD}\" INTEGER, ADD COLUMN \"newCOLOR\" INTEGER;
-                UPDATE      \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = 0, \"newCOLOR\" = 0;
                 FOR poly IN polygons LOOP
-                    colorVAL = (SELECT MIN (\"tmpCOLORS\".\"COLOR\")
+                    colorVAL = (SELECT MIN (\"tmpCOLORS\".\"tmpCOLOR\")
                                 FROM (SELECT \"public\".\"tmpCOLORS\".\"tmpCOLOR\", COUNT (\"Adjacent_Polygons\".\"${idFLD}\") AS \"NumPoly\"
                                       FROM \"public\".\"tmpCOLORS\"
                                       LEFT JOIN (SELECT \"${schema}\".\"${tblName}\".\"${idFLD}\",
@@ -230,7 +235,7 @@ function PGpolygonColorizeSQL ()
                                                  FROM   \"${schema}\".\"${tblName}\"
                                                  WHERE  \"${schema}\".\"${tblName}\".\"${idFLD}\" != \"poly\".\"${idFLD}\"
                                                  AND  St_Dimension (St_Intersection (\"${schema}\".\"${tblName}\".\"${geomFLD}\", \"poly\".\"${geomFLD}\")) > 0) AS \"Adjacent_Polygons\"
-                                ON  \"public\".\"tmpCOLORS\".\"COLOR\" = \"Adjacent_Polygons\".\"newCOLOR\"
+                                ON  \"public\".\"tmpCOLORS\".\"tmpCOLOR\" = \"Adjacent_Polygons\".\"newCOLOR\"
                                 GROUP BY \"public\".\"tmpCOLORS\".\"tmpCOLOR\") AS \"tmpCOLORS\"
                                 WHERE \"tmpCOLORS\".\"tmpCOLOR\" != 0 AND \"NumPoly\" = 0);
                     UPDATE \"${schema}\".\"${tblName}\" SET \"newCOLOR\" = colorVAL WHERE \"${idFLD}\" = \"poly\".\"${idFLD}\";
