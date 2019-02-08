@@ -269,7 +269,7 @@ DBObjRecord *DBNetworkIF::CellAdd(DBObjRecord *cellRec) {
     if (pos.Col >= ColNum()) return ((DBObjRecord *) NULL);
     if (pos.Row >= RowNum()) return ((DBObjRecord *) NULL);
 
-    ((DBInt *) DataRec->Data())[(size_t) pos.Row * ColNum() + (size_t) pos.Col] = cellRec->RowID();
+    ((DBInt *) DataRec->Data())[(size_t) pos.Row * ColNum() + (size_t) pos.Col] = cellRec->RowID ();
     return (cellRec);
 }
 
@@ -657,7 +657,7 @@ int DBNetworkIF::Trim() {
     DBInt i, row, col;
     DBPosition pos, min, max;
     DBRegion extent = DataPTR->Extent();
-    DBObjRecord *cellRec;
+    DBObjRecord *cellRec, *basinRec;
     DBCoordinate coord;
 
     min.Row = RowNum();
@@ -681,6 +681,13 @@ int DBNetworkIF::Trim() {
         pos.Row = pos.Row - min.Row;
         pos.Col = pos.Col - min.Col;
         PositionFLD->Position(cellRec, pos);
+    }
+    for (i = 0;i < BasinNum(); ++i) {
+        basinRec = Basin (i);
+        pos = MouthPosFLD->Position (basinRec);
+        pos.Row = pos.Row - min.Row;
+        pos.Col = pos.Col - min.Col;
+        MouthPosFLD->Position (basinRec,pos);
     }
     coord.X = min.Col * CellWidth();
     coord.Y = min.Row * CellHeight();

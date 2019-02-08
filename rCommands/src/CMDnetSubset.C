@@ -140,29 +140,31 @@ int main(int argc, char *argv[]) {
         netIF->UpStreamSearch	(cellRec, DBNetworkUnselect);
     }
     saveTable = new DBObjTable (*cellTable);
-    for (cellID = 0;cellID < cellTable->ItemNum (); ++cellID) {
-        cellRec = cellTable->Item (cellID);
+
+    for (cellID = 0;cellID < cellTable->ItemNum(); ++cellID) {
+        cellRec = cellTable->Item(cellID);
         netIF->CellDelete(cellRec);
     }
     cellTable->DeleteAll();
     for (cellID = 0; cellID < saveTable->ItemNum(); ++cellID) {
         cellRec = saveTable->Item(cellID);
         if ((cellRec->Flags() & DBObjectFlagSelected) != DBObjectFlagSelected)
-            cellRec = new DBObjRecord(*cellRec);
-            cellTable->Add (cellRec);
-            netIF->CellAdd (cellRec);
+            cellTable->Add (new DBObjRecord(*cellRec));
+    }
+    for (cellID = 0;cellID < cellTable->ItemNum(); ++cellID) {
+        cellRec = cellTable->Item(cellID);
+        netIF->CellAdd(cellRec);
     }
     delete saveTable;
-    netData->Write(argv[2]);
     if ((netIF->Build () == CMsucceeded) &&
         (netIF->Trim  () == CMsucceeded) &&
         (netIF->Build () == CMsucceeded)) {
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? netData->Write(argv[2]) : netData->Write(stdout);
     }
-    delete netIF;
     delete pntIF;
-    delete netData;
+    delete netIF;
     delete pntData;
+    delete netData;
     if (verbose) RGlibPauseClose();
     return (ret);
 }

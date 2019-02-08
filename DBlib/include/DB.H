@@ -650,7 +650,7 @@ public:
 
     DBInt RowID(void) const { return (RowIdVAR); }
 
-    void _RowID(DBInt id) { RowIdVAR = id; }
+    void RowID(DBInt id) { RowIdVAR = id; }
 
     DBInt ListPos(void) const { return (ListPosVAR); }
 
@@ -869,7 +869,7 @@ public:
             CurrentVAR = NumVAR;
             ((Object **) ((char *) NULL + ItemsPTR))[CurrentVAR] = ((Object **) ((char *) NULL +
                                                                                  ListPTR))[CurrentVAR] = object;
-            ((DBObject *) object)->_RowID(NumVAR);
+            ((DBObject *) object)->RowID(NumVAR);
             ((DBObject *) object)->ListPos(NumVAR);
             NumVAR = NumVAR + 1;
         }
@@ -886,7 +886,7 @@ public:
 
         for (i = rowID; i < (DBInt) NumVAR - 1; ++i) {
             ((Object **) ((char *) NULL + ItemsPTR))[i] = ((Object **) ((char *) NULL + ItemsPTR))[i + 1];
-            ((Object **) ((char *) NULL + ItemsPTR))[i]->_RowID(i);
+            ((Object **) ((char *) NULL + ItemsPTR))[i]->RowID(i);
         }
         for (i = 0; i < (DBInt) NumVAR - 1; ++i)
             if (((Object **) ((char *) NULL + ItemsPTR))[i]->ListPos() > object->ListPos()) {
@@ -993,7 +993,7 @@ public:
             }
             for (i = 0; i < (DBInt) NumVAR; ++i) {
                 ((Object **) ((char *) NULL + ItemsPTR))[i] = ((Object **) ((char *) NULL + ListPTR))[i] = new Object();
-                ((Object **) ((char *) NULL + ItemsPTR))[i]->_RowID(i);
+                ((Object **) ((char *) NULL + ItemsPTR))[i]->RowID(i);
                 ((Object **) ((char *) NULL + ItemsPTR))[i]->ListPos(i);
             }
         }
@@ -1026,7 +1026,7 @@ public:
                     (char *) NULL + ItemsPTR))[i];
         for (i = 0; i < (DBInt) NumVAR; ++i) {
             ((Object **) ((char *) NULL + ItemsPTR))[i] = ((Object **) ((char *) NULL + ListPTR))[i];
-            (((Object **) ((char *) NULL + ItemsPTR))[i])->_RowID(i);
+            (((Object **) ((char *) NULL + ItemsPTR))[i])->RowID(i);
             (((Object **) ((char *) NULL + ItemsPTR))[i])->ListPos(i);
         }
     }

@@ -20,11 +20,13 @@ int main(int argc, char *argv[]) {
     DBInt fromSelection = false, recID;
     char *tableName = (char *) NULL;
     char *expr = (char *) NULL;
+    DBInt cellID;
     DBMathOperand *operand;
     DBObjectLIST<DBObject> *variables = new DBObjectLIST<DBObject>("Variables");
-    DBObjData *data;
+    DBObjData  *data;
     DBObjTable *table, *saveTable, *groups = (DBObjTable *) NULL, *saveGroups;
     DBObjRecord *record;
+    DBNetworkIF *netIF = (DBNetworkIF *) NULL;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-a", "--table")) {
@@ -94,6 +96,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (tableName == (char *) NULL) tableName = DBrNItems;
+    if (strcmp (tableName,DBrNCells) == 0) netIF = new DBNetworkIF (data);
 
     if ((table = data->Table(tableName)) == (DBObjTable *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Invalid table!");
@@ -103,6 +106,12 @@ int main(int argc, char *argv[]) {
     }
 
     saveTable = new DBObjTable(*table);
+    if (netIF != (DBNetworkIF *) NULL) {
+        for (cellID = 0; cellID < table->ItemNum(); ++cellID) {
+            record = table->Item(cellID);
+            netIF->CellDelete(record);
+        }
+    }
     table->DeleteAll();
     if ((strcmp(tableName, DBrNItems) == 0) && ((groups = data->Table(DBrNGroups)) != (DBObjTable *) NULL)) {
         saveGroups = new DBObjTable(*groups);
@@ -138,14 +147,24 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+    if (netIF != (DBNetworkIF *) NULL) {
+        for (cellID = 0; cellID < netIF->CellNum(); ++cellID) {
+            record = table->Item(cellID);
+            netIF->CellAdd(record);
+        }
+    }
 
     if (expr != (char *) NULL) delete operand;
     delete variables;
     delete saveTable;
     if (groups != (DBObjTable *) NULL) delete saveGroups;
 
+    if (netIF != (DBNetworkIF *) NULL) {
+        netIF->Trim();
+        netIF->Build();
+        delete netIF;
+    }
     ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
-
     delete data;
     if (verbose) RGlibPauseClose();
     return (ret);
