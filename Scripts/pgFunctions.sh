@@ -20,6 +20,7 @@ else
         export _GHAASpgUserName="${LOGNAME}";
     fi
 fi
+if [[ -e "${GHAASsslDIR}" ]]; then export _GHAASpgSSLdir="${GHAASsslDIR}"; fi
 
 export     _GHAASpgSSLhostCA=""
 export _GHAASpgSSLclientCert=""
