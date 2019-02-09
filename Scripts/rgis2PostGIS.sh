@@ -72,8 +72,8 @@ do
 done
 
 if [ "${RGISFILE}" == "" ]; then PrintUsage; fi
-FILENAME="${RGISFILE##*/}"
-FILENAME="${FILENAME%%.*}"
+ FILENAME="${RGISFILE##*/}"
+ FILENAME="${FILENAME%%.*}"
 EXTENSION="${RGISFILE#*.}"
 
 if [ "${SCHEMA}"  == "" ]; then  SCHEMA="public"; fi
