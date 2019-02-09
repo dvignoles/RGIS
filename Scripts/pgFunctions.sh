@@ -20,7 +20,6 @@ else
         export _GHAASpgUserName="${LOGNAME}";
     fi
 fi
-if [[ -e "${GHAASsslDIR}" ]]; then export _GHAASpgSSLdir="${GHAASsslDIR}"; fi
 
 export     _GHAASpgSSLhostCA=""
 export _GHAASpgSSLclientCert=""
@@ -351,4 +350,4 @@ function PGrasterize ()
 	RGISsetHeader "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}" "static" 
 }
 
-if [[ "${GHAASSSLDIR}" != "" ]]; then PGsslDir "${GHAASSSLDIR}"; else export _GHAASpgSSLdir=""; fi
+if [[ "${GHAASsslDIR}" != "" ]]; then PGsslDir "${GHAASsslDIR}"; else export _GHAASpgSSLdir=""; fi
