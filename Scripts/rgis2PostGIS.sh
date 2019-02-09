@@ -85,7 +85,7 @@ if [ "${TBLNAME}" == "" ]; then TBLNAME="${FILENAME}"; fi
        ID=$(caseFunc "${CASE}" "ID")
 GRIDVALUE=$(caseFunc "${CASE}" "GridValue")
 
-TEMPFILE="TEMP${FILENAME}"
+TEMPFILE="TEMP$(caseFunc "${CASE}" ${FILENAME})"
 
 case "${EXTENSION}" in
 	(gdbp|gdbp.gz|gdbl|gdbl.gz)
