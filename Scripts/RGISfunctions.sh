@@ -1351,6 +1351,80 @@ function _RGISvariableDir ()
 	return 0
 }
 
+function RGISgeoResolutionInSecond ()
+{
+    local resolution="${1}"
+
+   	case "${resolution}" in
+	("15sec")
+		echo "15"
+	;;
+	("30sec")
+		echo "30"
+	;;
+	("45sec")
+		echo "45"
+	;;
+	("01min")
+		echo "60"
+	;;
+	("1m30s")
+		echo "90"
+	;;
+	("2m30s")
+		echo "150"
+	;;
+	("03min")
+		echo "180"
+	;;
+	("3m45s")
+		echo "225"
+	;;
+	("05min")
+		echo "300"
+	;;
+	("06min")
+		echo "360"
+	;;
+	("10min")
+		echo "600"
+	;;
+	("15min")
+		echo "900"
+	;;
+	("30min")
+		echo "1800"
+	;;
+	("60min")
+		echo "3600"
+	;;
+	("02deg")
+		echo "7200"
+	;;
+	(*)
+		echo "Invalid resolution" > /dev/stderr
+		return 1
+	;;
+	esac
+    return 0
+}
+
+RGISgeoResolutionMultiplier () # Destination resolution is devided by source resolution. Decimals ar chapped off.
+{
+    local srcRes="$(RGISgeoResolutionInSecond "${1}")"
+    local dstRes="$(RGISgeoResolutionInSecond "${2}")"
+
+    if [[ "${srcRes}" == "" || "${dstRes}" == "" ]]
+    then
+        echo "Invalid resolutions: ${srcRes}, ${dstRes}" > /dev/stderr
+        echo "Usage: Destination resolution is devided by source resolution. Decimals ar chapped off." > /dev/stderr
+        return 1
+    else
+        echo "${dstRes} / ${srcRes}" | bc -l | sed "s:\([0-9]*\).*:\1:"
+    fi
+    return 0
+
+}
 function _RGISresolutionDir ()
 {
 	local      archive="${1}"
