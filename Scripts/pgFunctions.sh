@@ -355,7 +355,7 @@ function PGrasterize ()
 
 	gdal_rasterize -l "${schema}"."${tblname}" -a "${idField}" -init "${initVal}" -ot Integer  -of GTiff \
 	               -ts "${ncols}" "${nrows}" -te "${extent_llx}" "${extent_lly}" "${extent_urx}" "${extent_ury}" \
-	               "PG:$(PGdbName "${dbName}") password=$(PGuserPassword)" "${rgisFile%.gdbd*}.tif"
+	               "PG:$(PGdbName "${dbName}")" "${rgisFile%.gdbd*}.tif"
 
 	gdal_translate -of AAIGrid  "${rgisFile%.gdbd*}.tif" "${rgisFile%.gdbd*}.grd"
 	(echo "2"

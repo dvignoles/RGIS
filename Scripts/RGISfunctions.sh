@@ -1848,18 +1848,7 @@ function RGISsetHeader ()
 	local   sourceInst="${1}"; shift
 	local sourcePerson="${1}"; shift
 
-    if [[ "$(RGIScase "lower" "${tStepType}")" == "static" ]]
-    then
-	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}")"
-	elif [[ "${tStep}" == "" ]]
-	then
-	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "annual")"
-	elif [[ "${timeRange}" == "" ]]
-	then
-	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}")"
-	else
-	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}" "${timeRange}")"
-	fi
+	local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" ${tStepType} ${tStep} ${timeRange})"
 
 	if [[ "${rgisFile}" == "" ]]
 	then
