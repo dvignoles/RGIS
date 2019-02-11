@@ -1825,30 +1825,42 @@ function RGISAppend ()
 	local filename=$(RGISfile  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${tStep}" "${startyear}-${endyear}")
 	local    title=$(RGIStitle              "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${tStep}" "${startyear}-${endyear}" "${version}")
 	local  subject=$(RGISlookupSubject  "${variable}")
-   local shadeset=$(RGISlookupShadeset "${variable}")
+    local shadeset=$(RGISlookupShadeset "${variable}")
 
 	grdAppendLayers -t "${title}" -d "${domain}" -u "${subject}" -v "${version}" -o "${filename}" ${files}
 }
 
 function RGISsetHeader ()
 {
-	local      archive="${1}"
-	local       domain="${2}"
-	local      subject="${3}"
-	local      product="${4}"
-	local   resolution="${5}"
-	local    tStepType="${6}"
-	local        tStep="${7}"
-	local    timeRange="${8}"
-	local      version="${9}"
-	local        title="${8}"
-	local      comment="${10}"
-    local     citation="${11}"
-	local  institution="${12}"
-	local   sourceInst="${13}"
-	local sourcePerson="${14}"
+	local      archive="${1}"; shift
+	local       domain="${1}"; shift
+	local      subject="${1}"; shift
+	local      product="${1}"; shift
+	local   resolution="${1}"; shift
+	local    tStepType="${1}"; shift
+	local        tStep="${1}"; shift
+	local    timeRange="${1}"; shift
+	local      version="${1}"; shift
+	local        title="${1}"; shift
+	local      comment="${1}"; shift
+    local     citation="${1}"; shift
+	local  institution="${1}"; shift
+	local   sourceInst="${1}"; shift
+	local sourcePerson="${1}"; shift
 
-	rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" ${tStepType} ${tStep} ${timeRange})"
+    if [[ "$(RGIScase "lower" "${tStepType}")" == "static" ]]
+    then
+	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}")"
+	elif [[ "${tStep}" == "" ]]
+	then
+	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "annual")"
+	elif [[ "${timeRange}" == "" ]]
+	then
+	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}")"
+	else
+	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}" "${timeRange}")"
+	fi
+
 	if [[ "${rgisFile}" == "" ]]
 	then
 		echo "Missing ${rgisFile} in RGISsetHeader"
@@ -1900,7 +1912,7 @@ function RGISAggregateTS ()
       local    title=$(RGIStitle "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${totStep}" "${year}" "${version}")
       local  subject=$(RGISlookupSubject    "${variable}")
       local shadeset=$(RGISlookupShadeset   "${variable}")
-		local   method=$(RGISlookupAggrMethod "${variable}")
+	  local   method=$(RGISlookupAggrMethod "${variable}")
 
       grdTSAggr -a "${method}" -e "$(RGISlookupTimeStep ${totStep})" -t "${title}" -d "${domain}" -u "${subject}" -s "${shadeset}" "${fromFile}" "${toFile}" || return 1
    done
