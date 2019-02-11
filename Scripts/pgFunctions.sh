@@ -252,6 +252,30 @@ function PGpolygonColorizeSQL ()
           ORDER BY \"${schema}\".\"${tblName}\".\"${colorFLD}\";"
 }
 
+function PGimportShapeFile ()
+{
+	local   caseVal="${1}";                            shift
+	local    dbName="$(RGIScase "${caseVal}" "${1}")"; shift
+	local    schema="$(RGIScase "${caseVal}" "${1}")"; shift
+	local   tblName="$(RGIScase "${caseVal}" "${1}")"; shift
+	local shapeFile="${1}";                            shift
+	local       gid="${1}";                            shift
+	local      geom="${1}";                            shift
+	local     color="${1}";                            shift
+
+	echo "DROP TABLE IF EXISTS \"${schema}\".\"${tblName}\";" | psql "$(PGdbName "${dbName}")"
+	shp2pgsql -k -s 4326 -W "latin1" "${shapeFile}" "${schema}.${tblName}" |\
+	psql "$(PGdbName "${dbName}")"
+
+	if [[ "${gid}" != "" ]]
+	then
+		if [[  "${geom}" == "" ]]; then local  geom="geom"; fi
+		if [[ "${color}" == "" ]]; then local color="$(RGIScase "${caseVal}" "Color")"; fi
+		PGpolygonColorizeSQL "${caseVal}" "${schema}" "${tblName}" "${geom}" "${gid}" "${color}" |\
+		psql "$(PGdbName "${dbName}")"
+	fi
+}
+
 function PGrasterDimension ()
 {
 	local resolution="${1}"; shift
@@ -312,15 +336,15 @@ function PGrasterize ()
 	local    idField="$(RGIScase "${caseVal}" "${1}")"; shift
 	local    initVal="$(RGIScase "${caseVal}" "${1}")"; shift
 	local       geom="$(RGIScase "${caseVal}" "${1}")"; shift
-	local rgisArchiv="${1}"; shoft
-	local     domain="${1}"; shoft
-	local    subject="${1}"; shoft
-	local    product="${1}"; shoft
-	local resolution="${1}"; shoft
-	local extent_llx="${1}"; shoft
-	local extent_lly="${1}"; shoft
-	local extent_urx="${1}"; shoft
-	local extent_ury="${1}"; shoft
+	local rgisArchiv="${1}"; shift
+	local     domain="${1}"; shift
+	local    subject="${1}"; shift
+	local    product="${1}"; shift
+	local resolution="${1}"; shift
+	local extent_llx="${1}"; shift
+	local extent_lly="${1}"; shift
+	local extent_urx="${1}"; shift
+	local extent_ury="${1}"; shift
 
 	local rgisFile="$(RGISfilePath "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}" "static")"
 
