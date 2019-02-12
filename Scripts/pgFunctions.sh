@@ -371,7 +371,8 @@ function PGrasterize ()
 	tblJoinTables -t "${schema} ${tblname}" -u "Zones" -a "${rgisFile%.gdbd*}.gdbt" -e "DBItems" -o "DBItems" -r "GridValue" -j "${idField}" "${rgisFile}" - |\
 	tblDeleteField -f "DBItems" - "${rgisFile}"
 	rm "${rgisFile%.gdbd*}.gdbt"
-	RGISsetHeader "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}" "static"
+	grdRenameLayers -r 1 "$(RGISlookupSubject "${subject}")" "${rgisFile}" "${rgisFile}"
+	RGISsetHeader "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}"
 }
 
 if [[ "${GHAASsslDIR}" != "" ]]; then PGsslDir "${GHAASsslDIR}"; else export _GHAASpgSSLdir=""; fi
