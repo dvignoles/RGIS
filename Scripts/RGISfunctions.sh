@@ -1872,11 +1872,10 @@ function RGISsetHeader ()
 		local person=$(finger $(env | grep "LOGNAME" | sed "s:LOGNAME=::") | grep Name | sed -e "s|.*Name: ||")
 	fi
 
-	local subString=""
-	if [[ "${tStepType}"    == "" ]]; then local tStepType="static";  fi;
+	if [[ "${tStepType}"    == "" ]]; then local tStepType="static";  fi
 	if [[ "${version}"      == "" ]]; then local   version="pre0.01"; fi
 
-	if [[ "${title}"        == "" ]]; then local        title="$(RGIStitle "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}" "${timeRange}"  "${version}")"; fi
+	if [[ "${title}"        == "" ]]; then local        title="$(RGIStitle "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}" "${timeRange}" "${version}")"; fi
 	if [[ "${comment}"      == "" ]]; then local      comment="${domain} $(_RGISlookupFullName "${subject}") from ${product} at ${resolution}"; fi
 	if [[ "${citation}"     == "" ]]; then local     citation="Pirated ${subject} from ${product}"; fi
 	if [[ "${institution}"  == "" ]]; then local  institution="Advanced Science Research Center at the Graduate Center, CUNY"; fi
