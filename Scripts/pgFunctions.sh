@@ -186,11 +186,11 @@ function PGattribTableSQL ()
 	local       geom="${5}"
 
 	echo "DROP TABLE IF EXISTS \"public\".\"temp_tb\";
-          CREATE TABLE \"public\".\"temp_tb\" AS (SELECT * FROM \"${schema}\".\"${tblname}\");
-          ALTER TABLE \"public\".\"temp_tb\" DROP \"geom\";
- 		  COPY \"public\".\"temp_tb\" TO STDOUT
- 		  DELIMITER AS '	' NULL AS '-9999' CSV HEADER QUOTE AS '\"';
- 		  DROP TABLE \"public\".\"temp_tb\";"
+              CREATE TABLE \"public\".\"temp_tb\" AS (SELECT * FROM \"${schema}\".\"${tblname}\");
+              ALTER TABLE \"public\".\"temp_tb\" DROP \"geom\";
+ 	      COPY \"public\".\"temp_tb\" TO STDOUT
+ 	      DELIMITER AS '	' NULL AS '-9999' CSV HEADER QUOTE AS '\"';
+ 	      DROP TABLE \"public\".\"temp_tb\";"
 }
 
 function PGpolygonColorizeSQL ()
@@ -312,6 +312,17 @@ function PGrasterize ()
 	local ncols=$(PGrasterDimension "${resolution}" "${extent_llx}" "${extent_urx}")
 	local nrows=$(PGrasterDimension "${resolution}" "${extent_lly}" "${extent_ury}")
 
+	# I don't understand why gdal_translate does not like gid field
+	if [[ "${idField}" == "gid" ]]
+	then
+		echo "ALTER TABLE \"${schema}\".\"${tblname}\"
+		      DROP COLUMN IF EXISTS \"$(RGIScase ${caseVal} "idField")\",
+		      ADD  COLUMN \"$(RGIScase ${caseVal} "idField")\" INTEGER;
+		      UPDATE      \"${schema}\".\"${tblname}\"
+		      SET \"$(RGIScase ${caseVal} "idField")\" = ${idField};" |\
+		psql -q "$(PGdbName "${dbName}")"
+		local idField="$(RGIScase ${caseVal} "idField")"
+	fi
 	gdal_rasterize -l "${schema}"."${tblname}" -a "${idField}" -init "${initVal}" -ot Integer  -of GTiff \
 	               -ts "${ncols}" "${nrows}" -te "${extent_llx}" "${extent_lly}" "${extent_urx}" "${extent_ury}" \
 	               "PG:$(PGdbName "${dbName}")" "${rgisFile%.gdbd*}.tif"
@@ -323,6 +334,7 @@ function PGrasterize ()
 	 echo "${rgisFile}" 
 	 echo "0") | grdImport -b "${rgisFile%.gdbd*}.grd"
 	rm  "${rgisFile%.gdbd*}.tif" "${rgisFile%.gdbd*}.grd.aux.xml" "${rgisFile%.gdbd*}.prj" "${rgisFile%.gdbd*}.grd"
+
 	PGattribTableSQL "sensitive" "${schema}" "${tblname}" "${idField}" "${geom}" |\
 	psql -q "$(PGdbName "${dbName}")" |\
 	table2rgis - "${rgisFile%.gdbd*}.gdbt"
