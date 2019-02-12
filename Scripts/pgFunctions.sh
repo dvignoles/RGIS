@@ -263,8 +263,9 @@ function PGimportShapeFile ()
 	local      geom="${1}";                            shift
 	local     color="${1}";                            shift
 
+    if [[ "${caseVal}" == "lower" ]]; then local caseOpt=""; else caseOpt="-k"; fi
 	echo "DROP TABLE IF EXISTS \"${schema}\".\"${tblName}\";" | psql "$(PGdbName "${dbName}")"
-	shp2pgsql -k -s 4326 -W "latin1" "${shapeFile}" "${schema}.${tblName}" |\
+	shp2pgsql ${caseOpt} -s 4326 -W "latin1" "${shapeFile}" "${schema}.${tblName}" |\
 	psql "$(PGdbName "${dbName}")"
 
 	if [[ "${gid}" != "" ]]
