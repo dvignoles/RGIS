@@ -1879,7 +1879,7 @@ function RGISsetHeader ()
 	if [[ "${version}"      == "" ]]; then local   version="pre0.01"; fi
 	local subString="${resolution}, ${subString}"
 
-	if [[ "${title}"        == "" ]]; then local        title="$(RGIStitle "${domain}" "${subject}" "${product}" \("${subString}"\) "${version}")"; fi
+	if [[ "${title}"        == "" ]]; then local        title="$(RGIStitle "${domain}" "${subject}" "${product}" \("${subString}"\) "${version}" "${tStepType}")"; fi
 	if [[ "${comment}"      == "" ]]; then local      comment="${domain} $(_RGISlookupFullName "${subject}") from ${product} at ${resolution}"; fi
 	if [[ "${citation}"     == "" ]]; then local     citation="Pirated ${subject} from ${product}"; fi
 	if [[ "${institution}"  == "" ]]; then local  institution="Advanced Science Research Center at the Graduate Center, CUNY"; fi
