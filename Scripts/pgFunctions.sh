@@ -186,8 +186,8 @@ function PGattribTableSQL ()
 	local       geom="${5}"
 
 	echo "DROP TABLE IF EXISTS \"public\".\"temp_tb\";
-              CREATE TABLE \"public\".\"temp_tb\" AS (SELECT * FROM \"${schema}\".\"${tblname}\");
-              ALTER TABLE \"public\".\"temp_tb\" DROP \"geom\";
+          CREATE TABLE \"public\".\"temp_tb\" AS (SELECT * FROM \"${schema}\".\"${tblname}\");
+          ALTER TABLE \"public\".\"temp_tb\" DROP \"geom\";
  	      COPY \"public\".\"temp_tb\" TO STDOUT
  	      DELIMITER AS '	' NULL AS '-9999' CSV HEADER QUOTE AS '\"';
  	      DROP TABLE \"public\".\"temp_tb\";"
@@ -335,7 +335,7 @@ function PGrasterize ()
 	 echo "0") | grdImport -b "${rgisFile%.gdbd*}.grd"
 	rm  "${rgisFile%.gdbd*}.tif" "${rgisFile%.gdbd*}.grd.aux.xml" "${rgisFile%.gdbd*}.prj" "${rgisFile%.gdbd*}.grd"
 
-	PGattribTableSQL "sensitive" "${schema}" "${tblname}" "${idField}" "${geom}" |\
+	PGattribTableSQL "${caseVal}" "${schema}" "${tblname}" "${idField}" "${geom}" |\
 	psql -q "$(PGdbName "${dbName}")" |\
 	table2rgis - "${rgisFile%.gdbd*}.gdbt"
 
