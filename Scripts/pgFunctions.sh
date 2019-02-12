@@ -282,50 +282,8 @@ function PGrasterDimension ()
 	local resolution="${1}"; shift
 	local     coord0="${1}"; shift
 	local     coord1="${1}"; shift
-	 
-	case "${resolution}" in
-	("15sec")
-		local seconds="15"
-	;;
-	("30sec")
-		local seconds="30"
-	;;
-	("45sec")
-		local seconds="45"
-	;;
-	("01min")
-		local seconds="60"
-	;;
-	("1m30s")
-		local seconds="90"
-	;;
-	("03min")
-		local seconds="180"
-	;;
-	("3m45s")
-		local seconds="225"
-	;;
-	("05min")
-		local seconds="300"
-	;;
-	("06min")
-		local seconds="360"
-	;;
-	("10min")
-		local seconds="600"
-	;;
-	("15min")
-		local seconds="900"
-	;;
-	("30min")
-		local seconds="1800"
-	;;
-	(*)
-		echo "Invalid resolution" > /dev/std/err
-		return 1
-	;;
-	esac
-	echo $(echo "(${coord1} - ${coord0}) * 3600 / ${seconds}" | bc)
+
+	echo $(echo "(${coord1} - ${coord0}) * 3600 / $(RGISgeoResolutionInSecond "${resolution}")" | bc)
 }
 
 function PGrasterize ()
@@ -349,7 +307,7 @@ function PGrasterize ()
 
 	local rgisFile="$(RGISfilePath "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}" "static")"
 
-	[[ -e "${rgisFile/*}" ]] || mkdir -p "${rgisFile%/*}"
+	[[ -e "${rgisFile%/*}" ]] || mkdir -p "${rgisFile%/*}"
 
 	local ncols=$(PGrasterDimension "${resolution}" "${extent_llx}" "${extent_urx}")
 	local nrows=$(PGrasterDimension "${resolution}" "${extent_lly}" "${extent_ury}")
