@@ -1749,14 +1749,14 @@ function RGISfile ()
 
 function RGIStitle ()
 {
-	local     domain="${1}"
-	local   variable="${2}"
-	local    product="${3}"
-	local resolution="${4}"
-	local  tStepType="${5}"
-	local      tStep=$(echo "${6}" | tr "[A-Z]" "[a-z]")
-	local  timeRange="${7}"
-	local    version="${8}"
+	local     domain="${1}"; shift
+	local   variable="${1}"; shift
+	local    product="${1}"; shift
+	local resolution="${1}"; shift
+	local  tStepType="$(echo "${1}" | tr "[A-Z]" "[a-z]")"; shift
+	local      tStep="$(echo "${1}" | tr "[A-Z]" "[a-z]")"; shift
+	local  timeRange="${1}"; shift
+	local    version="${1}"; shift
 
 
 	local variableFullName=$(_RGISlookupFullName "${variable}")
@@ -1786,7 +1786,6 @@ function RGIStitle ()
 			;;
 			(*)
 				echo "Unknown time step ${tStep}"  > /dev/stderr
-				return 1
 			;;
 		esac
 		if [[ "${timeRange}" == "" ]]
@@ -1802,15 +1801,15 @@ function RGIStitle ()
 
 function RGISAppend ()
 {
-    local    archive="${1}"
-    local     domain="${2}"
-    local   variable="${3}"
-    local    product="${4}"
-    local resolution="${5}"
-    local    version="${6}"
-    local  startyear="${7}"
-	local    endyear="${8}"
-	local      tStep="${9}"
+    local    archive="${1}"; shift
+    local     domain="${1}"; shift
+    local   variable="${1}"; shift
+    local    product="${1}"; shift
+    local resolution="${1}"; shift
+    local    version="${1}"; shift
+    local  startyear="${1}"; shift
+	local    endyear="${1}"; shift
+	local      tStep="${1}"; shift
 
  	local      files=""
 	local  separator=" "
@@ -1843,22 +1842,22 @@ function RGISsetHeader ()
 	local      version="${1}"; shift
 	local        title="${1}"; shift
 	local      comment="${1}"; shift
-    local     citation="${1}"; shift
+	local     citation="${1}"; shift
 	local  institution="${1}"; shift
 	local   sourceInst="${1}"; shift
 	local sourcePerson="${1}"; shift
 
-    if [[ "${tStepType}" == "Static" ]]
-    then
-	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}")"
-	elif [[ "${tStep}" == "" ]]
+	if [[ "$(RGIScase "lower" "${tStepType}")" == "static" ]]
 	then
-	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "Annual")"
+	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}")"
+	elif [[     "${tStep}" == "" ]]
+	then
+	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "Annual")"
 	elif [[ "${timeRange}" == "" ]]
 	then
-	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}")"
+	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}")"
 	else
-	    local rgisFile="$(RGISfile "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}" "${timeRange}")"
+	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}" "${timeRange}")"
 	fi
 
 	if [[ "${rgisFile}" == "" ]]
@@ -1873,7 +1872,7 @@ function RGISsetHeader ()
 		local person=$(finger $(env | grep "LOGNAME" | sed "s:LOGNAME=::") | grep Name | sed -e "s|.*Name: ||")
 	fi
 
-    local subString=""
+	local subString=""
 	if [[ "${tStepType}"    == "" ]]; then local tStepType="static";  fi
 	if [[ "${tStep}"        == "" ]]; then local     tStep="";        else local subString="${subString}, ${tStep}";     fi
 	if [[ "${timeRange}"    == "" ]]; then local timeRange="";        else local subString="${subString}, ${timeRange}"; fi
@@ -1886,7 +1885,7 @@ function RGISsetHeader ()
 	if [[ "${institution}"  == "" ]]; then local  institution="Advanced Science Research Center at the Graduate Center, CUNY"; fi
 	if [[ "${sourceInst}"   == "" ]]; then local   sourceInst="City College of New York"; fi
 	if [[ "${sourcePerson}" == "" ]]; then local sourcePerson="${person}"; fi
-	setHeader  -t "${title}" -d "${domain}" -u "${subject}" -y "on" -c "${comment}" -i "${citation}" -n "${institution}" -o "${sourceInst}" -p "${sourcePerson}" -v "${version}" "${rgisFile}" "${rgisFile}"
+	echo setHeader  -t "${title}" -d "${domain}" -u "$(RGISlookupSubject "${subject}")" -y "on" -c "${comment}" -i "${citation}" -n "${institution}" -o "${sourceInst}" -p "${sourcePerson}" -v "${version}" "${rgisFile}" "${rgisFile}"
 }
 
 function RGISAggregateTS ()
