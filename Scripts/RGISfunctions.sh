@@ -1873,7 +1873,7 @@ function RGISsetHeader ()
 	fi
 
 	local subString=""
-	if [[ "${tStepType}"    == "" ]]; then local tStepType="static";  fi
+	if [[ "${tStepType}"    == "" ]]; then local tStepType="static";  fi;  local subString="${subString}, ${tStepType}";
 	if [[ "${tStep}"        == "" ]]; then local     tStep="";        else local subString="${subString}, ${tStep}";     fi
 	if [[ "${timeRange}"    == "" ]]; then local timeRange="";        else local subString="${subString}, ${timeRange}"; fi
 	if [[ "${version}"      == "" ]]; then local   version="pre0.01"; fi
@@ -1885,7 +1885,7 @@ function RGISsetHeader ()
 	if [[ "${institution}"  == "" ]]; then local  institution="Advanced Science Research Center at the Graduate Center, CUNY"; fi
 	if [[ "${sourceInst}"   == "" ]]; then local   sourceInst="City College of New York"; fi
 	if [[ "${sourcePerson}" == "" ]]; then local sourcePerson="${person}"; fi
-	echo setHeader  -t "${title}" -d "${domain}" -u "$(RGISlookupSubject "${subject}")" -y "on" -c "${comment}" -i "${citation}" -n "${institution}" -o "${sourceInst}" -p "${sourcePerson}" -v "${version}" "${rgisFile}" "${rgisFile}"
+	setHeader  -t "${title}" -d "${domain}" -u "$(RGISlookupSubject "${subject}")" -y "on" -c "${comment}" -i "${citation}" -n "${institution}" -o "${sourceInst}" -p "${sourcePerson}" -v "${version}" "${rgisFile}" "${rgisFile}"
 }
 
 function RGISAggregateTS ()
