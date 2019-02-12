@@ -371,7 +371,7 @@ function PGrasterize ()
 	tblJoinTables -t "${schema} ${tblname}" -u "Zones" -a "${rgisFile%.gdbd*}.gdbt" -e "DBItems" -o "DBItems" -r "GridValue" -j "${idField}" "${rgisFile}" - |\
 	tblDeleteField -f "DBItems" - "${rgisFile}"
 	rm "${rgisFile%.gdbd*}.gdbt"
-	grdRenameLayers -r 1 "$(RGISlookupSubject "${subject}")" "${rgisFile}" "${rgisFile}"
+	grdRenameLayers -r 0 "$(RGISlookupSubject "${subject}")" "${rgisFile}" "${rgisFile}"
 	RGISsetHeader "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}"
 }
 
