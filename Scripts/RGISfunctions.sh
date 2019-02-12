@@ -1876,7 +1876,7 @@ function RGISsetHeader ()
 	if [[ "${tStepType}"    == "" ]]; then local tStepType="static";  fi;
 	if [[ "${version}"      == "" ]]; then local   version="pre0.01"; fi
 
-	if [[ "${title}"        == "" ]]; then local        title="$(RGIStitle "${domain}" "${subject}" "${product}" "${resolution}" "${version}" "${tStepType}" ${tStep} ${timeRange}")"; fi
+	if [[ "${title}"        == "" ]]; then local        title="$(RGIStitle "${domain}" "${subject}" "${product}" "${resolution}" "${version}" "${tStepType}" ${tStep} ${timeRange})"; fi
 	if [[ "${comment}"      == "" ]]; then local      comment="${domain} $(_RGISlookupFullName "${subject}") from ${product} at ${resolution}"; fi
 	if [[ "${citation}"     == "" ]]; then local     citation="Pirated ${subject} from ${product}"; fi
 	if [[ "${institution}"  == "" ]]; then local  institution="Advanced Science Research Center at the Graduate Center, CUNY"; fi
