@@ -79,7 +79,7 @@ EXTENSION="${RGISFILE#*.}"
 if [ "${SCHEMA}"  == "" ]; then  SCHEMA="public"; fi
 if [ "${TBLNAME}" == "" ]; then TBLNAME="${FILENAME}"; fi
 
-   DBNAME=$(caseFunc "${CASE}" "${DBNAME}")
+   DBNAME="${DBNAME}"
    SCHEMA=$(caseFunc "${CASE}" "${SCHEMA}")
   TBLNAME=$(caseFunc "${CASE}" "${TBLNAME}")
        ID=$(caseFunc "${CASE}" "ID")
@@ -94,11 +94,11 @@ case "${EXTENSION}" in
 		ogr2ogr -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
 		shp2pgsql -k -s 4326 "${TEMPFILE}.shp" "${SCHEMA}"."${TBLNAME}_geom" | psql "${DBNAME}"
 		echo "ALTER TABLE \"${SCHEMA}\".\"${TBLNAME}\" ADD COLUMN \"geom\" geometry;
-      		UPDATE \"${SCHEMA}\".\"${TBLNAME}\"
-        	SET \"geom\" = \"${SCHEMA}\".\"${TBLNAME}_geom\".\"geom\"
-         	FROM   \"${SCHEMA}\".\"${TBLNAME}_geom\"
-        	WHERE  \"${SCHEMA}\".\"${TBLNAME}\".\"${ID}\" =  \"${SCHEMA}\".\"${TBLNAME}_geom\".\"gid\";
-         	DROP TABLE \"${SCHEMA}\".\"${TBLNAME}_geom\";" | psql "${DBNAME}"
+      		  UPDATE \"${SCHEMA}\".\"${TBLNAME}\"
+        	  SET \"geom\" = \"${SCHEMA}\".\"${TBLNAME}_geom\".\"geom\"
+         	  FROM   \"${SCHEMA}\".\"${TBLNAME}_geom\"
+        	  WHERE  \"${SCHEMA}\".\"${TBLNAME}\".\"${ID}\" =  \"${SCHEMA}\".\"${TBLNAME}_geom\".\"gid\";
+         	  DROP TABLE \"${SCHEMA}\".\"${TBLNAME}_geom\";" | psql "${DBNAME}"
       rm "${TEMPFILE}".*
 	;;
 	(gdbd|gdbd.gz)
@@ -108,12 +108,12 @@ case "${EXTENSION}" in
 		gdal_polygonize.py -8  "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
 		shp2pgsql -k -s 4326 "${TEMPFILE}.shp" "${SCHEMA}"."${TBLNAME}_geom" | tee "${TEMPFILE}".sql | psql "${DBNAME}"
 		echo "ALTER TABLE \"${SCHEMA}\".\"${TBLNAME}\" ADD COLUMN \"geom\" geometry;
-      		UPDATE \"${SCHEMA}\".\"${TBLNAME}\"
-        	SET \"geom\" = \"${TBLNAME}_SELECTION\".\"geom\"
-         	FROM  (SELECT \"DN\", ST_BUFFER (ST_UNION (\"geom\"),0.0) AS \"geom\" FROM \"${SCHEMA}\".\"${TBLNAME}_geom\"
-         	       GROUP BY \"${SCHEMA}\".\"${TBLNAME}_geom\".\"DN\") AS \"${TBLNAME}_SELECTION\"
-        	WHERE  \"${SCHEMA}\".\"${TBLNAME}\".\"${GRIDVALUE}\" = \"${TBLNAME}_SELECTION\".\"DN\";
-	       	DROP TABLE\"${SCHEMA}\".\"${TBLNAME}_geom\";" | psql "${DBNAME}"
+      		  UPDATE \"${SCHEMA}\".\"${TBLNAME}\"
+        	  SET \"geom\" = \"${TBLNAME}_SELECTION\".\"geom\"
+         	  FROM  (SELECT \"DN\", ST_BUFFER (ST_UNION (\"geom\"),0.0) AS \"geom\" FROM \"${SCHEMA}\".\"${TBLNAME}_geom\"
+         	         GROUP BY \"${SCHEMA}\".\"${TBLNAME}_geom\".\"DN\") AS \"${TBLNAME}_SELECTION\"
+        	  WHERE  \"${SCHEMA}\".\"${TBLNAME}\".\"${GRIDVALUE}\" = \"${TBLNAME}_SELECTION\".\"DN\";
+	       	  DROP TABLE\"${SCHEMA}\".\"${TBLNAME}_geom\";" | psql "${DBNAME}"
          rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
