@@ -17,8 +17,7 @@ bfekete@ccny.cuny.edu
 
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
-    char *title = (char *) NULL,  *subject = (char *) NULL;
-    char *domain = (char *) NULL, *version = (char *) NULL;
+    char *title = (char *) NULL, *domain = (char *) NULL, *version = (char *) NULL;
     char *pointName = (char *) NULL;
     DBInt cellID, pntID;
     DBPosition pos;
@@ -44,15 +43,6 @@ int main(int argc, char *argv[]) {
                 return (CMfailed);
             }
             title = argv[argPos];
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
-        if (CMargTest (argv[argPos], "-u", "--subject")) {
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
-                CMmsgPrint(CMmsgUsrError, "Missing subject!");
-                return (CMfailed);
-            }
-            subject = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
@@ -83,7 +73,6 @@ int main(int argc, char *argv[]) {
             CMmsgPrint(CMmsgInfo, "%s [options] <input network> <output network>", CMfileName(argv[0]));
             CMmsgPrint(CMmsgInfo, "     -p,--points      <point coverage>");
             CMmsgPrint(CMmsgInfo, "     -t,--title       [dataset title]");
-            CMmsgPrint(CMmsgInfo, "     -u,--subject     [subject]");
             CMmsgPrint(CMmsgInfo, "     -d,--domain      [domain]");
             CMmsgPrint(CMmsgInfo, "     -v,--version     [version]");
             CMmsgPrint(CMmsgInfo, "     -V,--verbose");
@@ -122,7 +111,6 @@ int main(int argc, char *argv[]) {
         return (CMfailed);
     }
     if (title   != (char *) NULL) netData->Name(title);
-    if (subject != (char *) NULL) netData->Document(DBDocSubject, subject);
     if (domain  != (char *) NULL) netData->Document(DBDocGeoDomain, domain);
     if (version != (char *) NULL) netData->Document(DBDocVersion, version);
 

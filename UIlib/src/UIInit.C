@@ -18,7 +18,7 @@ bfekete@ccny.cuny.edu
 #include <Xm/DrawingA.h>
 #include <UI.H>
 
-#define UICopyRightText "[Copyright (1994-2018) UNH - CCNY/CUNY]"
+#define UICopyRightText "[Copyright (1994-2019) UNH - ASRC/CUNY]"
 
 static Widget _UITopLevel;
 static UIMenuItem *_UIMainMenu;
