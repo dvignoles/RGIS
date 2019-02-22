@@ -288,13 +288,12 @@ function PGrasterDimension ()
 
 function PGrasterize ()
 {
-	local    caseVal="${1}";                            shift
-	local     dbName="$(RGIScase "${caseVal}" "${1}")"; shift
-	local     schema="$(RGIScase "${caseVal}" "${1}")"; shift
-	local    tblname="$(RGIScase "${caseVal}" "${1}")"; shift
-	local    idField="$(RGIScase "${caseVal}" "${1}")"; shift
-	local    initVal="$(RGIScase "${caseVal}" "${1}")"; shift
-	local       geom="$(RGIScase "${caseVal}" "${1}")"; shift
+	local     dbName="${1}"; shift
+	local     schema="${1}"; shift
+	local    tblname="${1}"; shift
+	local    idField="${1}"; shift
+	local    initVal="${1}"; shift
+	local       geom="${1}"; shift
 	local rgisArchiv="${1}"; shift
 	local     domain="${1}"; shift
 	local    subject="${1}"; shift
@@ -316,12 +315,12 @@ function PGrasterize ()
 	if [[ "${idField}" == "gid" ]]
 	then
 		echo "ALTER TABLE \"${schema}\".\"${tblname}\"
-		      DROP COLUMN IF EXISTS \"$(RGIScase ${caseVal} "idField")\",
-		      ADD  COLUMN \"$(RGIScase ${caseVal} "idField")\" INTEGER;
+		      DROP COLUMN IF EXISTS \"idField\",
+		      ADD  COLUMN \"idField\" INTEGER;
 		      UPDATE      \"${schema}\".\"${tblname}\"
-		      SET \"$(RGIScase ${caseVal} "idField")\" = ${idField};" |\
+		      SET \"idField\" = ${idField};" |\
 		psql -q "$(PGdbName "${dbName}")"
-		local idField="$(RGIScase ${caseVal} "idField")"
+		local idField="idField"
 	fi
 	gdal_rasterize -l "${schema}"."${tblname}" -a "${idField}" -init "${initVal}" -ot Integer  -of GTiff \
 	               -ts "${ncols}" "${nrows}" -te "${extent_llx}" "${extent_lly}" "${extent_urx}" "${extent_ury}" \
@@ -335,7 +334,7 @@ function PGrasterize ()
 	 echo "0") | grdImport -b "${rgisFile%.gdbd*}.grd"
 	rm  "${rgisFile%.gdbd*}.tif" "${rgisFile%.gdbd*}.grd.aux.xml" "${rgisFile%.gdbd*}.prj" "${rgisFile%.gdbd*}.grd"
 
-	PGattribTableSQL "${caseVal}" "${schema}" "${tblname}" "${idField}" "${geom}" |\
+	PGattribTableSQL "sensitive" "${schema}" "${tblname}" "${idField}" "${geom}" |\
 	psql -q "$(PGdbName "${dbName}")" |\
 	table2rgis - "${rgisFile%.gdbd*}.gdbt"
 

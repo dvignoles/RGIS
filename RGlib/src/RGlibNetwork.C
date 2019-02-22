@@ -910,14 +910,12 @@ DBInt RGlibNetworkConfluences(DBObjData *netData, DBObjData *outPntData) {
         if (((toCellRec = netIF->ToCell(cellRec)) != (DBObjRecord *) NULL) &&
             (netIF->CellOrder(toCellRec) == cellOrder))
             continue;
-
         sprintf(recordName, "Confluence%010d", pntId++);
         pntRec = pntIF->NewItem(recordName);
         pntIF->Coordinate(pntRec, netIF->Center(cellRec));
         pntIF->ItemSymbol(pntRec, pntIF->Symbol(cellOrder - 1));
         orderFLD->Int(pntRec, cellOrder);
     }
-
     return (DBSuccess);
 }
 
@@ -975,10 +973,6 @@ DBInt RGlibNetworkBasinProf(DBObjData *netData, DBObjData *gridData, DBObjData *
             yCoordFLD->Float(tblRec, coord.Y);
             dist += netIF->CellLength(cellRec);
             distFLD->Float(tblRec, dist);
-            valueFLD = fields->First();
-            valueFLD = fields->Next();
-            valueFLD = fields->Next();
-            valueFLD = fields->Next();
             for (layerID = 0; layerID < gridIF->LayerNum(); ++layerID) {
                 layerRec = gridIF->Layer(layerID);
                 if ((layerRec->Flags() & DBObjectFlagIdle) == DBObjectFlagIdle) continue;
