@@ -202,8 +202,7 @@ function PGpolygonColorizeSQL ()
     local     idFLD="$(RGIScase "${caseVal}" "${1}")"; shift
     local  colorFLD="$(RGIScase "${caseVal}" "${1}")"; shift
 
-    echo   "DROP TABLE IF EXISTS \"public\".\"tmpCOLORS\";
-            CREATE TABLE \"public\".\"tmpCOLORS\" (\"tmpCOLOR\" INTEGER NOT NULL CONSTRAINT \"tmpCOLOR_pkey\" PRIMARY KEY);
+    echo   "CREATE TEMPORARY TABLE \"public\".\"tmpCOLORS\" (\"tmpCOLOR\" INTEGER NOT NULL CONSTRAINT \"tmpCOLOR_pkey\" PRIMARY KEY);
             INSERT INTO  \"public\".\"tmpCOLORS\" (\"tmpCOLOR\") VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12);
             ALTER TABLE \"${schema}\".\"${tblName}\" DROP COLUMN IF EXISTS \"${colorFLD}\",
                                                      DROP COLUMN IF EXISTS \"newCOLOR\";
@@ -243,7 +242,6 @@ function PGpolygonColorizeSQL ()
                 UPDATE \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = \"newCOLOR\";
                 UPDATE \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = 1 WHERE \"${colorFLD}\" = 0;
                 ALTER TABLE \"${schema}\".\"${tblName}\" DROP COLUMN \"newCOLOR\";
-                DROP TABLE \"public\".\"tmpCOLORS\";
             END;
           \$COLORIZE\$;
           SELECT   \"${schema}\".\"${tblName}\".\"${colorFLD}\", COUNT (\"${schema}\".\"${tblName}\".\"${idFLD}\")
