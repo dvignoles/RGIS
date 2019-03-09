@@ -40,7 +40,7 @@ do
 	(-c|--case)
 	    shift; if [ "${1}" == "" ]; then PrintUsage; fi
 	    case "${1}" in
-	    (sensitive|lower|upper)
+	    (sensitive|lower)
 	        CASE="${1}"
 	        ;;
 	    (*)
