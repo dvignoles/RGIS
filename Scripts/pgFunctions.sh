@@ -202,8 +202,8 @@ function PGpolygonColorizeSQL ()
     local     idFLD="$(RGIScase "${caseVal}" "${1}")"; shift
     local  colorFLD="$(RGIScase "${caseVal}" "${1}")"; shift
 
-    echo   "CREATE TEMPORARY TABLE \"tmpCOLORS\" (\"tmpCOLOR\" INTEGER NOT NULL CONSTRAINT \"tmpCOLOR_pkey\" PRIMARY KEY);
-            INSERT INTO  \"tmpCOLORS\" (\"tmpCOLOR\") VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12);
+    echo   "CREATE TEMPORARY TABLE \"TMPcolors\" (\"tmpCOLOR\" INTEGER NOT NULL CONSTRAINT \"tmpCOLOR_pkey\" PRIMARY KEY);
+            INSERT INTO  \"TMPcolors\" (\"tmpCOLOR\") VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12);
             ALTER TABLE \"${schema}\".\"${tblName}\" DROP COLUMN IF EXISTS \"${colorFLD}\",
                                                      DROP COLUMN IF EXISTS \"newCOLOR\";
             ALTER TABLE \"${schema}\".\"${tblName}\" ADD COLUMN \"${colorFLD}\" INTEGER,
@@ -226,17 +226,17 @@ function PGpolygonColorizeSQL ()
             BEGIN
                 FOR poly IN polygons LOOP
                     colorVAL = (SELECT MIN (\"tmpCOLORS\".\"tmpCOLOR\")
-                                FROM (SELECT \"tmpCOLORS\".\"tmpCOLOR\", COUNT (\"Adjacent_Polygons\".\"${idFLD}\") AS \"NumPoly\"
-                                      FROM \"tmpCOLORS\"
+                                FROM (SELECT \"TMPcolors\".\"tmpCOLOR\", COUNT (\"Adjacent_Polygons\".\"${idFLD}\") AS \"NumPoly\"
+                                      FROM \"TMPcolors\"
                                       LEFT JOIN (SELECT \"${schema}\".\"${tblName}\".\"${idFLD}\",
                                                         \"${schema}\".\"${tblName}\".\"${geomFLD}\",
                                                         \"${schema}\".\"${tblName}\".\"newCOLOR\"
                                                  FROM   \"${schema}\".\"${tblName}\"
                                                  WHERE  \"${schema}\".\"${tblName}\".\"${idFLD}\" != \"poly\".\"${idFLD}\"
                                                  AND  St_Dimension (St_Intersection (\"${schema}\".\"${tblName}\".\"${geomFLD}\", \"poly\".\"${geomFLD}\")) > 0) AS \"Adjacent_Polygons\"
-                                ON  \"tmpCOLORS\".\"tmpCOLOR\" = \"Adjacent_Polygons\".\"newCOLOR\"
-                                GROUP BY \"COLORS\".\"tmpCOLOR\") AS \"COLORS\"
-                                WHERE \"COLORS\".\"tmpCOLOR\" != 0 AND \"NumPoly\" = 0);
+                                ON  \"TMPcolors\".\"tmpCOLOR\" = \"Adjacent_Polygons\".\"newCOLOR\"
+                                GROUP BY \"TMPcolors\".\"tmpCOLOR\") AS \"tmpCOLORS\"
+                                WHERE \"tmpCOLORS\".\"tmpCOLOR\" != 0 AND \"NumPoly\" = 0);
                     UPDATE \"${schema}\".\"${tblName}\" SET \"newCOLOR\" = colorVAL WHERE \"${idFLD}\" = \"poly\".\"${idFLD}\";
                 END LOOP;
                 UPDATE \"${schema}\".\"${tblName}\" SET \"${colorFLD}\" = \"newCOLOR\";
