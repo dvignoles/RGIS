@@ -105,7 +105,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
     DBObjectLIST<DBObjTableField> *fields = table->Fields();
     DBObjRecord *record;
     DBObjTableField *field;
-    DBInt bufferLen [2] = {0,0};
+    DBInt bufferLen [2] = {0,0}, recordID, nameLength = 1;
     char *bufferPtr [2] = {(char *) NULL, (char *) NULL};
 
     if ((RGlibTableCopy == mode) || (RGlibTableBlank == mode)) {
@@ -119,10 +119,13 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
             fprintf (outFile, "DROP TABLE IF EXISTS \"%s\".\"%s\";\n", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
             fprintf (outFile, "CREATE TABLE \"%s\".\"%s\"\n",          _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
         }
-
+        for (recordID = 0;recordID < table->ItemNum();++recordID) {
+            record = table->Item (recordID);
+            nameLength = nameLength > strlen (record->Name ()) ? nameLength : strlen (record->Name ());
+        }
         fprintf (outFile,"(\n");
         fprintf (outFile,"\"%s\" SERIAL,\n",_RGlibSQLCaseChange (sqlCase, "ID", bufferPtr, bufferLen));
-        fprintf (outFile,"\"%s\" CHARACTER VARYING(%d) COLLATE pg_catalog.\"default\",\n",_RGlibSQLCaseChange (sqlCase, "RecordName", bufferPtr, bufferLen),DBStringLength);
+        fprintf (outFile,"\"%s\" CHARACTER VARYING(%d) COLLATE pg_catalog.\"default\",\n",_RGlibSQLCaseChange (sqlCase, "RecordName", bufferPtr, bufferLen),nameLength + 1);
         for (field = fields->First(); field != (DBObjTableField *) NULL; field = fields->Next()) {
             if (DBTableFieldIsVisible (field))
                 switch (field->Type()) {
