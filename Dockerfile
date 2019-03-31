@@ -10,3 +10,4 @@ RUN ln -snf /usr/share/zoneinfo/UTC /etc/localtime && echo UTC > /etc/timezone
 
 # Install GHAAS
 RUN git clone https://github.com/bmfekete/RGIS /tmp/RGIS && /tmp/RGIS/install.sh /usr/local/share && rm -rf /tmp/RGIS
+ENV PATH "${PATH};/usr/local/share/ghaas/bin;/usr/local/share/ghaas/f"
