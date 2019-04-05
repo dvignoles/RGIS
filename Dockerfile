@@ -6,7 +6,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
                        libudunits2-0 libudunits2-data libudunits2-dev \
                        libexpat1 libexpat1-dev libxext-dev \
                        libmotif-common libmotif-dev gdal-bin gdal-data libgdal-dev \
-                       postgis postgis-doc postgresql-10-postgis-2.4 && rm -rf /var/lib/apt/lists/*
+                       postgis postgis-doc postgresql-client && rm -rf /var/lib/apt/lists/*
 
 # Always use UTC on a server
 RUN ln -snf /usr/share/zoneinfo/UTC /etc/localtime && echo UTC > /etc/timezone
