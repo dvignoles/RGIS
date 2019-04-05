@@ -21,7 +21,7 @@ ENV GROUP="compass"
 ENV   UID="1000"
 ENV   GID="1000"
 
-COPY Containers/startup.sh /opt/startup.sh
+COPY Container/startup.sh /opt/startup.sh
 VOLUME /data/RGISarchive2
 VOLUME /home/${USER}
 
@@ -30,4 +30,4 @@ RUN addgroup --gid ${GID} ${GROUP} && adduser --uid ${UID} --gid ${GID} --home /
 USER ${USER}:${GROUP}
 WORKDIR /home/${USER}
 
-ENTRYPOINT ["/bin/bash.sh"]
+ENTRYPOINT ["/bin/bash"]
