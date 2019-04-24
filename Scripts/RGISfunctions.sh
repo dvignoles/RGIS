@@ -349,22 +349,28 @@ function RGISlookupSubject ()
 		(surface_air_pressure)                        #  94
 			echo "AirPressure"
 		;;
-		(upstream_area)                               #  95
+		(surface_air_pressure)                        #  94
+			echo "AirPressure"
+		;;
+		(travel_time)                                 #  95
+			echo "TravelTime"
+		;;
+		(upstream_area)                               #  96
 			echo "UpstreamArea"
 		;;
-		(vegetables_crop_fraction)                    #  96
+		(vegetables_crop_fraction)                    #  97
 			echo "CropFraction-Vegetables"
 		;;
-		(wilting_point)                               #  97
+		(wilting_point)                               #  98
 			echo "Soil-WiltingPoint"
 		;;
-		(wind_speed)                                  #  98
+		(wind_speed)                                  #  99
 			echo "WindSpeed"
 		;;
-		(u_wind_speed)                                #  99
+		(u_wind_speed)                                # 100
 			echo "WindSpeed-U10m"
 		;;
-		(v_wind_speed)                                # 100
+		(v_wind_speed)                                # 101
 			echo "WindSpeed-V10m"
 		;;
 		(*)
@@ -663,22 +669,25 @@ function _RGISlookupFullName ()
 		(surface_air_pressure)                        #  94
 			echo "Air Pressure"
 		;;
-		(upstream_area)                               #  95
+		(travel_time)                                 #  95
+			echo "Travel Time"
+		;;
+		(upstream_area)                               #  96
 			echo "Upstream Area"
 		;;
-		(vegetables_crop_fraction)                    #  96
+		(vegetables_crop_fraction)                    #  97
 			echo "Vegetables Crop Fraction"
 		;;
-		(wilting_point)                               #  97
+		(wilting_point)                               #  98
 			echo "Wilting Point"
 		;;
-		(wind_speed)                                  #  98
+		(wind_speed)                                  #  99
 			echo "Wind Speed"
 		;;
-		(u_wind_speed)                                #  99
+		(u_wind_speed)                                # 100
 			echo "Wind Speed U-direction"
 		;;
-		(v_wind_speed)                                # 100
+		(v_wind_speed)                                # 101
 			echo "Wind Speed V-direction"
 		;;
 		(*)
@@ -965,22 +974,25 @@ function RGISlookupShadeset ()
 		(subbasin)                                    #  94
 			echo "grey"
 		;;
-		(upstream_area)                               #  95
+		(travel_time)                                 #  95
 			echo "grey"
 		;;
-		(vegetables_crop_fraction)                    #  96
+		(upstream_area)                               #  96
 			echo "grey"
 		;;
-		(wilting_point)                               #  97
+		(vegetables_crop_fraction)                    #  97
 			echo "grey"
 		;;
-		(wind_speed)                                  #  98
+		(wilting_point)                               #  98
 			echo "grey"
 		;;
-		(u_wind_speed)                                #  99
+		(wind_speed)                                  #  99
 			echo "grey"
 		;;
-		(v_wind_speed)                                # 100
+		(u_wind_speed)                                # 100
+			echo "grey"
+		;;
+		(v_wind_speed)                                # 101
 			echo "grey"
 		;;
 		(*)
@@ -1267,22 +1279,25 @@ function RGISlookupAggrMethod ()
 		(subbasin)                                    #  94
 			echo "avg"
 		;;
-		(upstream_area)                               #  95
+		(travel_time)                                 #  95
+			echo "N/A"
+		;;
+        (upstream_area)                               #  96
 			echo "avg"
 		;;
-		(vegetables_crop_fraction)                    #  96
+		(vegetables_crop_fraction)                    #  97
 			echo "avg"
 		;;
-		(wilting_point)                               #  97
+		(wilting_point)                               #  98
 			echo "avg"
 		;;
-		(wind_speed)                                  #  98
+		(wind_speed)                                  #  99
 			echo "avg"
 		;;
-		(u_wind_speed)                                #  99
+		(u_wind_speed)                                # 100
 			echo "avg"
 		;;
-		(v_wind_speed)                                # 100
+		(v_wind_speed)                                # 101
 			echo "avg"
 		;;
 		(*)
