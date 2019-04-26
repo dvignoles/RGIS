@@ -1792,49 +1792,59 @@ function RGIStitle ()
 	local   variable="${1}"; shift
 	local    product="${1}"; shift
 	local resolution="${1}"; shift
-	local  tStepType="$(echo "${1}" | tr "[A-Z]" "[a-z]")"; shift
-	local      tStep="$(echo "${1}" | tr "[A-Z]" "[a-z]")"; shift
+	local  tStepType="${1}"; shift
+	local      tStep="${1}"; shift
 	local  timeRange="${1}"; shift
 	local    version="${1}"; shift
 
 
 	local variableFullName=$(_RGISlookupFullName "${variable}")
 
-	if [[ "${tStepType}" == "static" ]]
-	then
-		local tStepString=""
-	else
-		case "${tStep}" in
-			(hourly)
-				local tStepStr="Hourly"
-			;;
-			(3hourly)
-				local tStepStr="3Hourly"
-			;;
-			(6hourly)
-				local tStepStr="6Hourly"
-			;;
-			(daily)
-				local tStepStr="Daily"
-			;;
-			(monthly)
-				local tStepStr="Monthly"
-			;;
-			(annual)
-				local tStepStr="Annual"
-			;;
-			(*)
-				echo "Unknown time step ${tStep}"  > /dev/stderr
-			;;
-		esac
-		if [[ "${timeRange}" == "" ]]
-		then
-			local tStepString=", ${tStepStr}${tStepType}"
-		else
-			local tStepString=", ${tStepStr}${tStepType}, ${timeRange}"
-		fi
-	fi
-	echo "${domain}, ${product} ${variableFullName} (${resolution}${tStepString}) V${version}"
+	case "$(echo "${tStepType}" | tr "[A-Z]" "[a-z]")" in
+	    (static)
+		    local tStepString=""
+		;;
+	    (lt|ts)
+    		case "$(echo "${tStep}" | tr "[A-Z]" "[a-z]")" in
+			    (hourly)
+				    local tStepStr="Hourly"
+			    ;;
+			    (3hourly)
+				    local tStepStr="3Hourly"
+			    ;;
+			    (6hourly)
+				    local tStepStr="6Hourly"
+			    ;;
+			    (daily)
+				    local tStepStr="Daily"
+			    ;;
+			    (monthly)
+				    local tStepStr="Monthly"
+			    ;;
+			    (annual)
+				    local tStepStr="Annual"
+			    ;;
+			    (*)
+				    echo "Unknown time step ${tStep}"  > /dev/stderr
+			    ;;
+    		esac
+		    if [[ "${timeRange}" == "" ]]
+		    then
+			    local tStepString=", ${tStepStr}$(echo "${tStepType}" | tr "[a-z]" "[A-Z]")"
+		    else
+			    local tStepString=", ${tStepStr}$(echo "${tStepType}" | tr "[a-z]" "[A-Z]"), ${timeRange}"
+		    fi
+        ;;
+    	(*)
+    	    echo "Unknown time step type"  > /dev/stderr
+    	;;
+    esac
+    if [[ "${version}" == "" ]]
+    then
+    	echo "${domain}, ${product} ${variableFullName} (${resolution}${tStepString})"
+    else
+    	echo "${domain}, ${product} ${variableFullName} (${resolution}${tStepString}) V${version}"
+    fi
 	return 0
 }
 
