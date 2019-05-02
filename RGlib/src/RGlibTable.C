@@ -138,7 +138,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
                         fprintf(outFile, "\"%s\" INTEGER,\n", _RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen));
                         break;
                     case DBTableFieldFloat:
-                        fprintf(outFile, "\"%s\" NUMERIC (%d,%d),\n", _RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen), field->FormatWidth(), field->FormatDecimals());
+                        fprintf(outFile, "\"%s\" FLOAT,\n",   _RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen));
                         break;
                     case DBTableFieldDate:
                         fprintf(outFile, "\"%s\" CHARACTER VARYING(10) COLLATE pg_catalog.\"default\",\n", _RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen));
@@ -166,8 +166,8 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
                     switch (field->Type()) {
                         default:
                         case DBTableFieldString: fprintf(outFile,",$$%s$$", field->String(record));  break;
-                        case DBTableFieldInt:    fprintf(outFile,",%d", field->Int (record));        break;
-                        case DBTableFieldFloat:  fprintf(outFile,",%f", field->Float (record));      break;
+                        case DBTableFieldInt:    fprintf(outFile,",%d",     field->Int (record));    break;
+                        case DBTableFieldFloat:  fprintf(outFile,",%f",     field->Float (record));  break;
                         case DBTableFieldDate:   fprintf(outFile,",\'%s\'", field->String (record)); break;
                     }
             }
