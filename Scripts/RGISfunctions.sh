@@ -1951,13 +1951,14 @@ function RGISAggregateTS ()
 
    for ((year = ${startyear}; year <= ${endyear} ; ++year))
    do
-      local fromFile=$(RGISfile "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${fromtStep}" "${year}")
-      local   toFile=$(RGISfile "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${totStep}"   "${year}")
-      local    title=$(RGIStitle "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${totStep}" "${year}" "${version}")
+      local fromFile=$(RGISfile     "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${fromtStep}" "${year}")
+      local   toFile=$(RGISfilePath "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${totStep}"   "${year}")
+      local    title=$(RGIStitle                 "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${totStep}"   "${year}" "${version}")
       local  subject=$(RGISlookupSubject    "${variable}")
       local shadeset=$(RGISlookupShadeset   "${variable}")
-	  local   method=$(RGISlookupAggrMethod "${variable}")
+      local   method=$(RGISlookupAggrMethod "${variable}")
 
+      [ -e "${toFile%/*}" ] || mkdir -p "${toFile%/*}"
       grdTSAggr -a "${method}" -e "$(RGISlookupTimeStep ${totStep})" -t "${title}" -d "${domain}" -u "${subject}" -s "${shadeset}" "${fromFile}" "${toFile}" || return 1
    done
 }
