@@ -159,8 +159,8 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
         }
         fprintf (outFile,") VALUES\n");
         for (record = table->First (); record != (DBObjRecord *) NULL; record = table->Next ()) {
-            if (record->RowID () == 0) fprintf (outFile,    "('%s'", record->Name());
-            else                       fprintf (outFile,"),\n('%s'", record->Name());
+            if (record->RowID () == 0) fprintf (outFile,    "($$%s$$", record->Name());
+            else                       fprintf (outFile,"),\n($$%s$$", record->Name());
             for (field = fields->First(); field != (DBObjTableField *) NULL; field = fields->Next()) {
                 if (DBTableFieldIsVisible (field))
                     switch (field->Type()) {
