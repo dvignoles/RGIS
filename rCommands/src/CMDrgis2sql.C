@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
     data = new DBObjData();
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Read(argv[1]) : data->Read(stdin);
     if ((ret == DBFault) || ((table = data->Table (rgisTableName)) == (DBObjTable *) NULL)) {
-        CMmsgPrint(CMmsgUsrError, "Wrong rgis data: %s!");
+        CMmsgPrint(CMmsgUsrError, "Wrong rgis table: %s!",rgisTableName);
         delete data;
         return (CMfailed);
     }
