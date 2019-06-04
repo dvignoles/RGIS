@@ -156,6 +156,36 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBFloat area) const {
         if ((dir == DBNetDirSE) || (dir == DBNetDirS) || (dir == DBNetDirSW)) cellPos.Row--;
         if ((dir == DBNetDirNE) || (dir == DBNetDirE) || (dir == DBNetDirSE)) cellPos.Col++;
         if ((dir == DBNetDirNW) || (dir == DBNetDirW) || (dir == DBNetDirSW)) cellPos.Col--;
+        if ((cellPos.Row < 0) || (cellPos.Col < 0) || (cellPos.Row >= RowNum()) || (cellPos.Col >= ColNum())) continue;
+
+        if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) ==
+            DBFault)
+            continue;
+        cellRec = CellTable->Item(cellID);
+        delta = fabs(area - CellBasinArea(cellRec)) / (fabs(area) + fabs(CellBasinArea(cellRec)));
+        if (delta < bestDelta) {
+            bestDelta = delta;
+            bestCellRec = cellRec;
+        }
+    }
+    for (i = 0; i < 12; ++i) {
+        dir = (0x01 << i) & 0xff;
+        cellPos = pos;
+        switch (dir) {
+            case  0: cellPos.Col -= 2; cellPos.Row -= 1; break;
+            case  1: cellPos.Col -= 2; break;
+            case  2: cellPos.Col -= 2; cellPos.Row += 1; break;
+            case  3: cellPos.Row -= 2; cellPos.Row -= 1; break;
+            case  4: cellPos.Row -= 2; break;
+            case  5: cellPos.Row -= 2; cellPos.Row += 1; break;
+            case  6: cellPos.Col += 2; cellPos.Row -= 1; break;
+            case  7: cellPos.Col += 2; break;
+            case  8: cellPos.Col += 2; cellPos.Row += 1; break;
+            case  9: cellPos.Row += 2; cellPos.Row -= 1; break;
+            case 10: cellPos.Row += 2; break;
+            case 11: cellPos.Row += 2; cellPos.Row += 1; break;
+        }
+        if ((cellPos.Row < 0) || (cellPos.Col < 0) || (cellPos.Row >= RowNum()) || (cellPos.Col >= ColNum())) continue;
         if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) == DBFault) continue;
         cellRec = CellTable->Item(cellID);
         delta = fabs(area - CellBasinArea(cellRec)) / (fabs(area) + fabs(CellBasinArea(cellRec)));
