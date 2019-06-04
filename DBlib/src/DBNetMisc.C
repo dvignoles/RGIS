@@ -168,8 +168,7 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBFloat area) const {
             bestCellRec = cellRec;
         }
     }
-    for (i = 0; i < 12; ++i) {
-        dir = (0x01 << i) & 0xff;
+    for (dir = 0; dir < 12; ++dir) {
         cellPos = pos;
         switch (dir) {
             case  0: cellPos.Col -= 2; cellPos.Row -= 1; break;
