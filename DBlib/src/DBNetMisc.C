@@ -153,7 +153,7 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBFloat area) const {
         cellPos = pos;
         cellPos.Col += i;
         cellPos.Row += j;
-        if ((i == j) || (cellPos.Row < 0) || (cellPos.Col < 0) || (cellPos.Row >= RowNum()) || (cellPos.Col >= ColNum())) continue;
+        if (((i == j) && (abs(i) == 3)) || (cellPos.Row < 0) || (cellPos.Col < 0) || (cellPos.Row >= RowNum()) || (cellPos.Col >= ColNum())) continue;
 
         if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) ==
             DBFault)
