@@ -36,8 +36,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *field) {
         if (netIF->Coord2Pos(coord, pos) == DBFault) continue;
         netIF->Pos2Coord(pos, coord);
         cellRec = netIF->Cell (coord);
-        if ((field != (DBObjTableField *) NULL) &&
-            (!CMmathEqualValues(field->Float(pntRec), field->FloatNoData()))) {
+        if ((field != (DBObjTableField *) NULL) && (!CMmathEqualValues(field->Float(pntRec), field->FloatNoData()))) {
             bestCellRec = netIF->Cell(coord, field->Float(pntRec));
             if ((cellRec != (DBObjRecord *) NULL) && (bestCellRec != (DBObjRecord *) NULL)) {
                 // The 4 cell area corresponds to the hard coded search radius in netIF->Cell ().
