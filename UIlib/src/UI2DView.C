@@ -461,6 +461,7 @@ UI2DView::UI2DView() : DBObject("Noname 2DView", sizeof(UI2DView)) {
                                            XmNbackground, UIColor(UIColorStandard, 0),
                                            NULL);
     XtAddCallback(DrawingAreaW, XmNresizeCallback, (XtCallbackProc) _UI2DViewResizeCBK, this);
+    XtAddCallback(DrawingAreaW, XmNexposeCallback, (XtCallbackProc) _UI2DViewRedrawCBK, this);
     XtAddEventHandler(DrawingAreaW,
                       EnterWindowMask | LeaveWindowMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask,
                       false, (XtEventHandler) _UI2DViewPointerEHR, this);
