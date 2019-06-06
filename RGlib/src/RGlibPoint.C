@@ -22,7 +22,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *field) {
     DBObjData *linkedData = dbData->LinkedData();
     DBVPointIF *pntIF;
     DBNetworkIF *netIF;
-    DBObjRecord *pntRec, *cellRec;
+    DBObjRecord *pntRec, *cellRec, *bestCellRec;
 
     if (linkedData == (DBObjData *) NULL) return (DBFault);
     pntIF = new DBVPointIF(dbData);
@@ -36,8 +36,9 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *field) {
         netIF->Pos2Coord(pos, coord);
         if ((field != (DBObjTableField *) NULL) &&
             (!CMmathEqualValues(field->Float(pntRec), field->FloatNoData())) &&
-            ((cellRec = netIF->Cell(coord, field->Float(pntRec))) != (DBObjRecord *) NULL))
-            coord = netIF->Center(cellRec);
+            ((bestCellRec = netIF->Cell(coord, field->Float(pntRec))) != (DBObjRecord *) NULL) &&
+            (fabs(netIF->CellBasinArea(cellRec) - netIF->CellBasinArea(bestCellRec)) > 4 * netIF->CellArea (cellRec)))
+            coord = netIF->Center(cellRec); // The 4 cell area corresponds to the hard coded search radius in netIF->Cell ().
         pntIF->Coordinate(pntRec, coord);
     }
     ret = DBSuccess;
