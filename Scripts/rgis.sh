@@ -23,6 +23,7 @@ then
    unset XUSERFILESEARCHPATH
 fi
 
+export GHAAS_BROWSER="firefox"
 export XAPPLRESDIR="$GHAAS_DIR/XResources"
 
 GHAAS_EXEC=${GHAAS_DIR}/bin/rgis22
