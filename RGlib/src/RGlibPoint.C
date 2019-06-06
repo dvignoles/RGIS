@@ -17,6 +17,7 @@ bfekete@ccny.cuny.edu
 
 DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *field) {
     DBInt pointID, ret = DBFault;
+    DBFloat areaDiff;
     DBCoordinate coord;
     DBPosition pos;
     DBObjData *linkedData = dbData->LinkedData();
@@ -34,11 +35,18 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *field) {
         coord = pntIF->Coordinate(pntRec);
         if (netIF->Coord2Pos(coord, pos) == DBFault) continue;
         netIF->Pos2Coord(pos, coord);
+        cellRec = netIF->Cell (coord);
         if ((field != (DBObjTableField *) NULL) &&
-            (!CMmathEqualValues(field->Float(pntRec), field->FloatNoData())) &&
-            ((bestCellRec = netIF->Cell(coord, field->Float(pntRec))) != (DBObjRecord *) NULL) &&
-            (fabs(netIF->CellBasinArea(cellRec) - netIF->CellBasinArea(bestCellRec)) > 4 * netIF->CellArea (cellRec)))
-            coord = netIF->Center(cellRec); // The 4 cell area corresponds to the hard coded search radius in netIF->Cell ().
+            (!CMmathEqualValues(field->Float(pntRec), field->FloatNoData()))) {
+            bestCellRec = netIF->Cell(coord, field->Float(pntRec));
+            if ((cellRec != (DBObjRecord *) NULL) && (bestCellRec != (DBObjRecord *) NULL)) {
+                // The 4 cell area corresponds to the hard coded search radius in netIF->Cell ().
+                areaDiff = (fabs(netIF->CellBasinArea(cellRec) - netIF->CellBasinArea(bestCellRec));
+                coord = areaDiff <4 * netIF->CellArea(cellRec)) ? netIF->Center(cellRec) : netIF->Center(bestCellRec);
+            }
+            else if (cellRec     != (DBObjRecord *) NULL) coord = netIF->Center(cellRec);
+            else if (bestCellRec != (DBObjRecord *) NULL) coord = netIF->Center(bestCellRec);
+        }
         pntIF->Coordinate(pntRec, coord);
     }
     ret = DBSuccess;
