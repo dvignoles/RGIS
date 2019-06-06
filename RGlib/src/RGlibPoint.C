@@ -25,7 +25,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *field) {
     DBNetworkIF *netIF;
     DBObjRecord *pntRec, *cellRec, *bestCellRec;
 
-    if (linkedData == (DBObjData *) NULL) return (DBFault);
+    if ((linkedData == (DBObjData *) NULL) && (linkedData->Type() != DBTypeNetwork) return (DBFault);
     pntIF = new DBVPointIF(dbData);
     netIF = new DBNetworkIF(linkedData);
     for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
