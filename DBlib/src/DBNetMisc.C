@@ -136,7 +136,7 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBFloat area) const {
     DBInt i, j;
     DBInt cellID;
     DBFloat bestDelta, delta;
-    DBObjRecord *cellRec, *bestCellRec, *retCellRec;
+    DBObjRecord *cellRec, *bestCellRec = (DBObjRecord *) NULL;
     DBPosition cellPos;
 
     if (pos.Col < 0) return ((DBObjRecord *) NULL);
@@ -144,29 +144,22 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBFloat area) const {
     if (pos.Col >= ColNum()) return ((DBObjRecord *) NULL);
     if (pos.Row >= RowNum()) return ((DBObjRecord *) NULL);
 
-    if ((cellID = ((DBInt *) DataRec->Data())[(size_t) pos.Row * (size_t) ColNum() + (size_t) pos.Col]) == DBFault)
-        return ((DBObjRecord *) NULL);
-    cellRec = CellTable->Item(cellID);
-    bestDelta = fabs(area - CellBasinArea(cellRec)) / (fabs(area) + fabs(CellBasinArea(cellRec)));
-    retCellRec = bestCellRec = cellRec;
+    bestDelta = HUGE_VAL;
     for (i = -3; i <= 3; ++i) for (j = -3; j <= 3; ++j) {
         cellPos = pos;
         cellPos.Col += i;
         cellPos.Row += j;
         if (((abs(i) == 3) && (i == j)) || (cellPos.Row < 0) || (cellPos.Col < 0) || (cellPos.Row >= RowNum()) || (cellPos.Col >= ColNum())) continue;
 
-        if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) ==
-            DBFault)
-            continue;
+        if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) == DBFault) continue;
         cellRec = CellTable->Item(cellID);
-        delta = fabs(area - CellBasinArea(cellRec)) / (fabs(area) + fabs(CellBasinArea(cellRec)));
+        delta = fabs(area - CellBasinArea(cellRec));
         if (delta < bestDelta) {
             bestDelta = delta;
             bestCellRec = cellRec;
         }
     }
-    if ((bestDelta < 0.9) || (retCellRec == (DBObjRecord *) NULL)) retCellRec = bestCellRec;
-    return (retCellRec);
+    return (bestCellRec);
 }
 
 DBObjRecord *DBNetworkIF::ToCell(const DBObjRecord *cellRec) const {
