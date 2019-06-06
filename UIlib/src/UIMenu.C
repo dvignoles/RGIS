@@ -164,7 +164,7 @@ void UIMenuDisplayHelp(char *helpFile) {
             UIMessage((char *) "You Don't have Web Browser Configured!");
             return;
         }
-        sprintf(cmndString, getenv("GHAAS_BROWSER"), helpFile);
+        sprintf(cmndString,"%s %s &", getenv("GHAAS_BROWSER"), helpFile);
         system(cmndString);
     }
 }
