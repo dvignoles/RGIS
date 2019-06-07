@@ -12,11 +12,21 @@ case "$(uname)" in
     ;;
 esac
 
+function GHAASprojectDir ()
+{
+    local arg="${1}"; shift;
+
+    if [[ "${arg%/*}"     != "." ]]; then projectDir="${arg%/*}"; projectDir="${projectDir%/Scripts}"; else prodjectDir=".."; fi
+    if [[ "${projectDir}" == "." ]]; then projectDir="$(pwd)"; fi
+
+    echo "${projectDir}"
+}
+
 export __RGISarchiveFormat="gzipped"
 
 function RGISprocessorNum ()
 {
-    local processorNum="${0}"
+    local processorNum="${0}"; shift
 
     export GHAASprocessorNum="${processorNum}"
 }
@@ -43,8 +53,8 @@ function RGISarchiveFormat ()
 
 function RGIScase ()
 {
-    local caseVal="${1}"
-    local  string="${2}"
+    local caseVal="${1}"; shift
+    local  string="${1}"; shift
 
     case "${caseVal}" in
         (lower)
@@ -61,7 +71,7 @@ function RGIScase ()
 
 function RGISlookupSubject ()
 {
-    local variable="${1}"
+    local variable="${1}"; shift
 
 	case "$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
 		(air_temperature)                             #   0
@@ -381,7 +391,7 @@ function RGISlookupSubject ()
 
 function _RGISlookupFullName ()
 {
-    local variable="${1}"
+    local variable="${1}"; shift
 
 	case "$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
 		(air_temperature)                             #   0
@@ -698,7 +708,7 @@ function _RGISlookupFullName ()
 
 function RGISlookupShadeset ()
 {
-    local variable="${1}"
+    local variable="${1}"; shift
 
 	case "$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
 		(air_temperature|max_air_temperature|min_air_temperature) # 0 1 2
@@ -1003,7 +1013,7 @@ function RGISlookupShadeset ()
 
 function RGISlookupAggrMethod ()
 {
-    local variable="${1}"
+    local variable="${1}"; shift
 
 	case "$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
 		(air_temperature|max_air_temperature|min_air_temperature)  # 0 1 2
@@ -1326,8 +1336,8 @@ function RGISlookupTimeStep ()
 
 function RGIStimeNumberOfDays ()
 {
-	local    year="${1}"
-	local   month=$((${2} - 1))
+	local    year="${1}";        shift
+	local   month=$((${1} - 1)); shift
 	local century="${year%??}"
 
 	local monthLength[0]=31
@@ -1359,9 +1369,9 @@ function RGIStimeNumberOfDays ()
 
 function _RGISvariableDir ()
 {
-	local      archive="${1}"
-	local       domain="${2}"
-	local     variable="${3}"
+	local      archive="${1}"; shift
+	local       domain="${1}"; shift
+	local     variable="${1}"; shift
 
 	local       varDir=$(RGISlookupSubject "${variable}")
 
@@ -1392,7 +1402,7 @@ function _RGISvariableDir ()
 
 function RGISgeoResolutionInSecond ()
 {
-    local resolution="${1}"
+    local resolution="${1}"; shift
 
    	case "${resolution}" in
 	("15sec")
@@ -1450,8 +1460,8 @@ function RGISgeoResolutionInSecond ()
 
 RGISgeoResolutionMultiplier () # Destination resolution is devided by source resolution. Decimals ar chapped off.
 {
-    local srcRes="$(RGISgeoResolutionInSecond "${1}")"
-    local dstRes="$(RGISgeoResolutionInSecond "${2}")"
+    local srcRes="$(RGISgeoResolutionInSecond "${1}")"; shift
+    local dstRes="$(RGISgeoResolutionInSecond "${1}")"; shift
 
     if [[ "${srcRes}" == "" || "${dstRes}" == "" ]]
     then
@@ -1466,11 +1476,11 @@ RGISgeoResolutionMultiplier () # Destination resolution is devided by source res
 }
 function _RGISresolutionDir ()
 {
-	local      archive="${1}"
-	local       domain="${2}"
-	local     variable="${3}"
-	local      product="${4}"
-	local   resolution="${5}"
+	local      archive="${1}"; shift
+	local       domain="${1}"; shift
+	local     variable="${1}"; shift
+	local      product="${1}"; shift
+	local   resolution="${1}"; shift
 
 	local varDir=$(_RGISvariableDir "${archive}" "${domain}" "${variable}")
 	if [ "${varDir}" == "" ]
@@ -1548,8 +1558,8 @@ function _RGISresolutionDir ()
 }
 function _RGIStStepDir ()
 {
-	local tStepType="${1}"
-	local     tStep="${2}"
+	local tStepType="${1}"; shift
+	local     tStep="${1}"; shift
 
 	case "${tStepType}" in
 		(TS)
@@ -1586,13 +1596,13 @@ function _RGIStStepDir ()
 
 function RGISdirectoryPath ()
 {
-	local    archive="${1}"
-	local     domain="${2}"
-	local   variable="${3}"
-	local    product="${4}"
-	local resolution="${5}"
-	local  tStepType="${6}"
-	local      tStep=$(echo "${7}" | tr "[A-Z]" "[a-z]")
+	local    archive="${1}"; shift
+	local     domain="${1}"; shift
+	local   variable="${1}"; shift
+	local    product="${1}"; shift
+	local resolution="${1}"; shift
+	local  tStepType="${1}"; shift
+	local      tStep=$(echo "${1}" | tr "[A-Z]" "[a-z]"); shift
 
 	local        dir=$(_RGIStStepDir ${tStepType} ${tStep})
 	local     varDir=$(RGISlookupSubject "${variable}")
@@ -1602,12 +1612,12 @@ function RGISdirectoryPath ()
 
 function RGISdirectory ()
 {
-	local    archive="${1}"
-	local     domain="${2}"
-	local   variable="${3}"
-	local    product="${4}"
-	local resolution="${5}"
-	local  tStepType="${6}"
+	local    archive="${1}"; shift
+	local     domain="${1}"; shift
+	local   variable="${1}"; shift
+	local    product="${1}"; shift
+	local resolution="${1}"; shift
+	local  tStepType="${1}"; shift
 	local      tStep=$(echo "${7}" | tr "[A-Z]" "[a-z]")
 
 	local dir=$(_RGIStStepDir ${tStepType} ${tStep})
@@ -1624,7 +1634,8 @@ function RGISdirectory ()
 
 function RGISfileExtension ()
 {
-	local variable="${1}"
+	local variable="${1}"; shift
+
 	case "$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
 		(network)
 			local extension="gdbn"
@@ -1647,14 +1658,14 @@ function RGISfileExtension ()
 
 function RGISfilePath ()
 {
-	local      archive="${1}"
-	local       domain="${2}"
-	local     variable="${3}"
-	local      product="${4}"
-	local   resolution="${5}"
-	local    tStepType="${6}"
-	local        tStep=$(echo "${7}" | tr "[A-Z]" "[a-z]")
-	local    timeRange="${8}"
+	local      archive="${1}"; shift
+	local       domain="${1}"; shift
+	local     variable="${1}"; shift
+	local      product="${1}"; shift
+	local   resolution="${1}"; shift
+	local    tStepType="${1}"; shift
+	local        tStep=$(echo "${1}" | tr "[A-Z]" "[a-z]"); shift
+	local    timeRange="${1}"; shift
 
 	case "${tStep}" in
 		(hourly)
@@ -1716,14 +1727,14 @@ function RGISfilePath ()
 
 function RGISfile ()
 {
-	local      archive="${1}"
-	local       domain="${2}"
-	local     variable="${3}"
-	local      product="${4}"
-	local   resolution="${5}"
-	local    tStepType="${6}"
-	local        tStep=$(echo "${7}" | tr "[A-Z]" "[a-z]")
-	local    timeRange="${8}"
+	local      archive="${1}"; shift
+	local       domain="${1}"; shift
+	local     variable="${1}"; shift
+	local      product="${1}"; shift
+	local   resolution="${1}"; shift
+	local    tStepType="${1}"; shift
+	local        tStep=$(echo "${1}" | tr "[A-Z]" "[a-z]"); shift
+	local    timeRange="${1}"; shift
 
 	case "${tStep}" in
 		(hourly)
@@ -1935,16 +1946,16 @@ function RGISsetHeader ()
 
 function RGISAggregateTS ()
 {
-	local    archive="${1}"
-	local     domain="${2}"
-	local   variable="${3}"
-	local    product="${4}"
-	local resolution="${5}"
-	local    version="${6}"
-	local  startyear="${7}"
-	local    endyear="${8}"
-	local  fromtStep="${9}"
-	local    totStep="${10}"
+	local    archive="${1}"; shift
+	local     domain="${1}"; shift
+	local   variable="${1}"; shift
+	local    product="${1}"; shift
+	local resolution="${1}"; shift
+	local    version="${1}"; shift
+	local  startyear="${1}"; shift
+	local    endyear="${1}"; shift
+	local  fromtStep="${1}"; shift
+	local    totStep="${1}"; shift
 
    local     files=""
    local separator=""
@@ -1965,14 +1976,14 @@ function RGISAggregateTS ()
 
 function RGISClimatology ()
 {
-	local    archive="${1}"
-	local     domain="${2}"
-	local   variable="${3}"
-	local    product="${4}"
-	local resolution="${5}"
-	local    version="${6}"
- 	local  startyear="${7}"
-	local    endyear="${8}"
+	local    archive="${1}"; shift
+	local     domain="${1}"; shift
+	local   variable="${1}"; shift
+	local    product="${1}"; shift
+	local resolution="${1}"; shift
+	local    version="${1}"; shift
+ 	local  startyear="${1}"; shift
+	local    endyear="${1}"; shift
 
 	local     ltDir=$(RGISdirectory "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "LT" "monthly")
 	local    tsFile=$(RGISfile      "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "monthly" "${startyear}-${endyear}")
@@ -1989,14 +2000,14 @@ function RGISClimatology ()
 
 function RGISCellStats ()
 {
-	local    archive="${1}"
-	local     domain="${2}"
-	local   variable="${3}"
-	local    product="${4}"
-	local resolution="${5}"
-	local    version="${6}"
- 	local  startyear="${7}"
-	local    endyear="${8}"
+	local    archive="${1}"; shift
+	local     domain="${1}"; shift
+	local   variable="${1}"; shift
+	local    product="${1}"; shift
+	local resolution="${1}"; shift
+	local    version="${1}"; shift
+ 	local  startyear="${1}"; shift
+	local    endyear="${1}"; shift
 
 	local  statsDir=$(RGISdirectory  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "Stats" "annual")
 	local    tsFile=$(RGISfile       "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS"    "annual" "${startyear}-${endyear}")
@@ -2043,14 +2054,14 @@ function RGISCellStats ()
 
 function RGISStatistics ()
 {
-	local    archive="${1}"
-	local     domain="${2}"
-	local   variable="${3}"
-	local    product="${4}"
-	local resolution="${5}"
-	local    version="${6}"
-	local  startyear="${7}"
-	local    endyear="${8}"
+	local    archive="${1}"; shift
+	local     domain="${1}"; shift
+	local   variable="${1}"; shift
+	local    product="${1}"; shift
+	local resolution="${1}"; shift
+	local    version="${1}"; shift
+	local  startyear="${1}"; shift
+	local    endyear="${1}"; shift
 
 	RGISAppend "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}" "monthly" || return 1
 	RGISAppend "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}" "annual"  || return 1

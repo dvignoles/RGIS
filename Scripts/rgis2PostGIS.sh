@@ -12,8 +12,8 @@ function PrintUsage ()
 
 function caseFunc ()
 {
-    local caseVal="${1}"
-    local  string="${2}"
+    local caseVal="${1}"; shift
+    local  string="${1}"; shift
 
     case "${caseVal}" in
         (lower)

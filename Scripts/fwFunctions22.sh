@@ -231,11 +231,12 @@ function FwArguments()
 
 function FwInit()
 {
-	      _fwModelBIN=${1}	
-       _fwDomainNAME=${2}
-   _fwRGISDomainFILE=${3}
-       _fwGDSWorkDIR=${4}
-  	_fwRGISResultsDIR=${5}
+	     _fwModelBIN="${1}"; shift
+       _fwDomainNAME="${1}"; shift
+   _fwRGISDomainFILE="${1}"; shift
+       _fwGDSWorkDIR="${1}"; shift
+   _fwRGISResultsDIR="${1}"; shift
+
 	if [ "${6}" != "" ]; then export _fwRGISBIN="${6}/"; else export _fwRGISBIN=""; fi
 
 	    _fwDomainTYPE="${_fwRGISDomainFILE##*.}"
@@ -402,11 +403,12 @@ function _fwPrintTest()
 
 function FwGDSFilename()
 {
-	local fwVARIABLE="${1}"
-	local     fwMODE="${2}"
-	local  fwVERSION="${3}"
-	local     fwYEAR="${4}"
-	local     fwSTEP="${5}"
+	local fwVARIABLE="${1}"; shift
+	local     fwMODE="${1}"; shift
+	local  fwVERSION="${1}"; shift
+	local     fwYEAR="${1}"; shift
+	local     fwSTEP="${1}"; shift
+
 	if [ "${fwYEAR}" == "" ]
 	then
 		local fwFILENAME="${_fwGDSDomainDIR}/${fwVERSION}/${_fwDomainNAME}_${fwMODE}_${fwVARIABLE}_${fwVERSION}_${FwDomainRES}_${fwSTEP}LT.gds"
@@ -418,10 +420,10 @@ function FwGDSFilename()
 
 function FwRGISFilename()
 {
-	local fwVARIABLE="${1}"
-	local  fwVERSION="${2}"
-	local     fwSTEP="${3}"
-	local     fwYEAR="${4}"
+	local fwVARIABLE="${1}"; shift
+	local  fwVERSION="${1}"; shift
+	local     fwSTEP="${1}"; shift
+	local     fwYEAR="${1}"; shift
 
 	case "${fwSTEP}" in
 		(a)
@@ -450,7 +452,8 @@ function FwRGISFilename()
 
 function _fwPreprocess()
 {
-	local    fwYEAR="${1}"
+	local    fwYEAR="${1}"; shift
+
 	local fwPROC
 	[ "${FwVERBOSE}" == "on" ] && echo "      Preprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"
 	(( fwPROC = 0 ))
@@ -503,8 +506,9 @@ function _fwPreprocess()
 
 function _fwPostprocess()
 {
-   local fwVERSION="${1}"
-	local    fwYEAR="${2}"
+    local fwVERSION="${1}"; shift
+	local    fwYEAR="${1}"; shift
+
 	local fwPROC
 	if [ "${fwYEAR}" == "" ]; then local fwSUFFIX="LT"; else local fwSUFFIX="TS${fwYEAR}"; fi
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"; }
@@ -548,7 +552,8 @@ function _fwPostprocess()
 
 function _fwSpinup()
 {
-	local fwVERSION="${1}"
+	local fwVERSION="${1}"; shift
+
 	local fwPASS
 	local fwInputITEM
 	local fwOutputITEM
@@ -640,9 +645,9 @@ function _fwSpinup()
 
 function _fwRun()
 {
-    local     fwVERSION="${1}"
-    local   fwStartYEAR="${2}"
-	local     fwEndYEAR="${3}"
+    local     fwVERSION="${1}"; shift
+    local   fwStartYEAR="${1}"; shift
+	local     fwEndYEAR="${1}"; shift
 
 	[ "${FwVERBOSE}" == "on" ] && echo "Model run started:  $(date '+%Y-%m-%d %H:%M:%S')"
 	for (( fwYEAR = fwStartYEAR; fwYEAR <= fwEndYEAR; ++fwYEAR ))
@@ -751,9 +756,10 @@ function _fwRun()
 
 function FwRun()
 {
-	local   fwVERSION="${1}"
-	local fwStartYEAR="${2}"
-	local   fwEndYEAR="${3}"
+	local   fwVERSION="${1}"; shift
+	local fwStartYEAR="${1}"; shift
+	local   fwEndYEAR="${1}"; shift
+
 	     _fwGDSLogDIR="${_fwGDSDomainDIR}/${fwVERSION}/logs"
 
 	[ "${_fwTESTONLY}" == "on" ] && { { _fwPrintTest || return 1; } && return 0; }
