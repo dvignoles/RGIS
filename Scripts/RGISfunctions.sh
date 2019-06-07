@@ -22,6 +22,14 @@ function GHAASprojectDir ()
     echo "${projectDir}"
 }
 
+function GHAASscriptName ()
+{
+    local arg="${1}"; shift;
+
+     scriptNam="${0##*/}"; scriptName="${scriptName%.sh}";
+     echo "${scriptName}"
+}
+
 export __RGISarchiveFormat="gzipped"
 
 function RGISprocessorNum ()
