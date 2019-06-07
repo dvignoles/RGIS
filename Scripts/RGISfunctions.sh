@@ -1626,7 +1626,7 @@ function RGISdirectory ()
 	local    product="${1}"; shift
 	local resolution="${1}"; shift
 	local  tStepType="${1}"; shift
-	local      tStep=$(echo "${7}" | tr "[A-Z]" "[a-z]")
+	local      tStep=$(echo "${1}" | tr "[A-Z]" "[a-z]")
 
 	local dir=$(_RGIStStepDir ${tStepType} ${tStep})
 
@@ -1802,7 +1802,7 @@ function RGISfile ()
    	[ -e "${rgisDirectory}/${fileName}_${tStepStr}${tStepType}${timeRange}.${extension}" ]    && { echo    "${rgisDirectory}/${fileName}_${tStepStr}${tStepType}${timeRange}.${extension}";    return 0;}
    fi
    echo ""
-	return 1
+   return 1
 }
 
 function RGIStitle ()
