@@ -26,7 +26,7 @@ function GHAASscriptName ()
 {
     local arg="${1}"; shift;
 
-     scriptNam="${0##*/}"; scriptName="${scriptName%.sh}";
+     scriptName="${arg##*/}"; scriptName="${scriptName%.sh}";
      echo "${scriptName}"
 }
 
