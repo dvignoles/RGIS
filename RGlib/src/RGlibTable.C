@@ -124,7 +124,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
             nameLength = nameLength > strlen (record->Name ()) ? nameLength : strlen (record->Name ());
         }
         fprintf (outFile,"(\n");
-        fprintf (outFile,"\"%s\" SERIAL,\n",_RGlibSQLCaseChange (sqlCase, "ID", bufferPtr, bufferLen));
+        fprintf (outFile,"\"%s\" INTEGER,\n",_RGlibSQLCaseChange (sqlCase, "ID", bufferPtr, bufferLen));
         fprintf (outFile,"\"%s\" CHARACTER VARYING(%d) COLLATE pg_catalog.\"default\",\n",_RGlibSQLCaseChange (sqlCase, "RecordName", bufferPtr, bufferLen),nameLength + 1);
         for (field = fields->First(); field != (DBObjTableField *) NULL; field = fields->Next()) {
             if (DBTableFieldIsVisible (field))
