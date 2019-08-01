@@ -153,15 +153,15 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
     if ((RGlibTableCopy == mode) || (RGlibTableAppend == mode)) {
         if (dbSchemaName == (char *) NULL) fprintf (outFile,"INSERT INTO  \"%s\" (",  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
         else fprintf (outFile,"\nINSERT INTO  \"%s\".\"%s\" (", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
-        fprintf (outFile,"\"%s\"",_RGlibSQLCaseChange (sqlCase,  "ID",         bufferPtr, bufferLen));
+        fprintf (outFile, "\"%s\"",_RGlibSQLCaseChange (sqlCase, "ID",         bufferPtr, bufferLen));
         fprintf (outFile,",\"%s\"",_RGlibSQLCaseChange (sqlCase, "RecordName", bufferPtr, bufferLen));
         for (field = fields->First(); field != (DBObjTableField *) NULL; field = fields->Next()) {
             if (DBTableFieldIsVisible (field)) fprintf (outFile,",\"%s\"",_RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen));
         }
         fprintf (outFile,") VALUES\n");
         for (record = table->First (); record != (DBObjRecord *) NULL; record = table->Next ()) {
-            if (record->RowID () == 0) fprintf (outFile,    "(%d, $$%s$$", record->RowID () + 1, record->Name());
-            else                       fprintf (outFile,"),\n(%d, $$%s$$", record->RowID () + 1, record->Name());
+            if (record->RowID () == 0) fprintf (outFile,    "(%d,$$%s$$", record->RowID () + 1, record->Name());
+            else                       fprintf (outFile,"),\n(%d,$$%s$$", record->RowID () + 1, record->Name());
             for (field = fields->First(); field != (DBObjTableField *) NULL; field = fields->Next()) {
                 if (DBTableFieldIsVisible (field))
                     switch (field->Type()) {
