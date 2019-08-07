@@ -89,7 +89,7 @@ Widget UIDialogForm(char *dialogTitle, int resize) {
     actionForm = XtVaCreateManagedWidget(((char *) UIDialogActionFormName) + 1, xmFormWidgetClass, pane,
                                          XmNallowResize, false,
                                          XmNshadowThickness, 0, NULL);
-    button = XtVaCreateManagedWidget(UIDialogOkButtonName + 1, xmPushButtonWidgetClass, actionForm,
+    button = XtVaCreateManagedWidget(((char *) UIDialogOkButtonName) + 1, xmPushButtonWidgetClass, actionForm,
                                      XmNtopAttachment, XmATTACH_FORM,
                                      XmNtopOffset, 5,
                                      XmNbottomAttachment, XmATTACH_FORM,
