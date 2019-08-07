@@ -15,11 +15,11 @@ bfekete@ccny.cuny.edu
 #include <Xm/TextF.h>
 #include <UI.H>
 
-#define UIRelateNameTextF            "*UIRelateNameTextField"
-#define UIRelateDataTextF            "*UIRelateDataTextField"
-#define UIRelateFieldTextF            "*UIRelateFieldTextField"
-#define UIRelateJoinFieldTextF    "*UIRelateJoinFieldTextField"
-#define UIRelateJoinFieldButton    "*UIRelateJoinFieldButton"
+#define UIRelateNameTextF       "*UIRelateNameTextField"
+#define UIRelateDataTextF       "*UIRelateDataTextField"
+#define UIRelateFieldTextF      "*UIRelateFieldTextField"
+#define UIRelateJoinFieldTextF  "*UIRelateJoinFieldTextField"
+#define UIRelateJoinFieldButton "*UIRelateJoinFieldButton"
 #define UIRelateField        0x00
 #define UIRelateJoinField    0x01
 
@@ -197,7 +197,7 @@ DBInt UIRelateData(DBObjData *data, DBObjRecord *relRec) {
                       &save);
         mainForm = UIDialogFormGetMainForm(dShell);
 
-        fieldTextF = XtVaCreateManagedWidget(UIRelateNameTextF + 1, xmTextFieldWidgetClass, mainForm,
+        fieldTextF = XtVaCreateManagedWidget((char *) UIRelateNameTextF + 1, xmTextFieldWidgetClass, mainForm,
                                              XmNtopAttachment, XmATTACH_FORM,
                                              XmNtopOffset, 10,
                                              XmNleftAttachment, XmATTACH_POSITION,
@@ -222,7 +222,7 @@ DBInt UIRelateData(DBObjData *data, DBObjRecord *relRec) {
         XmStringFree(string);
 
 
-        dataField = XtVaCreateManagedWidget(UIRelateDataTextF + 1, xmTextFieldWidgetClass, mainForm,
+        dataField = XtVaCreateManagedWidget((char *) UIRelateDataTextF + 1, xmTextFieldWidgetClass, mainForm,
                                             XmNtopAttachment, XmATTACH_WIDGET,
                                             XmNtopWidget, fieldTextF,
                                             XmNtopOffset, 5,
@@ -265,7 +265,7 @@ DBInt UIRelateData(DBObjData *data, DBObjRecord *relRec) {
         XtAddCallback(button, XmNactivateCallback, (XtCallbackProc) _UIRelateDataSelectButtonCBK,
                       (XtPointer) dataField);
 
-        fieldTextF = XtVaCreateManagedWidget(UIRelateFieldTextF + 1, xmTextFieldWidgetClass, mainForm,
+        fieldTextF = XtVaCreateManagedWidget((char *) UIRelateFieldTextF + 1, xmTextFieldWidgetClass, mainForm,
                                              XmNtopAttachment, XmATTACH_WIDGET,
                                              XmNtopWidget, dataField,
                                              XmNtopOffset, 5,
@@ -307,7 +307,7 @@ DBInt UIRelateData(DBObjData *data, DBObjRecord *relRec) {
         XmStringFree(string);
         XtAddCallback(button, XmNactivateCallback, (XtCallbackProc) _UIRelateFieldSelectButtonCBK,
                       (XtPointer) UIRelateField);
-        fieldTextF = XtVaCreateManagedWidget(UIRelateJoinFieldTextF + 1, xmTextFieldWidgetClass, mainForm,
+        fieldTextF = XtVaCreateManagedWidget((char *) UIRelateJoinFieldTextF + 1, xmTextFieldWidgetClass, mainForm,
                                              XmNtopAttachment, XmATTACH_OPPOSITE_WIDGET,
                                              XmNtopWidget, fieldTextF,
                                              XmNrightAttachment, XmATTACH_OPPOSITE_WIDGET,
@@ -334,7 +334,7 @@ DBInt UIRelateData(DBObjData *data, DBObjRecord *relRec) {
                                 NULL);
         XmStringFree(string);
         string = XmStringCreate((char *) "Select", UICharSetBold);
-        button = XtVaCreateManagedWidget(UIRelateJoinFieldButton + 1, xmPushButtonGadgetClass, mainForm,
+        button = XtVaCreateManagedWidget((char *) UIRelateJoinFieldButton + 1, xmPushButtonGadgetClass, mainForm,
                                          XmNtopAttachment, XmATTACH_OPPOSITE_WIDGET,
                                          XmNtopWidget, fieldTextF,
                                          XmNleftAttachment, XmATTACH_WIDGET,
