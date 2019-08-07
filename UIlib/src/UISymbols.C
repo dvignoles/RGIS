@@ -249,7 +249,7 @@ int UISymbolEdit(DBObjTable *symbols, int symbolType) {
                                             XmNleftAttachment, XmATTACH_FORM,
                                             XmNrightAttachment, XmATTACH_FORM,
                                             NULL);
-        list = XtVaCreateManagedWidget(UISymListName + 1, xmListWidgetClass, scrolledW,
+        list = XtVaCreateManagedWidget(((char *) UISymListName) + 1, xmListWidgetClass, scrolledW,
                                        XmNvisibleItemCount, 6,
                                        XmNselectionPolicy, XmBROWSE_SELECT,
                                        XmNscrollBarDisplayPolicy, XmSTATIC,
@@ -272,7 +272,7 @@ int UISymbolEdit(DBObjTable *symbols, int symbolType) {
                                          NULL);
         XtAddCallback(button, XmNactivateCallback, (XtCallbackProc) _UISymbolLoadNamesCBK, list);
         XmStringFree(string);
-        text = XtVaCreateManagedWidget(UISymTextFieldName + 1, xmTextFieldWidgetClass, mainForm,
+        text = XtVaCreateManagedWidget(((char *) UISymTextFieldName) + 1, xmTextFieldWidgetClass, mainForm,
                                        XmNtopAttachment, XmATTACH_WIDGET,
                                        XmNtopWidget, label,
                                        XmNleftAttachment, XmATTACH_FORM,
@@ -308,7 +308,7 @@ int UISymbolEdit(DBObjTable *symbols, int symbolType) {
         }
 
         string = XmStringCreate((char *) "Foreground:", UICharSetNormal);
-        foreMenu = XtVaCreateManagedWidget(UISymForegroundMenuName + 1, xmRowColumnWidgetClass, mainForm,
+        foreMenu = XtVaCreateManagedWidget(((char *) UISymForegroundMenuName) + 1, xmRowColumnWidgetClass, mainForm,
                                            XmNtopAttachment, XmATTACH_WIDGET,
                                            XmNtopWidget, text,
                                            XmNrightAttachment, XmATTACH_FORM,
@@ -319,7 +319,7 @@ int UISymbolEdit(DBObjTable *symbols, int symbolType) {
                                            NULL);
         XmStringFree(string);
         string = XmStringCreate((char *) "Background:", UICharSetNormal);
-        backMenu = XtVaCreateManagedWidget(UISymBackgroundMenuName + 1, xmRowColumnWidgetClass, mainForm,
+        backMenu = XtVaCreateManagedWidget(((char *) UISymBackgroundMenuName) + 1, xmRowColumnWidgetClass, mainForm,
                                            XmNtopAttachment, XmATTACH_WIDGET,
                                            XmNtopWidget, foreMenu,
                                            XmNrightAttachment, XmATTACH_FORM,
@@ -359,7 +359,7 @@ int UISymbolEdit(DBObjTable *symbols, int symbolType) {
             XtAddCallback(button, XmNactivateCallback, (XtCallbackProc) UIAuxSetBooleanTrueCBK, &changed);
         }
         string = XmStringCreate((char *) "Shade:", UICharSetNormal);
-        symMenu = XtVaCreateWidget(UISymShadeMenuName + 1, xmRowColumnWidgetClass, rowCol,
+        symMenu = XtVaCreateWidget(((char *) UISymShadeMenuName) + 1, xmRowColumnWidgetClass, rowCol,
                                    XmNsubMenuId, symMenu,
                                    XmNlabelString, string,
                                    XmNrowColumnType, XmMENU_OPTION,
@@ -387,7 +387,7 @@ int UISymbolEdit(DBObjTable *symbols, int symbolType) {
             XtAddCallback(button, XmNactivateCallback, (XtCallbackProc) UIAuxSetBooleanTrueCBK, &changed);
         }
         string = XmStringCreate((char *) "Marker:", UICharSetNormal);
-        symMenu = XtVaCreateWidget(UISymMarkerMenuName + 1, xmRowColumnWidgetClass, rowCol,
+        symMenu = XtVaCreateWidget(((char *) UISymMarkerMenuName) + 1, xmRowColumnWidgetClass, rowCol,
                                    XmNsubMenuId, symMenu,
                                    XmNlabelString, string,
                                    XmNrowColumnType, XmMENU_OPTION,
@@ -429,7 +429,7 @@ int UISymbolEdit(DBObjTable *symbols, int symbolType) {
             XtAddCallback(button, XmNactivateCallback, (XtCallbackProc) UIAuxSetBooleanTrueCBK, &changed);
         }
         string = XmStringCreate((char *) "Line:", UICharSetNormal);
-        symMenu = XtVaCreateWidget(UISymLineMenuName + 1, xmRowColumnWidgetClass, rowCol,
+        symMenu = XtVaCreateWidget(((char *) UISymLineMenuName) + 1, xmRowColumnWidgetClass, rowCol,
                                    XmNsubMenuId, symMenu,
                                    XmNlabelString, string,
                                    XmNrowColumnType, XmMENU_OPTION,

@@ -69,7 +69,7 @@ Widget UIDialogForm(char *dialogTitle, int resize) {
                                   XmNkeyboardFocusPolicy, XmEXPLICIT,
                                   XmNallowShellResize, true,
                                   NULL);
-    bulletin = XtVaCreateWidget(UIDialogBulletinName + 1, xmBulletinBoardWidgetClass, dShell,
+    bulletin = XtVaCreateWidget(((char *) UIDialogBulletinName) + 1, xmBulletinBoardWidgetClass, dShell,
                                 XmNnoResize, resize,
                                 XmNdialogStyle, XmDIALOG_FULL_APPLICATION_MODAL,
                                 XmNtransient, true,
@@ -77,16 +77,16 @@ Widget UIDialogForm(char *dialogTitle, int resize) {
                                 XmNmarginWidth, 5,
                                 NULL);
     XtAddCallback(bulletin, XmNunmapCallback, (XtCallbackProc) UILoopStopCBK, NULL);
-    pane = XtVaCreateManagedWidget(UIDialogPaneName + 1, xmPanedWindowWidgetClass, bulletin,
+    pane = XtVaCreateManagedWidget(((char *) UIDialogPaneName) + 1, xmPanedWindowWidgetClass, bulletin,
                                    XmNsashWidth, 1,
                                    XmNsashHeight, 1,
                                    XmNallowResize, true,
                                    NULL);
-    XtVaCreateManagedWidget(UIDialogFormName + 1, xmFormWidgetClass, pane,
+    XtVaCreateManagedWidget(((char *)UIDialogFormName) + 1, xmFormWidgetClass, pane,
                             XmNshadowThickness, 0,
                             XmNallowResize, true,
                             NULL);
-    actionForm = XtVaCreateManagedWidget(UIDialogActionFormName + 1, xmFormWidgetClass, pane,
+    actionForm = XtVaCreateManagedWidget(((char *) UIDialogActionFormName) + 1, xmFormWidgetClass, pane,
                                          XmNallowResize, false,
                                          XmNshadowThickness, 0, NULL);
     button = XtVaCreateManagedWidget(UIDialogOkButtonName + 1, xmPushButtonWidgetClass, actionForm,
@@ -102,7 +102,7 @@ Widget UIDialogForm(char *dialogTitle, int resize) {
                                      NULL);
     XtSetSensitive(button, false);
     XtAddCallback(button, XmNactivateCallback, (XtCallbackProc) UILoopStopCBK, NULL);
-    button = XtVaCreateManagedWidget(UIDialogCancelButtonName + 1, xmPushButtonWidgetClass, actionForm,
+    button = XtVaCreateManagedWidget(((char *) UIDialogCancelButtonName) + 1, xmPushButtonWidgetClass, actionForm,
                                      XmNtopAttachment, XmATTACH_FORM,
                                      XmNtopOffset, 5,
                                      XmNbottomAttachment, XmATTACH_FORM,

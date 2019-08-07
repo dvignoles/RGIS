@@ -88,14 +88,14 @@ Widget UINumberInputCreate(Widget parent, char *labelText, Arg *wargs, DBInt arg
                                     XmNbottomAttachment, XmATTACH_FORM,
                                     NULL);
     string = XmStringCreate((char *) "NotSet", UICharSetNormal);
-    XtVaCreateManagedWidget(UINumberInputField + 1, xmLabelWidgetClass, frame,
+    XtVaCreateManagedWidget(((char *) UINumberInputField) + 1, xmLabelWidgetClass, frame,
                             XmNmarginWidth, 5,
                             XmNalignment, XmALIGNMENT_END,
                             XmNlabelString, string,
                             XmNrecomputeSize, false,
                             NULL);
     XmStringFree(string);
-    scale = XtVaCreateManagedWidget(UINumberInputScale + 1, xmScaleWidgetClass, form,
+    scale = XtVaCreateManagedWidget(((char *) UINumberInputScale) + 1, xmScaleWidgetClass, form,
                                     XmNtopAttachment, XmATTACH_OPPOSITE_WIDGET,
                                     XmNtopWidget, frame,
                                     XmNtopOffset, 3,
@@ -114,7 +114,7 @@ Widget UINumberInputCreate(Widget parent, char *labelText, Arg *wargs, DBInt arg
     XtAddCallback(scale, XmNdragCallback, (XtCallbackProc) _UINumberInputScaleCBK, (XtPointer) form);
     XtAddCallback(scale, XmNvalueChangedCallback, (XtCallbackProc) _UINumberInputScaleCBK, (XtPointer) form);
     string = XmStringCreate(labelText, UICharSetBold);
-    XtVaCreateManagedWidget(UINumberInputLabel + 1, xmLabelWidgetClass, form,
+    XtVaCreateManagedWidget(((char *) UINumberInputLabel) + 1, xmLabelWidgetClass, form,
                             XmNtopAttachment, XmATTACH_OPPOSITE_WIDGET,
                             XmNtopWidget, frame,
                             XmNleftAttachment, XmATTACH_FORM,
