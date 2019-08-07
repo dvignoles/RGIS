@@ -264,7 +264,7 @@ int UISymbolEdit(DBObjTable *symbols, int symbolType) {
                                         NULL);
         XmStringFree(string);
         string = XmStringCreate((char *) "Load Names", UICharSetNormal);
-        button = XtVaCreateManagedWidget(UISymLoadNamesButtonName + 1, xmPushButtonWidgetClass, mainForm,
+        button = XtVaCreateManagedWidget(((char *) UISymLoadNamesButtonName) + 1, xmPushButtonWidgetClass, mainForm,
                                          XmNtopAttachment, XmATTACH_WIDGET,
                                          XmNtopWidget, label,
                                          XmNrightAttachment, XmATTACH_FORM,
