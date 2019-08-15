@@ -166,6 +166,9 @@ function PGdbName ()
 	local   dbName="${1}"; shift
 	local userName="${1}"; shift
 
+	USAGE="Usage: PGdbName <dbName> [userName]"
+    if [[ "${dbName}" == "" ]]; then echo "${USAGE}"; return 1; fi
+
     if [[ "${userName}" == "" ]]; then local userName="$(PGuserName)"; fi
 
     local sslString="host=${_GHAASpgHostName} dbname=${dbName} user=${userName}"
@@ -182,8 +185,10 @@ function PGattribTableSQL ()
 	local    caseVal="${1}";                            shift
 	local     schema="$(RGIScase "${caseVal}" "${1}")"; shift
 	local    tblname="$(RGIScase "${caseVal}" "${1}")"; shift
-	local    idField="$(RGIScase "${caseVal}" "${1}")"; shift
-	local       geom="${5}"
+	local       geom="${1}";                            shift
+
+	USAGE="Usage: PGattribTableSQL <case> <schema> <tblName> <id field> <geom field>"
+    if [[ "${geom}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	echo "DROP TABLE IF EXISTS \"public\".\"temp_tb\";
           CREATE TABLE \"public\".\"temp_tb\" AS (SELECT * FROM \"${schema}\".\"${tblname}\");
@@ -201,6 +206,9 @@ function PGpolygonColorizeSQL ()
     local   geomFLD="$(RGIScase "${caseVal}" "${1}")"; shift
     local     idFLD="$(RGIScase "${caseVal}" "${1}")"; shift
     local  colorFLD="$(RGIScase "${caseVal}" "${1}")"; shift
+
+	USAGE="Usage: PGpolygonColorizeSQL <case> <schema> <tblName> <geom field> <id field> <color field>"
+    if [[ "${colorFLD}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
     echo   "CREATE TEMPORARY TABLE \"TMPcolors\" (\"tmpCOLOR\" INTEGER NOT NULL CONSTRAINT \"tmpCOLOR_pkey\" PRIMARY KEY);
             INSERT INTO  \"TMPcolors\" (\"tmpCOLOR\") VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12);
@@ -261,6 +269,9 @@ function PGimportShapeFile ()
 	local      geom="${1}";                            shift
 	local     color="${1}";                            shift
 
+	USAGE="Usage: PGimportShapeFile <case> <dbName> <schema> <tblName> <shapefile> [id field] [geom field] [color field]"
+    if [[ "${shapeFile}" == "" ]]; then echo "${USAGE}"; return 1; fi
+
     if [[ "${caseVal}" == "lower" ]]; then local caseOpt=""; else caseOpt="-k"; fi
 	echo "DROP TABLE IF EXISTS \"${schema}\".\"${tblName}\";" | psql "$(PGdbName "${dbName}")"
 	shp2pgsql ${caseOpt} -s 4326 -W "latin1" "${shapeFile}" "${schema}.${tblName}" |\
@@ -281,6 +292,9 @@ function PGrasterDimension ()
 	local     coord0="${1}"; shift
 	local     coord1="${1}"; shift
 
+	USAGE="Usage: PGrasterDimension <resolution> <coord0> <coord1>"
+    if [[ "${coord1}" == "" ]]; then echo "${USAGE}"; return 1; fi
+
 	echo $(echo "(${coord1} - ${coord0}) * 3600 / $(RGISgeoResolutionInSecond "${resolution}")" | bc)
 }
 
@@ -288,7 +302,7 @@ function PGrasterize ()
 {
 	local     dbName="${1}"; shift
 	local     schema="${1}"; shift
-	local    tblname="${1}"; shift
+	local    tblName="${1}"; shift
 	local    idField="${1}"; shift
 	local    initVal="${1}"; shift
 	local       geom="${1}"; shift
@@ -302,6 +316,9 @@ function PGrasterize ()
 	local extent_urx="${1}"; shift
 	local extent_ury="${1}"; shift
 
+    USAGE="Usage: PGrasterize <dbName> <schema> <tblName> <idField> <initVal> <geom> <rgisArchive> <domain> <subject> <oroduct> <resolution> llx lly urx ury"
+    if [[ "${extent_ury}" == "" ]]; then echo "${USAGE}"; return 1; fi
+
 	local rgisFile="$(RGISfilePath "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}" "static")"
 
 	[[ -e "${rgisFile%/*}" ]] || mkdir -p "${rgisFile%/*}"
@@ -312,15 +329,15 @@ function PGrasterize ()
 	# I don't understand why gdal_translate does not like gid field
 	if [[ "${idField}" == "gid" ]]
 	then
-		echo "ALTER TABLE \"${schema}\".\"${tblname}\"
+		echo "ALTER TABLE \"${schema}\".\"${tblName}\"
 		      DROP COLUMN IF EXISTS \"idField\",
 		      ADD  COLUMN \"idField\" INTEGER;
-		      UPDATE      \"${schema}\".\"${tblname}\"
+		      UPDATE      \"${schema}\".\"${tblName}\"
 		      SET \"idField\" = ${idField};" |\
 		psql -q "$(PGdbName "${dbName}")"
 		local idField="idField"
 	fi
-	gdal_rasterize -l "${schema}"."${tblname}" -a "${idField}" -init "${initVal}" -ot Integer  -of GTiff \
+	gdal_rasterize -l "${schema}"."${tblName}" -a "${idField}" -init "${initVal}" -ot Integer  -of GTiff \
 	               -ts "${ncols}" "${nrows}" -te "${extent_llx}" "${extent_lly}" "${extent_urx}" "${extent_ury}" \
 	               "PG:$(PGdbName "${dbName}")" "${rgisFile%.gdbd*}.tif"
 
@@ -332,11 +349,11 @@ function PGrasterize ()
 	 echo "0") | grdImport -b "${rgisFile%.gdbd*}.grd"
 	rm  "${rgisFile%.gdbd*}.tif" "${rgisFile%.gdbd*}.grd.aux.xml" "${rgisFile%.gdbd*}.prj" "${rgisFile%.gdbd*}.grd"
 
-	PGattribTableSQL "sensitive" "${schema}" "${tblname}" "${idField}" "${geom}" |\
+	PGattribTableSQL "sensitive" "${schema}" "${tblName}" "${idField}" "${geom}" |\
 	psql -q "$(PGdbName "${dbName}")" |\
 	table2rgis - "${rgisFile%.gdbd*}.gdbt"
 
-	tblJoinTables -t "${schema} ${tblname}" -u "Zones" -a "${rgisFile%.gdbd*}.gdbt" -e "DBItems" -o "DBItems" -r "GridValue" -j "${idField}" "${rgisFile}" - |\
+	tblJoinTables -t "${schema} ${tblName}" -u "Zones" -a "${rgisFile%.gdbd*}.gdbt" -e "DBItems" -o "DBItems" -r "GridValue" -j "${idField}" "${rgisFile}" - |\
 	tblDeleteField -f "DBItems" - "${rgisFile}"
 	rm "${rgisFile%.gdbd*}.gdbt"
 	grdRenameLayers -r 1 "$(RGISlookupSubject "${subject}")" "${rgisFile}" "${rgisFile}"
@@ -350,6 +367,9 @@ PGaddCodeField ()
     local     table="${1}"; shift
     local charField="${1}"; shift
     local codeField="${1}"; shift
+
+USAGE="Usage: PGaddCodeField <dbname> <schema> <table> <name field> <code field>"
+if [[ "${codeField}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 echo "DROP TABLE IF EXISTS \"RGISTemp_TABLE\";
 CREATE TEMPORARY TABLE \"RGISTemp_TABLE\"
