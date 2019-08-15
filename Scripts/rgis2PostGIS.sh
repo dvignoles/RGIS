@@ -89,17 +89,17 @@ TEMPFILE="TEMP$(caseFunc "${CASE}" ${FILENAME})"
 
 case "${EXTENSION}" in
 	(gdbp|gdbp.gz|gdbl|gdbl.gz)
-		rgis2ascii "${RGISFILE}" "${TEMPFILE}.asc"
-        rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" "${RGISFILE}" | psql "${DBNAME}"
-		ogr2ogr -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
-		shp2pgsql -k -s 4326 "${TEMPFILE}.shp" "${SCHEMA}"."${TBLNAME}_geom" | psql "${DBNAME}"
-		echo "ALTER TABLE \"${SCHEMA}\".\"${TBLNAME}\" ADD COLUMN \"geom\" geometry;
+    rgis2ascii "${RGISFILE}" "${TEMPFILE}.asc"
+    rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" "${RGISFILE}" | psql "${DBNAME}"
+    ogr2ogr -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
+    shp2pgsql -k -s 4326 "${TEMPFILE}.shp" "${SCHEMA}"."${TBLNAME}_geom" | psql "${DBNAME}"
+    echo "ALTER TABLE \"${SCHEMA}\".\"${TBLNAME}\" ADD COLUMN \"geom\" geometry;
       		  UPDATE \"${SCHEMA}\".\"${TBLNAME}\"
         	  SET \"geom\" = \"${SCHEMA}\".\"${TBLNAME}_geom\".\"geom\"
          	  FROM   \"${SCHEMA}\".\"${TBLNAME}_geom\"
         	  WHERE  \"${SCHEMA}\".\"${TBLNAME}\".\"${ID}\" =  \"${SCHEMA}\".\"${TBLNAME}_geom\".\"gid\";
          	  DROP TABLE \"${SCHEMA}\".\"${TBLNAME}_geom\";" | psql "${DBNAME}"
-      rm "${TEMPFILE}".*
+    rm "${TEMPFILE}".*
 	;;
 	(gdbd|gdbd.gz)
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
@@ -117,12 +117,12 @@ case "${EXTENSION}" in
          rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
-	    rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
-		raster2pgsql "${TEMPFILE}.grd" "${SCHEMA}"."${TBLNAME}_Raster" |\
-		sed "s:$(echo "${SCHEMA}"  | tr "[A-Z]" "[a-z]"):${SCHEMA}:g"  |\
-		sed "s:$(echo "${TBLNAME}" | tr "[A-Z]" "[a-z]"):${TBLNAME}:g" |\
-		psql "${DBNAME}"
-		rm "${TEMPFILE}.grd"
+    rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
+    raster2pgsql "${TEMPFILE}.grd" "${SCHEMA}"."${TBLNAME}_Raster" |\
+    sed "s:$(echo "${SCHEMA}"  | tr "[A-Z]" "[a-z]"):${SCHEMA}:g"  |\
+    sed "s:$(echo "${TBLNAME}" | tr "[A-Z]" "[a-z]"):${TBLNAME}:g" |\
+    psql "${DBNAME}"
+    rm "${TEMPFILE}.grd"
 	;;
 	(*)
 		echo ${EXTENSION}

@@ -343,4 +343,29 @@ function PGrasterize ()
 	RGISsetHeader "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}" "static"
 }
 
+PGaddCodeField ()
+{
+    local    schema="${1}"; shift
+    local     table="${1}"; shift
+    local charField="${1}"; shift
+    local codeField="${1}"; shift
+
+echo "DROP TABLE IF EXISTS \"RGISTemp_TABLE\";
+CREATE TEMPORARY TABLE \"RGISTemp_TABLE\"
+(\"${codeFied}\" SERIAL, \"${charField}\" CHARACTER VARYING(80) COLLATE pg_catalog.default,
+ CONSTRAINT \"RGISTemp_TABLE_pkey\" PRIMARY KEY (\"${codeField}\")) WITH (OIDS = FALSE);
+
+INSERT INTO \"RGISTemp_TABLE\" (\"${charField}\")
+SELECT \"${charField}\" FROM \"${schema}\".\"${table}\" GROUP BY \"${charField}\" ORDER BY \"${charField}\";
+
+ALTER TABLE \"${schema}\".\"${table}\" ADD \"${codeFied}\" INTEGER;
+
+UPDATE \"${schema}\".\"${table}\"
+    SET \"${codeFied}\" = \"RGISTemp_TABLE\".\"${codeFied}\"
+FROM \"RGISTemp_TABLE\"
+WHERE \"${schema}\".\"${table}\".\"${charField}\" like \"RGISTemp_TABLE\".\"${charField}\";
+
+DROP TABLE \"RGISTemp_TABLE\";"
+}
+
 if [[ "${GHAASsslDIR}" != "" ]]; then PGsslDir "${GHAASsslDIR}"; else export _GHAASpgSSLdir=""; fi
