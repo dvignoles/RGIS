@@ -345,6 +345,7 @@ function PGrasterize ()
 
 PGaddCodeField ()
 {
+    local    dbName="${1}"; shift
     local    schema="${1}"; shift
     local     table="${1}"; shift
     local charField="${1}"; shift
@@ -365,7 +366,7 @@ UPDATE \"${schema}\".\"${table}\"
 FROM \"RGISTemp_TABLE\"
 WHERE \"${schema}\".\"${table}\".\"${charField}\" like \"RGISTemp_TABLE\".\"${charField}\";
 
-DROP TABLE \"RGISTemp_TABLE\";"
+DROP TABLE \"RGISTemp_TABLE\";" | psql -q "$(PGdbName "${dbName}")"
 }
 
 if [[ "${GHAASsslDIR}" != "" ]]; then PGsslDir "${GHAASsslDIR}"; else export _GHAASpgSSLdir=""; fi
