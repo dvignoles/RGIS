@@ -353,16 +353,16 @@ PGaddCodeField ()
 
 echo "DROP TABLE IF EXISTS \"RGISTemp_TABLE\";
 CREATE TEMPORARY TABLE \"RGISTemp_TABLE\"
-(\"${codeFied}\" SERIAL, \"${charField}\" CHARACTER VARYING(80) COLLATE pg_catalog.default,
+(\"${codeField}\" SERIAL, \"${charField}\" CHARACTER VARYING(80) COLLATE pg_catalog.default,
  CONSTRAINT \"RGISTemp_TABLE_pkey\" PRIMARY KEY (\"${codeField}\")) WITH (OIDS = FALSE);
 
 INSERT INTO \"RGISTemp_TABLE\" (\"${charField}\")
 SELECT \"${charField}\" FROM \"${schema}\".\"${table}\" GROUP BY \"${charField}\" ORDER BY \"${charField}\";
 
-ALTER TABLE \"${schema}\".\"${table}\" ADD \"${codeFied}\" INTEGER;
+ALTER TABLE \"${schema}\".\"${table}\" ADD \"${codeField}\" INTEGER;
 
 UPDATE \"${schema}\".\"${table}\"
-    SET \"${codeFied}\" = \"RGISTemp_TABLE\".\"${codeFied}\"
+    SET \"${codeField}\" = \"RGISTemp_TABLE\".\"${codeField}\"
 FROM \"RGISTemp_TABLE\"
 WHERE \"${schema}\".\"${table}\".\"${charField}\" like \"RGISTemp_TABLE\".\"${charField}\";
 
