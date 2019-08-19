@@ -109,7 +109,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
     char *bufferPtr [2] = {(char *) NULL, (char *) NULL}, *notExists, *separator = (char *) " ";
 
     if ((RGlibTableCopy == mode) || (RGlibTableBlank == mode) || (RGlibTableReplace == mode)) {
-        notExists = RGlibTableCopy == mode ? (char *) "IF NOT EXISTS " : (char *) " ";
+        notExists = RGlibTableCopy == mode ? (char *) " IF NOT EXISTS " : (char *) " ";
         if (dbSchemaName == (char *) NULL) {
             fprintf (outFile, "-- Table: \"%s\"\n",             _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
             if (RGlibTableCopy != mode) {
@@ -130,7 +130,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
         }
         fprintf (outFile,"(\n");
         fprintf (outFile,"\"%s\" SERIAL,\n",_RGlibSQLCaseChange (sqlCase, "ID", bufferPtr, bufferLen));
-        fprintf (outFile,"\"%s\" CHARACTER VARYING(%d) COLLATE pg_catalog.\"default\",\n",_RGlibSQLCaseChange (sqlCase, "RecordName", bufferPtr, bufferLen),nameLength + 1);
+        if (recordName) fprintf (outFile,"\"%s\" CHARACTER VARYING(%d) COLLATE pg_catalog.\"default\",\n",_RGlibSQLCaseChange (sqlCase, "RecordName", bufferPtr, bufferLen),nameLength + 1);
         for (field = fields->First(); field != (DBObjTableField *) NULL; field = fields->Next()) {
             if (DBTableFieldIsVisible (field))
                 switch (field->Type()) {
@@ -157,8 +157,8 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
 
     if ((RGlibTableBlank != mode)) {
         if (RGlibTableCopy == mode) {
-            if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nTRUNCATE TABLE \"%s\"",        _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
-            else                               fprintf (outFile,"\nTRUNCATE TABLE \"%s\".\"%s\"", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
+            if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nTRUNCATE TABLE \"%s\"          RESTART IDENTITY CASCADE", _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
+            else                               fprintf (outFile,"\nTRUNCATE TABLE \"%s\".\"%s\"   RESTART IDENTITY CASCADE", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
         }
         if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nINSERT INTO  \"%s\" (",  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
         else fprintf (outFile,"\nINSERT INTO  \"%s\".\"%s\" (", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
