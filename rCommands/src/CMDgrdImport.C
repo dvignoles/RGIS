@@ -342,7 +342,7 @@ int main(int argc, char *argv[]) {
 
     grdData->Name("Untitled");
     FILE *inFILE, *lstFILE = (FILE *) NULL;
-    char fileName[DBDataFileNameLen], recordName[DBStringLength];
+    char fileName[DBDataFileNameLen+256], recordName[DBStringLength]; //TODO: ugly fixed size array from Pete.
     DBInt pathLen, itemSize, chunk, i, j, row, col, recordLen;
     DBCoordinate coord;
     DBRegion extent;
