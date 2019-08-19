@@ -16,7 +16,7 @@ bfekete@ccny.cuny.edu
 
 int main(int argc, char *argv[]) {
     FILE *outFile;
-    DBInt argPos, argNum = argc, ret, mode = RGlibTableCopy, sqlCase = RGlibSQLCaseSensitive;
+    DBInt argPos, argNum = argc, ret, mode = RGlibTableCopy, recordName = true, sqlCase = RGlibSQLCaseSensitive;
     char *rgisTableName = (char *) "DBItems";
     char *dbSchemaName  = (char *) NULL;
     char *sqlTableName   = (char *) NULL;
@@ -69,8 +69,8 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest(argv[argPos], "-m", "--mode")) {
-            const char *options[] = {"copy", "append", "blank", (char *) NULL};
-            int codes[] = {RGlibTableCopy, RGlibTableAppend, RGlibTableBlank}, code;
+            const char *options[] = {"copy", "append", "replace", "blank", (char *) NULL};
+            int codes[] = {RGlibTableCopy, RGlibTableAppend, RGlibTableReplace, RGlibTableBlank}, code;
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             if ((code = CMoptLookup(options, argv[argPos], false)) == CMfailed) {
                 CMmsgPrint(CMmsgWarning, "Ignoring illformed step option [%s]!", argv[argPos]);
@@ -79,13 +79,25 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
+        if (CMargTest(argv[argPos], "-r", "--recordname")) {
+            const char *options[] = {"on", "off", (char *) NULL};
+            int codes[] = {true,false}, code;
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            if ((code = CMoptLookup(options, argv[argPos], false)) == CMfailed) {
+                CMmsgPrint(CMmsgWarning, "Ignoring illformed step option [%s]!", argv[argPos]);
+            }
+            else recordName = codes[code];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
         if (CMargTest (argv[argPos], "-h", "--help")) {
             CMmsgPrint(CMmsgInfo, "%s [options] <rgis file> <sqlfile>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgInfo, "     -a,--rgistable [rgis table]");
-            CMmsgPrint(CMmsgInfo, "     -c,--case      [sensitive|lower|upper");
-            CMmsgPrint(CMmsgInfo, "     -s,--schema    [sql schema]");
-            CMmsgPrint(CMmsgInfo, "     -q,--sqltable  [sql table]");
-            CMmsgPrint(CMmsgInfo, "     -m,--mode      [copy|append|blank]");
+            CMmsgPrint(CMmsgInfo, "     -a,--rgistable  [rgis table]");
+            CMmsgPrint(CMmsgInfo, "     -c,--case       [sensitive|lower|upper");
+            CMmsgPrint(CMmsgInfo, "     -s,--schema     [sql schema]");
+            CMmsgPrint(CMmsgInfo, "     -q,--sqltable   [sql table]");
+            CMmsgPrint(CMmsgInfo, "     -m,--mode       [copy|append|replace|blank]");
+            CMmsgPrint(CMmsgInfo, "     -r,--recordname [on|off]");
             CMmsgPrint(CMmsgInfo, "     -h,--help");
             return (DBSuccess);
         }
@@ -111,7 +123,7 @@ int main(int argc, char *argv[]) {
         return (CMfailed);
     }
 
-    ret = RGlibTableToSQL (table, dbSchemaName, sqlTableName, mode, sqlCase, outFile);
+    ret = RGlibTableToSQL (table, dbSchemaName, sqlTableName, mode, recordName, sqlCase, outFile);
 
     delete data;
     if (outFile != stdout) {

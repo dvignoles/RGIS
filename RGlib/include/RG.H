@@ -141,9 +141,9 @@ DBInt RGlibNetworkToStreamlines (DBObjData *, DBInt, DBObjData *);
 
 DBInt RGLibTableJoin(DBObjTable *, DBObjTableField *, DBObjTable *, DBObjTableField *);
 
-enum {RGlibTableCopy, RGlibTableAppend, RGlibTableBlank };
+enum {RGlibTableCopy, RGlibTableAppend, RGlibTableReplace, RGlibTableBlank };
 
-DBInt RGlibTableToSQL (DBObjTable *, const char *, const char *, DBInt, DBInt, FILE *);
+DBInt RGlibTableToSQL (DBObjTable *, const char *, const char *, DBInt, DBInt, DBInt, FILE *);
 
 DBInt RGlibRGIS2DataStream(DBObjData *, DBObjData *, char *, FILE *);
 

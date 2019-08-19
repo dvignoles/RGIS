@@ -101,23 +101,28 @@ static const char *_RGlibSQLCaseChange (DBInt sqlCase, const char *str, char **b
     return (*bufferPtr);
 }
 
-DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *dbTableName, DBInt mode, DBInt sqlCase, FILE *outFile) {
+DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *dbTableName, DBInt mode, DBInt recordName, DBInt sqlCase, FILE *outFile) {
     DBObjectLIST<DBObjTableField> *fields = table->Fields();
     DBObjRecord *record;
     DBObjTableField *field;
     DBInt bufferLen [2] = {0,0}, recordID, nameLength = 1;
-    char *bufferPtr [2] = {(char *) NULL, (char *) NULL};
+    char *bufferPtr [2] = {(char *) NULL, (char *) NULL}, *notExists, *separator = (char *) " ";
 
-    if ((RGlibTableCopy == mode) || (RGlibTableBlank == mode)) {
+    if ((RGlibTableCopy == mode) || (RGlibTableBlank == mode) || (RGlibTableReplace == mode)) {
+        notExists = RGlibTableCopy == mode ? (char *) "IF NOT EXISTS " : (char *) " ";
         if (dbSchemaName == (char *) NULL) {
             fprintf (outFile, "-- Table: \"%s\"\n",             _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
-            fprintf (outFile, "DROP TABLE IF EXISTS \"%s\";\n", _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
-            fprintf (outFile, "CREATE TABLE \"%s\"\n",          _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
+            if (RGlibTableCopy != mode) {
+                fprintf (outFile, "DROP TABLE IF EXISTS \"%s\";\n", _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
+            }
+            fprintf (outFile, "CREATE TABLE%s\"%s\"\n",         notExists, _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
         }
         else {
             fprintf (outFile, "-- Table: \"%s\".\"%s\"\n",             _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
-            fprintf (outFile, "DROP TABLE IF EXISTS \"%s\".\"%s\";\n", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
-            fprintf (outFile, "CREATE TABLE \"%s\".\"%s\"\n",          _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
+            if (RGlibTableCopy != mode) {
+                fprintf (outFile, "DROP TABLE IF EXISTS \"%s\".\"%s\";\n", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
+            }
+            fprintf (outFile, "CREATE TABLE%s\"%s\".\"%s\"\n",         notExists, _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
         }
         for (recordID = 0;recordID < table->ItemNum();++recordID) {
             record = table->Item (recordID);
@@ -150,26 +155,54 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
         fprintf (outFile,"TABLESPACE pg_default;\n");
     }
 
-    if ((RGlibTableCopy == mode) || (RGlibTableAppend == mode)) {
-        if (dbSchemaName == (char *) NULL) fprintf (outFile,"INSERT INTO  \"%s\" (",  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
+    if ((RGlibTableBlank != mode)) {
+        if (RGlibTableCopy == mode) {
+            if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nTRUNCATE TABLE \"%s\"",        _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
+            else                               fprintf (outFile,"\nTRUNCATE TABLE \"%s\".\"%s\"", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
+        }
+        if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nINSERT INTO  \"%s\" (",  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
         else fprintf (outFile,"\nINSERT INTO  \"%s\".\"%s\" (", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
-        fprintf (outFile,"\"%s\"",_RGlibSQLCaseChange (sqlCase, "RecordName", bufferPtr, bufferLen));
+        if (recordName) {
+            fprintf (outFile,"\"%s\"",_RGlibSQLCaseChange (sqlCase, "RecordName", bufferPtr, bufferLen));
+            separator = (char *) ", ";
+        }
+        else separator = (char *) " ";
+
         for (field = fields->First(); field != (DBObjTableField *) NULL; field = fields->Next()) {
-            if (DBTableFieldIsVisible (field)) fprintf (outFile,",\"%s\"",_RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen));
+            if (DBTableFieldIsVisible (field)) {
+                fprintf (outFile,"%s\"%s\"",separator,_RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen));
+                separator = (char *) ", ";
+            }
         }
         fprintf (outFile,") VALUES\n");
         for (record = table->First (); record != (DBObjRecord *) NULL; record = table->Next ()) {
-            if (record->RowID () == 0) fprintf (outFile,    "($$%s$$", record->Name());
-            else                       fprintf (outFile,"),\n($$%s$$", record->Name());
+            if (record->RowID () == 0) {
+                if (recordName) { fprintf (outFile,  "($$%s$$, ", record->Name()); separator = (char *) ", "; }
+                else            { fprintf (outFile,  "(");                         separator = (char *) ""; }
+            }
+            else {
+                if (recordName) { fprintf (outFile,"),\n($$%s$$", record->Name());  separator = (char *) ", "; }
+                else            { fprintf (outFile,"),\n(");                        separator = (char *) ""; }
+            }
             for (field = fields->First(); field != (DBObjTableField *) NULL; field = fields->Next()) {
-                if (DBTableFieldIsVisible (field))
+                if (DBTableFieldIsVisible (field)) {
                     switch (field->Type()) {
                         default:
-                        case DBTableFieldString: fprintf(outFile,",$$%s$$", field->String(record));  break;
-                        case DBTableFieldInt:    fprintf(outFile,",%d",     field->Int (record));    break;
-                        case DBTableFieldFloat:  fprintf(outFile,",%f",     field->Float (record));  break;
-                        case DBTableFieldDate:   fprintf(outFile,",\'%s\'", field->String (record)); break;
+                        case DBTableFieldString:
+                            fprintf(outFile, "%s$$%s$$", separator, field->String(record));
+                            break;
+                        case DBTableFieldInt:
+                            fprintf(outFile, "%s%d", separator, field->Int(record));
+                            break;
+                        case DBTableFieldFloat:
+                            fprintf(outFile, "%s%f", separator, field->Float(record));
+                            break;
+                        case DBTableFieldDate:
+                            fprintf(outFile, "%s\'%s\'", separator, field->String(record));
+                            break;
                     }
+                    separator = (char *) ", ";
+                }
             }
         }
         fprintf (outFile,");");
