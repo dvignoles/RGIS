@@ -157,8 +157,8 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
 
     if ((RGlibTableBlank != mode)) {
         if (RGlibTableCopy == mode) {
-            if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nTRUNCATE TABLE \"%s\"          RESTART IDENTITY CASCADE", _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
-            else                               fprintf (outFile,"\nTRUNCATE TABLE \"%s\".\"%s\"   RESTART IDENTITY CASCADE", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
+            if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nTRUNCATE TABLE \"%s\"          RESTART IDENTITY CASCADE;", _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
+            else                               fprintf (outFile,"\nTRUNCATE TABLE \"%s\".\"%s\"   RESTART IDENTITY CASCADE;", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
         }
         if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nINSERT INTO  \"%s\" (",  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
         else fprintf (outFile,"\nINSERT INTO  \"%s\".\"%s\" (", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
