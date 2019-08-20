@@ -1,5 +1,5 @@
 FROM ubuntu:19.04
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y gnupg gnupg-utils lsb-base lsb-release wget ca-certificates && \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata gnupg gnupg-utils lsb-base lsb-release wget ca-certificates && \
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
     echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" >> /etc/apt/sources.list.d/pgdg.list && \
     apt-get update && apt-get install -y --no-install-recommends dialog apt-utils apt-transport-https dnsutils psmisc \
