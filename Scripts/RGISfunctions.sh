@@ -1675,6 +1675,9 @@ function RGISfilePath ()
 	local        tStep=$(echo "${1}" | tr "[A-Z]" "[a-z]"); shift
 	local    timeRange="${1}"; shift
 
+	USAGE="Usage: RGISfilePath <archive> <domain> <variable> <product> <resolution> <tstep type> <tstep> [time range]"
+    if [[ "${tStep}" == "" ]]; then echo "${USAGE}"; return 1; fi
+
 	case "${tStep}" in
 		(hourly)
 			local tStepStr="h"
@@ -1743,6 +1746,9 @@ function RGISfile ()
 	local    tStepType="${1}"; shift
 	local        tStep=$(echo "${1}" | tr "[A-Z]" "[a-z]"); shift
 	local    timeRange="${1}"; shift
+
+	USAGE="Usage: RGISfile <archive> <domain> <variable> <product> <resolution> <tstep type> <tstep> [time range]"
+    if [[ "${tStep}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	case "${tStep}" in
 		(hourly)
@@ -1816,6 +1822,8 @@ function RGIStitle ()
 	local  timeRange="${1}"; shift
 	local    version="${1}"; shift
 
+	USAGE="Usage: RGIStitle <archive> <domain> <variable> <product> <resolution> <tstep type> <tstep> <time range> <version>"
+    if [[ "${endYear}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	local variableFullName=$(_RGISlookupFullName "${variable}")
 
@@ -1879,6 +1887,9 @@ function RGISAppend ()
 	local    endyear="${1}"; shift
 	local      tStep="${1}"; shift
 
+	USAGE="Usage: RGISSAppend <archive> <domain> <variable> <product> <resolution> <version> <start year> <end year> <time step>"
+    if [[ "${tStep}" == "" ]]; then echo "${USAGE}"; return 1; fi
+
  	local      files=""
 	local  separator=" "
 
@@ -1901,7 +1912,7 @@ function RGISsetHeader ()
 {
 	local      archive="${1}"; shift
 	local       domain="${1}"; shift
-	local      subject="${1}"; shift
+	local     variable="${1}"; shift
 	local      product="${1}"; shift
 	local   resolution="${1}"; shift
 	local    tStepType="${1}"; shift
@@ -1915,17 +1926,20 @@ function RGISsetHeader ()
 	local   sourceInst="${1}"; shift
 	local sourcePerson="${1}"; shift
 
+	USAGE="Usage: RGISsetHeader <archive> <domain> <variable> <product> <resolution> <tstep type> <tstep> <time range> <version> <title> <comment> <citation> <institution> <source inst> <source person>"
+    if [[ "${endYear}" == "" ]]; then echo "${USAGE}"; return 1; fi
+
 	if [[ "$(RGIScase "lower" "${tStepType}")" == "static" ]]
 	then
-	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}")"
+	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${tStepType}")"
 	elif [[     "${tStep}" == "" ]]
 	then
-	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "Annual")"
+	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${tStepType}" "Annual")"
 	elif [[ "${timeRange}" == "" ]]
 	then
-	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}")"
+	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${tStepType}" "${tStep}")"
 	else
-	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}" "${timeRange}")"
+	    local rgisFile="$(RGISfilePath "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${tStepType}" "${tStep}" "${timeRange}")"
 	fi
 
 	if [[ "${rgisFile}" == "" ]]
@@ -1943,13 +1957,13 @@ function RGISsetHeader ()
 	if [[ "${tStepType}"    == "" ]]; then local tStepType="static";  fi
 	if [[ "${version}"      == "" ]]; then local   version="pre0.01"; fi
 
-	if [[ "${title}"        == "" ]]; then local        title="$(RGIStitle "${domain}" "${subject}" "${product}" "${resolution}" "${tStepType}" "${tStep}" "${timeRange}" "${version}")"; fi
-	if [[ "${comment}"      == "" ]]; then local      comment="${domain} $(_RGISlookupFullName "${subject}") from ${product} at ${resolution}"; fi
-	if [[ "${citation}"     == "" ]]; then local     citation="Pirated ${subject} from ${product}"; fi
+	if [[ "${title}"        == "" ]]; then local        title="$(RGIStitle "${domain}" "${variable}" "${product}" "${resolution}" "${tStepType}" "${tStep}" "${timeRange}" "${version}")"; fi
+	if [[ "${comment}"      == "" ]]; then local      comment="${domain} $(_RGISlookupFullName "${variable}") from ${product} at ${resolution}"; fi
+	if [[ "${citation}"     == "" ]]; then local     citation="Pirated ${variable} from ${product}"; fi
 	if [[ "${institution}"  == "" ]]; then local  institution="Advanced Science Research Center at the Graduate Center, CUNY"; fi
 	if [[ "${sourceInst}"   == "" ]]; then local   sourceInst="City College of New York"; fi
 	if [[ "${sourcePerson}" == "" ]]; then local sourcePerson="${person}"; fi
-	setHeader  -t "${title}" -d "${domain}" -u "$(RGISlookupSubject "${subject}")" -y "on" -c "${comment}" -i "${citation}" -n "${institution}" -o "${sourceInst}" -p "${sourcePerson}" -v "${version}" "${rgisFile}" "${rgisFile}"
+	setHeader  -t "${title}" -d "${domain}" -u "$(RGISlookupSubject "${variable}")" -y "on" -c "${comment}" -i "${citation}" -n "${institution}" -o "${sourceInst}" -p "${sourcePerson}" -v "${version}" "${rgisFile}" "${rgisFile}"
 }
 
 function RGISAggregateTS ()
@@ -1964,6 +1978,9 @@ function RGISAggregateTS ()
 	local    endyear="${1}"; shift
 	local  fromtStep="${1}"; shift
 	local    totStep="${1}"; shift
+
+	USAGE="Usage: RGISAggregateTS <archive> <domain> <variable> <product> <resolution> <version> <start year> <end year> <from timestep> <to timestep>"
+    if [[ "${totStep}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
    local     files=""
    local separator=""
@@ -1993,6 +2010,9 @@ function RGISClimatology ()
  	local  startyear="${1}"; shift
 	local    endyear="${1}"; shift
 
+	USAGE="Usage: RGISClimatology <archive> <domain> <variable> <product> <resolution> <version> <start year> <end year>"
+    if [[ "${endYear}" == "" ]]; then echo "${USAGE}"; return 1; fi
+
 	local     ltDir=$(RGISdirectory "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "LT" "monthly")
 	local    tsFile=$(RGISfile      "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "monthly" "${startyear}-${endyear}")
 	local    ltFile=$(RGISfile      "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "LT" "monthly" "${startyear}-${endyear}")
@@ -2016,6 +2036,9 @@ function RGISCellStats ()
 	local    version="${1}"; shift
  	local  startyear="${1}"; shift
 	local    endyear="${1}"; shift
+
+	USAGE="Usage: RGISCellStats <archive> <domain> <variable> <product> <resolution> <version> <start year> <end year>"
+    if [[ "${endYear}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	local  statsDir=$(RGISdirectory  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "Stats" "annual")
 	local    tsFile=$(RGISfile       "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS"    "annual" "${startyear}-${endyear}")
@@ -2070,6 +2093,9 @@ function RGISStatistics ()
 	local    version="${1}"; shift
 	local  startyear="${1}"; shift
 	local    endyear="${1}"; shift
+
+	USAGE="Usage: RGISStatistics <archive> <domain> <variable> <product> <resolution> <version> <start year> <end year>"
+    if [[ "${endYear}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	RGISAppend "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}" "monthly" || return 1
 	RGISAppend "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}" "annual"  || return 1
