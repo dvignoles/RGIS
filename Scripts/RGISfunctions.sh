@@ -2077,10 +2077,12 @@ RGISclimatology ()
 
 	case "${timeStep}" in
 	(annual)
-		local nStep="1"
+		local     nStep="1"
+		local tStepUnit="year"
 	;;
 	(monthly)
-		local nStep="12"
+		local     nStep="12"
+		local tStepUnit="month"
 	;;
 	(*)
 		echo "Invalid time step: ${timeStep}"
@@ -2092,7 +2094,8 @@ RGISclimatology ()
 	local    title="$(RGIStitle                  "${domain}" "${variable}" "${product}" "${resolution}" "LT" "${timeStep}" "${range}")"
 	[ -e "${fileName%/*}"  ] || mkdir -p "${fileName%/*}"
 	grdAppendLayers ${tsFiles} |\
-	grdCycleMean -n "${nStep}" -t "${title}" -u "$(RGISlookupSubject "${variable}")" -d "${domain}" -s "$(RGISlookupShadeset "${variable}")" - "${fileName}"
+	grdCycleMean -n "${nStep}" -t "${title}" -u "$(RGISlookupSubject "${variable}")" -d "${domain}" -s "$(RGISlookupShadeset "${variable}")" |\
+	grdDateLayers -e "${tStepUnit}" - "${fileName}"
 }
 
 function RGISCellStats ()
