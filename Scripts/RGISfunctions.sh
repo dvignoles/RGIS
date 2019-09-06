@@ -1999,31 +1999,100 @@ function RGISAggregateTS ()
    done
 }
 
-function RGISClimatology ()
+RGISclimatology ()
 {
 	local    archive="${1}"; shift
 	local     domain="${1}"; shift
 	local   variable="${1}"; shift
 	local    product="${1}"; shift
 	local resolution="${1}"; shift
-	local    version="${1}"; shift
- 	local  startyear="${1}"; shift
-	local    endyear="${1}"; shift
+	local   timeStep="$(echo "${1}" | tr "[A-Z]" "[a-z]")"; shift
+ 	local  startYear="${1}"; shift
+	local    endYear="${1}"; shift
 
-	USAGE="Usage: RGISClimatology <archive> <domain> <variable> <product> <resolution> <version> <start year> <end year>"
-    if [[ "${endYear}" == "" ]]; then echo "${USAGE}"; return 1; fi
+	USAGE="Usage: RGISclimatology <archive> <domain> <variable> <product> <resolution> [annual|monthly] [start year] [end year]"
+    if [[ "${timeStep}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
-	local     ltDir=$(RGISdirectory "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "LT" "monthly")
-	local    tsFile=$(RGISfile      "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "monthly" "${startyear}-${endyear}")
-	local    ltFile=$(RGISfile      "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "LT" "monthly" "${startyear}-${endyear}")
-	local     title=$(RGIStitle                  "${domain}" "${variable}" "${product}" "${resolution}" "LT" "monthly" "${startyear}-${endyear}")
-	local   subject=$(RGISlookupSubject  "${variable}")
-	local  shadeset=$(RGISlookupShadeset "${variable}")
+	if [[ "${startYear}" == "" ]]
+	then
+		if [[ "${endYear}" == "" ]]
+		then
+			local tsFiles=""
+			local     sep=""
+			for fileName in $(RGISfilePath  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${timeStep}" "*")
+			do
+				local tsFiles="${tsFiles}${sep}${fileName}"
+				local     sep=" "
+			done
+			local range=""
+		else
+			local tsFiles=""
+			local     sep=""
+			local lastFile="$(RGISfilePath  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${timeStep}" "${endYear}")"
+			for fileName in $(RGISfilePath  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${timeStep}" "*")
+			do
+				if [[ ${fileName} == ${lastFile} ]]
+				then
+					break;
+				else
+					local tsFiles="${tsFiles}${sep}${fileName}"
+					local     sep=" "
+				fi
+			done
+			local tsFiles="${tsFiles}${sep}${fileName}"
+			local range="year-${endYear}"
+		fi
+	elif [[ "${endYear}" == "" ]]
+	then
+		local tsFiles=""
+		local     sep=""
+		for (( year = ${startYear}; ; ++year ))
+			do
+			local fileName="$(RGISfilePath  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${timeStep}" "${year}")"
+			if [ -e ${fileName} ]
+			then
+				local tsFiles="${tsFiles}${sep}${fileName}"
+				local     sep=" "
+			else
+				break;
+			fi
+			done
+			local range="${startYear}-year"
+	else
+		local tsFiles=""
+		local     sep=""
+		for (( year = ${startYear}; year <= ${endYear}; ++year ))
+			do
+			local fileName="$(RGISfilePath  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${timeStep}" "${year}")"
+			if [ -e ${fileName} ]
+			then
+				local tsFiles="${tsFiles}${sep}${fileName}"
+				local     sep=" "
+			else
+				break;
+			fi
+		done
+		local range="${startYear}-${endYear}"
+	fi
 
-	[ -e "${ltDir}" ] || mkdir -p "${ltDir}" || return 1
-	grdCycleMean	-t "${title}" -d "${domain}" -u "${subject}" -v "${version}" -s "${shadeset}" -n 12 "${tsFile}" - |\
-	grdDateLayers   -e "month" - "${ltFile}" || return 1
-	return 0
+	case "${timeStep}" in
+	(annual)
+		local nStep="1"
+	;;
+	(monthly)
+		local nStep="12"
+	;;
+	(*)
+		echo "Invalid time step: ${timeStep}"
+		exit 1
+	;;
+	esac
+
+	local fileName="$(RGISfilePath  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "LT" "${timeStep}" "${range}")"
+	local    title="$(RGIStitle                  "${domain}" "${variable}" "${product}" "${resolution}" "LT" "${timeStep}" "${range}")"
+	[ -e "${fileName%/*}"  ] || mkdir -p "${fileName%/*}"
+	grdAppendLayers ${tsFiles} |\
+	grdCycleMean -n "${nStep}" -t "${title}" -u "$(RGISlookupSubject "${variable}")" -d "${domain}" -s "$(RGISlookupShadeset "${variable}")" - "${fileName}"
 }
 
 function RGISCellStats ()
