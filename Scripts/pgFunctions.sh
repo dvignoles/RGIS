@@ -389,4 +389,49 @@ WHERE \"${schema}\".\"${table}\".\"${charField}\" like \"RGISTemp_TABLE\".\"${ch
 DROP TABLE \"RGISTemp_TABLE\";" | psql -q "$(PGdbName "${dbName}")"
 }
 
+function PGgpkgExportTable ()
+{
+	local   dbName="${1}"; shift
+	local   schema="${1}"; shift
+	local  tblName="${1}"; shift
+	local gpkgFile="${1}"; shift
+
+	local updateFlag=""
+	[ -e "${gpkgFile}" ] && local updateFlag="-update"
+
+	ogr2ogr -f GPKG -nln "${schema}.${tblName}" "${gpkgFile}" ${updateFlag} -sql "SELECT * FROM \"${schema}\".\"${tblName}\"" PG:dbname="${dbName}"
+}
+
+function PGgpkgExportSchema ()
+{
+	local     dbName="${1}"; shift
+	local     schema="${1}"; shift
+	local    objects="${1}"; shift
+	local   gpkgFile="${1}"; shift
+
+
+	case "${objects}" in
+	(tables)
+		echo "Exporting ${schema} tables"
+		local sqlCommand="\dt;"
+	;;
+	(views)
+		echo "Exporting ${schema} views"
+		local sqlCommand="\dv;"
+	;;
+	esac
+	local ifs="${IFS}"
+	IFS='|'
+
+	echo "SET search_path TO \"${schema}\"; ${sqlCommand}" |\
+	psql "${dbName}" | sed "1,4d" | sed '$d' | sed '$d' |\
+	while read line
+	do
+		local columns=(${line})
+		local tblName=$(echo "${columns[1]}" | sed -e 's/^[[:space:]]*//' | sed -e 's/[[:space:]]*$//')
+		pgGPKGexportTable "${dbName}" "${schema}" "${tblName}" "${gpkgFile}"
+	done
+	IFS="${ifs}"
+}
+
 if [[ "${GHAASsslDIR}" != "" ]]; then PGsslDir "${GHAASsslDIR}"; else export _GHAASpgSSLdir=""; fi
