@@ -1676,7 +1676,7 @@ function RGISfilePath ()
 	local    timeRange="${1}"; shift
 
 	USAGE="Usage: RGISfilePath <archive> <domain> <variable> <product> <resolution> <tstep type> <tstep> [time range]"
-    if [[ "${resolution}" == "" ]]; then echo "${USAGE}"; return 1; fi
+    if [[ "${tStepType}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	case "${tStep}" in
 		(hourly)
@@ -1748,7 +1748,7 @@ function RGISfile ()
 	local    timeRange="${1}"; shift
 
 	USAGE="Usage: RGISfile <archive> <domain> <variable> <product> <resolution> <tstep type> <tstep> [time range]"
-    if [[ "${resolution}" == "" ]]; then echo "${USAGE}"; return 1; fi
+    if [[ "${tStepType}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	case "${tStep}" in
 		(hourly)
