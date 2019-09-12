@@ -1823,7 +1823,7 @@ function RGIStitle ()
 	local    version="${1}"; shift
 
 	USAGE="Usage: RGIStitle <archive> <domain> <variable> <product> <resolution> <tstep type> <tstep> <time range> <version>"
-    if [[ "${endYear}" == "" ]]; then echo "${USAGE}"; return 1; fi
+    if [[ "${tStepType}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	local variableFullName=$(_RGISlookupFullName "${variable}")
 
