@@ -117,15 +117,16 @@ case "${EXTENSION}" in
          rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
-    rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
-    raster2pgsql "${TEMPFILE}.grd" "${SCHEMA}"."${TBLNAME}_Raster" |\
-    sed "s:$(echo "${SCHEMA}"  | tr "[A-Z]" "[a-z]"):${SCHEMA}:g"  |\
-    sed "s:$(echo "${TBLNAME}" | tr "[A-Z]" "[a-z]"):${TBLNAME}:g" |\
-    psql "${DBNAME}"
-    rm "${TEMPFILE}.grd"
+        rgis2netcdf "${RGISFILE}" "${TEMPFILE}.nc"
+        gdal_translate -a_srs "EPSG:4326" -of "GTiff" "${TEMPFILE}.nc" "${TEMPFILE}.tif"
+        raster2pgsql "${TEMPFILE}.tif" "${SCHEMA}"."${TBLNAME}_Raster" |\
+        sed "s:$(echo "${SCHEMA}"  | tr "[A-Z]" "[a-z]"):${SCHEMA}:g"  |\
+        sed "s:$(echo "${TBLNAME}" | tr "[A-Z]" "[a-z]"):${TBLNAME}:g" |\
+        psql "${DBNAME}"
+        rm "${TEMPFILE}.nc" "${TEMPFILE}.tif"
 	;;
 	(*)
-		echo ${EXTENSION}
+		echo "Unrecognised extension: ${EXTENSION}"
 		PrintUsage
 	;;
 esac
