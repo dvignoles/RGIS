@@ -177,8 +177,8 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
         fprintf (outFile,") VALUES\n");
         for (record = table->First (); record != (DBObjRecord *) NULL; record = table->Next ()) {
             if (record->RowID () == 0) {
-                if (recordName) { fprintf (outFile,  "($$%s$$, ", record->Name()); separator = (char *) ", "; }
-                else            { fprintf (outFile,  "(");                         separator = (char *) ""; }
+                if (recordName) { fprintf (outFile,     "($$%s$$", record->Name()); separator = (char *) ", "; }
+                else            { fprintf (outFile,     "(");                       separator = (char *) ""; }
             }
             else {
                 if (recordName) { fprintf (outFile,"),\n($$%s$$", record->Name());  separator = (char *) ", "; }
