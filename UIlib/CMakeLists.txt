@@ -1,6 +1,5 @@
 FILE(GLOB sources src/*.C)
 add_library(UI22 ${sources})
 target_include_directories(UI22 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ../DBlib/include ../CMlib/include)
-target_link_libraries(UI22 LINK_PUBLIC CM10 DB22 RG22 MF10 -lXm -lXt -lXext -lX11 -lnetcdf -ludunits2 -lm)
 install(TARGETS UI22 DESTINATION ghaas/lib)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/UI.H DESTINATION ghaas/include)

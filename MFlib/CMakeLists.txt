@@ -1,6 +1,5 @@
 FILE(GLOB sources src/*.c)
 add_library(MF10 ${sources})
 target_include_directories(MF10 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ../CMlib/include)
-target_link_libraries(MF10 LINK_PUBLIC CM10 DB22 -lnetcdf -ludunits2 -lm)
 install(TARGETS MF10 DESTINATION ghaas/lib)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/MF.h DESTINATION ghaas/include)

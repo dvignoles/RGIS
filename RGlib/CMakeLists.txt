@@ -1,6 +1,5 @@
 FILE(GLOB sources src/*.C)
 add_library(RG22 ${sources})
 target_include_directories(RG22 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ../DBlib/include ../CMlib/include ../MFlib/include)
-target_link_libraries(RG22 LINK_PUBLIC CM10 DB22 MF10 -lnetcdf -ludunits2 -lm)
 install(TARGETS RG22 DESTINATION ghaas/lib)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/RG.H DESTINATION ghaas/include)

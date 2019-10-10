@@ -1,7 +1,6 @@
 FILE(GLOB sources src/*.C)
 add_library(DB22 ${sources})
 target_include_directories(DB22 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ../CMlib/include)
-target_link_libraries(DB22 LINK_PUBLIC CM10 -lnetcdf -ludunits2 -lm)
 install(TARGETS DB22 DESTINATION ghaas/lib)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/DB.H   DESTINATION ghaas/include)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/DBif.H DESTINATION ghaas/include)
