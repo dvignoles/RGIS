@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(ghaas)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
-set(BUILD_SHARED_LIBS "on")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -std=c++11")
 
 if(${CMAKE_HOST_APPLE})
     set(CMAKE_MACOSX_RPATH "on")

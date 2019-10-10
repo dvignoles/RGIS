@@ -1,5 +1,3 @@
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ../CMlib/include ../NClib/include)
 
 foreach(loop_var FAccumulate FCut FSort FStat)
