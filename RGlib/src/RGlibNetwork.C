@@ -1460,7 +1460,7 @@ Stop:
     return (cellID == 0 ? DBSuccess : DBFault);
 }
 
-static DBInt _RGlibNetworkResorvoir(void *, DBObjRecord *);
+static DBInt _RGlibNetworkReservoir(void *, DBObjRecord *);
 
 class VolumeCalc {
 private:
@@ -1500,7 +1500,7 @@ public:
         LevelVAR  = HeightFLD->Float (cellRec);
         VolumeVAR = 0.0;
         AreaVAR   = 0.0;
-        NetIF->UpStreamSearch(cellRec, (DBNetworkACTION) _RGlibNetworkResorvoir);
+        NetIF->UpStreamSearch(cellRec, (DBNetworkACTION) _RGlibNetworkReservoir);
         VolFLD->Float  (cellRec, VolumeVAR);
         AreaFLD->Float (cellRec, AreaVAR);
     };
@@ -1520,7 +1520,7 @@ public:
 
 static class VolumeCalc *_RGlibNetworkVolumeCalc;
 
-static DBInt _RGlibNetworkResorvoir(void *io, DBObjRecord *cellRec) {
+static DBInt _RGlibNetworkReservoir(void *io, DBObjRecord *cellRec) {
 
     return (_RGlibNetworkVolumeCalc->Volume (cellRec));
 }
