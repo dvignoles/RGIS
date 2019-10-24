@@ -6,7 +6,7 @@ Copyright 1994-2019, UNH - ASRC/CUNY
 
 CMDrgis2sql.C
 
-bfekete@ccny.cuny.edu
+bfekete@gc.cuny.edu
 
 *******************************************************************************/
 

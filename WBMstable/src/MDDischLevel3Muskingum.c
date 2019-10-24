@@ -6,7 +6,7 @@ Copyright 1994-2014, UNH - CCNY/CUNY
 
 MDDichLevel3Muskingum.c
 
-bfekete@ccny.cuny.edu
+bfekete@gc.cuny.edu
 
 *******************************************************************************/
 

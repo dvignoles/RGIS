@@ -6,7 +6,7 @@ Copyright 1994-2019, UNH - ASRC/CUNY
 
 CMDtblConvCoord.C
 
-bfekete@ccny.cuny.edu
+bfekete@gc.cuny.edu
 
 *******************************************************************************/
 

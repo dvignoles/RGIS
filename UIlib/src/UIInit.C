@@ -6,7 +6,7 @@ Copyright 1994-2019, UNH - ASRC/CUNY
 
 UIInit.C
 
-bfekete@ccny.cuny.edu
+bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
@@ -142,7 +142,7 @@ Widget UIInitialize(char *title, char *icon, char *helpFile, UIMenuItem mainMenu
     XtRealizeWidget(_UITopLevel);
     _UIColorInitialize(_UITopLevel);
 
-    pixmap = XmGetPixmap(XtScreen(UITopLevel()), (char *) "GHAASccny.xpm", foreground, background);
+    pixmap = XmGetPixmap(XtScreen(UITopLevel()), (char *) "GHAASasrc.xpm", foreground, background);
     ccnyLogo = XtVaCreateManagedWidget("GHAASMainUNHLogo", xmLabelWidgetClass, mainForm,
                                        XmNlabelType, XmPIXMAP,
                                        XmNlabelPixmap, pixmap,

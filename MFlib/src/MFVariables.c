@@ -6,7 +6,7 @@ Copyright 1994-2019, UNH - ASRC/CUNY
 
 MFVariables.c
 
-bfekete@ccny.cuny.edu
+bfekete@gc.cuny.edu
 
 *******************************************************************************/
 

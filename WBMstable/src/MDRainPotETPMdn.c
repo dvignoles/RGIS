@@ -6,7 +6,7 @@ Copyright 1994-2014, UNH - CCNY/CUNY
 
 MDPotETPMdn.c
 
-bfekete@ccny.cuny.edu
+bfekete@gc.cuny.edu
 
 *******************************************************************************/
 

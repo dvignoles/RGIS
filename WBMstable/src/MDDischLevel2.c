@@ -6,7 +6,7 @@ Copyright 1994-2014, UNH - CCNY/CUNY
 
 MDDischLevel2.c
 
-bfekete@ccny.cuny.edu
+bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
