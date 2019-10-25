@@ -105,7 +105,7 @@ case "${EXTENSION}" in
 		rgis2netcdf "${RGISFILE}" "${TEMPFILE}.nc"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" "${RGISFILE}" | psql "${DBNAME}"
 		gdal_translate -a_srs EPSG:4326 "NetCDF:${TEMPFILE}.nc:Subbasins" "${TEMPFILE}.tif"
-		gdal_polygonize.py "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
+		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
 		shp2pgsql -k -s 4326 "${TEMPFILE}.shp" "${SCHEMA}"."${TBLNAME}_geom" | tee "${TEMPFILE}".sql | psql "${DBNAME}"
 		echo "ALTER TABLE \"${SCHEMA}\".\"${TBLNAME}\" ADD COLUMN \"geom\" geometry;
       		  UPDATE \"${SCHEMA}\".\"${TBLNAME}\"
@@ -113,7 +113,8 @@ case "${EXTENSION}" in
          	  FROM  (SELECT \"DN\", ST_BUFFER (ST_UNION (\"geom\"),0.0) AS \"geom\" FROM \"${SCHEMA}\".\"${TBLNAME}_geom\"
          	         GROUP BY \"${SCHEMA}\".\"${TBLNAME}_geom\".\"DN\") AS \"${TBLNAME}_SELECTION\"
         	  WHERE  \"${SCHEMA}\".\"${TBLNAME}\".\"${GRIDVALUE}\" = \"${TBLNAME}_SELECTION\".\"DN\";
-	       	  DROP TABLE\"${SCHEMA}\".\"${TBLNAME}_geom\";" | psql "${DBNAME}"
+			  DELETE FROM \"${SCHEMA}\".\"${TBLNAME}\" WHERE \"geom\" IS NULL; 
+			  DROP TABLE  \"${SCHEMA}\".\"${TBLNAME}_geom\";" |  psql "${DBNAME}"
          rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
