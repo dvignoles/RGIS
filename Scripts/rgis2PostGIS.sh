@@ -104,7 +104,7 @@ case "${EXTENSION}" in
 	(gdbd|gdbd.gz)
 		rgis2netcdf "${RGISFILE}" "${TEMPFILE}.nc"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" "${RGISFILE}" | psql "${DBNAME}"
-		gdal_translate -a_srs EPSG:4326 "${TEMPFILE}.nc":Subbasins "${TEMPFILE}.tif"
+		gdal_translate -a_srs EPSG:4326 "NetCDF:${TEMPFILE}.nc:Subbasins" "${TEMPFILE}.tif"
 		gdal_polygonize.py -8  "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
 		shp2pgsql -k -s 4326 "${TEMPFILE}.shp" "${SCHEMA}"."${TBLNAME}_geom" | tee "${TEMPFILE}".sql | psql "${DBNAME}"
 		echo "ALTER TABLE \"${SCHEMA}\".\"${TBLNAME}\" ADD COLUMN \"geom\" geometry;
