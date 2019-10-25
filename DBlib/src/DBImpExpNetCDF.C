@@ -610,53 +610,57 @@ static DBInt _DBExportNetCDFTimeDefine(DBObjData *dbData, int ncid, int dimids[]
             sscanf(timeStr, "%4d-%2d-%2d %2d:%2d", &year, &month, &day, &hour, &minute);
             sprintf(unitStr, "minutes since %s", timeStr);
             break;
+        default:
+            unitStr[0] = '\0';
+            break;
     }
-    if ((utUnit = ut_parse(utSystem, unitStr, UT_ASCII)) == (ut_unit *) NULL) {
-        CMmsgPrint(CMmsgAppError, "Invalid time Unit [%s] in: %s %d", unitStr, __FILE__, __LINE__);
-        ut_free(baseTimeUnit);
-        ut_free_system(utSystem);
-        delete gridIF;
-        return (DBFault);
-    }
-    if ((cvConverter = ut_get_converter(baseTimeUnit, utUnit)) == (cv_converter *) NULL) {
-        CMmsgPrint(CMmsgUsrError, "Time converter error!n");
-        switch (ut_get_status()) {
-            case UT_BAD_ARG:
-                CMmsgPrint(CMmsgUsrError, "unit1 or unit2 is NULL.");
-                break;
-            case UT_NOT_SAME_SYSTEM:
-                CMmsgPrint(CMmsgUsrError, "unit1 and unit2 belong to different unit-systems.");
-                break;
-            default:
-                CMmsgPrint(CMmsgUsrError, "Conversion between the units is not possible.");
-                break;
+    if (strlen(unitStr) > 0) {
+        if ((utUnit = ut_parse(utSystem, unitStr, UT_ASCII)) == (ut_unit *) NULL) {
+            CMmsgPrint(CMmsgAppError, "Invalid time Unit [%s] in: %s %d", unitStr, __FILE__, __LINE__);
+            ut_free(baseTimeUnit);
+            ut_free_system(utSystem);
+            delete gridIF;
+            return (DBFault);
         }
-        ut_free(utUnit);
-        ut_free(baseTimeUnit);
-        ut_free_system(utSystem);
-        delete gridIF;
-        return (DBFault);
-    }
-    if ((status = nc_put_att_text(ncid, timeid, "units", strlen(unitStr), unitStr)) != NC_NOERR) {
-        CMmsgPrint(CMmsgAppError, "NC Error '%s' in: %s %d", nc_strerror(status), __FILE__, __LINE__);
-        ut_free_system(utSystem);
-        ut_free(utUnit);
-        ut_free(baseTimeUnit);
-        cv_free(cvConverter);
-        delete gridIF;
-        return (DBFault);
-    }
-    str = (char *) "t";
-    if ((status = nc_put_att_text(ncid, timeid, "axis", strlen(str), str)) != NC_NOERR) {
-        CMmsgPrint(CMmsgAppError, "NC Error '%s' in: %s %d", nc_strerror(status), __FILE__, __LINE__);
-        ut_free_system(utSystem);
-        ut_free(utUnit);
-        ut_free(baseTimeUnit);
-        cv_free(cvConverter);
-        delete gridIF;
-        return (DBFault);
-    }
-    /* End Defining Time Variable */
+        if ((cvConverter = ut_get_converter(baseTimeUnit, utUnit)) == (cv_converter *) NULL) {
+            CMmsgPrint(CMmsgUsrError, "Time converter error!n");
+            switch (ut_get_status()) {
+                case UT_BAD_ARG:
+                    CMmsgPrint(CMmsgUsrError, "unit1 or unit2 is NULL.");
+                    break;
+                case UT_NOT_SAME_SYSTEM:
+                    CMmsgPrint(CMmsgUsrError, "unit1 and unit2 belong to different unit-systems.");
+                    break;
+                default:
+                    CMmsgPrint(CMmsgUsrError, "Conversion between the units is not possible.");
+                    break;
+            }
+            ut_free(utUnit);
+            ut_free(baseTimeUnit);
+            ut_free_system(utSystem);
+            delete gridIF;
+            return (DBFault);
+        }
+        if ((status = nc_put_att_text(ncid, timeid, "units", strlen(unitStr), unitStr)) != NC_NOERR) {
+            CMmsgPrint(CMmsgAppError, "NC Error '%s' in: %s %d", nc_strerror(status), __FILE__, __LINE__);
+            ut_free_system(utSystem);
+            ut_free(utUnit);
+            ut_free(baseTimeUnit);
+            cv_free(cvConverter);
+            delete gridIF;
+            return (DBFault);
+        }
+        str = (char *) "t";
+        if ((status = nc_put_att_text(ncid, timeid, "axis", strlen(str), str)) != NC_NOERR) {
+            CMmsgPrint(CMmsgAppError, "NC Error '%s' in: %s %d", nc_strerror(status), __FILE__, __LINE__);
+            ut_free_system(utSystem);
+            ut_free(utUnit);
+            ut_free(baseTimeUnit);
+            cv_free(cvConverter);
+            delete gridIF;
+            return (DBFault);
+        }
+    } /* End Defining Time Variable */
 
     if ((status = nc_enddef(ncid)) != NC_NOERR) {
         CMmsgPrint(CMmsgAppError, "NC Error '%s' in: %s %d", nc_strerror(status), __FILE__, __LINE__);
@@ -704,9 +708,12 @@ static DBInt _DBExportNetCDFTimeDefine(DBObjData *dbData, int ncid, int dimids[]
                 sscanf(timeStr, "%4d-%2d-%2d %2d:%2d", &year, &month, &day, &hour, &minute);
                 break;
         }
-        val = ut_encode_time(year, month, day, hour, minute, (double) 0.0);
-        val = cv_convert_double(cvConverter, val);
-        record[layerID] = (int) val;
+        if (strlen(unitStr) > 0) {
+            val = ut_encode_time(year, month, day, hour, minute, (double) 0.0);
+            val = cv_convert_double(cvConverter, val);
+            record[layerID] = (int) val;
+        }
+        else record[layerID] = layerID;
     }
     if ((status = nc_put_vara_int(ncid, timeid, &start, &count, record)) != NC_NOERR) {
         CMmsgPrint(CMmsgAppError, "NC Error '%s' in: %s %d", nc_strerror(status), __FILE__, __LINE__);
@@ -751,9 +758,11 @@ static DBInt _DBExportNetCDFTimeDefine(DBObjData *dbData, int ncid, int dimids[]
 
     delete gridIF;
     free(record);
-    ut_free(utUnit);
+    if (strlen(unitStr) > 0) {
+        ut_free(utUnit);
+        cv_free(cvConverter);
+    }
     ut_free(baseTimeUnit);
-    cv_free(cvConverter);
     ut_free_system(utSystem);
     return (DBSuccess);
 }
