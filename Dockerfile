@@ -11,7 +11,7 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
     apt-get install -y --no-install-recommends dialog apt-utils apt-transport-https dnsutils psmisc \
                        vim rsync screen tmux bc curl nfs-common python python-numpy python-psutil \
                        netcdf-bin nco cdo libudunits2-0 libudunits2-data gnuplot imagemagick \
-	                     gdal-bin python-gdal python3-gdal postgresql-client-11 libexpat1 \
+	                     gdal-bin python-gdal python3-gdal postgresql-client-common libexpat1 \
                        libmotif-common libxss1 r-base texlive-full && rm -rf /var/lib/apt/lists/*
 
 # Container with basic command-line and desktop applications
