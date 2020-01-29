@@ -8,19 +8,65 @@ USAGE="Usage ${0##*/} <rgis directory> <netcdf directory>"
 if [[ "${NCDIR}" == "" ]]; then echo "${USAGE}"; exit 1; fi
 
 
-procNum=0
-find "${RGISDIR}" -name "*.gdbc.gz" | sort |\
-(while read RGISFILE
- do
-	NCFILE="$(echo "${RGISFILE}" | sed "s:${RGISDIR}:${NCDIR}:" | sed "s:gdbc.gz:nc:")"
-	[ -e "${NCFILE%/*}" ] || mkdir -p "${NCFILE%/*}"
-	rgis2netcdf "${RGISFILE}" "${NCFILE}" &
-	if (( ${procNum} == ${GHAASprocessorNum} ))
-	then
-   		wait
-  		procNum=0
-   	else
-	   	procNum=$(echo "${procNum} + 1" | bc -l)
+ 
+function RGIStoNC ()
+{
+	local rgisDir="${1}"; shift;
+	local   ncDir="${1}"; shift;
 
-   	fi
- done)
+	local procNum=0
+	find "${rgisDir}" -name "*.gdbc.gz" |\
+	(while read rgisFile
+	 do
+		ncFile="$(echo "${rgisFile}" | sed "s:${rgisDir}:${ncDir}:" | sed "s:gdbc.gz:nc:")"
+		[ -e "${ncFile%/*}" ] || mkdir -p "${ncFile%/*}"
+		local rgisDate="$(date "+%Y-%m-%d %H:%M:%S" -r "${rgisFile}")"
+		if [[ -e "${ncFile}" ]]
+		then
+			local ncDate="$(date "+%Y-%m-%d %H:%M:%S" -r   "${ncFile}")"
+	  	else
+	  		local ncData=""
+	  	fi
+		if [[ "${rgisDate}" > "${ncDate}" ]]
+		then
+			rgis2netcdf "${rgisFile}" "${ncFile}" &
+			if (( ${procNum} == ${GHAASprocessorNum} ))
+			then
+  				wait
+  				procNum=0
+	   		else
+		   		procNum=$(expr ${procNum} + 1)
+  			fi
+		fi
+	done)
+}
+
+function PurgeNCfiles ()
+{
+	local rgisDir="${1}"; shift;
+	local   ncDir="${1}"; shift;
+
+	find "${ncDir}" -name "*.nc" |\
+	(while read ncFile
+	 do
+		rgisFile="$(echo "${ncFile}" | sed "s:${ncDir}:${rgisDir}:" | sed "s:nc:gdbc.gz:")"
+		[ -e "${rgisFile}" ] || echo "${ncFile}"
+	done)
+}
+
+function PurgeNCdirs ()
+{
+	local rgisDir="${1}"; shift;
+	local   ncDir="${1}"; shift;
+
+	find "${ncDir}" -type "d" |\
+	(while read ncDir
+	 do
+		rgisDir="$(echo "${ncDir}" | sed "s:${ncDir}:${rgisDir}:")"
+		[ -e "${rgisDir}" ] || echo "${ncDir}"
+	done)
+}
+
+RGIStoNC     "${RGISDIR}" "${NCDIR}"
+PurgeNCfiles "${RGISDIR}" "${NCDIR}"
+PurgeNCdirs  "${RGISDIR}" "${NCDIR}"
