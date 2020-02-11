@@ -1900,8 +1900,8 @@ function RGISAppend ()
 		local separator=" "
 	done
 
-	local filename=$(RGISfile  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${tStep}" "${startyear}-${endyear}")
-	local    title=$(RGIStitle              "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${tStep}" "${startyear}-${endyear}" "${version}")
+	local filename=$(RGISfilePath  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${tStep}" "${startyear}-${endyear}")
+	local    title=$(RGIStitle                  "${domain}" "${variable}" "${product}" "${resolution}" "TS" "${tStep}" "${startyear}-${endyear}" "${version}")
 	local  subject=$(RGISlookupSubject  "${variable}")
     local shadeset=$(RGISlookupShadeset "${variable}")
 
