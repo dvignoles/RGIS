@@ -2167,7 +2167,7 @@ function RGISStatistics ()
 	local    endyear="${1}"; shift
 
 	USAGE="Usage: RGISStatistics <archive> <domain> <variable> <product> <resolution> <version> <start year> <end year>"
-    if [[ "${endYear}" == "" ]]; then echo "${USAGE}"; return 1; fi
+    if [[ "${endyear}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	RGISAppend "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}" "monthly" || return 1
 	RGISAppend "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}" "annual"  || return 1
