@@ -2110,7 +2110,7 @@ function RGISCellStats ()
 	local    endyear="${1}"; shift
 
 	USAGE="Usage: RGISCellStats <archive> <domain> <variable> <product> <resolution> <version> <start year> <end year>"
-    if [[ "${endYear}" == "" ]]; then echo "${USAGE}"; return 1; fi
+    if [[ "${endyear}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	local  statsDir=$(RGISdirectory  "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "Stats" "annual")
 	local    tsFile=$(RGISfile       "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS"    "annual" "${startyear}-${endyear}")
