@@ -1875,7 +1875,7 @@ function RGIStitle ()
 	return 0
 }
 
-function RGISAppend ()
+function RGISappend ()
 {
     local    archive="${1}"; shift
     local     domain="${1}"; shift
@@ -1966,7 +1966,7 @@ function RGISsetHeader ()
 	setHeader  -t "${title}" -d "${domain}" -u "$(RGISlookupSubject "${variable}")" -y "on" -c "${comment}" -i "${citation}" -n "${institution}" -o "${sourceInst}" -p "${sourcePerson}" -v "${version}" "${rgisFile}" "${rgisFile}"
 }
 
-function RGISAggregateTS ()
+function RGISaggregateTS ()
 {
 	local    archive="${1}"; shift
 	local     domain="${1}"; shift
@@ -2098,7 +2098,7 @@ RGISclimatology ()
 	grdDateLayers -e "${tStepUnit}" - "${fileName}"
 }
 
-function RGISCellStats ()
+function RGIScellStats ()
 {
 	local    archive="${1}"; shift
 	local     domain="${1}"; shift
@@ -2155,7 +2155,7 @@ function RGISCellStats ()
 	return 0
 }
 
-function RGISStatistics ()
+function RGISstatistics ()
 {
 	local    archive="${1}"; shift
 	local     domain="${1}"; shift
@@ -2169,11 +2169,11 @@ function RGISStatistics ()
 	USAGE="Usage: RGISStatistics <archive> <domain> <variable> <product> <resolution> <version> <start year> <end year>"
     if [[ "${endyear}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
-	RGISAppend "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}" "monthly" || return 1
-	RGISAppend "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}" "annual"  || return 1
+	RGISappend "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}" "monthly" || return 1
+	RGISappend "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}" "annual"  || return 1
 
-	RGISClimatology "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}"      || return 1
-	RGISCellStats   "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}"      || return 1
+	RGISclimatology "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}"      || return 1
+	RGIScellStats   "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "${version}" "${startyear}" "${endyear}"      || return 1
 	local  annualTSfile=$(RGISfile "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS"    "annual"  "${startyear}-${endyear}")
 	local monthlyTSfile=$(RGISfile "${archive}" "${domain}" "${variable}" "${product}" "${resolution}" "TS"    "monthly" "${startyear}-${endyear}")
 	[ -e  "${annualTSfile}" ] && rm  "${annualTSfile}"
