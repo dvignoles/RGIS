@@ -34,11 +34,9 @@ make install
 chmod ugo+x ${install_dir}/ghaas/Scripts/*.sh
 chmod ugo+x ${install_dir}/ghaas/f/*
 chmod -R ugo+r ${install_dir}/ghaas
-if ! [ -e  ${install_dir}/ghaas/bin/rgis ]
-then
-    ln -s ${install_dir}/ghaas/Scripts/rgis.sh ${install_dir}/ghaas/bin/rgis
-fi
-if ! [ -e  ${install_dir}/ghaas/bin/rgis2PostGIS ]
-then
-    ln -s ${install_dir}/ghaas/Scripts/rgis2PostGIS.sh ${install_dir}/ghaas/bin/rgis2PostGIS
-fi
+
+Scripts="rgis rgis2PostGIS rgisSync2netcdf"
+for script in ${Scripts}
+do
+    [ -e  ${install_dir}/ghaas/bin/${script} ] || ln -s ${install_dir}/ghaas/Scripts/${script}.sh ${install_dir}/ghaas/bin/${script}
+done
