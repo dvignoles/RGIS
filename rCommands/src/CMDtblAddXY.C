@@ -103,13 +103,16 @@ int main(int argc, char *argv[]) {
         case DBTypeVectorPoint:
             pntIF = new DBVPointIF (data);
             if (strcmp("tableName","DBItems") == 0 ) {
-
-                if (fieldXName == (char *) NULL)  fieldXName = (char *) "PointXCoord";
-                if (fieldYName == (char *) NULL)  fieldYName = (char *) "PointYCoord";
-                fieldX  = new DBObjTableField (fieldXName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
-                fieldY  = new DBObjTableField (fieldYName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
-                table->AddField(fieldX);
-                table->AddField(fieldY);
+                fieldX = table->Field (fieldXName == (char *) NULL ? (char *) "PointXCoord" : fieldXName);
+                if (fieldX == (DBObjTableField *) NULL) {
+                    fieldX  = new DBObjTableField (fieldXName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
+                    table->AddField(fieldX);
+                }
+                fieldY = table->Field (fieldYName == (char *) NULL ? (char *) "PointYCoord" : fieldYName);
+                if (fieldY == (DBObjTableField *) NULL) {
+                    fieldY = new DBObjTableField(fieldYName, DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat4));
+                    table->AddField(fieldY);
+                }
                 for (recID = 0; recID < table->ItemNum(); ++recID) {
                     record = pntIF->Item(recID);
                     coord  = pntIF->Coordinate (record);
@@ -125,12 +128,16 @@ int main(int argc, char *argv[]) {
         case DBTypeNetwork:
             netIF = new DBNetworkIF(data);
             if (strcmp(tableName,"DBItems") == 0) {
-                if (fieldXName == (char *) NULL)  fieldXName = (char *) "MouthXCoord";
-                if (fieldYName == (char *) NULL)  fieldYName = (char *) "MouthYCoord";
-                fieldX  = new DBObjTableField (fieldXName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
-                fieldY  = new DBObjTableField (fieldYName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
-                table->AddField(fieldX);
-                table->AddField(fieldY);
+                fieldX = table->Field (fieldXName == (char *) NULL ? (char *) "MouthXCoord" : fieldXName);
+                if (fieldX == (DBObjTableField *) NULL) {
+                    fieldX  = new DBObjTableField (fieldXName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
+                    table->AddField(fieldX);
+                }
+                fieldY = table->Field (fieldYName == (char *) NULL ? (char *) "MouthYCoord" : fieldYName);
+                if (fieldY == (DBObjTableField *) NULL) {
+                    fieldY = new DBObjTableField(fieldYName, DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat4));
+                    table->AddField(fieldY);
+                }
                 for (recID = 0; recID < table->ItemNum(); ++recID) {
                     record = netIF->Basin(recID);
                     coord = netIF->Center(netIF->MouthCell(record));
@@ -139,12 +146,16 @@ int main(int argc, char *argv[]) {
                 }
                 ret = CMsucceeded;
             } else if (strcmp(tableName,"DBCells") == 0) {
-                if (fieldXName == (char *) NULL)  fieldXName = (char *) "CellXCoord";
-                if (fieldYName == (char *) NULL)  fieldYName = (char *) "CellYCoord";
-                fieldX  = new DBObjTableField (fieldXName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
-                fieldY  = new DBObjTableField (fieldYName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
-                table->AddField(fieldX);
-                table->AddField(fieldY);
+                fieldX = table->Field (fieldXName == (char *) NULL ? (char *) "CellXCoord" : fieldXName);
+                if (fieldX == (DBObjTableField *) NULL) {
+                    fieldX  = new DBObjTableField (fieldXName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
+                    table->AddField(fieldX);
+                }
+                fieldY = table->Field (fieldYName == (char *) NULL ? (char *) "CellYCoord" : fieldYName);
+                if (fieldY == (DBObjTableField *) NULL) {
+                    fieldY = new DBObjTableField(fieldYName, DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat4));
+                    table->AddField(fieldY);
+                }
                 for (recID = 0; recID < table->ItemNum(); ++recID) {
                     record = netIF->Cell(recID);
                     coord  = netIF->Center(record);
