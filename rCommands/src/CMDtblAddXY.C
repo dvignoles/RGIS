@@ -102,12 +102,14 @@ int main(int argc, char *argv[]) {
         case DBTypeVectorPoint:
             pntIF = new DBVPointIF (data);
             if (strcmp(tableName,"DBItems") == 0 ) {
-                fieldX = table->Field (fieldXName == (char *) NULL ? (char *) "XCoord" : fieldXName);
+                fieldXName = fieldXName == (char *) NULL ? (char *) "XCoord" : fieldXName;
+                fieldX = table->Field (fieldXName);
                 if (fieldX == (DBObjTableField *) NULL) {
                     fieldX  = new DBObjTableField (fieldXName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
                     table->AddField(fieldX);
                 }
-                fieldY = table->Field (fieldYName == (char *) NULL ? (char *) "YCoord" : fieldYName);
+                fieldYName = fieldYName == (char *) NULL ? (char *) "YCoord" : fieldYName;
+                fieldY = table->Field (fieldYName);
                 if (fieldY == (DBObjTableField *) NULL) {
                     fieldY = new DBObjTableField(fieldYName, DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat4));
                     table->AddField(fieldY);
@@ -127,12 +129,14 @@ int main(int argc, char *argv[]) {
         case DBTypeNetwork:
             netIF = new DBNetworkIF(data);
             if (strcmp(tableName,"DBItems") == 0) {
-                fieldX = table->Field (fieldXName == (char *) NULL ? (char *) "MouthXCoord" : fieldXName);
+                fieldXName = fieldXName == (char *) NULL ? (char *) "MouthXCoord" : fieldXName;
+                fieldX = table->Field (fieldXName);
                 if (fieldX == (DBObjTableField *) NULL) {
                     fieldX  = new DBObjTableField (fieldXName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
                     table->AddField(fieldX);
                 }
-                fieldY = table->Field (fieldYName == (char *) NULL ? (char *) "MouthYCoord" : fieldYName);
+                fieldYName = fieldYName == (char *) NULL ? (char *) "MouthYCoord" : fieldYName;
+                fieldY = table->Field (fieldYName);
                 if (fieldY == (DBObjTableField *) NULL) {
                     fieldY = new DBObjTableField(fieldYName, DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat4));
                     table->AddField(fieldY);
@@ -145,12 +149,14 @@ int main(int argc, char *argv[]) {
                 }
                 ret = CMsucceeded;
             } else if (strcmp(tableName,"DBCells") == 0) {
-                fieldX = table->Field (fieldXName == (char *) NULL ? (char *) "CellXCoord" : fieldXName);
+                fieldXName = fieldXName == (char *) NULL ? (char *) "CellXCoord" : fieldXName;
+                fieldX = table->Field (fieldXName);
                 if (fieldX == (DBObjTableField *) NULL) {
                     fieldX  = new DBObjTableField (fieldXName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
                     table->AddField(fieldX);
                 }
-                fieldY = table->Field (fieldYName == (char *) NULL ? (char *) "CellYCoord" : fieldYName);
+                fieldYName = fieldYName == (char *) NULL ? (char *) "CellYCoord" : fieldYName;
+                fieldY = table->Field (fieldYName);
                 if (fieldY == (DBObjTableField *) NULL) {
                     fieldY = new DBObjTableField(fieldYName, DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat4));
                     table->AddField(fieldY);
