@@ -11,6 +11,7 @@ bfekete@gc.cuny.edu
 *******************************************************************************/
 
 #include <stdlib.h>
+#include <math.h>
 #include <unistd.h>
 #include <sys/timeb.h>
 #include <signal.h>
@@ -174,7 +175,7 @@ void CMthreadJobDestroy (CMthreadJob_p job) {
 
 static void *_CMthreadWork (void *dataPtr) {
 	CMthreadData_p data = (CMthreadData_p) dataPtr;
-	size_t taskId, groupId, start, end, threadNum, completed;
+	size_t taskId, groupId, start, end, chunkSize, threadNum, completed;
 	CMthreadTeam_p team = (CMthreadTeam_p) data->TeamPtr;
 	CMthreadJob_p  job;
     struct timeb tbs;
@@ -193,7 +194,10 @@ static void *_CMthreadWork (void *dataPtr) {
                 start = job->Groups[groupId].Start;
                 end   = job->Groups[groupId].End;
                 threadNum = end - start < team->ThreadNum ? end - start : team->ThreadNum;
-                for (taskId = start + data->Id; taskId < end; taskId += threadNum) {
+                chunkSize = (size_t) ceil ((double) (end - start) / (double) threadNum);
+                start = start + data->Id * chunkSize;
+                end   = start + chunkSize < end ? start + chunkSize : end;
+                 for (taskId = start; taskId < end; ++taskId) {
                     job->UserFunc(data->Id, job->SortedTasks[taskId]->Id, job->CommonData);
                     job->SortedTasks[taskId]->Completed = 1;
                 }
