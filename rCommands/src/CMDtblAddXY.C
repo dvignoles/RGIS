@@ -21,7 +21,6 @@ int main(int argc, char *argv[]) {
     DBInt recID;
     DBObjData *data;
     char *tableName = (char *) NULL;
-    char *fieldIDName = (char *) NULL;
     char *fieldXName = (char *) NULL;
     char *fieldYName = (char *) NULL;
     DBObjTable *table;
@@ -103,12 +102,12 @@ int main(int argc, char *argv[]) {
         case DBTypeVectorPoint:
             pntIF = new DBVPointIF (data);
             if (strcmp(tableName,"DBItems") == 0 ) {
-                fieldX = table->Field (fieldXName == (char *) NULL ? (char *) "PointXCoord" : fieldXName);
+                fieldX = table->Field (fieldXName == (char *) NULL ? (char *) "XCoord" : fieldXName);
                 if (fieldX == (DBObjTableField *) NULL) {
                     fieldX  = new DBObjTableField (fieldXName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
                     table->AddField(fieldX);
                 }
-                fieldY = table->Field (fieldYName == (char *) NULL ? (char *) "PointYCoord" : fieldYName);
+                fieldY = table->Field (fieldYName == (char *) NULL ? (char *) "YCoord" : fieldYName);
                 if (fieldY == (DBObjTableField *) NULL) {
                     fieldY = new DBObjTableField(fieldYName, DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat4));
                     table->AddField(fieldY);
