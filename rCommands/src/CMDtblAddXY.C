@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
     switch (data->Type()) {
         case DBTypeVectorPoint:
             pntIF = new DBVPointIF (data);
-            if (strcmp("tableName","DBItems") == 0 ) {
+            if (strcmp(tableName,"DBItems") == 0 ) {
                 fieldX = table->Field (fieldXName == (char *) NULL ? (char *) "PointXCoord" : fieldXName);
                 if (fieldX == (DBObjTableField *) NULL) {
                     fieldX  = new DBObjTableField (fieldXName, DBTableFieldFloat, (char *) "%10.3f", sizeof (DBFloat4));
