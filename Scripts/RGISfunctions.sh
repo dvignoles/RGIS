@@ -448,18 +448,26 @@ function RGISfileExtension ()
 {
 	local variable="${1}"; shift
 
-	case "$(echo "${variable}" | tr "[A-Z]" "[a-z]")" in
+    local dataType="$(vdbLookup -t "${variable}")"
+    if [[ "${dataType}" == "" ]]
+    then
+        local dataType="continuous"
+    fi
+	case "${dataType}" in
 		(network)
 			local extension="gdbn"
 		;;
-		(confluence|crossing-*)
+		(point)
 			local extension="gdbp"
 		;;
-		(continents|countries|states|counties|ocean_basins|subbasin|hydro_unit)
-			local extension="gdbd"
-		;;
-		(streamline)
+		(line)
 			local extension="gdbl"
+		;;
+		(polygon)
+			local extension="gdbp"
+		;;
+		(discrete)
+			local extension="gdbd"
 		;;
 		(*)
 			local extension="gdbc"
