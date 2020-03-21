@@ -29,6 +29,15 @@ UIMenuItem RGISMainMenu [] = {
 	UIMenuItem ((char *) "Display", UIMENU_NORULE, RGISDataGroup, RGISDisplayMenu),
 	UIMenuItem ()};
 
+static void _CMDprintUsage () {
+    CMmsgPrint (CMmsgInfo, "rgis [options]");
+    CMmsgPrint (CMmsgInfo, "     -m, --metadb   [meta database]");
+    CMmsgPrint (CMmsgInfo, "     -p, --progress [yes|no]");
+    CMmsgPrint (CMmsgInfo, "     -s, --spin     [yes|no]");
+    CMmsgPrint (CMmsgInfo, "     -P, --planet   [Earth|Mars|Venus|radius]");
+    CMmsgPrint (CMmsgInfo, "     -h, --help");
+}
+
 int main (int argc,char **argv)
 
 	{
@@ -90,12 +99,7 @@ int main (int argc,char **argv)
 			}
 		if (CMargTest (argv [argPos],"-h","--help"))
 			{
-			CMmsgPrint (CMmsgInfo, "rgis [options]");
-			CMmsgPrint (CMmsgInfo, "     -m, --metadb   [meta database]");
-			CMmsgPrint (CMmsgInfo, "     -p, --progress [yes|no]");
-			CMmsgPrint (CMmsgInfo, "     -s, --spin     [yes|no]");
-			CMmsgPrint (CMmsgInfo, "     -P, --planet   [Earth|Mars|Venus|radius]");
-			CMmsgPrint (CMmsgInfo, "     -h, --help");
+            _CMDprintUsage();
 			return (DBSuccess);
 			}
 		if ((argv [argPos][0] == '-') && (strlen (argv [argPos]) > 1))
