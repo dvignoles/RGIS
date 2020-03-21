@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDnetcdf2ds.C
 
@@ -14,6 +14,13 @@ bfekete@gc.cuny.edu
 #include <DB.H>
 #include <DBif.H>
 #include <RG.H>
+
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s [options] <input netcdf> <output datastream>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "     -m,--template     [template coverage]");
+    CMmsgPrint(CMmsgInfo, "     -f,--field        [fieldname]");
+    CMmsgPrint(CMmsgInfo, "     -h,--help");
+}
 
 int main(int argc, char *argv[]) {
     DBInt argPos, argNum = argc, ret;
@@ -42,10 +49,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            CMmsgPrint(CMmsgInfo, "%s [options] <input netcdf> <output datastream>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgInfo, "     -m,--template     [template coverage]");
-            CMmsgPrint(CMmsgInfo, "     -f,--field        [fieldname]");
-            CMmsgPrint(CMmsgInfo, "     -h,--help");
+            _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }
         if ((argv[argPos][0] == '-') && (strlen(argv[argPos]) > 1)) {

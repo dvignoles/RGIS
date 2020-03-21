@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDdsAggregate.c
 
@@ -15,12 +15,15 @@ andras@ob.sr.unh.edu
 #include <stdlib.h>
 #include <string.h>
 
-enum {
-    DAY = 10, MONTH = 7, YEAR = 4
-};
-enum {
-    AVG = 1, SUM = 2
-};
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgUsrError, "%s [options] <in datastream> <out datastream>", CMfileName(arg0));
+    CMmsgPrint(CMmsgUsrError, "  -e, --step [year|month|day]");
+    CMmsgPrint(CMmsgUsrError, "  -a, --aggregate [avg|sum]");
+    CMmsgPrint(CMmsgUsrError, "  -h,--help");
+}
+
+enum { DAY = 10, MONTH = 7, YEAR = 4 };
+enum { AVG = 1, SUM = 2 };
 
 int main(int argc, char *argv[]) {
     int argPos = 0, argNum = argc, ret = CMfailed, itemSize, i, recordNum = 0, step = CMfailed, mode = CMfailed;
@@ -69,10 +72,7 @@ int main(int argc, char *argv[]) {
         Help:
         if (CMargTest(argv[argPos], "-h", "--help")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) < argPos) break;
-            CMmsgPrint(CMmsgUsrError, "%s [options] <in datastream> <out datastream>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgUsrError, "  -e, --step [year|month|day]");
-            CMmsgPrint(CMmsgUsrError, "  -a, --aggregate [avg|sum]");
-            CMmsgPrint(CMmsgUsrError, "  -h,--help");
+            _CMDprintUsage (argv[0]);
             ret = CMsucceeded;
             goto Stop;
         }

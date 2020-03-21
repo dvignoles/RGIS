@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDrgis2netcdf.C
 
@@ -15,14 +15,18 @@ bfekete@gc.cuny.edu
 #include <DBif.H>
 #include <RG.H>
 
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s [options] <input data> <output netcdf>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "     -h,--help");
+}
+
 int main(int argc, char *argv[]) {
     DBInt argPos, argNum = argc, ret;
     DBObjData *grdData;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            CMmsgPrint(CMmsgInfo, "%s [options] <input data> <output netcdf>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgInfo, "     -h,--help");
+            _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }
         if ((argv[argPos][0] == '-') && (strlen(argv[argPos]) > 1)) {

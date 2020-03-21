@@ -1,4 +1,3 @@
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 FILE(GLOB sources src/*.c)
 add_executable(WBMstable.bin ${sources})
 if(${CMAKE_HOST_APPLE})

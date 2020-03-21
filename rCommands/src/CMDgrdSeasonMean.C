@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDgrdSeasonMean.C
 
@@ -14,6 +14,19 @@ bfekete@gc.cuny.edu
 #include <DB.H>
 #include <DBif.H>
 #include <RG.H>
+
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgSysError, "%s [options] <input grid> <output grid>", CMfileName(arg0));
+    CMmsgPrint(CMmsgSysError, "     -a,--aggregate [avg|sum]");
+    CMmsgPrint(CMmsgSysError, "     -o,--offset    [offset]");
+    CMmsgPrint(CMmsgSysError, "     -e,--step      [number of steps]");
+    CMmsgPrint(CMmsgSysError, "     -t,--title     [dataset title]");
+    CMmsgPrint(CMmsgSysError, "     -u,--subject   [subject]");
+    CMmsgPrint(CMmsgSysError, "     -d,--domain    [domain]");
+    CMmsgPrint(CMmsgSysError, "     -v,--version   [version]");
+    CMmsgPrint(CMmsgSysError, "     -V,--verbose");
+    CMmsgPrint(CMmsgSysError, "     -h,--help");
+}
 
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
@@ -105,16 +118,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            CMmsgPrint(CMmsgSysError, "%s [options] <input grid> <output grid>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgSysError, "     -a,--aggregate [avg|sum]");
-            CMmsgPrint(CMmsgSysError, "     -o,--offset    [offset]");
-            CMmsgPrint(CMmsgSysError, "     -e,--step      [number of steps]");
-            CMmsgPrint(CMmsgSysError, "     -t,--title     [dataset title]");
-            CMmsgPrint(CMmsgSysError, "     -u,--subject   [subject]");
-            CMmsgPrint(CMmsgSysError, "     -d,--domain    [domain]");
-            CMmsgPrint(CMmsgSysError, "     -v,--version   [version]");
-            CMmsgPrint(CMmsgSysError, "     -V,--verbose");
-            CMmsgPrint(CMmsgSysError, "     -h,--help");
+            _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }
         if ((argv[argPos][0] == '-') && (strlen(argv[argPos]) > 1)) {

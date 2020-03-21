@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDgetHeader.C
 
@@ -20,7 +20,22 @@ andras@ob.sr.unh.edu
 
 #define FIELD_SIZE 100000
 
-void Show_Usage(char *);
+static void _CMDprintUsage (char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s [options] <RiverGIS file>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "       => Gets RiverGIS file header informations.");
+    CMmsgPrint(CMmsgInfo, "       -a,--all");
+    CMmsgPrint(CMmsgInfo, "       -c,--comment");
+    CMmsgPrint(CMmsgInfo, "       -C,--citation");
+    CMmsgPrint(CMmsgInfo, "       -d,--domain");
+    CMmsgPrint(CMmsgInfo, "       -i,--institute");
+    CMmsgPrint(CMmsgInfo, "       -p,--person");
+    CMmsgPrint(CMmsgInfo, "       -s,--subject");
+    CMmsgPrint(CMmsgInfo, "       -S,--source");
+    CMmsgPrint(CMmsgInfo, "       -t,--title");
+    CMmsgPrint(CMmsgInfo, "       -v,--version");
+    CMmsgPrint(CMmsgInfo, "       -V,--verbose");
+    CMmsgPrint(CMmsgInfo, "       -h,--help");
+}
 
 int main(int argc, char *argv[]) {
     bool All_Fields = false;
@@ -33,7 +48,7 @@ int main(int argc, char *argv[]) {
     DBDataHeader header;
 
     if (argc == 1) {
-        Show_Usage(argv[0]);
+        _CMDprintUsage (argv[0]);
         return 0;
     }
 
@@ -49,7 +64,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            Show_Usage(argv[0]);
+            _CMDprintUsage (argv[0]);
             return 0;
         }
         if ((file == (FILE *) NULL) && (access(argv[argPos], R_OK) == 0)) file = fopen(argv[argPos], "r");
@@ -178,22 +193,4 @@ int main(int argc, char *argv[]) {
 
     if (verbose) RGlibPauseClose();
     return (0);
-}
-
-void Show_Usage(char *arg0) {
-    CMmsgPrint(CMmsgInfo, "%s [options] <RiverGIS file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "       => Gets RiverGIS file header informations.");
-    CMmsgPrint(CMmsgInfo, "       -a,--all");
-    CMmsgPrint(CMmsgInfo, "       -c,--comment");
-    CMmsgPrint(CMmsgInfo, "       -C,--citation");
-    CMmsgPrint(CMmsgInfo, "       -d,--domain");
-    CMmsgPrint(CMmsgInfo, "       -i,--institute");
-    CMmsgPrint(CMmsgInfo, "       -p,--person");
-    CMmsgPrint(CMmsgInfo, "       -s,--subject");
-    CMmsgPrint(CMmsgInfo, "       -S,--source");
-    CMmsgPrint(CMmsgInfo, "       -t,--title");
-    CMmsgPrint(CMmsgInfo, "       -v,--version");
-    CMmsgPrint(CMmsgInfo, "       -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "       -h,--help");
-    exit(0);
 }

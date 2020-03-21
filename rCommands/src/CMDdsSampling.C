@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDdsSampling.C
 
@@ -14,6 +14,12 @@ bfekete@gc.cuny.edu
 #include <MF.h>
 #include <stdlib.h>
 #include <string.h>
+
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgUsrError, "%s [options] <in datastream> <out datastream>", CMfileName(arg0));
+    CMmsgPrint(CMmsgUsrError, "  -i, --item [item]");
+    CMmsgPrint(CMmsgUsrError, "  -h,--help");
+}
 
 int main(int argc, char *argv[]) {
     int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemID;
@@ -39,9 +45,7 @@ int main(int argc, char *argv[]) {
         Help:
         if (CMargTest(argv[argPos], "-h", "--help")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) < argPos) break;
-            CMmsgPrint(CMmsgUsrError, "%s [options] <in datastream> <out datastream>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgUsrError, "  -i, --item [item]");
-            CMmsgPrint(CMmsgUsrError, "  -h,--help");
+            _CMDprintUsage (argv[0]);
             ret = CMsucceeded;
             goto Stop;
         }

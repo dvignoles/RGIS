@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDrgisMetadb.C
 
@@ -15,7 +15,10 @@ bfekete@gc.cuny.edu
 #include <DBif.H>
 #include <RG.H>
 
-void Usage(char *);
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s -m [metadb file] <rgis data file> ... <rgis data file>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
+}
 
 int main(int argc, char *argv[]) {
     int i, verbose = false;
@@ -26,13 +29,13 @@ int main(int argc, char *argv[]) {
     DBObjMetaEntry *metaEntry;
 
     if (argc < 2) {
-        Usage(argv[0]);
+        _CMDprintUsage(argv[0]);
         return (0);
     }
 
     for (i = 1; i < argc; ++i) {
         if ((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0)) {
-            Usage(argv[0]);
+            _CMDprintUsage(argv[0]);
             return (0);
         }
         else if ((strcmp(argv[i], "-V") == 0) || (strcmp(argv[i], "--verbose") == 0)) verbose = true;
@@ -41,7 +44,7 @@ int main(int argc, char *argv[]) {
                 ghaasMetaDB = argv[i];
                 break;
             } else {
-                Usage(argv[0]);
+                _CMDprintUsage(argv[0]);
                 return (0);
             }
         }
@@ -71,9 +74,4 @@ int main(int argc, char *argv[]) {
     delete dbDataset;
     if (verbose) RGlibPauseClose();
     return (0);
-}
-
-void Usage(char *arg0) {
-    CMmsgPrint(CMmsgInfo, "%s -m [metadb file] <rgis data file> ... <rgis data file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
 }

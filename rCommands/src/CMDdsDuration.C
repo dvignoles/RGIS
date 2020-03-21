@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDdsDuration.C
 
@@ -15,6 +15,14 @@ bfekete@gc.cuny.edu
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgUsrError, "%s [options] <out datastream>", CMfileName(arg0));
+    CMmsgPrint(CMmsgUsrError, "  -i, --input [input datastream]");
+    CMmsgPrint(CMmsgUsrError, "  -b, --bins  [# of bins]");
+    CMmsgPrint(CMmsgUsrError, "  -m, --mode  [percent|value]");
+    CMmsgPrint(CMmsgUsrError, "  -h,--help");
+}
 
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret = CMfailed, itemSize, i, bin, binNum = 1000, percent;
@@ -29,7 +37,10 @@ int main(int argc, char *argv[]) {
     double value, binSize, binMax, binMin, percentMin; /* percentMax */
     MFdsHeader_t header, outHeader;
 
-    if (argNum < 2) goto Help;
+    if (argNum < 2) {
+        _CMDprintUsage (argv[0]);
+        return (1);
+    }
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest(argv[argPos], "-i", "--input")) {
@@ -65,14 +76,8 @@ int main(int argc, char *argv[]) {
         }
         if (CMargTest(argv[argPos], "-h", "--help")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) < argPos) break;
-            Help:
-            CMmsgPrint(CMmsgUsrError, "%s [options] <out datastream>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgUsrError, "  -i, --input [input datastream]");
-            CMmsgPrint(CMmsgUsrError, "  -b, --bins  [# of bins]");
-            CMmsgPrint(CMmsgUsrError, "  -m, --mode  [percent|value]");
-            CMmsgPrint(CMmsgUsrError, "  -h,--help");
-            ret = CMsucceeded;
-            goto Stop;
+            _CMDprintUsage (argv[0]);
+            return (CMsucceeded);
         }
         if ((argv[argPos][0] == '-') && (strlen(argv[argPos]) > 1)) {
             CMmsgPrint(CMmsgUsrError, "Unknown option: %s!", argv[argPos]);

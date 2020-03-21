@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDgrdImport.C
 
@@ -42,7 +42,7 @@ using namespace std;
 
 /*==========================================================================*/
 
-int confOk, colNum, rowNum, tempInt;
+int colNum, rowNum, tempInt;
 char *text, listFileName[DBDataFileNameLen], buffer[256];
 char outFile[DBDataFileNameLen];
 float cellWidth, cellHeight, llXCoord, llYCoord;
@@ -52,8 +52,6 @@ static float missingVal = DBDefaultMissingFloatVal;
 float temp;
 bool Batch_Mode = false;
 bool Continuous_Grid_Mode = false;
-
-void showUsage(char argv[]);
 
 int readHeader(bool ListFileMode);
 
@@ -316,9 +314,27 @@ int readHeader(bool ListFileMode) {
     return 0;
 }
 
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s - imports data files into ghdb format", arg0);
+    CMmsgPrint(CMmsgInfo, "  options:");
+    CMmsgPrint(CMmsgInfo, "    -b,--batch (optional) turns the prompt for information off");
+    CMmsgPrint(CMmsgInfo, "    -h,--help (optional) shows usage");
+    CMmsgPrint(CMmsgInfo, "    <filename> (optional) grdimport will attempt to automatically");
+    CMmsgPrint(CMmsgInfo, "    read the standard header from an ascii file.");
+    CMmsgPrint(CMmsgInfo, "  examples:");
+    CMmsgPrint(CMmsgInfo, "    grdImport.Linux -b < completeInputFile.txt");
+    CMmsgPrint(CMmsgInfo, "      Don't prompt for information, just read completeFile.txt for arguments");
+    CMmsgPrint(CMmsgInfo, "    grdImport.Linux -b someFile.asc < partialInputFile.txt");
+    CMmsgPrint(CMmsgInfo, "      Don't prompt for information, just read the header of the ascii file and");
+    CMmsgPrint(CMmsgInfo, "      partialInputFile.txt for all of the arguments.");
+    CMmsgPrint(CMmsgInfo, "    grdImport.Linux <--prompt for all information step by step");
+    CMmsgPrint(CMmsgInfo, "      grdImport.Linux someFile.asc <--get as much info as you can out of");
+    CMmsgPrint(CMmsgInfo, "      the header, and prompt for whatever else is needed.");
+}
+
 int main(int argc, char *argv[]) {
     if (Exists_In_Arguments((char *) "-h", (char *) "--help", argc, argv) != -1) {
-        showUsage(argv[0]);
+        _CMDprintUsage(argv[0]);
         return 0;
     }
     if (Exists_In_Arguments((char *) "-b", (char *) "--batch", argc, argv) != -1) Batch_Mode = true;
@@ -654,23 +670,4 @@ int main(int argc, char *argv[]) {
     delete gridIF;
     if (grdData->Write(outFile) == DBFault) return (-1);
     return 0;
-}
-
-void showUsage(char progName[]) {
-    CMmsgPrint(CMmsgInfo, "%s - imports data files into ghdb format", progName);
-    CMmsgPrint(CMmsgInfo, "  options:");
-    CMmsgPrint(CMmsgInfo, "    -b,--batch (optional) turns the prompt for information off");
-    CMmsgPrint(CMmsgInfo, "    -h,--help (optional) shows usage");
-    CMmsgPrint(CMmsgInfo, "    <filename> (optional) grdimport will attempt to automatically");
-    CMmsgPrint(CMmsgInfo, "    read the standard header from an ascii file.");
-    CMmsgPrint(CMmsgInfo, "  examples:");
-    CMmsgPrint(CMmsgInfo, "    grdImport.Linux -b < completeInputFile.txt");
-    CMmsgPrint(CMmsgInfo, "      Don't prompt for information, just read completeFile.txt for arguments");
-    CMmsgPrint(CMmsgInfo, "    grdImport.Linux -b someFile.asc < partialInputFile.txt");
-    CMmsgPrint(CMmsgInfo, "      Don't prompt for information, just read the header of the ascii file and");
-    CMmsgPrint(CMmsgInfo, "      partialInputFile.txt for all of the arguments.");
-    CMmsgPrint(CMmsgInfo, "    grdImport.Linux <--prompt for all information step by step");
-    CMmsgPrint(CMmsgInfo, "      grdImport.Linux someFile.asc <--get as much info as you can out of");
-    CMmsgPrint(CMmsgInfo, "      the header, and prompt for whatever else is needed.");
-    exit(0);
 }

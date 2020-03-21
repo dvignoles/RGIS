@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDgrdDateLayers.C
 
@@ -76,6 +76,20 @@ static DBInt modifyDate(DBObjData *dbData, int timeStep,
     }
     delete gridIF;
     return (DBSuccess);
+}
+
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s [options] <input grid> <output grid>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "     -y,--year      [beginning year]");
+    CMmsgPrint(CMmsgInfo, "     -m,--month     [beginning month]");
+    CMmsgPrint(CMmsgInfo, "     -d,--day       [beginning day]");
+    CMmsgPrint(CMmsgInfo, "     -r,--hour      [beginning hour]");
+    CMmsgPrint(CMmsgInfo, "     -i,--minute    [beginning minute]");
+    CMmsgPrint(CMmsgInfo, "     -e,--step      [year|month|day|hour|minute]");
+    CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
+    CMmsgPrint(CMmsgInfo, "     -n,--number    [number of intervals]");
+    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
+    CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
 
 int main(int argc, char *argv[]) {
@@ -207,17 +221,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            CMmsgPrint(CMmsgInfo, "%s [options] <input grid> <output grid>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgInfo, "     -y,--year      [beginning year]");
-            CMmsgPrint(CMmsgInfo, "     -m,--month     [beginning month]");
-            CMmsgPrint(CMmsgInfo, "     -d,--day       [beginning day]");
-            CMmsgPrint(CMmsgInfo, "     -r,--hour      [beginning hour]");
-            CMmsgPrint(CMmsgInfo, "     -i,--minute    [beginning minute]");
-            CMmsgPrint(CMmsgInfo, "     -e,--step      [year|month|day|hour|minute]");
-            CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
-            CMmsgPrint(CMmsgInfo, "     -n,--number    [number of intervals]");
-            CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-            CMmsgPrint(CMmsgInfo, "     -h,--help");
+            _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }
         if ((argv[argPos][0] == '-') && (strlen(argv[argPos]) > 1)) {

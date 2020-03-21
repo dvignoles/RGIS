@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDnetTransfer.C
 Based on CMDnetErosion.C
@@ -15,8 +15,6 @@ wil.wollheim@unh.edu
 #include <DB.H>
 #include <DBif.H>
 #include <RG.H>
-
-/*char *_CMDWhat = GHAASVersion;*/
 
 int _CMDnetTransfer(DBObjData *netData,
                     DBObjData *inData,
@@ -158,6 +156,26 @@ int _CMDnetTransfer(DBObjData *netData,
     return (ret);
 
     return (DBSuccess);
+}
+
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgUsrError, "%s [options] <input grid> <output grid>",CMfileName(arg0));
+    CMmsgPrint(CMmsgUsrError, "     -n, --network     [network coverage]");
+    CMmsgPrint(CMmsgUsrError, "     -w, --weight      [weight grid]");
+    CMmsgPrint(CMmsgUsrError, "     -f, --coefficient [coefficient]");
+    CMmsgPrint(CMmsgUsrError, "     -k, --transfer    [coefficient grid]");
+    CMmsgPrint(CMmsgUsrError, "     -q, --discharge   [discharge grid - m/s]");
+    CMmsgPrint(CMmsgUsrError, "     -l, --hydrload    [hydraulic load grid - m/yr]");
+    CMmsgPrint(CMmsgUsrError, "     -p, --umax   		 [umax value - mg/m2/hr]");
+    CMmsgPrint(CMmsgUsrError, "     -r, --halfsat     [halfsat value - mg/l]");
+    CMmsgPrint(CMmsgUsrError, "     -m, --mode        [rate|volume]");
+    CMmsgPrint(CMmsgUsrError, "     -t, --title       [dataset title]");
+    CMmsgPrint(CMmsgUsrError, "     -u, --subject     [subject]");
+    CMmsgPrint(CMmsgUsrError, "     -d, --domain      [domain]");
+    CMmsgPrint(CMmsgUsrError, "     -v, --version     [version]");
+    CMmsgPrint(CMmsgUsrError, "     -s, --shadeset    [standard|grey|blue|blue-to-red|elevation");
+    CMmsgPrint(CMmsgUsrError, "     -V, --verbose");
+    CMmsgPrint(CMmsgUsrError, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
@@ -332,24 +350,8 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            CMmsgPrint(CMmsgUsrError, "netTransfer [options] <input grid> <output grid>");
-            CMmsgPrint(CMmsgUsrError, "     -n, --network     [network coverage]");
-            CMmsgPrint(CMmsgUsrError, "     -w, --weight      [weight grid]");
-            CMmsgPrint(CMmsgUsrError, "     -f, --coefficient [coefficient]");
-            CMmsgPrint(CMmsgUsrError, "     -k, --transfer    [coefficient grid]");
-            CMmsgPrint(CMmsgUsrError, "     -q, --discharge   [discharge grid - m/s]");
-            CMmsgPrint(CMmsgUsrError, "     -l, --hydrload    [hydraulic load grid - m/yr]");
-            CMmsgPrint(CMmsgUsrError, "     -p, --umax   		 [umax value - mg/m2/hr]");
-            CMmsgPrint(CMmsgUsrError, "     -r, --halfsat     [halfsat value - mg/l]");
-            CMmsgPrint(CMmsgUsrError, "     -m, --mode        [rate|volume]");
-            CMmsgPrint(CMmsgUsrError, "     -t, --title       [dataset title]");
-            CMmsgPrint(CMmsgUsrError, "     -u, --subject     [subject]");
-            CMmsgPrint(CMmsgUsrError, "     -d, --domain      [domain]");
-            CMmsgPrint(CMmsgUsrError, "     -v, --version     [version]");
-            CMmsgPrint(CMmsgUsrError, "     -s, --shadeset    [standard|grey|blue|blue-to-red|elevation");
-            CMmsgPrint(CMmsgUsrError, "     -V, --verbose");
-            CMmsgPrint(CMmsgUsrError, "     -h, --help");
-            return (DBSuccess);
+            _CMDprintUsage(argv[0]);
+           return (DBSuccess);
         }
         if ((argv[argPos][0] == '-') && (strlen(argv[argPos]) > 1)) {
             CMmsgPrint(CMmsgUsrError, "Unknown option: %s!", argv[argPos]);

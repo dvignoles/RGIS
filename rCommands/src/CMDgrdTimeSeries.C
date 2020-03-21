@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDgrdTimeSeries.C
 
@@ -13,6 +13,21 @@ bfekete@gc.cuny.edu
 #include<cm.h>
 #include<DB.H>
 #include<RG.H>
+
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s [options] <input table> <output grid>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "     -g,--grid      [discrete grid coverage]");
+    CMmsgPrint(CMmsgInfo, "     -r,--relate    [relate field]");
+    CMmsgPrint(CMmsgInfo, "     -j,--join      [join field]");
+    CMmsgPrint(CMmsgInfo, "     -i,--variable  [variable field]");
+    CMmsgPrint(CMmsgInfo, "     -a,--date      [date field]");
+    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
+    CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
+    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
+    CMmsgPrint(CMmsgInfo, "     -h,--help");
+}
 
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
@@ -134,18 +149,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            CMmsgPrint(CMmsgInfo, "%s [options] <input table> <output grid>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgInfo, "     -g,--grid      [discrete grid coverage]");
-            CMmsgPrint(CMmsgInfo, "     -r,--relate    [relate field]");
-            CMmsgPrint(CMmsgInfo, "     -j,--join      [join field]");
-            CMmsgPrint(CMmsgInfo, "     -i,--variable  [variable field]");
-            CMmsgPrint(CMmsgInfo, "     -a,--date      [date field]");
-            CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-            CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
-            CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
-            CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
-            CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-            CMmsgPrint(CMmsgInfo, "     -h,--help");
+            _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }
         if ((argv[argPos][0] == '-') && (strlen(argv[argPos]) > 1)) {

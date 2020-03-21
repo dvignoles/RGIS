@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDtblStatistics.C
 
@@ -137,7 +137,7 @@ private:
     Functions func;
 };
 
-void doHelp(bool extended, char *arg0) {
+static void doHelp(bool extended, char *arg0) {
     if (extended) {
         CMmsgPrint(CMmsgInfo, "%s [options] [field] ... <input file> ...", CMfileName(arg0));
         CMmsgPrint(CMmsgInfo, "**fieldnames must match fieldnames in first line of datafile.**Valid flags:");

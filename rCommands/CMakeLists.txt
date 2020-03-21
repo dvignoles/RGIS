@@ -1,4 +1,4 @@
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ../CMlib/include ../DBlib/include ../RGlib/include ../MFlib/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ../VDBlib/include ../CMlib/include ../DBlib/include ../RGlib/include ../MFlib/include)
 
 foreach(loop_var ds2rgis dsAggregate dsDuration dsSampling getHeader grdAppendLayers grdBoxAggr grdCalculate grdCellStats grdCreateNetwork
 grdCycleMean grdDateLayers grdDifference grdExtractLayers grdHeatIndex grdImport grdMerge grdMinMax grdNetFilter grdNoNeg grdOperation grdReclassDisc  grdRemovePits grdRenameLayers grdRunningMean
@@ -6,13 +6,13 @@ grdSeasonAggr grdSeasonMean grdTimeSeries grdTSAggr grdZoneHist grdZoneStats net
 netcdf2ds netcdf2rgis netCells2Grid netCellSearch netCellSlopes netConfluence netCreatePnts netDefragment netErosion netImportASCII netInvAccum netStreamlines netSubset netTransfer
 netPourElevation netPotReservoir netTrim netUnaccumulate netUpstreamAvg pntGridSampling pntGridValue pntStationDist pntSTNChar pntSubbasCenter pntSubbasHist pntSubbasins pntSubbasStats
 pntSymbolField rgis2ascii rgis2domain rgis2ds rgis2netcdf rgis2sql rgis2table rgisMetadb setHeader setProperties table2rgis tblAddField tblAddIdXY tblCalculate tblConv2Point
-tblConvCoord tblDecimalDate tblDeleteField tblDeleteRec tblIdleRec tblJoinTables tblMergeCoord tblMergeDate tblMJoinTables tblRedefField tblSelectRec
+tblConvCoord tblDecimalDate tblDeleteField tblDeleteRec tblIdleRec tblJoinTables tblMergeCoord tblMergeDate tblMJoinTables tblRedefField tblSelectRec vdbLookup
 tblSortRec tblSplitDate tblStatistics tblTopoCalc )
 	add_executable(${loop_var} src/CMD${loop_var}.C)
 	if(${CMAKE_HOST_APPLE})
-		target_link_libraries(${loop_var} LINK_PUBLIC RG22 DB22 MF10 CM10 -lnetcdf -ludunits2 -lm)
+		target_link_libraries(${loop_var} LINK_PUBLIC RG22 DB22 MF10 VDB CM10 -lnetcdf -ludunits2 -lm)
 	else(${CMAKE_HOST_APPLE})
-		target_link_libraries(${loop_var} LINK_PUBLIC RG22 DB22 MF10 CM10 -lnetcdf -ludunits2 -lm -pthread)
+		target_link_libraries(${loop_var} LINK_PUBLIC RG22 DB22 MF10 VDB CM10 -lnetcdf -ludunits2 -lm -pthread)
 	endif(${CMAKE_HOST_APPLE})
 	install (TARGETS ${loop_var} RUNTIME DESTINATION ghaas/bin)
 endforeach(loop_var)

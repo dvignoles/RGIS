@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDsetProperties.C
 
@@ -16,6 +16,21 @@ bfekete@gc.cuny.edu
 #include <DBif.H>
 #include <RG.H>
 
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "       -p,--projection [geographic|cartesian]");
+    CMmsgPrint(CMmsgInfo, "       -r,--precision [ten-base exponent]");
+    CMmsgPrint(CMmsgInfo, "       -a,--max_scale [ten-base exponent]");
+    CMmsgPrint(CMmsgInfo, "       -i,--mix_scale [ten-base exponent]");
+    CMmsgPrint(CMmsgInfo, "       -t,--title   <title>");
+    CMmsgPrint(CMmsgInfo, "       -d,--domain  <domanin>");
+    CMmsgPrint(CMmsgInfo, "       -u,--subject <subject>");
+    CMmsgPrint(CMmsgInfo, "       -v,--version <version>");
+    CMmsgPrint(CMmsgInfo, "       -y,--display [on|off]");
+    CMmsgPrint(CMmsgInfo, "       -V,--verbose");
+    CMmsgPrint(CMmsgInfo, "       -h,--help");
+}
+
 int main(int argc, char *argv[]) {
     char *title = (char *) NULL, *subject = (char *) NULL, *domain = (char *) NULL, *version = (char *) NULL;
     int argPos, argNum = argc, verbose = false, ret;
@@ -24,7 +39,10 @@ int main(int argc, char *argv[]) {
     DBGridIF    *gridIF;
     DBNetworkIF *netIF;
 
-    if (argc == 1) goto Help;
+    if (argc == 1) {
+        _CMDprintUsage(argv[0]);
+        return (0);
+    }
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-p", "--projection")) {
@@ -144,19 +162,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            Help:
-            CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgInfo, "       -p,--projection [geographic|cartesian]");
-            CMmsgPrint(CMmsgInfo, "       -r,--precision [ten-base exponent]");
-            CMmsgPrint(CMmsgInfo, "       -a,--max_scale [ten-base exponent]");
-            CMmsgPrint(CMmsgInfo, "       -i,--mix_scale [ten-base exponent]");
-            CMmsgPrint(CMmsgInfo, "       -t,--title   <title>");
-            CMmsgPrint(CMmsgInfo, "       -d,--domain  <domanin>");
-            CMmsgPrint(CMmsgInfo, "       -u,--subject <subject>");
-            CMmsgPrint(CMmsgInfo, "       -v,--version <version>");
-            CMmsgPrint(CMmsgInfo, "       -y,--display [on|off]");
-            CMmsgPrint(CMmsgInfo, "       -V,--verbose");
-            CMmsgPrint(CMmsgInfo, "       -h,--help");
+            _CMDprintUsage(argv[0]);
             return 0;
         }
         if ((argv[argPos][0] == '-') && (strlen(argv[argPos]) > 1)) {

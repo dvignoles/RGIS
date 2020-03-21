@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDgrdBoxAggr.C
 
@@ -16,12 +16,22 @@ bfekete@gc.cuny.edu
 #include <DBif.H>
 #include <RG.H>
 
-typedef enum {
-    CMDboxAverage, CMDboxMinimum, CMDboxMaximum, CMDboxSum
-} CMDboxMethod;
+typedef enum {CMDboxAverage, CMDboxMinimum, CMDboxMaximum, CMDboxSum} CMDboxMethod;
+typedef enum { CMDboxWeightArea, CMDboxWeightCellNum} CMDboxWeight;
 
-typedef enum { CMDboxWeightArea, CMDboxWeightCellNum
-} CMDboxWeight;
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "     -z,--size      [box size]");
+    CMmsgPrint(CMmsgInfo, "     -m,--method    [avg|min|max|sum]");
+    CMmsgPrint(CMmsgInfo, "     -w,--weight    [area|cellnum]");
+    CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
+    CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
+    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
+    CMmsgPrint(CMmsgInfo, "     -h,--help");
+}
 
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
@@ -150,17 +160,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgInfo, "     -z,--size      [box size]");
-            CMmsgPrint(CMmsgInfo, "     -m,--method    [avg|min|max|sum]");
-            CMmsgPrint(CMmsgInfo, "     -w,--weight    [area|cellnum]");
-            CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
-            CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-            CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
-            CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
-            CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
-            CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-            CMmsgPrint(CMmsgInfo, "     -h,--help");
+            _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }
         if ((argv[argPos][0] == '-') && ((int) strlen(argv[argPos]) > 1)) {

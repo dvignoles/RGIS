@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDgrdHeatIndex.C
 
@@ -42,6 +42,18 @@ static DBFloat _CMDheatIndex (DBFloat airT, DBFloat dewT) {
         }
     }
     return ((hi - 32.0) / 1.8);
+}
+
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s [options] <air temperature grid> <output grid>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "     -e,--dewpoint  [dewpoint temperature grid]");
+    CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
+    CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
+    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
+    CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
 
 int main(int argc, char *argv[]) {
@@ -129,15 +141,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            CMmsgPrint(CMmsgInfo, "%s [options] <air temperature grid> <output grid>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgInfo, "     -e,--dewpoint  [dewpoint temperature grid]");
-            CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
-            CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-            CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
-            CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
-            CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
-            CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-            CMmsgPrint(CMmsgInfo, "     -h,--help");
+            _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }
         if ((argv[argPos][0] == '-') && (strlen(argv[argPos]) > 1)) {

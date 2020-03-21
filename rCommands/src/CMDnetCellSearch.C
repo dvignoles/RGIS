@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Utilities V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2019, UNH - ASRC/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 CMDnetCellSearch.C
 
@@ -17,6 +17,13 @@ bfekete@gc.cuny.edu
 static bool _CMDnetCellSearchPrintID(DBNetworkIF *netIF, DBObjRecord *cellRec, void *dataPtr) {
     printf("%d\n", cellRec->RowID() + 1);
     return (true);
+}
+
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s [options] <input network> <output list>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "     -c,--coordinates");
+    CMmsgPrint(CMmsgInfo, "     -d,--direction [upstream|downstream]");
+    CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
 
 int main(int argc, char *argv[]) {
@@ -55,10 +62,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            CMmsgPrint(CMmsgInfo, "%s [options] <input network> <output list>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgInfo, "     -c,--coordinates");
-            CMmsgPrint(CMmsgInfo, "     -d,--direction [upstream|downstream]");
-            CMmsgPrint(CMmsgInfo, "     -h,--help");
+            _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }
         if ((argv[argPos][0] == '-') && (strlen(argv[argPos]) > 1)) {
