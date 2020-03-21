@@ -34,7 +34,10 @@ int main(int argc, char *argv[]) {
     const char *shdSet = (const char *) NULL;
     const char *aggreg = (const char *) NULL;
 
-    if (argNum != 3) _CMDprintUsage (argv[0]);
+    if (argNum != 3) {
+        _CMDprintUsage (argv[0]);
+        return (CMsucceeded);
+    }
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-c", "--cfname")) {
@@ -106,22 +109,26 @@ int main(int argc, char *argv[]) {
         if ((rgName = VDBrgName (cfName)) != (const char *) NULL) printf ("%s",rgName);
         return (0);
     } else if (rgName != (const char*) NULL) {
-        if ((cfName = VDBrgName (rgName)) != (const char *) NULL) printf ("%s",cfName);
+        if ((cfName = VDBcfName (rgName)) != (const char *) NULL) printf ("%s",cfName);
     } else if (lgName != (const char *) NULL) {
-        if (((lgName = VDBlongName(lgName)) != NULL) ||
-            (((lgName = VDBcfName(lgName)) != NULL) && ((lgName = VDBlongName(lgName)) != NULL)))
+        cfName = lgName;
+        if (((lgName = VDBlongName(cfName)) != NULL) ||
+            (((cfName = VDBcfName(cfName)) != NULL) && ((lgName = VDBlongName(cfName)) != NULL)))
             printf("%s",lgName);
     } else if (dtType != (const char *) NULL) {
-        if (((dtType = VDBlongName(dtType)) != NULL) ||
-            (((dtType = VDBcfName(dtType)) != NULL) && ((shdSet = VDBlongName(dtType)) != NULL)))
+        cfName = dtType;
+        if (((dtType = VDBdataType(cfName)) != NULL) ||
+            (((cfName = VDBcfName(cfName)) != NULL) && ((dtType = VDBdataType(cfName)) != NULL)))
             printf("%s",dtType);
     } else if (shdSet != (const char *) NULL) {
-        if (((shdSet = VDBlongName(shdSet)) != NULL) ||
-            (((shdSet = VDBcfName(shdSet)) != NULL) && ((shdSet = VDBlongName(shdSet)) != NULL)))
+        cfName = shdSet;
+        if (((shdSet = VDBshadset(cfName)) != NULL) ||
+            (((cfName = VDBcfName(cfName)) != NULL) && ((shdSet = VDBshadset(cfName)) != NULL)))
             printf("%s",shdSet);
     } else if (aggreg != (const char *) NULL) {
-        if (((aggreg = VDBlongName(aggreg)) != NULL) ||
-            (((aggreg = VDBcfName(aggreg)) != NULL) && ((shdSet = VDBlongName(aggreg)) != NULL)))
+        cfName = aggreg;
+        if (((aggreg = VDBaggregation(cfName)) != NULL) ||
+            (((cfName = VDBcfName(cfName)) != NULL) && ((aggreg = VDBaggregation(cfName)) != NULL)))
             printf("%s",aggreg);
     }
     return (ret);

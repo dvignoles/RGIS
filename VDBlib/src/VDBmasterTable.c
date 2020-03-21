@@ -152,7 +152,7 @@ const char *VDBcfName (const char *rgName) {
     int i;
 
     for (i = 0; i < VDBrecordNum; ++i) {
-        if (strcmp (rgName, _VDBmasterTable[i].CFname) == 0) return (_VDBmasterTable[i].CFname);
+        if (strcmp (rgName, _VDBmasterTable[i].GHAASname) == 0) return (_VDBmasterTable[i].CFname);
     }
     return ((const  char *) NULL);
 }
