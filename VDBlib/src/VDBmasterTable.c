@@ -90,6 +90,7 @@ static VDBmasterTable_t _VDBmasterTable [] = {
         {"meteorology",   "wind_speed",                        "WindSpeed",                       "Wind Speed",                        "continuous", "grey",        "avg"},
         {"meteorology",   "u_wind_speed",                      "WindSpeed-U10m",                  "Wind Speed U-direction",            "continuous", "grey",        "avg"},
         {"network",       "basin",                             "Basin",                           "Basin",                             "discrete",   "N/A",         "N/A"},
+        {"network",       "mouth",                             "Mouth",                           "Mouth",                             "point",      "N/A",         "N/A"},
         {"network",       "cell_area",                         "CellArea",                        "Cell Area",                         "continuous", "grey",        "max"},
         {"network",       "cell_slope",                        "CellSlope",                       "Cell Slope",                        "continuous", "grey",        "avg"},
         {"network",       "confluence",                        "Confluence",                      "Confluence",                        "point",      "N/A",         "N/A"},
