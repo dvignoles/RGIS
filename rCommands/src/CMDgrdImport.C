@@ -359,6 +359,7 @@ int main(int argc, char *argv[]) {
     grdData->Name("Untitled");
     FILE *inFILE, *lstFILE = (FILE *) NULL;
     char fileName[DBDataFileNameLen+256], recordName[DBStringLength]; //TODO: ugly fixed size array from Pete.
+    DBAddress item;
     DBInt pathLen, itemSize, chunk, i, j, row, col, recordLen;
     DBCoordinate coord;
     DBRegion extent;
@@ -486,7 +487,7 @@ int main(int argc, char *argv[]) {
                 return 0;
         }
         valueSizeFLD->Int(layerRec, itemSize);
-        dataRec = new DBObjRecord(layerRec->Name(), (DBUnsigned) colNum * (DBUnsigned) rowNum, valueSizeFLD->Int(layerRec));
+        dataRec = new DBObjRecord(layerRec->Name(), (DBAddress) colNum * (DBAddress) rowNum, valueSizeFLD->Int(layerRec));
         if (dataRec->Data() == (void *) NULL) {
             delete dataRec;
             delete grdData;
@@ -507,29 +508,29 @@ int main(int argc, char *argv[]) {
         if (fileType == RGISGridBinary) {
             recordLen = (layout == RGISLaoutByRow ? colNum : rowNum) * itemSize + skipPad;
             for (j = 0; (chunk = fread(buffer, 1, sizeof(buffer), inFILE)) > 0; ++j)
-                for (i = 0; i < chunk; i += itemSize) {//this is the itemsize declaration
+                for (item = 0; item < chunk; item += itemSize) {//this is the itemsize declaration
                     //it is dependent upon the
                     if (byteOrder != DBByteOrder())
                         switch (itemSize) {
                             default:
                                 break;
                             case 2:
-                                DBByteOrderSwapHalfWord(buffer + i);
+                                DBByteOrderSwapHalfWord(buffer + item);
                                 break;
                             case 4:
-                                DBByteOrderSwapWord(buffer + i);
+                                DBByteOrderSwapWord(buffer + item);
                                 break;
                             case 8:
-                                DBByteOrderSwapLongWord(buffer + i);
+                                DBByteOrderSwapLongWord(buffer + item);
                                 break;
                         }
                     if (layout == RGISLaoutByRow) {
-                        if ((row = (j * sizeof(buffer) + i) / recordLen) >= rowNum) continue;
-                        if ((col = ((j * sizeof(buffer) + i) % recordLen) / itemSize) >= colNum) continue;
+                        if ((row = (DBInt)  ((DBAddress) j * sizeof(buffer) + item) / recordLen) >= rowNum) continue;
+                        if ((col = (DBInt) (((DBAddress) j * sizeof(buffer) + item) % recordLen) / itemSize) >= colNum) continue;
                     }
                     else {
-                        if ((col = (j * sizeof(buffer) + i) / recordLen) >= colNum) continue;
-                        if ((row = ((j * sizeof(buffer) + i) % recordLen) / itemSize) >= rowNum) continue;
+                        if ((col = (DBInt)  ((DBAddress) j * sizeof(buffer) + item) / recordLen) >= colNum) continue;
+                        if ((row = (DBInt) (((DBAddress) j * sizeof(buffer) + item) % recordLen) / itemSize) >= rowNum) continue;
                     }
                     if (rowOrder == RGISItemOrderBottomUp) row = rowNum - row - 1;
                     col -= llCellCol;
@@ -537,8 +538,8 @@ int main(int argc, char *argv[]) {
                     row -= llCellRow;
                     row = row < 0 ? rowNum + row : row;
                     memcpy(((char *) dataRec->Data()) +
-                           ((DBUnsigned) row * (DBUnsigned) colNum + (DBUnsigned) col) * (DBUnsigned) itemSize,
-                           buffer + i, itemSize);
+                           ((DBAddress) row * (DBAddress) colNum + (DBAddress) col) * (DBAddress) itemSize,
+                           buffer + (DBAddress) i, itemSize);
                 }
         }
         else {
@@ -572,8 +573,7 @@ int main(int argc, char *argv[]) {
                 row -= llCellRow;
                 row = row < 0 ? rowNum + row : row;
                 memcpy(((char *) dataRec->Data()) +
-                       ((DBUnsigned) row * (DBUnsigned) colNum + (DBUnsigned) col) * (DBUnsigned) itemSize, buffer,
-                       itemSize);
+                       ((DBAddress) row * (DBAddress) colNum + (DBAddress) col) * (DBAddress) itemSize, buffer, itemSize);
                 if (layout == RGISLaoutByRow) {
                     i += 1;
                     if (i >= colNum) {
@@ -614,16 +614,16 @@ int main(int argc, char *argv[]) {
         backgroundFLD->Int(symRec, 0);
         styleFLD->Int(symRec, 0);
         for (dataRec = (grdData->Arrays())->First(); dataRec != (DBObjRecord *) NULL; dataRec = (grdData->Arrays())->Next()) {
-            for (i = 0; i < colNum * rowNum; ++i) {
+            for (item = 0; item < colNum * rowNum; ++item) {
                 switch (itemSize) {
                     case 1:
-                        intVal = (DBInt) (*((DBByte *) ((char *) dataRec->Data() + i * itemSize)));
+                        intVal = (DBInt) (*((DBByte *) ((char *) dataRec->Data() + item * itemSize)));
                         break;
                     case 2:
-                        intVal = (DBInt) (*((DBShort *) ((char *) dataRec->Data() + i * itemSize)));
+                        intVal = (DBInt) (*((DBShort *) ((char *) dataRec->Data() + item * itemSize)));
                         break;
                     default:
-                        intVal = (DBInt) (*((DBInt *) ((char *) dataRec->Data() + i * itemSize)));
+                        intVal = (DBInt) (*((DBInt *) ((char *) dataRec->Data() + item * itemSize)));
                         break;
                 }
                 sprintf(buffer, "Category%d", intVal);
@@ -639,9 +639,9 @@ int main(int argc, char *argv[]) {
                 }
                 intVal = itemRec->RowID();
                 switch (itemSize) {
-                    case 1:  *((DBByte *)  ((char *) dataRec->Data() + i * itemSize)) = intVal; break;
-                    case 2:  *((DBShort *) ((char *) dataRec->Data() + i * itemSize)) = intVal; break;
-                    default: *((DBInt *)   ((char *) dataRec->Data() + i * itemSize)) = intVal; break;
+                    case 1:  *((DBByte *)  ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
+                    case 2:  *((DBShort *) ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
+                    default: *((DBInt *)   ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
                 }
 
             }
@@ -649,18 +649,18 @@ int main(int argc, char *argv[]) {
         itemTable->ListSort(gridValueFLD);
         for (dataRec = (grdData->Arrays())->First();
              dataRec != (DBObjRecord *) NULL; dataRec = (grdData->Arrays())->Next()) {
-            for (i = 0; i < colNum * rowNum; ++i) {
+            for (item = 0; item < colNum * rowNum; ++item) {
                 switch(itemSize) {
-                    case 1:  intVal = (DBInt) (*((DBByte *)  ((char *) dataRec->Data() + i * itemSize))); break;
-                    case 2:  intVal = (DBInt) (*((DBShort *) ((char *) dataRec->Data() + i * itemSize))); break;
-                    default: intVal = (DBInt) (*((DBInt *)   ((char *) dataRec->Data() + i * itemSize))); break;
+                    case 1:  intVal = (DBInt) (*((DBByte *)  ((char *) dataRec->Data() + item * itemSize))); break;
+                    case 2:  intVal = (DBInt) (*((DBShort *) ((char *) dataRec->Data() + item * itemSize))); break;
+                    default: intVal = (DBInt) (*((DBInt *)   ((char *) dataRec->Data() + item * itemSize))); break;
                 }
                 itemRec = itemTable->Item(intVal);
                 intVal = itemRec->ListPos();
                 switch (itemSize) {
-                    case 1:   *((DBByte *)  ((char *) dataRec->Data() + i * itemSize)) = intVal; break;
-                    case 2:   *((DBShort *) ((char *) dataRec->Data() + i * itemSize)) = intVal; break;
-                    default:  *((DBInt *)   ((char *) dataRec->Data() + i * itemSize)) = intVal; break;
+                    case 1:   *((DBByte *)  ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
+                    case 2:   *((DBShort *) ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
+                    default:  *((DBInt *)   ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
                 }
             }
         }
