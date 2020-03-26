@@ -70,7 +70,7 @@ int DBImportASCIINet(DBObjData *netData, const char *fileName) {
     }
 
     for (i = 0; i < 6; ++i)
-        if (fgets(buffer, sizeof(buffer), file) == (char *) NULL) {
+        if (fgets(buffer, sizeof(buffer) - 1, file) == (char *) NULL) {
             CMmsgPrint(CMmsgSysError, "File Reading Error in: %s %d", __FILE__, __LINE__);
             return (DBFault);
         }
