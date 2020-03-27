@@ -18,8 +18,9 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -b,--basin_pack [basin pack file]");
+    CMmsgPrint(CMmsgInfo, "     -b,--build      [yes|no]");
     CMmsgPrint(CMmsgInfo, "     -g,--gradient   [down|up]");
+    CMmsgPrint(CMmsgInfo, "     -p,--basin_pack [basin pack file]");
     CMmsgPrint(CMmsgInfo, "     -t,--title      [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -d,--domain     [domain]");
     CMmsgPrint(CMmsgInfo, "     -v,--version    [version]");
@@ -29,30 +30,27 @@ static void _CMDprintUsage (const char *arg0) {
 
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
-    bool downhill = true;
+    bool downhill = true, build = true;
     char *title = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     DBObjData *outData = (DBObjData *) NULL, *inData = (DBObjData *) NULL, *basinData = (DBObjData *) NULL;
-    DBInt DBGridCont2Network(DBObjData *, DBObjData *, bool);
+    DBInt DBGridCont2Network(DBObjData *, DBObjData *, bool, bool);
 
     for (argPos = 1; argPos < argNum;) {
-        if (CMargTest(argv[argPos], "-b", "--basin_pack")) {
+        if (CMargTest(argv[argPos], "-b", "--build")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
-                CMmsgPrint(CMmsgUsrError, "Missing basin pack filename!");
+                CMmsgPrint(CMmsgUsrError, "Missing build option!");
                 return (CMfailed);
             }
             else {
-                if (basinData != (DBObjData *) NULL)
-                    CMmsgPrint(CMmsgWarning, "Ignoring redefined basin pack");
-                else {
-                    basinData = new DBObjData();
-                    if (basinData->Read(argv[argPos]) == DBFault) {
-                        CMmsgPrint(CMmsgUsrError, "Basin data reading error");
-                        delete basinData;
-                        basinData = (DBObjData *) NULL;
-                        return (CMfailed);
-                    }
+                const char *options[] = {"yes", "no", (char *) NULL};
+                bool methods[] = {true, false};
+                DBInt code;
+
+                if ((code = CMoptLookup(options, argv[argPos], false)) == CMfailed) {
+                    CMmsgPrint(CMmsgWarning, "Ignoring ill formed build option [%s]!", argv[argPos]);
                 }
+                else build = methods[code];
             }
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
@@ -71,6 +69,27 @@ int main(int argc, char *argv[]) {
                     CMmsgPrint(CMmsgWarning, "Ignoring illformed gradient method [%s]!", argv[argPos]);
                 }
                 else downhill = methods[code];
+            }
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest(argv[argPos], "-p", "--basin_pack")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing basin pack filename!");
+                return (CMfailed);
+            }
+            else {
+                if (basinData != (DBObjData *) NULL)
+                    CMmsgPrint(CMmsgWarning, "Ignoring redefined basin pack");
+                else {
+                    basinData = new DBObjData();
+                    if (basinData->Read(argv[argPos]) == DBFault) {
+                        CMmsgPrint(CMmsgUsrError, "Basin data reading error");
+                        delete basinData;
+                        basinData = (DBObjData *) NULL;
+                        return (CMfailed);
+                    }
+                }
             }
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
@@ -142,7 +161,7 @@ int main(int argc, char *argv[]) {
     outData->Document(DBDocGeoDomain, domain);
     outData->Document(DBDocVersion, version);
 
-    if (DBGridCont2Network(inData, outData, downhill) == DBFault) {
+    if (DBGridCont2Network(inData, outData, downhill, build) == DBFault) {
         CMmsgPrint(CMmsgUsrError, "Grid create network failed!");
         ret = DBFault;
         goto Stop;

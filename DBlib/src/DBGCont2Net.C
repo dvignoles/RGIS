@@ -13,7 +13,7 @@ bfekete@gc.cuny.edu
 #include <DB.H>
 #include <DBif.H>
 
-DBInt DBGridCont2Network(DBObjData *gridData, DBObjData *netData, bool downhill) {
+DBInt DBGridCont2Network(DBObjData *gridData, DBObjData *netData, bool downhill, bool build) {
     DBInt basinID, layerID, zLayerID, zLayerNum, dir, maxDir, projection = gridData->Projection(), *zones;
     DBFloat elev0, elev1, delta, maxDelta, distance;
     DBCoordinate coord0, coord1;
@@ -226,7 +226,11 @@ DBInt DBGridCont2Network(DBObjData *gridData, DBObjData *netData, bool downhill)
 
     netData->Precision(DBMathMin (gridIF->CellWidth(), gridIF->CellHeight()) / 25.0);
     netIF = new DBNetworkIF(netData);
-    netIF->Build();
+    if (build) netIF->Build();
     delete netIF;
     return (DBSuccess);
+}
+
+DBInt DBGridCont2Network(DBObjData *gridData, DBObjData *netData, bool downhill) {
+    return (DBGridCont2Network(gridData, netData,downhill,true));
 }
