@@ -127,6 +127,7 @@ static VDBmasterTable_t _VDBmasterTable [] = {
         {"station",       "power_plant_catchment",             "PowerPlant-Catchment",            "Power Plant",                       "discrete",   "N/A",          "N/A"},
         {"station",       "reservoir",                         "Reservoir",                       "Reservoir",                         "point",      "N/A",          "N/A"},
         {"station",       "reservoir_catchment",               "Reservoir-Catchment",             "Reservoir Catchment",               "discrete",   "N/A",          "N/A"},
+        {"station",       "drainage_area",                     "DrainageArea",                    "Drainage Area",                     "continuous", "grey",        "max"},
         {"topography",    "bathymetry",                        "bathymetry",                      "Bathymetry",                        "continuous", "blue",         "avg"},
         {"topography",    "bathymetry_min",                    "bathymetry-Min",                  "Minimum Depth",                     "continuous", "blue",         "avg"},
         {"topography",    "bathymetry_max",                    "bathymetry-Max",                  "Maximum Depth",                     "continuous", "blue",         "avg"},
