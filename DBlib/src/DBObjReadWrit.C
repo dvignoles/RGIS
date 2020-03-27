@@ -247,7 +247,7 @@ int DBObjTable::Write(FILE *file) {
                 case DBTableFieldTableRec:
                 case DBTableFieldDataRec:
                     if ((obj = field->Record(record)) != (DBObjRecord *) NULL)
-                        field->Record(record, (DBObjRecord *) ((char *) NULL + obj->RowID()));
+                         field->Record(record, (DBObjRecord *) ((char *) NULL + obj->RowID()));
                     else field->Record(record, (DBObjRecord *) DBFault);
                     break;
             }

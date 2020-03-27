@@ -217,6 +217,9 @@ function RGISgeoResolutionInSecond ()
     local resolution="${1}"; shift
 
    	case "${resolution}" in
+   	("7p50s")
+   	    echo "7.5"
+   	 ;;
 	("15sec")
 		echo "15"
 	;;
@@ -312,6 +315,7 @@ function _RGISresolutionDir ()
 				if [ "${resolution%km+}" == "${resolution}" ] # Geographic
 				then
 					local geogNum=0
+					local geogRes[${geogNum}]="7p50s"; (( ++geogNum ))
 					local geogRes[${geogNum}]="15sec"; (( ++geogNum ))
 					local geogRes[${geogNum}]="30sec"; (( ++geogNum ))
 					local geogRes[${geogNum}]="45sec"; (( ++geogNum ))

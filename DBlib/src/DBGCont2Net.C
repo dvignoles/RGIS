@@ -215,7 +215,7 @@ DBInt DBGridCont2Network(DBObjData *gridData, DBObjData *netData, bool downhill,
     }
     PauseStop:
     if (pos.Row < gridIF->RowNum()) return (DBFault);
-    sprintf(nameSTR, "GHAASBasin%d", (DBInt) 0);
+    sprintf(nameSTR, "GHAASBasin%d", (DBInt) 1);
     basinRec = basinTable->Add(nameSTR);
     mouthPosFLD->Position(basinRec, positionFLD->Position(cellTable->Item(0)));
     colorFLD->Int(basinRec, 0);
@@ -225,9 +225,11 @@ DBInt DBGridCont2Network(DBObjData *gridData, DBObjData *netData, bool downhill,
     if (zGridIF != (DBGridIF *) NULL) delete zGridIF;
 
     netData->Precision(DBMathMin (gridIF->CellWidth(), gridIF->CellHeight()) / 25.0);
-    netIF = new DBNetworkIF(netData);
-    if (build) netIF->Build();
-    delete netIF;
+    if (build) {
+        netIF = new DBNetworkIF(netData);
+        netIF->Build();
+        delete netIF;
+    }
     return (DBSuccess);
 }
 
