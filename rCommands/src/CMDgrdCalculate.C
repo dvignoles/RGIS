@@ -242,12 +242,14 @@ public:
         return (CMsucceeded);
     }
 
-    CMreturn Configure(bool shrink, bool flat, char *expStr) {
+    CMreturn Configure(DBObjData *data, bool shrink, bool flat, char *expStr) {
         size_t i;
         DBInt recID, layerID;
         DBFloat floatVal;
         DBObject *obj;
         DBObjTableField *fieldPTR;
+        DBGridIF *gridIF;
+        DBNetworkIF *netIF;
 
         Operand = new DBMathOperand(expStr);
         if (Operand->Expand(Variables) == DBFault) return (CMfailed);
@@ -283,6 +285,31 @@ public:
 
         for (i = 0; i < ExpNum; ++i) if (Expressions[i]->Configure(Table) == DBFault) return (CMfailed);
         Operand->Configure(Table->Fields());
+
+        if (data != (DBObjData *) NULL) {
+            switch (data->Type ()) {
+                case DBTypeGridContinuous:
+                case DBTypeGridDiscrete:
+                    gridIF = new DBGridIF (data);
+                    CellSize.X = gridIF->CellWidth ();
+                    CellSize.Y = gridIF->CellHeight();
+                    Extent = data->Extent();
+                    delete gridIF;
+                    break;
+                case DBTypeNetwork:
+                    netIF = new DBNetworkIF (data);
+                    CellSize.X = netIF->CellWidth ();
+                    CellSize.Y = netIF->CellHeight ();
+                    Extent = data->Extent();
+                    delete netIF;
+                    break;
+                case DBTypeVectorPoint:
+                    Extent = data->Extent ();
+                    break;
+                default:
+                    break;
+            }
+        }
         if (shrink) for (i = 0; i < VarNum; ++i) Extent.Shrink(GrdVar[i]->Extent());
         return (CMsucceeded);
     }
@@ -400,7 +427,7 @@ int main(int argc, char *argv[]) {
     char *domain = (char *) NULL, *version = (char *) NULL;
     int shadeSet = DBDataFlagDispModeContGreyScale;
     bool shrink = true, flat = false;
-    DBObjData *data;
+    DBObjData *data = (DBObjData *) NULL;
     CMDgrdThreadData *threadData = new CMDgrdThreadData();
 
     for (argPos = 1; argPos < argNum;) {
@@ -450,11 +477,15 @@ int main(int argc, char *argv[]) {
                 return (CMfailed);
             }
             if ((ret = CMoptLookup(names, argv[argPos], true)) == CMfailed) {
-                CMmsgPrint(CMmsgUsrError, "Invalid extent mode!");
-                delete threadData;
-                return (CMfailed);
+                shrink = false;
+                data = new DBObjData();
+                if (data->Read (argv[argPos]) != DBSuccess) {
+                    CMmsgPrint(CMmsgUsrError, "Invalid template coverage [%s]!",argv[argPos]);
+                    delete threadData;
+                    return (CMfailed);
+                }
             }
-            shrink = codes[ret];
+            else shrink = codes[ret];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
@@ -568,10 +599,11 @@ int main(int argc, char *argv[]) {
     }
     if (verbose) RGlibPauseOpen(argv[0]);
 
-    if (threadData->Configure(shrink, flat, expStr) == CMfailed) {
+    if (threadData->Configure(data, shrink, flat, expStr) == CMfailed) {
         delete threadData;
         return (CMfailed);
     }
+    if (data != (DBObjData *) NULL) delete data;
 
     if (title == (char *) NULL) title = (char *) "Grid Calculate Result";
     if (subject == (char *) NULL) subject = (char *) "GridCalc";
@@ -583,9 +615,7 @@ int main(int argc, char *argv[]) {
         delete threadData;
         return (CMfailed);
     }
-
     delete threadData;
-
     data->Document(DBDocSubject, subject);
     data->Document(DBDocGeoDomain, domain);
     data->Document(DBDocVersion, version);
