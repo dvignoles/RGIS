@@ -33,8 +33,8 @@ int DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, FILE *file) {
 
     fprintf(file, "ncols         %d\n", gridIF->ColNum());
     fprintf(file, "nrows         %d\n", gridIF->RowNum());
-    fprintf(file, "xllcorner     %.3lf\n", (data->Extent()).LowerLeft.X);
-    fprintf(file, "yllcorner     %.3lf\n", (data->Extent()).LowerLeft.Y);
+    fprintf(file, "xllcorner     %.4lf\n", (data->Extent()).LowerLeft.X);
+    fprintf(file, "yllcorner     %.4lf\n", (data->Extent()).LowerLeft.Y);
     fprintf(file, "cellsize      %.12lf\n", gridIF->CellWidth());
     switch (data->Type()) {
         case DBTypeGridContinuous:
