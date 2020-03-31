@@ -21,6 +21,8 @@ bfekete@gc.cuny.edu
 #define XLLCENTER "xllcenter"
 #define YLLCENTER "yllcenter"
 #define CELLSIZE  "cellsize"
+#define DX        "dx"
+#define DY        "dy"
 #define NODATA    "nodata_value"
 #define CORNER 0
 #define CENTER 1
@@ -30,7 +32,7 @@ int DBImportASCIINet(DBObjData *netData, const char *fileName) {
     char buffer[81];
     char nameSTR[DBStringLength];
     DBInt i, j, rowNum, colNum, cornerType, noData, gridVal;
-    DBFloat cellSize;
+    DBFloat cellWidth, cellHeight;
     DBPosition pos;
     DBCoordinate coord;
     DBRegion extent;
@@ -97,8 +99,12 @@ int DBImportASCIINet(DBObjData *netData, const char *fileName) {
                 sscanf(buffer + strlen(YLLCENTER), "%lf", &(coord.Y));
                 cornerType = CENTER;
             }
+            if (strncmp(buffer, DX, strlen(DX)) == 0)
+                sscanf(buffer + strlen(DX), "%lf", &cellWidth);
+            if (strncmp(buffer, DY, strlen(DY)) == 0)
+                sscanf(buffer + strlen(DY), "%lf", &cellHeight);
             if (strncmp(buffer, CELLSIZE, strlen(CELLSIZE)) == 0)
-                sscanf(buffer + strlen(CELLSIZE), "%lf", &cellSize);
+            { sscanf(buffer + strlen(CELLSIZE), "%lf", &cellWidth); cellHeight = cellWidth; }
             if (strncmp(buffer, NODATA, strlen(NODATA)) == 0)
                 sscanf(buffer + strlen(NODATA), "%d", &noData);
         }
@@ -108,8 +114,8 @@ int DBImportASCIINet(DBObjData *netData, const char *fileName) {
         return (DBFault);
     }
 
-    cellWidthFLD->Float(layerRec, cellSize);
-    cellHeightFLD->Float(layerRec, cellSize);
+    cellWidthFLD->Float(layerRec, cellWidth);
+    cellHeightFLD->Float(layerRec, cellHeight);
     valueTypeFLD->Int(layerRec, DBTableFieldInt);
     valueSizeFLD->Int(layerRec, sizeof(DBInt));
     rowNumFLD->Int(layerRec, rowNum);
@@ -152,12 +158,12 @@ Stop:
     basinRec = basinTable->Add(nameSTR);
     mouthPosFLD->Position(basinRec, positionFLD->Position(cellTable->Item(0)));
     colorFLD->Int(basinRec, 0);
-    netData->Precision(cellSize / 25.0);
-    coord.X = coord.X - cornerType * cellSize / 2.0;
-    coord.Y = coord.Y - cornerType * cellSize / 2.0;
+    netData->Precision(cellWidth / 25.0);
+    coord.X = coord.X - cornerType * cellWidth / 2.0;
+    coord.Y = coord.Y - cornerType * cellHeight / 2.0;
     extent.Expand(coord);
-    coord.X += colNum * cellSize;
-    coord.Y += rowNum * cellSize;
+    coord.X += colNum * cellWidth;
+    coord.Y += rowNum * cellHeight;
     extent.Expand(coord);
     netData->Extent(extent);
     netData->Projection(DBMathGuessProjection(extent));
