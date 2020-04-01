@@ -26,7 +26,7 @@ bfekete@gc.cuny.edu
 #define DBForward         true
 #define DBBackward        false
 #define DBStringLength    0x20
-#define DBDataFileNameLen 0x100
+#define DBDataFileNameLen 0x400
 
 #define DBSystemNameLen   0x20
 #define DBLoginNameLen    0x20
