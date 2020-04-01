@@ -38,17 +38,35 @@ int DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, FILE *file) {
     fprintf(file, "cellsize      %.12lf\n", gridIF->CellWidth());
     switch (data->Type()) {
         case DBTypeGridContinuous:
-        DBFloat value;
-        fprintf(file, "NODATA_value  %f\n", gridIF->MissingValue());
-        for (row = gridIF->RowNum() - 1; row >= 0; row--) {
-            for (col = 0; col < gridIF->ColNum(); col++) {
-                pos.Row = row;
-                pos.Col = col;
-                if (gridIF->Value(layerRec, pos, &value)) fprintf(file, " %.15g", value);
-                else fprintf(file, " %f", gridIF->MissingValue());
+            switch (gridIF->ValueType()) {
+                case DBTableFieldFloat:
+                    DBFloat floatVal;
+                    fprintf(file, "NODATA_value  %f\n", gridIF->MissingValue());
+                    for (row = gridIF->RowNum() - 1; row >= 0; row--) {
+                        for (col = 0; col < gridIF->ColNum(); col++) {
+                            pos.Row = row;
+                            pos.Col = col;
+                            if (gridIF->Value(layerRec, pos, &floatVal)) fprintf(file, " %.15g", floatVal);
+                        else fprintf(file, " %f", gridIF->MissingValue());
+                    }
+                    fprintf(file, "\n");
+                }
+                break;
+            case DBTableFieldInt:
+                DBInt intVal;
+                fprintf(file, "NODATA_value  %d\n", (DBInt) gridIF->MissingValue());
+                for (row = gridIF->RowNum() - 1; row >= 0; row--) {
+                    for (col = 0; col < gridIF->ColNum(); col++) {
+                        pos.Row = row;
+                        pos.Col = col;
+                        if (gridIF->Value(layerRec, pos, &intVal)) fprintf(file, " %d", intVal);
+                        else fprintf(file, " %d", (DBInt) gridIF->MissingValue());
+                    }
+                    fprintf(file, "\n");
+                }
+                break;
             }
-            fprintf(file, "\n");
-        }
+            break;
         case DBTypeGridDiscrete:
         fprintf(file, "NODATA_value  %d\n", DBDefaultMissingIntVal);
         for (row = gridIF->RowNum() - 1; row >= 0; row--) {
