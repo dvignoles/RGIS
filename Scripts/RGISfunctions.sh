@@ -217,6 +217,9 @@ function RGISgeoResolutionInSecond ()
     local resolution="${1}"; shift
 
    	case "${resolution}" in
+   	("03sec")
+   	    echo "3"
+   	 ;;
    	("7p50s")
    	    echo "7.5"
    	 ;;
