@@ -1695,7 +1695,7 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
             extent.LowerLeft.X = longitudes[0] < longitudes[1] ? longitudes[0] : longitudes[1];
             extent.UpperRight.X = longitudes[0] > longitudes[1] ? longitudes[0] : longitudes[1];
             for (i = 2; i < colNum; i++) {
-                extent.LowerLeft.X = extent.LowerLeft.X < longitudes[i] ? extent.LowerLeft.X : longitudes[i];
+                extent.LowerLeft.X  = extent.LowerLeft.X  < longitudes[i] ? extent.LowerLeft.X  : longitudes[i];
                 extent.UpperRight.X = extent.UpperRight.X > longitudes[i] ? extent.UpperRight.X : longitudes[i];
                 if (CMmathEqualValues(cellSize.X, fabs(longitudes[i] - longitudes[i - 1])) != true) {
                     CMmsgPrint(CMmsgAppError, "Longitude has irregular spacing in: %s %d", __FILE__, __LINE__);
@@ -2059,14 +2059,15 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
             }
 
             for (colID = 0; colID < colNum; colID++)
-                vector[colID] = CMmathEqualValues(vector[colID], fillValue) ? missingValue :
-                                scaleFactor * vector[colID] + dataOffset;
-            if (longitudes[0] < longitudes[1])
+                vector[colID] = CMmathEqualValues(vector[colID], fillValue) ? missingValue : scaleFactor * vector[colID] + dataOffset;
+            if (longitudes[0] < longitudes[1]) {
                 for (colID = 0; colID < colNum; colID++)
-                    ((float *) (dataRec->Data()))[colNum * rowID + colID] = vector[colID];
-            else
+                    ((float *) (dataRec->Data()))[(size_t) colNum * (size_t) rowID + (size_t) colID] = vector[colID];
+            }
+            else {
                 for (colID = 0; colID < colNum; colID++)
-                    ((float *) (dataRec->Data()))[colNum * rowID + colID] = vector[colNum - colID - 1];
+                    ((float *) (dataRec->Data()))[(size_t)colNum * (size_t) rowID + (size_t) colID] = vector[colNum - colID - 1];
+            }
         }
     }
     gridIF = new DBGridIF(data);
