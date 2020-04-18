@@ -83,7 +83,7 @@ int DBObjRecord::Read(FILE *file, int swap) {
         CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);
     }
-    if (fread((char *) NULL + DataPTR, ItemSizeVAR == 0 ? 1 : ItemSizeVAR, LengthVAR, file) != 1) {
+    if (fread((char *) NULL + DataPTR, ItemSizeVAR == 0 ? 1 : ItemSizeVAR, LengthVAR, file) != LengthVAR) {
         CMmsgPrint(CMmsgSysError, "File Reading Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);
     }
@@ -122,7 +122,7 @@ int DBObjRecord::Write(FILE *file) {
         CMmsgPrint(CMmsgSysError, "File Writing Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);
     }
-    if (fwrite((char *) NULL + DataPTR, ItemSizeVAR == 0 ? 1 : ItemSizeVAR, LengthVAR, file) != 1) {
+    if (fwrite((char *) NULL + DataPTR, ItemSizeVAR == 0 ? 1 : ItemSizeVAR, LengthVAR, file) != LengthVAR) {
         CMmsgPrint(CMmsgSysError, "File Writing Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);
     }
