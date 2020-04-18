@@ -103,7 +103,7 @@ bfekete@gc.cuny.edu
 #define DBObjectFlagLocked                ((DBInt) (0x01 << 0x04))
 #define DBObjectFlagChanged               ((DBInt) (0x01 << 0x04))
 #define DBObjectFlagLocked                ((DBInt) (0x01 << 0x04))
-#define DBObjectFlagBigData               ((DBInt) (0x01 << 0x1F))
+#define DBObjectFlagBigData               ((DBInt) (0x01 << 0x0F))
 
 #define DBDataLISTFlagSmartSort           0x10000000L
 

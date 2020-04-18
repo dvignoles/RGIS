@@ -75,7 +75,7 @@ int DBObjRecord::Read(FILE *file, int swap) {
     }
     if (swap) Swap();
 
-    if ((Flags() | DBObjectFlagBigData) != DBObjectFlagBigData) {
+    if ((Flags() & DBObjectFlagBigData) != DBObjectFlagBigData) {
         LengthVAR = ItemSizeVAR == 0 ? LengthVAR : LengthVAR / ItemSizeVAR;
         Flags(DBObjectFlagBigData, DBSet);
     }
