@@ -59,3 +59,8 @@ void DBByteOrderSwapLongWord(void *data) {
     ((char *) data)[3] = ((char *) data)[4];
     ((char *) data)[4] = ch;
 }
+
+void DBByteOrderSwapCoordinate(void *data) {
+    DBCoordinate *coord = (DBCoordinate *) data;
+    coord->Swap();
+}

@@ -323,7 +323,7 @@ DBObjData *DBGridMerge(DBObjData *grd0Data, DBObjData *grd1Data) {
         grd1ItemFLD = grd1ItemTable->Field(fieldID);
         if ((strcmp(grd0ItemFLD->Name(), grd1ItemFLD->Name()) != 0) ||
             (grd0ItemFLD->Type() != grd1ItemFLD->Type()) ||
-            (grd0ItemFLD->Length() != grd1ItemFLD->Length()) ||
+            (grd0ItemFLD->FieldLength() != grd1ItemFLD->FieldLength()) ||
             (grd0ItemFLD->Size() != grd1ItemFLD->Size())) {
             CMmsgPrint(CMmsgUsrError, "Incompatible item table structure");
             goto Stop;
@@ -371,7 +371,7 @@ DBObjData *DBGridMerge(DBObjData *grd0Data, DBObjData *grd1Data) {
             grd1CellFLD = grd1CellTable->Field(fieldID);
             if ((strcmp(grd0CellFLD->Name(), grd1CellFLD->Name()) != 0) ||
                 (grd0CellFLD->Type() != grd1CellFLD->Type()) ||
-                (grd0CellFLD->Length() != grd1CellFLD->Length()) ||
+                (grd0CellFLD->FieldLength() != grd1CellFLD->FieldLength()) ||
                 (grd0CellFLD->Size() != grd1CellFLD->Size())) {
                 CMmsgPrint(CMmsgUsrError, "Incompatible cell tables");
                 goto Stop;

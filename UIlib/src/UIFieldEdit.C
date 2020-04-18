@@ -66,7 +66,7 @@ static void _UITableFieldEditDisplayWidgets(Widget mainForm, DBObjTableField *fi
             XtManageChild(XtNameToWidget(mainForm, UITableFieldEditSizeShortButton));
             XtManageChild(XtNameToWidget(mainForm, UITableFieldEditSizeLongButton));
             XmScaleSetValue(XtNameToWidget(mainForm, UITableFieldEditDecimalsScale), field->FormatDecimals());
-            switch (field->Length()) {
+            switch (field->FieldLength()) {
                 case sizeof(DBFloat4):
                     XtVaSetValues(XtNameToWidget(mainForm, UITableFieldEditSizeOptionMenu),
                                   XmNmenuHistory, XtNameToWidget(mainForm, UITableFieldEditSizeShortButton), NULL);
@@ -90,7 +90,7 @@ static void _UITableFieldEditDisplayWidgets(Widget mainForm, DBObjTableField *fi
             XtManageChild(XtNameToWidget(mainForm, UITableFieldEditSizeByteButton));
             XtManageChild(XtNameToWidget(mainForm, UITableFieldEditSizeShortButton));
             XtManageChild(XtNameToWidget(mainForm, UITableFieldEditSizeLongButton));
-            switch (field->Length()) {
+            switch (field->FieldLength()) {
                 case sizeof(DBByte):
                     XtVaSetValues(XtNameToWidget(mainForm, UITableFieldEditSizeOptionMenu),
                                   XmNmenuHistory, XtNameToWidget(mainForm, UITableFieldEditSizeByteButton), NULL);
@@ -140,7 +140,7 @@ static void _UITableFieldEditWidthScaleValueCBK(Widget widget, Widget label, XmS
     XtVaGetValues(mainForm, XmNuserData, &field, NULL);
     switch (field->Type()) {
         case DBTableFieldString:
-            field->Length(0x01 << callData->value);
+            field->FieldLength (0x01 << callData->value);
             break;
         case DBTableFieldInt:
             field->FormatWidth(callData->value);
@@ -186,7 +186,7 @@ static void _UITableFieldEditSizeButtonCBK(Widget widget, DBInt size, XmAnyCallb
     if ((field->Type() != DBTableFieldInt) || (field->Type() != DBTableFieldFloat)) return;
 
     if (field->Type() == DBTableFieldFloat) size = size << 0x01;
-    field->Length(size);
+    field->FieldLength(size);
 }
 
 static void _UITableFieldEditTextValueChangedCBK(Widget widget, void *data, XmTextVerifyCallbackStruct *callData) {
@@ -477,7 +477,7 @@ DBObjTableField *UITableFieldEdit(DBObjTableField *field) {
         if (retField->Type() != field->Type()) changed = true;
         else if (strcmp(retField->Name(), field->Name()) != 0) changed = true;
         else if (strcmp(retField->Format(), field->Format()) != 0) changed = true;
-        else if (retField->Length() != field->Length()) changed = true;
+        else if (retField->FieldLength() != field->FieldLength()) changed = true;
         else
             switch (retField->Type()) {
                 case DBTableFieldInt:

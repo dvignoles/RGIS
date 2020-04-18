@@ -169,10 +169,10 @@ int DBImportARCLine(DBObjData *vecData, const char *arcCov) {
         linkNumFLD->Int(nodeRec, linkNumFLD->Int(nodeRec) + 1);
         if (arcRecord.NumOfPnts() > 2) {
             if ((dataRec = data->Item(lineRec->RowID())) == (DBObjRecord *) NULL) {
-                dataRec = new DBObjRecord ("LineData", 0, sizeof(DBFloat));
+                dataRec = new DBObjRecord ("LineData", 1, sizeof(DBCoordinate));
                 data->Add(dataRec);
             }
-            dataRec->Realloc((arcRecord.NumOfPnts() - 2) * sizeof(DBCoordinate));
+            dataRec->Realloc(arcRecord.NumOfPnts());
             if ((vertexes = (DBCoordinate *) dataRec->Data()) == NULL) {
                 CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s %d", __FILE__, __LINE__);
                 return (DBFault);

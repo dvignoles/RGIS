@@ -691,7 +691,7 @@ static void printCrops(const MDIrrigatedCrop * curCrop) {
 	CMmsgPrint(CMmsgDebug,"CurrentCropID %i \n", curCrop->ID);
 	CMmsgPrint(CMmsgDebug,"CropName %s	\n ", curCrop->cropName);
 	CMmsgPrint(CMmsgDebug,"kc  %f %f %f \n",  curCrop->cropKc [0], curCrop->cropKc [1], curCrop->cropKc [2]);
-	CMmsgPrint(CMmsgDebug,"Length./Total . %f %f %f %f %i \n",
+	CMmsgPrint(CMmsgDebug,"FieldLength./Total . %f %f %f %f %i \n",
 			curCrop->cropSeasLength [0],
 			curCrop->cropSeasLength [1],
 			curCrop->cropSeasLength [2],

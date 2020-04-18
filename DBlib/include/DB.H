@@ -167,6 +167,8 @@ void DBByteOrderSwapWord(void *);
 
 void DBByteOrderSwapLongWord(void *);
 
+void DBByteOrderSwapCoordinate(void *);
+
 class DBVarString {
 private:
     DBShort LengthVAR;
@@ -1131,14 +1133,14 @@ private:
     char *NameSTR;
     DBInt TypeVAR;
     char *FormatSTR;
-    DBUnsigned LengthVAR;
+    DBUnsigned FieldLengthVAR;
     DBByte RequiredVAR;
 public:
     DBTableFieldDefinition() {
         NameSTR = (char *) NULL;
         TypeVAR = DBFault;
         FormatSTR = (char *) "%8x";
-        LengthVAR = 0;
+        FieldLengthVAR = 0;
         RequiredVAR = false;
     }
 
@@ -1146,7 +1148,7 @@ public:
         NameSTR = name;
         TypeVAR = type;
         FormatSTR = format;
-        LengthVAR = length;
+        FieldLengthVAR = length;
         RequiredVAR = false;
     }
 
@@ -1154,7 +1156,7 @@ public:
         NameSTR = name;
         TypeVAR = type;
         FormatSTR = format;
-        LengthVAR = length;
+        FieldLengthVAR = length;
         RequiredVAR = required;
     }
 
@@ -1164,7 +1166,7 @@ public:
 
     const char *Format() const { return (FormatSTR); }
 
-    DBUnsigned Length() const { return (LengthVAR); }
+    DBUnsigned FieldLength() const { return (FieldLengthVAR); }
 
     DBInt Required() const { return (RequiredVAR); }
 };
@@ -1176,8 +1178,8 @@ private:
     DBByte UnitVAR;
     DBByte RequiredVAR;
 
-    DBShort StartByteVAR;
-    DBUShort LengthVAR;
+    DBShort  StartByteVAR;
+    DBUShort FieldLengthVAR;
     char FormatSTR[DBStringLength];
     union {
         DBProperties<DBByte> BytePROP;
@@ -1234,9 +1236,9 @@ public:
 
     void Type(DBInt);
 
-    DBInt Length() const { return (LengthVAR); }
+    DBInt FieldLength() const { return (FieldLengthVAR); }
 
-    void Length(DBInt);
+    void FieldLength(DBInt);
 
     DBInt Required() const { return (RequiredVAR); }
 
@@ -1255,7 +1257,7 @@ public:
     DBInt Int(const DBObjRecord *) const;
 
     DBInt IntNoData(void) const {
-        switch (LengthVAR) {
+        switch (FieldLengthVAR) {
             case sizeof(DBByte):
                 return (BytePROP.NoData());
             case sizeof(DBShort):
@@ -1266,7 +1268,7 @@ public:
     }
 
     void IntNoData(DBInt noData) {
-        switch (LengthVAR) {
+        switch (FieldLengthVAR) {
             case sizeof(DBByte):
                 BytePROP.NoData((DBByte) noData);
                 break;
@@ -1284,7 +1286,7 @@ public:
     DBFloat Float(const DBObjRecord *) const;
 
     DBFloat FloatNoData(void) const {
-        switch (LengthVAR) {
+        switch (FieldLengthVAR) {
             case sizeof(DBFloat4):
                 return ((DBFloat) Float4PROP.NoData());
             default:
@@ -1293,7 +1295,7 @@ public:
     }
 
     void FloatNoData(DBFloat noData) {
-        switch (LengthVAR) {
+        switch (FieldLengthVAR) {
             case sizeof(DBFloat4):
                 Float4PROP.NoData((DBFloat4) noData);
                 break;
@@ -1367,7 +1369,7 @@ public:
         RecordLengthVAR = 0;
         while (fieldDefs[i++].Name() != NULL)
             AddField(new DBObjTableField(fieldDefs[i - 1].Name(), fieldDefs[i - 1].Type(), fieldDefs[i - 1].Format(),
-                                         fieldDefs[i - 1].Length(), fieldDefs[i - 1].Required()));
+                                         fieldDefs[i - 1].FieldLength(), fieldDefs[i - 1].Required()));
     };
 
     DBObjTable(const char *name, DBUnsigned size) : DBObjectLIST<DBObjRecord>(name, size) {

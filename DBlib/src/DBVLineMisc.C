@@ -61,7 +61,7 @@ void DBVLineIF::Vertexes(DBObjRecord *lineRec, DBCoordinate *coord, DBInt vertex
             }
             dataArrays->Add(dataRec);
         }
-        else dataRec->Realloc(vertexNum * sizeof(DBCoordinate));
+        else dataRec->Realloc(vertexNum);
         if ((vertexes = (DBCoordinate *) dataRec->Data()) == NULL) {
             CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s %d", __FILE__, __LINE__);
             return;

@@ -1433,7 +1433,8 @@ DBInt RGlibNetworkPourElevation (DBObjData *netData, const char *elevStr, const 
     DBFloat elev, pour;
 
     if (pourFLD == (DBObjTableField *) NULL)
-        cellTable->AddField(pourFLD = new DBObjTableField(pourStr, elevFLD->Type(), elevFLD->Format (),  elevFLD->Length ()));
+        cellTable->AddField(pourFLD = new DBObjTableField(pourStr, elevFLD->Type(), elevFLD->Format (),
+                                                          elevFLD->FieldLength()));
 
     cellNum = netIF->CellNum ();
     for (cellID = 0; cellID < cellNum; cellID++) {
@@ -1481,9 +1482,11 @@ public:
         VolFLD    = cellTable->Field(volStr);
         AreaFLD   = cellTable->Field(areaStr);
         if (VolFLD == (DBObjTableField *) NULL)
-            cellTable->AddField(VolFLD  = new DBObjTableField(volStr,  ElevFLD->Type(), ElevFLD->Format (), ElevFLD->Length ()));
+            cellTable->AddField(VolFLD  = new DBObjTableField(volStr,  ElevFLD->Type(), ElevFLD->Format (),
+                                                              ElevFLD->FieldLength()));
         if (AreaFLD == (DBObjTableField *) NULL)
-            cellTable->AddField(AreaFLD = new DBObjTableField(areaStr, ElevFLD->Type(), ElevFLD->Format (), ElevFLD->Length ()));
+            cellTable->AddField(AreaFLD = new DBObjTableField(areaStr, ElevFLD->Type(), ElevFLD->Format (),
+                                                              ElevFLD->FieldLength()));
 
         NetIF     = new DBNetworkIF (netData);
 

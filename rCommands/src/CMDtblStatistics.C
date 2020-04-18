@@ -625,7 +625,7 @@ int main(int argc, char *argv[]) {
     while (p) {
         field = fields->Item(p->getOldName());
         if (p->getFunc() == MIN || p->getFunc() == MAX)
-            p->field = new DBObjTableField(p->getNewName(), field->Type(), field->Format(), field->Length());
+            p->field = new DBObjTableField(p->getNewName(), field->Type(), field->Format(), field->FieldLength());
         else if (p->getFunc() == NUM || p->getFunc() == NONNULL)
             p->field = new DBObjTableField(p->getNewName(), DBTableFieldInt, DBHiddenField, sizeof(DBInt));
         else p->field = new DBObjTableField(p->getNewName(), DBTableFieldFloat, DBHiddenField, sizeof(DBFloat));

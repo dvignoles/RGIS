@@ -649,7 +649,7 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 		if (UIDataHeaderForm (grdData))
 			{
 			FILE *inFILE, *lstFILE = (FILE *) NULL;
-			char fileName [DBDataFileNameLen], recordName [DBStringLength];
+			char fileName [DBDataFileNameLen + strlen(buffer)], recordName [DBStringLength];
 			DBInt pathLen, itemSize, chunk, i, j, row, col, recordLen;
 			DBCoordinate coord;
 			DBRegion extent;
