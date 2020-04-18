@@ -1,6 +1,6 @@
 /******************************************************************************
 
-GHAAS Database library V2.1
+GHAAS Database library V3.0
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2020, UNH - ASRC/CUNY
 
@@ -102,6 +102,8 @@ bfekete@gc.cuny.edu
 #define DBObjectFlagSelected              ((DBInt) (0x01 << 0x03))
 #define DBObjectFlagLocked                ((DBInt) (0x01 << 0x04))
 #define DBObjectFlagChanged               ((DBInt) (0x01 << 0x04))
+#define DBObjectFlagLocked                ((DBInt) (0x01 << 0x04))
+#define DBObjectFlagBigData               ((DBInt) (0x01 << 0x1F))
 
 #define DBDataLISTFlagSmartSort           0x10000000L
 
@@ -442,12 +444,12 @@ public:
     }
 };
 
-#define DBTimeStepMinute    (0x01)
-#define DBTimeStepHour        (0x01 << 0x01)
-#define DBTimeStepDay        (0x01 << 0x02)
-#define DBTimeStepWeek        (0x01 << 0x03)
-#define DBTimeStepMonth        (0x01 << 0x04)
-#define DBTimeStepYear        (0x01 << 0x05)
+#define DBTimeStepMinute (0x01)
+#define DBTimeStepHour   (0x01 << 0x01)
+#define DBTimeStepDay    (0x01 << 0x02)
+#define DBTimeStepWeek   (0x01 << 0x03)
+#define DBTimeStepMonth  (0x01 << 0x04)
+#define DBTimeStepYear   (0x01 << 0x05)
 
 class DBDate {
 private:
@@ -671,25 +673,25 @@ private:
 public:
     DBObject() {
         NameSTR.VString("");
-        FlagsVAR = 0x0;
+        FlagsVAR = DBObjectFlagBigData;
         SizeVAR = sizeof(DBObject);
     }
 
     DBObject(const char *name) {
         NameSTR.VString(name);
-        FlagsVAR = 0x0;
+        FlagsVAR = DBObjectFlagBigData;
         SizeVAR = sizeof(DBObject);
     }
 
     DBObject(const char *name, DBUnsigned size) {
         NameSTR.VString(name);
-        FlagsVAR = 0x0;
+        FlagsVAR = DBObjectFlagBigData;
         SizeVAR = size;
     }
 
     DBObject(const DBObject &obj) : DBObjectHeader(obj) {
         NameSTR.VString(obj.Name());
-        SizeVAR = obj.SizeVAR;
+        SizeVAR  = obj.SizeVAR;
         FlagsVAR = obj.FlagsVAR;
     }
 
@@ -728,11 +730,11 @@ public:
         LengthVAR = 0;
         ItemSizeVAR = 0;
         DataPTR = (DBAddress) NULL;
-    }
+     }
 
     DBObjRecord(const char *name, size_t length, DBInt itemSize) : DBObject(name, sizeof(DBObjRecord)) {
-        DataPTR = length > 0 ? (DBAddress) ((char *) malloc(length * itemSize) - (char *) NULL) : (DBAddress) NULL;
-        LengthVAR = DataPTR == (DBAddress) NULL ? 0 : length * itemSize;
+        DataPTR = length > 0 ? (DBAddress) ((char *) calloc(length, itemSize) - (char *) NULL) : (DBAddress) NULL;
+        LengthVAR = DataPTR == (DBAddress) NULL ? 0 : length;
         ItemSizeVAR = itemSize;
     }
 
@@ -745,19 +747,19 @@ public:
     DBObjRecord(DBObjRecord &record) : DBObject(record) {
         LengthVAR   = record.LengthVAR;
         ItemSizeVAR = record.ItemSizeVAR;
-        DataPTR = (DBAddress) ((char *) malloc(LengthVAR) - (char *) NULL);
-        memcpy((char *) NULL + DataPTR, (char *) NULL + record.DataPTR, record.LengthVAR);
+        DataPTR = (DBAddress) ((char *) calloc(LengthVAR, ItemSizeVAR > 0 ? ItemSizeVAR : 1) - (char *) NULL);
+        memcpy((char *) NULL + DataPTR, (char *) NULL + record.DataPTR, (size_t) record.LengthVAR * (size_t) (ItemSizeVAR > 0 ? ItemSizeVAR : 1));
     }
 
     ~DBObjRecord() { if (DataPTR != (DBAddress) NULL) free((void *) DataPTR); }
 
     void *Data() const { return ((void *) DataPTR); }
 
-    size_t Length() const { return (LengthVAR); }
+    size_t Length() const { return (LengthVAR * (size_t) (ItemSizeVAR > 0 ? ItemSizeVAR : 1)); }
 
     void Realloc(size_t length) {
         if (length > 0) {
-            DataPTR = (DBAddress) ((char *) realloc((char *) NULL + DataPTR, length) - (char *) NULL);
+            DataPTR = (DBAddress) ((char *) realloc((char *) NULL + DataPTR, length * (size_t) (ItemSizeVAR > 0 ? ItemSizeVAR : 1)) - (char *) NULL);
             LengthVAR = DataPTR == (DBAddress) NULL ? 0 : length;
         }
         else {

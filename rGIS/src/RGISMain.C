@@ -1,6 +1,6 @@
 /******************************************************************************
 
-GHAAS RiverGIS V2.1
+GHAAS RiverGIS V3.0
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2020, UNH - ASRC/CUNY
 
@@ -108,7 +108,7 @@ int main (int argc,char **argv)
 		}
 
 	workspace = new RGISWorkspace;
-	mainForm = UIInitialize ((char *) "GHAAS V2.2 - RiverGIS",(char *) "GHAASrgis",(char *) "RGISMain.html",
+	mainForm = UIInitialize ((char *) "GHAAS V3.0 - RiverGIS",(char *) "GHAASrgis",(char *) "RGISMain.html",
 									 RGISMainMenu,(void *) workspace,&argc,argv,720,500,(bool) spin,(bool) progress);
 
 	UIDataset ((char *) "GHAASrgis",metaDB);

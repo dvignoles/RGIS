@@ -1,6 +1,6 @@
 /******************************************************************************
 
-GHAAS RiverGIS V2.1
+GHAAS RiverGIS V3.0
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2020, UNH - ASRC/CUNY
 

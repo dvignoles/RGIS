@@ -1,6 +1,6 @@
 /******************************************************************************
 
-GHAAS Database library V2.1
+GHAAS Database library V3.0
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2020, UNH - ASRC/CUNY
 
@@ -82,6 +82,10 @@ int DBObjRecord::Read(FILE *file, int swap) {
     if (fread((char *) NULL + DataPTR, LengthVAR, 1, file) != 1) {
         CMmsgPrint(CMmsgSysError, "File Reading Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);
+    }
+    if ((Flags() | DBObjectFlagBigData) != DBObjectFlagBigData) {
+        LengthVAR = ItemSizeVAR == 0 ? LengthVAR : LengthVAR / ItemSizeVAR;
+        Flags(DBObjectFlagBigData, DBSet);
     }
     if (swap && ItemSizeVAR > 0) {
         DBUnsigned i;

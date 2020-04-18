@@ -26,7 +26,7 @@ fi
 export GHAAS_BROWSER="firefox"
 export XAPPLRESDIR="$GHAAS_DIR/XResources"
 
-GHAAS_EXEC=${GHAAS_DIR}/bin/rgis22
+GHAAS_EXEC=${GHAAS_DIR}/bin/rgis30
 
 if [ -f ${GHAAS_DIR}/Messages/RGIS.msg ]; then
 	cat ${GHAAS_DIR}/Messages/RGIS.msg

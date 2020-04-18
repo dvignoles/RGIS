@@ -1,5 +1,5 @@
 
-rgis can load gzip-ed files directly.
-The file selection box in the rgis GUI
-is updated accordingly.
-
+The RGIS data format changed to allow to create higher resolution data.
+The format change is backward compatible, therefore RGIS GUI and RGIS
+commands can read files created with previous versions, but the new
+slightly changed format is no longer readable with previous RGIS versions.

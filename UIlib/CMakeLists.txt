@@ -1,5 +1,5 @@
 FILE(GLOB sources src/*.C)
-add_library(UI22 ${sources})
-target_include_directories(UI22 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ../DBlib/include ../CMlib/include)
-install(TARGETS UI22 DESTINATION ghaas/lib)
+add_library(UI30 ${sources})
+target_include_directories(UI30 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ../DBlib/include ../CMlib/include)
+install(TARGETS UI30 DESTINATION ghaas/lib)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/UI.H DESTINATION ghaas/include)
