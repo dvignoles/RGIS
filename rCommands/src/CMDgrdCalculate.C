@@ -410,7 +410,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -c,--calculate   [expression]");
     CMmsgPrint(CMmsgInfo, "     -r,--variable    [variable expression]");
     CMmsgPrint(CMmsgInfo, "     -n,--interpolate [surface|flat]");
-    CMmsgPrint(CMmsgInfo, "     -x,--extent      [maximum minimum]");
+    CMmsgPrint(CMmsgInfo, "     -x,--extent      [maximum|minimum|<coverage>]");
     CMmsgPrint(CMmsgInfo, "     -t,--title       [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject     [subject]");
     CMmsgPrint(CMmsgInfo, "     -d,--domain      [domain]");
