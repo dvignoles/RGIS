@@ -396,12 +396,12 @@ DBInt DBObjTableField::Int(const DBObjRecord *record) const {
             switch (FieldLength()) {
                 case sizeof(DBInt): {
                     DBInt intVAR;
-                    memcpy(&intVAR, (char *) record->Data() + StartByte(), FieldLength());
+                    memcpy(&intVAR, (char *) record->Data() + StartByte(), sizeof(DBInt));
                     return (intVAR);
                 }
                 case sizeof(DBShort): {
                     DBShort shortVAR;
-                    memcpy(&shortVAR, (char *) record->Data() + StartByte(), FieldLength());
+                    memcpy(&shortVAR, (char *) record->Data() + StartByte(), sizeof(DBShort));
                     return ((DBInt) shortVAR);
                 }
                 case sizeof(DBByte): {

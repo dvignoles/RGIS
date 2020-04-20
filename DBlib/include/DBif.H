@@ -655,9 +655,9 @@ public:
         return (coord);
     }
 
-    DBShort RowNum() const { return (RowNumFLD->Int(LayerRecord)); }
+    DBInt RowNum() const { return (RowNumFLD->Int(LayerRecord)); }
 
-    DBShort ColNum() const { return (ColNumFLD->Int(LayerRecord)); }
+    DBInt ColNum() const { return (ColNumFLD->Int(LayerRecord)); }
 
     DBInt Coord2Pos(DBCoordinate, DBPosition &) const;
 

@@ -112,12 +112,12 @@ DBObjTable *_DBCreateDataBlockNetCells() {
 
 DBObjTable *_DBCreateDataBlockGridLayers() {
     DBTableFieldDefinition fieldDefs[] =
-            {DBTableFieldDefinition(DBrNRowNum, DBTableFieldInt, (char *) "%6d", sizeof(DBInt), true),
-             DBTableFieldDefinition(DBrNColNum, DBTableFieldInt, (char *) "%6d", sizeof(DBInt), true),
+            {DBTableFieldDefinition(DBrNRowNum, DBTableFieldInt, (char *) "%8d", sizeof(DBInt), true),
+             DBTableFieldDefinition(DBrNColNum, DBTableFieldInt, (char *) "%8d", sizeof(DBInt), true),
              DBTableFieldDefinition(DBrNValueType, DBTableFieldInt, (char *) "%1d", sizeof(DBByte), true),
              DBTableFieldDefinition(DBrNValueSize, DBTableFieldInt, (char *) "%1d", sizeof(DBByte), true),
-             DBTableFieldDefinition(DBrNCellWidth, DBTableFieldFloat, (char *) "%8.3f", sizeof(DBFloat), true),
-             DBTableFieldDefinition(DBrNCellHeight, DBTableFieldFloat, (char *) "%8.3f", sizeof(DBFloat), true),
+             DBTableFieldDefinition(DBrNCellWidth, DBTableFieldFloat, (char *) "%10.7f", sizeof(DBFloat), true),
+             DBTableFieldDefinition(DBrNCellHeight, DBTableFieldFloat, (char *) "%10.7f", sizeof(DBFloat), true),
              DBTableFieldDefinition(DBrNLayer, DBTableFieldDataRec, DBHiddenField, sizeof(DBAddress), true),
              DBTableFieldDefinition()};
     return (new DBObjTable(DBrNLayers, fieldDefs));
