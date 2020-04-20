@@ -106,7 +106,8 @@ case "${EXTENSION}" in
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" "${RGISFILE}" | psql "${DBNAME}"
 		gdal_translate -a_srs EPSG:4326 "${TEMPFILE}.grd" "${TEMPFILE}.tif"
 		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
-		shp2pgsql -k -s 4326 "${TEMPFILE}.shp" "${SCHEMA}"."${TBLNAME}_geom" | tee "${TEMPFILE}".sql | psql "${DBNAME}"
+		ogr2ogr -makevalid "${TEMPFILE}valid.shp" "${TEMPFILE}.shp"
+		shp2pgsql -k -s 4326 "${TEMPFILE}valid.shp" "${SCHEMA}"."${TBLNAME}_geom" | tee "${TEMPFILE}".sql | psql "${DBNAME}"
 		echo "ALTER TABLE \"${SCHEMA}\".\"${TBLNAME}\" ADD COLUMN \"geom\" geometry;
       		  UPDATE \"${SCHEMA}\".\"${TBLNAME}\"
         	  SET \"geom\" = \"${TBLNAME}_SELECTION\".\"geom\"
@@ -115,7 +116,7 @@ case "${EXTENSION}" in
         	  WHERE  \"${SCHEMA}\".\"${TBLNAME}\".\"${GRIDVALUE}\" = \"${TBLNAME}_SELECTION\".\"DN\";
 			  DELETE FROM \"${SCHEMA}\".\"${TBLNAME}\" WHERE \"geom\" IS NULL; 
 			  DROP TABLE  \"${SCHEMA}\".\"${TBLNAME}_geom\";" |  psql "${DBNAME}"
-         rm "${TEMPFILE}".*
+         rm "${TEMPFILE}".* "${TEMPFILE}valid".*
 	;;
 	(gdbc|gdbc.gz|nc)
         rgis2netcdf "${RGISFILE}" "${TEMPFILE}.nc"
