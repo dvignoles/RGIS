@@ -253,6 +253,9 @@ function RGISgeoResolutionInSecond ()
 	("06min")
 		echo "360"
 	;;
+	("7m30s")
+		echo "450"
+	;;
 	("10min")
 		echo "600"
 	;;
