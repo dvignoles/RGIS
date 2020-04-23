@@ -107,10 +107,10 @@ int main(int argc, char *argv[]) {
     pntData->Document(DBDocGeoDomain, domain);
     pntData->Document(DBDocVersion, version);
 
-    if ((ret = RGlibNetworkConfluences(netData, pntData)) == DBSuccess)
-        ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? pntData->Write(argv[2]) : pntData->Write(stdout);
-
+    ret = RGlibNetworkConfluences(netData, pntData);
     delete netData;
+    if (ret == DBSuccess)
+        ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? pntData->Write(argv[2]) : pntData->Write(stdout);
     delete pntData;
     if (verbose) RGlibPauseClose();
     return (ret);
