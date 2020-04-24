@@ -742,6 +742,7 @@ public:
     DBObjRecord(const char *name, size_t length) : DBObject(name, sizeof(DBObjRecord)) {
         DataPTR = length > 0 ? (DBAddress) ((char *) malloc(length) - (char *) NULL) : (DBAddress) NULL;
         Lower32VAR  = DataPTR == (DBAddress) NULL ? 0 : (length & 0x00000000FFFFFFFFL);
+        Rest2x16VAR = 0;
         Rest2x16VAR = (DBUnsigned) (((length > 0x10L) & 0xFFFFF0000L) | ElementSize ());
     }
 
