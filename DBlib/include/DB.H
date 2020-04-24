@@ -102,8 +102,6 @@ bfekete@gc.cuny.edu
 #define DBObjectFlagSelected              ((DBInt) (0x01 << 0x03))
 #define DBObjectFlagLocked                ((DBInt) (0x01 << 0x04))
 #define DBObjectFlagChanged               ((DBInt) (0x01 << 0x04))
-#define DBObjectFlagLocked                ((DBInt) (0x01 << 0x04))
-#define DBObjectFlagBigData               ((DBInt) (0x01 << 0x0F))
 
 #define DBDataLISTFlagSmartSort           0x10000000L
 
@@ -675,25 +673,25 @@ private:
 public:
     DBObject() {
         NameSTR.VString("");
-        FlagsVAR = DBObjectFlagBigData;
+        FlagsVAR = 0x0;
         SizeVAR = sizeof(DBObject);
     }
 
     DBObject(const char *name) {
         NameSTR.VString(name);
-        FlagsVAR = DBObjectFlagBigData;
+        FlagsVAR = 0x0;
         SizeVAR = sizeof(DBObject);
     }
 
     DBObject(const char *name, DBUnsigned size) {
         NameSTR.VString(name);
-        FlagsVAR = DBObjectFlagBigData;
+        FlagsVAR = 0x0;
         SizeVAR = size;
     }
 
     DBObject(const DBObject &obj) : DBObjectHeader(obj) {
         NameSTR.VString(obj.Name());
-        SizeVAR  = obj.SizeVAR;
+        SizeVAR = obj.SizeVAR;
         FlagsVAR = obj.FlagsVAR;
     }
 
@@ -718,56 +716,67 @@ public:
 
 class DBObjRecord : public DBObject {
 private:
-    DBUnsigned LengthVAR;
-    DBUnsigned ItemSizeVAR;
+    DBUnsigned Lower32VAR;
+    DBUnsigned Rest2x16VAR;
     DBAddress DataPTR;
 
     void Swap() {
-        DBByteOrderSwapWord(&LengthVAR);
-        DBByteOrderSwapWord(&ItemSizeVAR);
+        DBByteOrderSwapWord(&Lower32VAR);
+        DBByteOrderSwapWord(&Rest2x16VAR);
     }
 
 public:
     DBObjRecord() : DBObject("", sizeof(DBObjRecord)) {
-        LengthVAR = 0;
-        ItemSizeVAR = 0;
+        Lower32VAR = 0;
+        Rest2x16VAR= 0;
         DataPTR = (DBAddress) NULL;
      }
 
-    DBObjRecord(const char *name, size_t length, DBInt itemSize) : DBObject(name, sizeof(DBObjRecord)) {
-        DataPTR = length > 0 ? (DBAddress) ((char *) calloc(length, itemSize) - (char *) NULL) : (DBAddress) NULL;
-        LengthVAR = DataPTR == (DBAddress) NULL ? 0 : length;
-        ItemSizeVAR = itemSize;
+    DBObjRecord(const char *name, size_t length, DBInt elementSize) : DBObject(name, sizeof(DBObjRecord)) {
+        DataPTR = length > 0 ? (DBAddress) ((char *) calloc(length, elementSize) - (char *) NULL) : (DBAddress) NULL;
+        Lower32VAR = DataPTR == (DBAddress) NULL ? 0 : (length & 0x000000000FFFFFFFFL);
+        Rest2x16VAR = elementSize;
+        Rest2x16VAR = (DBUnsigned) (((length > 0x10L) & 0xFFFFF0000L) | ElementSize ());
     }
 
     DBObjRecord(const char *name, size_t length) : DBObject(name, sizeof(DBObjRecord)) {
         DataPTR = length > 0 ? (DBAddress) ((char *) malloc(length) - (char *) NULL) : (DBAddress) NULL;
-        LengthVAR = DataPTR == (DBAddress) NULL ? 0 : length;
-        ItemSizeVAR = 0;
+        Lower32VAR  = DataPTR == (DBAddress) NULL ? 0 : (length & 0x00000000FFFFFFFFL);
+        Rest2x16VAR = (DBUnsigned) (((length > 0x10L) & 0xFFFFF0000L) | ElementSize ());
     }
 
     DBObjRecord(DBObjRecord &record) : DBObject(record) {
-        LengthVAR   = record.LengthVAR;
-        ItemSizeVAR = record.ItemSizeVAR;
-        DataPTR = (DBAddress) ((char *) calloc(LengthVAR, ItemSizeVAR > 0 ? ItemSizeVAR : 1) - (char *) NULL);
-        memcpy((char *) NULL + DataPTR, (char *) NULL + record.DataPTR, (size_t) record.LengthVAR * (size_t) (ItemSizeVAR > 0 ? ItemSizeVAR : 1));
+        Lower32VAR  = record.Lower32VAR;
+        Rest2x16VAR = record.Rest2x16VAR;
+        DataPTR = (DBAddress) ((char *) malloc(Length()) - (char *) NULL);
+        memcpy((char *) NULL + DataPTR, (char *) NULL + record.DataPTR, Length());
     }
 
     ~DBObjRecord() { if (DataPTR != (DBAddress) NULL) free((void *) DataPTR); }
 
     void *Data() const { return ((void *) DataPTR); }
 
-    size_t Length() const { return (LengthVAR * (size_t) (ItemSizeVAR > 0 ? ItemSizeVAR : 1)); }
+    size_t Length() const {
+        size_t length = (((Rest2x16VAR < 0x10L) & 0xFFFFFFFF00000000L) | Lower32VAR);
+        return (length);
+    }
+
+    DBInt ElementSize () const {
+        DBInt elementSize = (Rest2x16VAR & 0x0000FFFFL);
+        return (elementSize);
+    }
 
     void Realloc(size_t length) {
         if (length > 0) {
-            DataPTR = (DBAddress) ((char *) realloc((char *) NULL + DataPTR, length * (size_t) (ItemSizeVAR > 0 ? ItemSizeVAR : 1)) - (char *) NULL);
-            LengthVAR = DataPTR == (DBAddress) NULL ? 0 : length;
+            DataPTR = (DBAddress) ((char *) realloc((char *) NULL + DataPTR, length) - (char *) NULL);
+            Lower32VAR = DataPTR == (DBAddress) NULL ? 0 : (length & 0x00FFFFFFFFL);
+            Rest2x16VAR = (DBUnsigned) (((length > 0x10L) & 0xFFFF0000L) | ElementSize ());
         }
         else {
             free((void *) DataPTR);
             DataPTR = (DBAddress) NULL;
-            LengthVAR = 0;
+            Lower32VAR  = 0;
+            Rest2x16VAR = ElementSize ();
         }
     }
 
@@ -1133,14 +1142,14 @@ private:
     char *NameSTR;
     DBInt TypeVAR;
     char *FormatSTR;
-    DBUnsigned FieldLengthVAR;
+    DBUnsigned LengthVAR;
     DBByte RequiredVAR;
 public:
     DBTableFieldDefinition() {
         NameSTR = (char *) NULL;
         TypeVAR = DBFault;
         FormatSTR = (char *) "%8x";
-        FieldLengthVAR = 0;
+        LengthVAR = 0;
         RequiredVAR = false;
     }
 
@@ -1148,7 +1157,7 @@ public:
         NameSTR = name;
         TypeVAR = type;
         FormatSTR = format;
-        FieldLengthVAR = length;
+        LengthVAR = length;
         RequiredVAR = false;
     }
 
@@ -1156,7 +1165,7 @@ public:
         NameSTR = name;
         TypeVAR = type;
         FormatSTR = format;
-        FieldLengthVAR = length;
+        LengthVAR = length;
         RequiredVAR = required;
     }
 
@@ -1166,7 +1175,7 @@ public:
 
     const char *Format() const { return (FormatSTR); }
 
-    DBUnsigned FieldLength() const { return (FieldLengthVAR); }
+    DBUnsigned Length() const { return (LengthVAR); }
 
     DBInt Required() const { return (RequiredVAR); }
 };
@@ -1178,8 +1187,8 @@ private:
     DBByte UnitVAR;
     DBByte RequiredVAR;
 
-    DBShort  StartByteVAR;
-    DBUShort FieldLengthVAR;
+    DBShort StartByteVAR;
+    DBUShort LengthVAR;
     char FormatSTR[DBStringLength];
     union {
         DBProperties<DBByte> BytePROP;
@@ -1236,9 +1245,9 @@ public:
 
     void Type(DBInt);
 
-    DBInt FieldLength() const { return (FieldLengthVAR); }
+    DBInt Length() const { return (LengthVAR); }
 
-    void FieldLength(DBInt);
+    void Length(DBInt);
 
     DBInt Required() const { return (RequiredVAR); }
 
@@ -1257,7 +1266,7 @@ public:
     DBInt Int(const DBObjRecord *) const;
 
     DBInt IntNoData(void) const {
-        switch (FieldLengthVAR) {
+        switch (LengthVAR) {
             case sizeof(DBByte):
                 return (BytePROP.NoData());
             case sizeof(DBShort):
@@ -1268,7 +1277,7 @@ public:
     }
 
     void IntNoData(DBInt noData) {
-        switch (FieldLengthVAR) {
+        switch (LengthVAR) {
             case sizeof(DBByte):
                 BytePROP.NoData((DBByte) noData);
                 break;
@@ -1286,7 +1295,7 @@ public:
     DBFloat Float(const DBObjRecord *) const;
 
     DBFloat FloatNoData(void) const {
-        switch (FieldLengthVAR) {
+        switch (LengthVAR) {
             case sizeof(DBFloat4):
                 return ((DBFloat) Float4PROP.NoData());
             default:
@@ -1295,7 +1304,7 @@ public:
     }
 
     void FloatNoData(DBFloat noData) {
-        switch (FieldLengthVAR) {
+        switch (LengthVAR) {
             case sizeof(DBFloat4):
                 Float4PROP.NoData((DBFloat4) noData);
                 break;
@@ -1369,7 +1378,7 @@ public:
         RecordLengthVAR = 0;
         while (fieldDefs[i++].Name() != NULL)
             AddField(new DBObjTableField(fieldDefs[i - 1].Name(), fieldDefs[i - 1].Type(), fieldDefs[i - 1].Format(),
-                                         fieldDefs[i - 1].FieldLength(), fieldDefs[i - 1].Required()));
+                                         fieldDefs[i - 1].Length(), fieldDefs[i - 1].Required()));
     };
 
     DBObjTable(const char *name, DBUnsigned size) : DBObjectLIST<DBObjRecord>(name, size) {

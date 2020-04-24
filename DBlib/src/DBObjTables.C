@@ -139,10 +139,10 @@ DBInt DBTableFieldMatch(const DBObjTableField *field0, const DBObjRecord *record
 
 void DBObjTableField::Swap() {
     DBByteOrderSwapHalfWord(&StartByteVAR);
-    DBByteOrderSwapHalfWord(&FieldLengthVAR);
+    DBByteOrderSwapHalfWord(&LengthVAR);
     switch (TypeVAR) {
         case DBTableFieldInt:
-            switch (FieldLengthVAR) {
+            switch (LengthVAR) {
                 case 2:
                     ShortPROP.Swap();
                     break;
@@ -152,7 +152,7 @@ void DBObjTableField::Swap() {
             }
             break;
         case DBTableFieldFloat:
-            switch (FieldLengthVAR) {
+            switch (LengthVAR) {
                 case 4:
                     Float4PROP.Swap();
                     break;
@@ -174,7 +174,7 @@ void DBObjTableField::Swap() {
 void DBObjTableField::Initialize(DBInt type, const char *format, DBUnsigned length, DBInt required) {
     TypeVAR = type;
     StartByteVAR = DBFault;
-    FieldLengthVAR = length;
+    LengthVAR = length;
     switch (type) {
         case DBTableFieldString:
             sprintf(FormatSTR + 1, "%ds", length);
@@ -208,7 +208,7 @@ void DBObjTableField::Initialize(DBInt type, const char *format, DBUnsigned leng
         case DBTableFieldDate:
             sprintf(FormatSTR + 1, "%ds", length);
             FormatSTR[0] = '%';
-            FieldLength(sizeof(DBDate));
+            Length(sizeof(DBDate));
             break;
     }
     RequiredVAR = required;
@@ -219,33 +219,33 @@ void DBObjTableField::Type(DBInt type) {
         switch (type) {
             case DBTableFieldString:
                 Format("%s");
-                FieldLength(DBStringLength);
+                Length(DBStringLength);
                 break;
             case DBTableFieldInt:
                 Format("%8d");
-                FieldLength(sizeof(DBShort));
+                Length(sizeof(DBShort));
                 IntNoData(DBDefaultMissingIntVal);
                 break;
             case DBTableFieldFloat:
                 Format("%8.3f");
-                FieldLength(sizeof(DBFloat4));
+                Length(sizeof(DBFloat4));
                 FloatNoData(DBDefaultMissingFloatVal);
                 break;
             case DBTableFieldDate:
                 Format("%10s");
-                FieldLength(sizeof(DBDate));
+                Length(sizeof(DBDate));
                 break;
         }
     TypeVAR = type;
 }
 
-void DBObjTableField::FieldLength(DBInt length) {
+void DBObjTableField::Length(DBInt length) {
     switch (TypeVAR) {
         case DBTableFieldInt: {
             DBInt intNoData;
 
             intNoData = IntNoData();
-            FieldLengthVAR = length;
+            LengthVAR = length;
             IntNoData(intNoData);
         }
             break;
@@ -253,12 +253,12 @@ void DBObjTableField::FieldLength(DBInt length) {
             DBFloat floatNoData;
 
             floatNoData = FloatNoData();
-            FieldLengthVAR = length;
+            LengthVAR = length;
             FloatNoData(floatNoData);
         }
             break;
         default:
-            FieldLengthVAR = length;
+            LengthVAR = length;
             break;
     }
 }
@@ -270,12 +270,12 @@ DBObjTableField::DBObjTableField(DBObjTableField &field) : DBObject(field) {
     RequiredVAR = field.RequiredVAR;
 
     StartByteVAR = field.StartByteVAR;
-    FieldLengthVAR = field.FieldLengthVAR;
+    LengthVAR = field.LengthVAR;
     strcpy(FormatSTR, field.FormatSTR);
     Flags(field.Flags());
     switch (TypeVAR) {
         case DBTableFieldInt:
-            switch (FieldLengthVAR) {
+            switch (LengthVAR) {
                 case sizeof(DBByte):
                     BytePROP = field.BytePROP;
                     break;
@@ -288,7 +288,7 @@ DBObjTableField::DBObjTableField(DBObjTableField &field) : DBObject(field) {
             }
             break;
         case DBTableFieldFloat:
-            switch (FieldLengthVAR) {
+            switch (LengthVAR) {
                 case sizeof(DBFloat4):
                     Float4PROP = field.Float4PROP;
                     break;
@@ -311,9 +311,9 @@ void DBObjTableField::String(DBObjRecord *record, const char *value) {
     int i;
 
     if (record == (DBObjRecord *) NULL) return;
-    strncpy((char *) record->Data() + StartByte(), value, FieldLength() - 1);
-    ((char *) record->Data())[StartByte() + FieldLength() - 1] = '\0';
-    for (i = FieldLength() - 2; i >= 0; --i)
+    strncpy((char *) record->Data() + StartByte(), value, Length() - 1);
+    ((char *) record->Data())[StartByte() + Length() - 1] = '\0';
+    for (i = Length() - 2; i >= 0; --i)
         if (((char *) record->Data())[StartByte() + i] != ' ') break;
         else ((char *) record->Data())[StartByte() + i] = '\0';
 }
@@ -356,13 +356,13 @@ void DBObjTableField::Int(DBObjRecord *record, DBInt value) {
     if (record == (DBObjRecord *) NULL) return;
     switch (Type()) {
         case DBTableFieldInt:
-            switch (FieldLength()) {
+            switch (Length()) {
                 case sizeof(DBInt):
-                    memcpy((char *) record->Data() + StartByte(), &value, FieldLength());
+                    memcpy((char *) record->Data() + StartByte(), &value, Length());
                     break;
                 case sizeof(DBShort): {
                     DBShort shortVAR = (DBShort) value;
-                    memcpy((char *) record->Data() + StartByte(), &shortVAR, FieldLength());
+                    memcpy((char *) record->Data() + StartByte(), &shortVAR, Length());
                 }
                     break;
                 case sizeof(DBByte): {
@@ -371,8 +371,7 @@ void DBObjTableField::Int(DBObjRecord *record, DBInt value) {
                 }
                     break;
                 default:
-                    CMmsgPrint(CMmsgAppError, "Invalid Data FieldLength [%s %d] in: %s %d", Name(), FieldLength(), __FILE__,
-                               __LINE__);
+                    CMmsgPrint(CMmsgAppError, "Invalid Data FieldLength [%s %d] in: %s %d", Name(),Length(), __FILE__,__LINE__);
                     break;
             }
             break;
@@ -380,7 +379,7 @@ void DBObjTableField::Int(DBObjRecord *record, DBInt value) {
             Float(record, (DBFloat) value);
             break;
         default:
-            CMmsgPrint(CMmsgAppError, "Invalid Data Type [%s] in: %s %d", Name(), __FILE__, __LINE__);
+            CMmsgPrint(CMmsgAppError, "Invalid Data Type [%s] in: %s %d", Name(),__FILE__,__LINE__);
             break;
     }
 }
@@ -393,7 +392,7 @@ DBInt DBObjTableField::Int(const DBObjRecord *record) const {
             if (sscanf(String(record), "%d", &intVAR) == 1) return (intVAR);
             else return (DBDefaultMissingIntVal);
         case DBTableFieldInt:
-            switch (FieldLength()) {
+            switch (Length()) {
                 case sizeof(DBInt): {
                     DBInt intVAR;
                     memcpy(&intVAR, (char *) record->Data() + StartByte(), sizeof(DBInt));
@@ -425,17 +424,17 @@ void DBObjTableField::Float(DBObjRecord *record, DBFloat value) {
             Int(record, (DBInt) value);
             break;
         case DBTableFieldFloat:
-            switch (FieldLength()) {
+            switch (Length()) {
                 case sizeof(DBFloat):
-                    memcpy((char *) record->Data() + StartByte(), &value, FieldLength());
+                    memcpy((char *) record->Data() + StartByte(), &value, Length());
                     break;
                 case sizeof(DBFloat4): {
                     DBFloat4 float4VAR = (DBFloat4) value;
-                    memcpy((char *) record->Data() + StartByte(), &float4VAR, FieldLength());
+                    memcpy((char *) record->Data() + StartByte(), &float4VAR, Length());
                 }
                     break;
                 default:
-                    CMmsgPrint(CMmsgAppError, "Invalid Data length [%s %d] in: %s %d", Name(), FieldLength(), __FILE__,
+                    CMmsgPrint(CMmsgAppError, "Invalid Data length [%s %d] in: %s %d", Name(), Length(), __FILE__,
                                __LINE__);
                     break;
             }
@@ -452,15 +451,15 @@ DBFloat DBObjTableField::Float(const DBObjRecord *record) const {
         case DBTableFieldInt:
             return ((DBFloat) Int(record));
         case DBTableFieldFloat:
-            switch (FieldLength()) {
+            switch (Length()) {
                 case sizeof(DBFloat): {
                     DBFloat floatVAR;
-                    memcpy(&floatVAR, (char *) record->Data() + StartByte(), FieldLength());
+                    memcpy(&floatVAR, (char *) record->Data() + StartByte(), Length());
                     return (floatVAR);
                 }
                 case sizeof(DBFloat4): {
                     DBFloat4 float4VAR;
-                    memcpy(&float4VAR, (char *) record->Data() + StartByte(), FieldLength());
+                    memcpy(&float4VAR, (char *) record->Data() + StartByte(), Length());
                     return ((DBFloat) float4VAR);
                 }
                 default:
@@ -533,7 +532,7 @@ void DBObjTableField::Position(DBObjRecord *record, DBPosition pos) {
         DBUShort Col;
     } uPos;
 
-    if (FieldLength() == sizeof(uPos)) {
+    if (Length() == sizeof(uPos)) {
         uPos.Row = (DBUShort) pos.Row;
         uPos.Col = (DBUShort) pos.Col;
         memcpy((char *) record->Data() + StartByte(), &uPos, sizeof(uPos));
@@ -551,7 +550,7 @@ DBPosition DBObjTableField::Position(const DBObjRecord *record) const {
     } uPos;
     DBPosition pos;
 
-    if (FieldLength() == sizeof(uPos)) {
+    if (Length() == sizeof(uPos)) {
         memcpy(&uPos, (char *) record->Data() + StartByte(), sizeof(uPos));
         pos.Row = (DBInt) uPos.Row;
         pos.Col = (DBInt) uPos.Col;
@@ -567,7 +566,7 @@ DBInt DBObjTableField::FormatWidth() const {
 
     switch (Type()) {
         case DBTableFieldString:
-            return (FieldLength());
+            return (Length());
         case DBTableFieldInt:
         case DBTableFieldFloat:
         case DBTableFieldDate:
@@ -642,7 +641,7 @@ void DBObjTable::AddField(DBObjTableField *field) {
     DBObjRecord *record;
     field->StartByte(RecordLengthVAR);
     FieldPTR->Add(field);
-    RecordLengthVAR += field->FieldLength();
+    RecordLengthVAR += field->Length();
     for (recID = 0; recID < ItemNum(); recID++) {
         record = Item(recID);
         record->Realloc(RecordLengthVAR);
@@ -669,22 +668,22 @@ void DBObjTable::RedefineField(DBObjTableField *field, DBObjTableField *newField
     DBObjTableField *tmpField;
 
     newField->StartByte(field->StartByte());
-    if (field->FieldLength() != newField->FieldLength()) {
-        RecordLengthVAR += (newField->FieldLength() - field->FieldLength());
+    if (field->Length() != newField->Length()) {
+        RecordLengthVAR += (newField->Length() - field->Length());
         for (fieldID = field->RowID() + 1; fieldID < FieldNum(); ++fieldID) {
             tmpField = Field(fieldID);
-            tmpField->StartByte(tmpField->StartByte() + newField->FieldLength() - field->FieldLength());
+            tmpField->StartByte(tmpField->StartByte() + newField->Length() - field->Length());
         }
     }
     for (recID = 0; recID < ItemNum(); recID++) {
         record = Item(recID);
         oldRecord = new DBObjRecord(*record);
-        if (field->FieldLength() != newField->FieldLength()) {
+        if (field->Length() != newField->Length()) {
             record->Realloc(RecordLengthVAR);
-            if (newField->StartByte() + newField->FieldLength() < RecordLengthVAR)
-                memcpy(((char *) record->Data()) + newField->StartByte() + newField->FieldLength(),
-                       ((char *) oldRecord->Data()) + field->StartByte() + field->FieldLength(),
-                       RecordLengthVAR - (newField->StartByte() + newField->FieldLength()));
+            if (newField->StartByte() + newField->Length() < RecordLengthVAR)
+                memcpy(((char *) record->Data()) + newField->StartByte() + newField->Length(),
+                       ((char *) oldRecord->Data()) + field->StartByte() + field->Length(),
+                       RecordLengthVAR - (newField->StartByte() + newField->Length()));
         }
         switch (newField->Type()) {
             case DBTableFieldString:
@@ -720,7 +719,7 @@ void DBObjTable::RedefineField(DBObjTableField *field, DBObjTableField *newField
     if (field->FormatWidth() != newField->FormatWidth()) field->FormatWidth(newField->FormatWidth());
     if ((field->Type() == DBTableFieldFloat) && (field->FormatDecimals() != field->FormatDecimals()))
         field->FormatDecimals(newField->FormatDecimals());
-    if (field->FieldLength() != newField->FieldLength()) field->FieldLength(newField->FieldLength());
+    if (field->Length() != newField->Length()) field->Length(newField->Length());
 }
 
 void DBObjTable::DeleteField(DBObjTableField *delField) {
@@ -732,17 +731,17 @@ void DBObjTable::DeleteField(DBObjTableField *delField) {
     for (fieldID = 0; fieldID < FieldPTR->ItemNum(); ++fieldID) {
         field = FieldPTR->Item(fieldID);
         if (field->StartByte() > delField->StartByte())
-            field->StartByte(field->StartByte() - delField->FieldLength());
+            field->StartByte(field->StartByte() - delField->Length());
     }
     for (recID = 0; recID < ItemNum(); ++recID) {
         record = Item(recID);
         data = (unsigned char *) record->Data() + delField->StartByte();
-        for (i = 0; i < RecordLengthVAR - delField->StartByte() - delField->FieldLength(); ++i)
-            data[i] = data[i + delField->FieldLength()];
-        record->Realloc(RecordLengthVAR - delField->FieldLength());
+        for (i = 0; i < RecordLengthVAR - delField->StartByte() - delField->Length(); ++i)
+            data[i] = data[i + delField->Length()];
+        record->Realloc(RecordLengthVAR - delField->Length());
     }
     FieldPTR->Remove(delField);
-    RecordLengthVAR -= delField->FieldLength();
+    RecordLengthVAR -= delField->Length();
     delete delField;
 }
 

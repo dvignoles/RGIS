@@ -189,13 +189,13 @@ int main(int argc, char *argv[]) {
                         length = sizeof(DBDate);
                     break;
             }
-        newField->FieldLength(length);
+        newField->Length(length);
         table->RedefineField(field, newField);
         delete newField;
     }
     else if (length != DBFault) {
         newField = new DBObjTableField(*field);
-        newField->FieldLength(length);
+        newField->Length(length);
         table->RedefineField(field, newField);
         delete newField;
     }

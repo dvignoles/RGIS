@@ -66,6 +66,7 @@ int DBObject::Write(FILE *file) {
 }
 
 int DBObjRecord::Read(FILE *file, int swap) {
+    size_t length, elementSize;
     if (DBObject::Read(file, swap) != DBSuccess) return (DBFault);
 
     if (fread((char *) this + sizeof(DBObject), sizeof(DBObjRecord) - sizeof(DBObject) - sizeof(DBAddress), 1, file) !=
@@ -75,23 +76,21 @@ int DBObjRecord::Read(FILE *file, int swap) {
     }
     if (swap) Swap();
 
-    if ((Flags() & DBObjectFlagBigData) != DBObjectFlagBigData) {
-        LengthVAR = ItemSizeVAR == 0 ? LengthVAR : LengthVAR / ItemSizeVAR;
-        Flags(DBObjectFlagBigData, DBSet);
-    }
-    if ((DataPTR = (DBAddress) ((char *) calloc(LengthVAR,ItemSizeVAR == 0 ? 1 : ItemSizeVAR) - (char *) NULL)) == (DBAddress) NULL) {
+    length = Length();
+    elementSize = ElementSize();
+    if ((DataPTR = (DBAddress) ((char *) malloc(Length()) - (char *) NULL)) == (DBAddress) NULL) {
         CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);
     }
-    if (fread((char *) NULL + DataPTR, ItemSizeVAR == 0 ? 1 : ItemSizeVAR, LengthVAR, file) != LengthVAR) {
+    if (fread((char *) NULL + DataPTR, Length(), 1, file) != 1) {
         CMmsgPrint(CMmsgSysError, "File Reading Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);
     }
-    if (swap && ItemSizeVAR > 1) {
+    if (swap && ElementSize () > 1) {
         DBUnsigned i;
         void (*swapFunc)(void *);
 
-        switch (ItemSizeVAR) {
+        switch (ElementSize()) {
             case 2:
                 swapFunc = DBByteOrderSwapHalfWord;
                 break;
@@ -109,7 +108,7 @@ int DBObjRecord::Read(FILE *file, int swap) {
                            __LINE__);
                 return (DBFault);
         }
-        for (i = 0; i < LengthVAR; ++i) (*swapFunc)((char *) NULL + DataPTR + i * ItemSizeVAR);
+        for (i = 0; i < Length(); i += ElementSize()) (*swapFunc)((char *) NULL + DataPTR + i * ElementSize());
     }
     return (DBSuccess);
 }
@@ -122,7 +121,7 @@ int DBObjRecord::Write(FILE *file) {
         CMmsgPrint(CMmsgSysError, "File Writing Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);
     }
-    if (fwrite((char *) NULL + DataPTR, ItemSizeVAR == 0 ? 1 : ItemSizeVAR, LengthVAR, file) != LengthVAR) {
+    if (fwrite((char *) NULL + DataPTR, Length(), 1, file) != 1) {
         CMmsgPrint(CMmsgSysError, "File Writing Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);
     }
@@ -166,8 +165,8 @@ int DBObjTable::Read(FILE *file, int swap) {
 
     RecordLengthVAR = 0;
     for (field = FieldPTR->First(); field != (DBObjTableField *) NULL; field = FieldPTR->Next())
-        RecordLengthVAR = RecordLengthVAR > field->StartByte() + field->FieldLength() ?
-                          RecordLengthVAR : field->StartByte() + field->FieldLength();
+        RecordLengthVAR = RecordLengthVAR > field->StartByte() + field->Length() ?
+                          RecordLengthVAR : field->StartByte() + field->Length();
 
     for (id = 0; id < ItemNum(); ++id) {
         if (ReadItem(file, id, swap) == DBFault) return (DBFault);
@@ -179,7 +178,7 @@ int DBObjTable::Read(FILE *file, int swap) {
                 case DBTableFieldFloat:
                 case DBTableFieldTableRec:
                 case DBTableFieldDataRec:
-                    switch (field->FieldLength()) {
+                    switch (field->Length()) {
                         case 2:
                             DBByteOrderSwapHalfWord((char *) record->Data() + field->StartByte());
                             break;
@@ -208,7 +207,7 @@ int DBObjTable::Read(FILE *file, int swap) {
                     break;
                 case DBTableFieldPosition:
                     pos = field->Position(record);
-                    switch (field->FieldLength()) {
+                    switch (field->Length()) {
                         case sizeof(DBPosition):
                             pos.Swap();
                             break;

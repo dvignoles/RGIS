@@ -357,9 +357,8 @@ DBInt RGlibPointInterStationTS(DBObjData *pntData, DBObjData *tsData, char *rela
     pntNextFLD = pntTBL->Field(RGlibNextStation);
     pntAreaFLD = pntTBL->Field(RGlibArea);
     pntInterStnFLD = pntTBL->Field(RGlibInterStation);
-    pntNewNextFLD = new DBObjTableField("NextStnTS", pntNextFLD->Type(), pntNextFLD->Format(), pntNextFLD->FieldLength());
-    pntNewInterStnFLD = new DBObjTableField("InterFluTS", pntInterStnFLD->Type(), pntInterStnFLD->Format(),
-                                            pntInterStnFLD->FieldLength());
+    pntNewNextFLD = new DBObjTableField("NextStnTS", pntNextFLD->Type(), pntNextFLD->Format(), pntNextFLD->Length());
+    pntNewInterStnFLD = new DBObjTableField("InterFluTS", pntInterStnFLD->Type(), pntInterStnFLD->Format(),pntInterStnFLD->Length());
     pntRelateFLD = pntTBL->Field(relateFldName);
     pntTBL->AddField(pntNewNextFLD);
     pntTBL->AddField(pntNewInterStnFLD);

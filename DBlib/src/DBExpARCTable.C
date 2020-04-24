@@ -49,7 +49,7 @@ int DBExportARCTableDef(DBObjData *data, char *tableName, char *fileName) {
                     fprintf(file, "%d %d C\n", outWidth, outWidth);
                     break;
                 case DBTableFieldString:
-                    outWidth = tableField->FieldLength();
+                    outWidth = tableField->Length();
                     fprintf(file, "%d %d C\n", outWidth, outWidth);
                     break;
                 case DBTableFieldInt:
@@ -57,11 +57,11 @@ int DBExportARCTableDef(DBObjData *data, char *tableName, char *fileName) {
                     if ((tableField->Format())[strlen(tableField->Format()) - 1] == 'X')
                         fprintf(file, "%d %d C\n", outWidth, outWidth);
                     else
-                        fprintf(file, "%d %d B\n", tableField->FieldLength() > 1 ? tableField->FieldLength() : 2, outWidth);
+                        fprintf(file, "%d %d B\n", tableField->Length() > 1 ? tableField->Length() : 2, outWidth);
                     break;
                 case DBTableFieldFloat:
                     sscanf(tableField->Format() + 1, "%d.%d", &outWidth, &decWidth);
-                    fprintf(file, "%d %d F %d\n", tableField->FieldLength(), outWidth, decWidth);
+                    fprintf(file, "%d %d F %d\n", tableField->Length(), outWidth, decWidth);
                     break;
                 case DBTableFieldDate:
                     outWidth = DBStringLength;

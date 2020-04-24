@@ -137,7 +137,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
                     default:
                     case DBTableFieldString:
                         fprintf(outFile, "\"%s\" CHARACTER VARYING(%d) COLLATE pg_catalog.\"default\",\n", _RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen),
-                                field->FieldLength());
+                                field->Length());
                         break;
                     case DBTableFieldInt:
                         fprintf(outFile, "\"%s\" INTEGER,\n", _RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen));

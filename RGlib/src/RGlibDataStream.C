@@ -40,7 +40,7 @@ DBInt RGlibRGIS2DataStream(DBObjData *grdData, DBObjData *tmplData, char *fieldN
             CMmsgPrint(CMmsgAppError, "Error: Invalid field [%s] in: %s %d", fieldName, __FILE__, __LINE__);
             return (DBFault);
         }
-        itemSize = fieldPTR->FieldLength();
+        itemSize = fieldPTR->Length();
         switch (fieldPTR->Type()) {
             case DBTableFieldInt:
                 switch (itemSize) {

@@ -802,15 +802,15 @@ static DBInt _DBExportNetCDFTable(DBObjTable *table, int ncid) {
                 size_t dimlen;
                 char *str, *dimname;
 
-                if (fieldRec->FieldLength() <= 8) {
+                if (fieldRec->Length() <= 8) {
                     dimname = (char *) "short_string";
                     dimlen = 8;
                 }
-                else if (fieldRec->FieldLength() <= 64) {
+                else if (fieldRec->Length() <= 64) {
                     dimname = (char *) "string";
                     dimlen = 64;
                 }
-                else if (fieldRec->FieldLength() <= NC_MAX_NAME) {
+                else if (fieldRec->Length() <= NC_MAX_NAME) {
                     dimname = (char *) "long_string";
                     dimlen = NC_MAX_NAME;
                 }
@@ -849,7 +849,7 @@ static DBInt _DBExportNetCDFTable(DBObjTable *table, int ncid) {
                 break;
             case DBTableFieldInt: {
                 int varid;
-                switch (fieldRec->FieldLength()) {
+                switch (fieldRec->Length()) {
                     case sizeof(char):
                     case sizeof(short):
                         vtype = NC_SHORT;
@@ -889,7 +889,7 @@ static DBInt _DBExportNetCDFTable(DBObjTable *table, int ncid) {
                 break;
             case DBTableFieldFloat: {
                 int varid;
-                switch (fieldRec->FieldLength()) {
+                switch (fieldRec->Length()) {
                     case sizeof(DBFloat4):
                         vtype = NC_FLOAT;
                         break;

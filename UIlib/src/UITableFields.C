@@ -58,8 +58,8 @@ public:
     DBInt Type() { return (NewFieldPTR->Type()); }
 
     void Size(DBInt size) {
-        if (NewFieldPTR->Type() == DBTableFieldFloat) NewFieldPTR->FieldLength(size << 0x01);
-        if (NewFieldPTR->Type() == DBTableFieldInt) NewFieldPTR->FieldLength(size);
+        if (NewFieldPTR->Type() == DBTableFieldFloat) NewFieldPTR->Length(size << 0x01);
+        if (NewFieldPTR->Type() == DBTableFieldInt) NewFieldPTR->Length(size);
     }
 
     void FormatWidth(DBInt width) {
@@ -67,7 +67,7 @@ public:
         switch (NewFieldPTR->Type()) {
             case DBTableFieldString:
                 width = 0x01 << width;
-                NewFieldPTR->FieldLength(width);
+                NewFieldPTR->Length(width);
                 break;
             case DBTableFieldInt:
                 NewFieldPTR->FormatWidth(width);
@@ -127,7 +127,7 @@ public:
     DBInt StructureIsChanged() {
         if (SubFormWGT == (Widget) NULL) return (false);
         if (OldFieldPTR->Type() != NewFieldPTR->Type()) return (true);
-        if (OldFieldPTR->FieldLength() != NewFieldPTR->FieldLength()) return (true);
+        if (OldFieldPTR->Length() != NewFieldPTR->Length()) return (true);
         return (false);
     }
 
@@ -462,7 +462,7 @@ UITableFieldSubForm::UITableFieldSubForm(Widget parent, DBObjTableField *field) 
             break;
         case DBTableFieldInt:
             XtSetSensitive(TypeButtonWGTs[1], true);
-            switch (NewFieldPTR->FieldLength()) {
+            switch (NewFieldPTR->Length()) {
                 case sizeof(DBByte):
                     XtSetSensitive(SizeButtonWGTs[0], true);
                     break;
@@ -476,7 +476,7 @@ UITableFieldSubForm::UITableFieldSubForm(Widget parent, DBObjTableField *field) 
             break;
         case DBTableFieldFloat:
             XtSetSensitive(TypeButtonWGTs[2], true);
-            switch (NewFieldPTR->FieldLength()) {
+            switch (NewFieldPTR->Length()) {
                 case sizeof(DBFloat4):
                     XtSetSensitive(SizeButtonWGTs[1], true);
                     break;
@@ -525,7 +525,7 @@ void UITableFieldSubForm::Display() {
             XtManageChild(SizeButtonWGTs[0]);
             XtManageChild(SizeButtonWGTs[1]);
             XtManageChild(SizeButtonWGTs[2]);
-            switch (NewFieldPTR->FieldLength()) {
+            switch (NewFieldPTR->Length()) {
                 case sizeof(DBByte):
                     XtVaSetValues(SizeMenuWGT, XmNmenuHistory, SizeButtonWGTs[0], NULL);
                     break;
@@ -559,7 +559,7 @@ void UITableFieldSubForm::Display() {
             XtManageChild(SizeButtonWGTs[1]);
             XtManageChild(SizeButtonWGTs[2]);
             XmScaleSetValue(DecimalsSWGT, NewFieldPTR->FormatDecimals());
-            switch (NewFieldPTR->FieldLength()) {
+            switch (NewFieldPTR->Length()) {
                 case sizeof(DBFloat4):
                     XtVaSetValues(SizeMenuWGT, XmNmenuHistory, SizeButtonWGTs[1], NULL);
                     break;
