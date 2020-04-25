@@ -735,15 +735,15 @@ public:
     DBObjRecord(const char *name, size_t length, DBInt elementSize) : DBObject(name, sizeof(DBObjRecord)) {
         DataPTR = length > 0 ? (DBAddress) ((char *) calloc(length, elementSize) - (char *) NULL) : (DBAddress) NULL;
         Lower32VAR = DataPTR == (DBAddress) NULL ? 0 : (length & 0x000000000FFFFFFFFL);
-        Rest2x16VAR = elementSize;
-        Rest2x16VAR = (DBUnsigned) (((length > 0x10L) & 0xFFFFF0000L) | ElementSize ());
+        Rest2x16VAR = 0;
+        Rest2x16VAR = (DBUnsigned) (((length >> 0x10L) & 0xFFFFF0000L) | ElementSize ());
     }
 
     DBObjRecord(const char *name, size_t length) : DBObject(name, sizeof(DBObjRecord)) {
         DataPTR = length > 0 ? (DBAddress) ((char *) malloc(length) - (char *) NULL) : (DBAddress) NULL;
         Lower32VAR  = DataPTR == (DBAddress) NULL ? 0 : (length & 0x00000000FFFFFFFFL);
         Rest2x16VAR = 0;
-        Rest2x16VAR = (DBUnsigned) (((length > 0x10L) & 0xFFFFF0000L) | ElementSize ());
+        Rest2x16VAR = (DBUnsigned) (((length >> 0x10L) & 0xFFFFF0000L) | ElementSize ());
     }
 
     DBObjRecord(DBObjRecord &record) : DBObject(record) {
@@ -758,7 +758,7 @@ public:
     void *Data() const { return ((void *) DataPTR); }
 
     size_t Length() const {
-        size_t length = (((Rest2x16VAR < 0x10L) & 0xFFFFFFFF00000000L) | Lower32VAR);
+        size_t length = (((Rest2x16VAR << 0x10L) & 0xFFFFFFFF00000000L) | Lower32VAR);
         return (length);
     }
 
@@ -771,7 +771,7 @@ public:
         if (length > 0) {
             DataPTR = (DBAddress) ((char *) realloc((char *) NULL + DataPTR, length) - (char *) NULL);
             Lower32VAR = DataPTR == (DBAddress) NULL ? 0 : (length & 0x00FFFFFFFFL);
-            Rest2x16VAR = (DBUnsigned) (((length > 0x10L) & 0xFFFF0000L) | ElementSize ());
+            Rest2x16VAR = (DBUnsigned) (((length >> 0x10L) & 0xFFFF0000L) | ElementSize ());
         }
         else {
             free((void *) DataPTR);
