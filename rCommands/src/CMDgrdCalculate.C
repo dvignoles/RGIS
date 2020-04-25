@@ -322,7 +322,7 @@ public:
         char *layerName;
         DBObjData *data;
         DBObjRecord *record;
-        size_t threadsNum = CMthreadProcessorNum();
+        size_t threadsNum = CMthreadProcessorNum(), taskNum;
         CMthreadTeam_t team;
         CMthreadJob_p job = (CMthreadJob_p) NULL;
 
@@ -334,9 +334,9 @@ public:
         data->Projection(GrdVar[0]->Projection()); // Taking projection from first grid variable
 
         GridIF = new DBGridIF(data);
-
-        if (team.ThreadNum > 0) {
-            if ((job = CMthreadJobCreate((size_t) (GridIF->RowNum()) * (size_t) (GridIF->ColNum()), userFunc, (void *) this)) ==
+        taskNum = GridIF->RowNum()) * (size_t) (GridIF->ColNum();
+        if ((team.ThreadNum > 2) && (taskNum < 0x30000000L)) {
+            if ((job = CMthreadJobCreate(taskNum, userFunc, (void *) this)) ==
                 (CMthreadJob_p) NULL) {
                 CMmsgPrint(CMmsgAppError, "Job creation error in %s:%d", __FILE__, __LINE__);
                 CMthreadTeamDestroy(&team);
