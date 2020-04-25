@@ -482,23 +482,23 @@ char *DBGridIF::ValueString(DBObjRecord *layerRec, DBPosition pos) {
 }
 
 void DBGridIF::RecalcStats(DBObjRecord *layerRec) {
-    DBInt obsNum = 0;
     DBPosition pos;
     DBFloat value, cellArea;
     DBFloat sumWeight = 0.0, minimum = DBHugeVal, maximum = -DBHugeVal, average = 0.0, stdDev = 0.0;
 
-    for (pos.Row = 0; pos.Row < RowNum(); ++pos.Row)
+    for (pos.Row = 0; pos.Row < RowNum(); ++pos.Row) {
+        pos.Col = 0;
+        cellArea = CellArea(pos);
         for (pos.Col = 0; pos.Col < ColNum(); ++pos.Col)
             if (Value(layerRec, pos, &value)) {
-                cellArea = CellArea(pos);
                 sumWeight += cellArea;
                 average = average + value * cellArea;
                 minimum = minimum < value ? minimum : value;
                 maximum = maximum > value ? maximum : value;
                 stdDev = stdDev + value * value * cellArea;
-                obsNum++;
             }
-    if (obsNum > 0) {
+    }
+    if (sumWeight > 0.0) {
         average = average / sumWeight;
         stdDev = stdDev / sumWeight;
         stdDev = stdDev - average * average;

@@ -1,5 +1,7 @@
 
-The RGIS data format changed to allow to create higher resolution data.
-The format change is backward compatible, therefore RGIS GUI and RGIS
-commands can read files created with previous versions, but the new
-slightly changed format is no longer readable with previous RGIS versions.
+The RGIS data format slightly changed to allow to create higher resolution
+data. Files within the limits of the previous data format are still readable
+with previous versions of the RGIS tools, but the large files, will likely
+crash the older versions (before 3.0).
+
+
