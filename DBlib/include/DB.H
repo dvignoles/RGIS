@@ -732,16 +732,17 @@ public:
         DataPTR = (DBAddress) NULL;
      }
 
-    DBObjRecord(const char *name, size_t length, DBInt elementSize) : DBObject(name, sizeof(DBObjRecord)) {
-        DataPTR = length > 0 ? (DBAddress) ((char *) calloc(length, elementSize) - (char *) NULL) : (DBAddress) NULL;
-        Lower32VAR = DataPTR == (DBAddress) NULL ? 0 : (length & 0x000000000FFFFFFFFL);
-        Rest2x16VAR = (DBUnsigned) (((length >> 0x10L) & 0xFFFFF0000L) | elementSize);
+    DBObjRecord(const char *name, size_t elementNum, DBInt elementSize) : DBObject(name, sizeof(DBObjRecord)) {
+        size_t size = elementNum * elementSize;
+        DataPTR = size > 0 ? (DBAddress) ((char *) malloc(size) - (char *) NULL) : (DBAddress) NULL;
+        Lower32VAR = DataPTR == (DBAddress) NULL ? 0 : (size & 0xFFFFFFFFL);
+        Rest2x16VAR = (DBUnsigned) (((size >> 0x10L) & 0xFFFFF0000L) | elementSize);
     }
 
-    DBObjRecord(const char *name, size_t length) : DBObject(name, sizeof(DBObjRecord)) {
-        DataPTR = length > 0 ? (DBAddress) ((char *) malloc(length) - (char *) NULL) : (DBAddress) NULL;
-        Lower32VAR  = DataPTR == (DBAddress) NULL ? 0 : (length & 0x00000000FFFFFFFFL);
-        Rest2x16VAR = (DBUnsigned) (((length >> 0x10L) & 0xFFFFF0000L) | 0x00L);
+    DBObjRecord(const char *name, size_t size) : DBObject(name, sizeof(DBObjRecord)) {
+        DataPTR = size > 0 ? (DBAddress) ((char *) malloc(size) - (char *) NULL) : (DBAddress) NULL;
+        Lower32VAR  = DataPTR == (DBAddress) NULL ? 0 : (size & 0xFFFFFFFFL);
+        Rest2x16VAR = (DBUnsigned) (((size >> 0x10L) & 0xFFFFF0000L) | 0x00L);
     }
 
     DBObjRecord(DBObjRecord &record) : DBObject(record) {
@@ -756,7 +757,7 @@ public:
     void *Data() const { return ((void *) DataPTR); }
 
     size_t Length() const {
-        size_t length = (((Rest2x16VAR << 0x10L) & 0xFFFFFFFF00000000L) | Lower32VAR);
+        size_t length = ((((((size_t) Rest2x16VAR) << 0x10L)) & 0xFFFFFFFF00000000L) | Lower32VAR);
         return (length);
     }
 
@@ -765,11 +766,11 @@ public:
         return (elementSize);
     }
 
-    void Realloc(size_t length) {
-        if (length > 0) {
-            DataPTR = (DBAddress) ((char *) realloc((char *) NULL + DataPTR, length) - (char *) NULL);
-            Lower32VAR = DataPTR == (DBAddress) NULL ? 0 : (length & 0x00FFFFFFFFL);
-            Rest2x16VAR = (DBUnsigned) (((length >> 0x10L) & 0xFFFF0000L) | ElementSize ());
+    void Realloc(size_t size) {
+        if (size > 0) {
+            DataPTR = (DBAddress) ((char *) realloc((char *) NULL + DataPTR, size) - (char *) NULL);
+            Lower32VAR = DataPTR == (DBAddress) NULL ? 0 : (size & 0xFFFFFFFFL);
+            Rest2x16VAR = (DBUnsigned) (((size >> 0x10L) & 0xFFFF0000L) | ElementSize ());
         }
         else {
             free((void *) DataPTR);

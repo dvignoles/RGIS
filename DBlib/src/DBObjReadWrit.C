@@ -66,7 +66,6 @@ int DBObject::Write(FILE *file) {
 }
 
 int DBObjRecord::Read(FILE *file, int swap) {
-    size_t length, elementSize;
     if (DBObject::Read(file, swap) != DBSuccess) return (DBFault);
 
     if (fread((char *) this + sizeof(DBObject), sizeof(DBObjRecord) - sizeof(DBObject) - sizeof(DBAddress), 1, file) !=
@@ -76,8 +75,6 @@ int DBObjRecord::Read(FILE *file, int swap) {
     }
     if (swap) Swap();
 
-    length = Length();
-    elementSize = ElementSize();
     if ((DataPTR = (DBAddress) ((char *) malloc(Length()) - (char *) NULL)) == (DBAddress) NULL) {
         CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);

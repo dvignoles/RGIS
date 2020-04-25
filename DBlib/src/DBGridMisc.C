@@ -245,8 +245,8 @@ DBInt DBGridIF::Coord2Sampler (DBCoordinate coord, DBGridSampler &sampler) const
 }
 
 DBInt DBGridIF::Coord2Pos(DBCoordinate coord, DBPosition &pos) const {
-    pos.Col = (DBInt) floor((coord.X - DataPTR->Extent().LowerLeft.X) / CellWidth());
-    pos.Row = (DBInt) floor((coord.Y - DataPTR->Extent().LowerLeft.Y) / CellHeight());
+    pos.Col = (DBInt) (floor((coord.X - DataPTR->Extent().LowerLeft.X) / CellWidth()));
+    pos.Row = (DBInt) (floor((coord.Y - DataPTR->Extent().LowerLeft.Y) / CellHeight()));
     if ((pos.Col < 0) || (pos.Col >= ColNum())) return (DBFault);
     if ((pos.Row < 0) || (pos.Row >= RowNum())) return (DBFault);
     return (DBSuccess);
@@ -268,7 +268,7 @@ DBInt DBGridIF::Value(DBObjRecord *layerRec, DBPosition pos, DBInt value) {
         return (false);
     }
 
-    j = (size_t) DimensionVAR.Col * (DimensionVAR.Row - pos.Row - 1) + pos.Col;
+    j = (size_t) DimensionVAR.Col * (size_t) (DimensionVAR.Row - pos.Row - 1) + (size_t) pos.Col;
     switch (ValueTypeVAR) {
         case DBTableFieldFloat:
             switch (ValueSizeVAR) {
@@ -276,7 +276,7 @@ DBInt DBGridIF::Value(DBObjRecord *layerRec, DBPosition pos, DBInt value) {
                     ((DBFloat4 *) (dataRec->Data()))[j] = (DBFloat4) value;
                     break;
                 case sizeof(DBFloat):
-                    ((DBFloat *) (dataRec->Data()))[j] = (DBFloat) value;
+                    ((DBFloat  *) (dataRec->Data()))[j] = (DBFloat)  value;
                     break;
             }
             break;
@@ -306,7 +306,7 @@ DBInt DBGridIF::Value(DBObjRecord *layerRec, DBPosition pos, DBInt *value) const
         return (false);
     }
 
-    j = (size_t) DimensionVAR.Col * (DimensionVAR.Row - pos.Row - 1) + pos.Col;
+    j = (size_t) DimensionVAR.Col * (size_t) (DimensionVAR.Row - pos.Row - 1) + (size_t) pos.Col;
     switch (ValueTypeVAR) {
         case DBTableFieldFloat:
             switch (ValueSizeVAR) {
@@ -348,7 +348,7 @@ DBInt DBGridIF::Value(DBObjRecord *layerRec, DBPosition pos, DBFloat *value) con
         return (false);
     }
 
-    j = (size_t) DimensionVAR.Col * (DimensionVAR.Row - pos.Row - 1) + pos.Col;
+    j = (size_t) DimensionVAR.Col * (size_t) (DimensionVAR.Row - pos.Row - 1) + (size_t) pos.Col;
     switch (ValueTypeVAR) {
         case DBTableFieldFloat:
             missingFloat = MissingValueFLD->Float(ItemTable->Item(layerRec->RowID()));
@@ -357,7 +357,7 @@ DBInt DBGridIF::Value(DBObjRecord *layerRec, DBPosition pos, DBFloat *value) con
                     *value = (DBFloat) ((DBFloat4 *) (dataRec->Data()))[j];
                     break;
                 case sizeof(DBFloat):
-                    *value = (DBFloat) ((DBFloat *) (dataRec->Data()))[j];
+                    *value = (DBFloat) ((DBFloat  *) (dataRec->Data()))[j];
                     break;
             }
             retVal = CMmathEqualValues(*value, missingFloat) ? false : true;
@@ -366,13 +366,13 @@ DBInt DBGridIF::Value(DBObjRecord *layerRec, DBPosition pos, DBFloat *value) con
             missingInt = MissingValueFLD->Int(ItemTable->Item(layerRec->RowID()));
             switch (ValueSizeVAR) {
                 case sizeof(DBByte):
-                    intVal = (DBInt) ((DBByte *) (dataRec->Data()))[j];
+                    intVal = (DBInt) ((DBByte  *) (dataRec->Data()))[j];
                     break;
                 case sizeof(DBShort):
                     intVal = (DBInt) ((DBShort *) (dataRec->Data()))[j];
                     break;
                 case sizeof(DBInt):
-                    intVal = (DBInt) ((DBInt *) (dataRec->Data()))[j];
+                    intVal = (DBInt) ((DBInt   *) (dataRec->Data()))[j];
                     break;
             }
             retVal = intVal == missingInt ? false : true;
@@ -383,14 +383,14 @@ DBInt DBGridIF::Value(DBObjRecord *layerRec, DBPosition pos, DBFloat *value) con
 }
 
 DBInt DBGridIF::Value(DBObjRecord *layerRec, DBPosition pos, DBFloat value) {
-    size_t j = (size_t) DimensionVAR.Col * (DimensionVAR.Row - pos.Row - 1) + pos.Col;
+    size_t j;
     DBObjRecord *dataRec = LayerFLD->Record(layerRec);
 
     if (pos.Col < 0) return (DBFault);
     if (pos.Row < 0) return (DBFault);
     if (pos.Col >= DimensionVAR.Col) return (DBFault);
     if (pos.Row >= DimensionVAR.Row) return (DBFault);
-
+    j = (size_t) DimensionVAR.Col * (size_t) (DimensionVAR.Row - pos.Row - 1) + (size_t) pos.Col;
     switch (ValueTypeVAR) {
         case DBTableFieldFloat:
             switch (ValueSizeVAR) {
