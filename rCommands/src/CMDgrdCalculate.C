@@ -334,7 +334,7 @@ public:
         data->Projection(GrdVar[0]->Projection()); // Taking projection from first grid variable
 
         GridIF = new DBGridIF(data);
-        taskNum = GridIF->RowNum()) * (size_t) (GridIF->ColNum();
+        taskNum = GridIF->RowNum() * (size_t) GridIF->ColNum();
         if ((team.ThreadNum > 2) && (taskNum < 0x30000000L)) {
             if ((job = CMthreadJobCreate(taskNum, userFunc, (void *) this)) ==
                 (CMthreadJob_p) NULL) {
