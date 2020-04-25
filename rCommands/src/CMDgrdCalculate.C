@@ -335,7 +335,7 @@ public:
 
         GridIF = new DBGridIF(data);
         taskNum = GridIF->RowNum() * (size_t) GridIF->ColNum();
-        if ((team.ThreadNum > 2) && (taskNum < 0x30000000L)) {
+        if ((team.ThreadNum > 1) && (taskNum < 0x30000000L)) {
             if ((job = CMthreadJobCreate(taskNum, userFunc, (void *) this)) ==
                 (CMthreadJob_p) NULL) {
                 CMmsgPrint(CMmsgAppError, "Job creation error in %s:%d", __FILE__, __LINE__);
