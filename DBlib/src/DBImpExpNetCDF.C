@@ -1495,16 +1495,14 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
     ut_unit *baseTimeUnit = (ut_unit *) NULL;
     ut_unit *timeUnit = (ut_unit *) NULL;
     cv_converter *cvConverter = (cv_converter *) NULL;
-    int rowNum = 0, colNum = 0, layerNum = 1, layerID;
+    int rowNum = 0, colNum = 0, layerNum = 1, layerID, colID, rowID;
     double *vector, *latitudes, *longitudes;
     double *timeSteps;
     double missingValue, fillValue;
     double scaleFactor, dataOffset;
     DBCoordinate cellSize;
-    DBPosition pos;
-    DBFloat cellArea, value, sumWeight = 0.0, minimum = DBHugeVal, maximum = -DBHugeVal, average = 0.0, stdDev = 0.0;
     DBRegion extent;
-    DBObjRecord *itemRec, *layerRec, *dataRec;
+    DBObjRecord *layerRec, *dataRec;
     DBObjTable *itemTable = data->Table(DBrNItems);
     DBObjTable *layerTable = data->Table(DBrNLayers);
     DBObjTableField *rowNumFLD = layerTable->Field(DBrNRowNum);
@@ -1514,10 +1512,6 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
     DBObjTableField *valueTypeFLD = layerTable->Field(DBrNValueType);
     DBObjTableField *valueSizeFLD = layerTable->Field(DBrNValueSize);
     DBObjTableField *layerFLD = layerTable->Field(DBrNLayer);
-    DBObjTableField *averageFLD = itemTable->Field(DBrNAverage);
-    DBObjTableField *stdDevFLD = itemTable->Field(DBrNStdDev);
-    DBObjTableField *minimumFLD = itemTable->Field(DBrNMinimum);
-    DBObjTableField *maximumFLD = itemTable->Field(DBrNMaximum);
     DBObjTableField *missingValueFLD = itemTable->Field(DBrNMissingValue);
     DBGridIF *gridIF;
 
@@ -1701,7 +1695,7 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
             extent.LowerLeft.X = longitudes[0] < longitudes[1] ? longitudes[0] : longitudes[1];
             extent.UpperRight.X = longitudes[0] > longitudes[1] ? longitudes[0] : longitudes[1];
             for (i = 2; i < colNum; i++) {
-                extent.LowerLeft.X  = extent.LowerLeft.X  < longitudes[i] ? extent.LowerLeft.X  : longitudes[i];
+                extent.LowerLeft.X = extent.LowerLeft.X < longitudes[i] ? extent.LowerLeft.X : longitudes[i];
                 extent.UpperRight.X = extent.UpperRight.X > longitudes[i] ? extent.UpperRight.X : longitudes[i];
                 if (CMmathEqualValues(cellSize.X, fabs(longitudes[i] - longitudes[i - 1])) != true) {
                     CMmsgPrint(CMmsgAppError, "Longitude has irregular spacing in: %s %d", __FILE__, __LINE__);
@@ -1896,10 +1890,10 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
 				}
 			else varUnit [attlen] = '\0';
 			TODO: Handle variable unit!
-*/          if ((status = nc_get_att_double(ncid, id, "_FillValue", &fillValue)) != NC_NOERR) fillValue = -9999.0;
+*/            if ((status = nc_get_att_double(ncid, id, "_FillValue", &fillValue)) != NC_NOERR) fillValue = -9999.0;
             if (((status = nc_get_att_double(ncid, id, "missing_value", &missingValue)) != NC_NOERR) ||
                 CMmathEqualValues(fillValue, missingValue))
-                missingValue = -9999.0; // TODO: Apperently, this is necessary, but I have yet to understand why.
+                missingValue = -9999.0; // TODO I am not sure if it is a good idea.
             if ((status = nc_get_att_double(ncid, id, "scale_factor", &scaleFactor)) != NC_NOERR) scaleFactor = 1.0;
             if ((status = nc_get_att_double(ncid, id, "add_offset", &dataOffset)) != NC_NOERR) dataOffset = 0.0;
             varid = id;
@@ -2005,7 +1999,6 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
         doTimeUnit = true;
     }
     else doTimeUnit = false;
-    gridIF = new DBGridIF(data);
     for (layerID = 0; layerID < layerNum; layerID++) {
         if (timedim != -1) {
             start[timeidx] = layerID;
@@ -2041,8 +2034,7 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
             ut_free_system(utSystem);
             return (DBFault);
         }
-        itemRec = itemTable->Add(layerRec->Name());
-        missingValueFLD->Float(itemRec, (DBFloat) missingValue);
+        missingValueFLD->Float(itemTable->Add(layerRec->Name()), (DBFloat) missingValue);
         rowNumFLD->Int(layerRec, rowNum);
         colNumFLD->Int(layerRec, colNum);
         cellWidthFLD->Float(layerRec, cellSize.X);
@@ -2052,9 +2044,8 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
         layerFLD->Record(layerRec, dataRec = new DBObjRecord(layerName, ((size_t) colNum) * ((size_t) rowNum),sizeof(DBFloat4)));
         (data->Arrays())->Add(dataRec);
 
-        sumWeight = 0.0;
-        for (pos.Row = 0; pos.Row < rowNum; pos.Row++) {
-            start[latidx] = latitudes[0] < latitudes[1] ? rowNum - pos.Row - 1 : pos.Row;
+        for (rowID = 0; rowID < rowNum; rowID++) {
+            start[latidx] = latitudes[0] < latitudes[1] ? rowNum - rowID - 1 : rowID;
             if ((status = nc_get_vara_double(ncid, varid, start, count, vector)) != NC_NOERR) {
                 CMmsgPrint(CMmsgAppError, "NC Error '%s' in: %s %d", nc_strerror(status), __FILE__, __LINE__);
                 free(vector);
@@ -2068,55 +2059,21 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
                 ut_free_system(utSystem);
                 return (DBFault);
             }
-            pos.Col = 0;
-            cellArea = gridIF->CellArea(pos);
-            if (longitudes[0] < longitudes[1]) {
-                for (pos.Col = 0; pos.Col < colNum; pos.Col++) {
-                    if (CMmathEqualValues(vector[pos.Col], fillValue)) {
-                        value = missingValue;
-                    }
-                    else {
-                        value = scaleFactor * vector[pos.Col] + dataOffset;
-                        ((float *) (dataRec->Data()))[(size_t) colNum * (size_t) pos.Row + (size_t) pos.Col] = value;
-                        sumWeight += cellArea;
-                        average = average + value * cellArea;
-                        minimum = minimum < value ? minimum : value;
-                        maximum = maximum > value ? maximum : value;
-                        stdDev = stdDev + value * value * cellArea;
-                    }
-                }
-            }
-            else {
-                for (pos.Col = colNum - 1; pos.Col >= 0; pos.Col--) {
-                    if (CMmathEqualValues(vector[pos.Col], fillValue)) {
-                        value = missingValue;
-                    }
-                    else {
-                        value = scaleFactor * vector[pos.Col] + dataOffset;
-                        ((float *) (dataRec->Data()))[(size_t)colNum * (size_t) pos.Row + (size_t) pos.Col] = value;
-                        sumWeight += cellArea;
-                        average = average + value * cellArea;
-                        minimum = minimum < value ? minimum : value;
-                        maximum = maximum > value ? maximum : value;
-                        stdDev = stdDev + value * value * cellArea;
-                    }
-                }
-            }
-        }
-        if (sumWeight > 0.0) {
-            average = average / sumWeight;
-            stdDev = stdDev / sumWeight;
-            stdDev = stdDev - average * average;
-            stdDev = sqrt(stdDev);
-        }
-        else average = stdDev = minimum = maximum = missingValue;
 
-        averageFLD->Float(itemRec, average);
-        minimumFLD->Float(itemRec, minimum);
-        maximumFLD->Float(itemRec, maximum);
-        stdDevFLD->Float(itemRec, stdDev);
+            for (colID = 0; colID < colNum; colID++)
+                vector[colID] = CMmathEqualValues(vector[colID], fillValue) ? missingValue :
+                                scaleFactor * vector[colID] + dataOffset;
+            if (longitudes[0] < longitudes[1])
+                for (colID = 0; colID < colNum; colID++)
+                    ((float *) (dataRec->Data()))[colNum * rowID + colID] = vector[colID];
+            else
+                for (colID = 0; colID < colNum; colID++)
+                    ((float *) (dataRec->Data()))[colNum * rowID + colID] = vector[colNum - colID - 1];
+        }
     }
+    gridIF = new DBGridIF(data);
     data->Document(DBDocSubject, varname);
+    gridIF->RecalcStats();
     free(vector);
     free(longitudes);
     free(latitudes);
