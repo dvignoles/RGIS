@@ -83,6 +83,7 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (verbose) RGlibPauseOpen(argv[0]);
@@ -90,6 +91,7 @@ int main(int argc, char *argv[]) {
     if (((doList || doNum) && (doAll || (layerName != (char *) NULL))) ||
         (doAll & (layerName != (char *) NULL))) {
         CMmsgPrint(CMmsgUsrError, "Conflicting options!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
 

@@ -588,12 +588,14 @@ int main(int argc, char *argv[]) {
 
     if (expStr == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Missing expression!");
+        _CMDprintUsage (argv[0]);
         delete threadData;
         return (CMfailed);
     }
 
     if (argNum > 2) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         delete threadData;
         return (CMfailed);
     }

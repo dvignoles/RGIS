@@ -102,10 +102,12 @@ int main(int argc, char *argv[]) {
 
     if (argNum < 2) {
         CMmsgPrint(CMmsgUsrError, "Missing input file");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
 

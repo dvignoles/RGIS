@@ -96,10 +96,12 @@ int main(int argc, char *argv[]) {
     }
     if (fieldName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Missing reclass field!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (verbose) RGlibPauseOpen(argv[0]);

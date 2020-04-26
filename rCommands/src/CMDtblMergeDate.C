@@ -131,6 +131,7 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (verbose) RGlibPauseOpen(argv[0]);
@@ -145,6 +146,7 @@ int main(int argc, char *argv[]) {
 
     if ((table = data->Table(tableName)) == (DBObjTable *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Invalid table!");
+        _CMDprintUsage (argv[0]);
         delete data;
         return (CMfailed);
     }
@@ -152,6 +154,7 @@ int main(int argc, char *argv[]) {
     if (yearFieldName != (char *) NULL) {
         if ((yearField = table->Field(yearFieldName)) == (DBObjTableField *) NULL) {
             CMmsgPrint(CMmsgUsrError, "Invalid year field [%s]!", yearFieldName);
+            _CMDprintUsage (argv[0]);
             delete data;
             return (CMfailed);
         }
@@ -160,6 +163,7 @@ int main(int argc, char *argv[]) {
     if (monthFieldName != (char *) NULL) {
         if ((monthField = table->Field(monthFieldName)) == (DBObjTableField *) NULL) {
             CMmsgPrint(CMmsgUsrError, "Invalid month field [%s]!", monthFieldName);
+            _CMDprintUsage (argv[0]);
             delete data;
             return (CMfailed);
         }
@@ -168,6 +172,7 @@ int main(int argc, char *argv[]) {
     if (dayFieldName != (char *) NULL) {
         if (monthField == (DBObjTableField *) NULL) {
             CMmsgPrint(CMmsgUsrError, "Month field is not set!");
+            _CMDprintUsage (argv[0]);
             delete data;
             return (CMfailed);
         }
@@ -194,11 +199,13 @@ int main(int argc, char *argv[]) {
     if (minFieldName != (char *) NULL) {
         if (hourField == (DBObjTableField *) NULL) {
             CMmsgPrint(CMmsgUsrError, "Hour field is not set!");
+            _CMDprintUsage (argv[0]);
             delete data;
             return (CMfailed);
         }
         if ((minField = table->Field(minFieldName)) == (DBObjTableField *) NULL) {
             CMmsgPrint(CMmsgUsrError, "Invalid minute field [%s]", minFieldName);
+            _CMDprintUsage (argv[0]);
             delete data;
             return (CMfailed);
         }

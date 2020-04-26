@@ -99,11 +99,13 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
 
     if (zoneGridName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Zone grid is not specified");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
 

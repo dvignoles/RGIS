@@ -113,6 +113,7 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (verbose) RGlibPauseOpen(argv[0]);
@@ -121,6 +122,7 @@ int main(int argc, char *argv[]) {
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? netData->Read(argv[1]) : netData->Read(stdin);
     if ((ret == DBFault) || (netData->Type() != DBTypeNetwork)) {
         CMmsgPrint(CMmsgUsrError, "Non-network coverage!");
+        _CMDprintUsage (argv[0]);
         delete netData;
         return (CMfailed);
     }

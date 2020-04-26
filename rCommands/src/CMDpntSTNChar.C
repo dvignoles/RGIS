@@ -97,18 +97,21 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (verbose) RGlibPauseOpen(argv[0]);
 
     if (networkName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Network coverage is not specified");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
 
     netData = new DBObjData();
     if ((netData->Read(networkName) == DBFault) || (netData->Type() != DBTypeNetwork)) {
         CMmsgPrint(CMmsgUsrError, "Invalid network coverage!");
+        _CMDprintUsage (argv[0]);
         delete netData;
         return (CMfailed);
     }
@@ -117,6 +120,7 @@ int main(int argc, char *argv[]) {
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Read(argv[1]) : data->Read(stdin);
     if ((ret == DBFault) || (data->Type() != DBTypeVectorPoint)) {
         CMmsgPrint(CMmsgUsrError, "Invalid point coverage!");
+        _CMDprintUsage (argv[0]);
         delete netData;
         delete data;
         return (CMfailed);

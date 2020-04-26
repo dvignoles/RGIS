@@ -112,17 +112,23 @@ int main(int argc, char *argv[]) {
         argPos++;
     }
 
-    if (argNum > 3) { CMmsgPrint(CMmsgUsrError, "Extra arguments!"); return (CMfailed); }
+    if (argNum > 3) {
+        CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
+        return (CMfailed);
+    }
 
     data = new DBObjData();
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Read(argv[1]) : data->Read(stdin);
     if ((ret == DBFault) || ((table = data->Table (rgisTableName)) == (DBObjTable *) NULL)) {
         CMmsgPrint(CMmsgUsrError, "Wrong rgis table: %s!",rgisTableName);
+        _CMDprintUsage (argv[0]);
         delete data;
         return (CMfailed);
     }
     if ((outFile = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? fopen (argv[2],"w") : stdout) == (FILE *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Invalid output!");
+        _CMDprintUsage (argv[0]);
         delete data;
         return (CMfailed);
     }

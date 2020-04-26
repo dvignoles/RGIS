@@ -151,7 +151,11 @@ int main(int argc, char *argv[]) {
         argPos++;
     }
 
-    if (argNum > 3) { CMmsgPrint(CMmsgUsrError, "Extra arguments!"); return (CMfailed);  }
+    if (argNum > 3) {
+        CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
+        return (CMfailed);
+    }
     if (dewpT == (char *) NULL)  { CMmsgPrint(CMmsgUsrError, "Dewpoint temperature is missing!"); return (CMfailed);  }
     if (verbose) RGlibPauseOpen(argv[0]);
 

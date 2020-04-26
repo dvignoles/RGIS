@@ -75,6 +75,7 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (verbose) RGlibPauseOpen(argv[0]);
@@ -89,6 +90,7 @@ int main(int argc, char *argv[]) {
 
     if ((table = data->Table(tableName)) == (DBObjTable *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Invalid table!");
+        _CMDprintUsage (argv[0]);
         delete data;
         return (CMfailed);
     }

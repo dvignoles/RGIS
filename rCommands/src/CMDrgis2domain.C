@@ -58,13 +58,15 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
 
     outFile = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? fopen(argv[2], "w") : stdout;
     if (outFile == (FILE *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Output file Opening error in: %s", CMfileName(argv[0]));
-        exit(DBFault);
+        _CMDprintUsage (argv[0]);
+        return(DBFault);
     }
 
     data = new DBObjData();

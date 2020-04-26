@@ -106,10 +106,12 @@ int main(int argc, char *argv[]) {
 
     if (srcFieldName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Missing source field!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (dstFieldName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Missing target field!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (nextFieldName == (char *) NULL) nextFieldName = RGlibNextStation;
@@ -117,6 +119,7 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (verbose) RGlibPauseOpen(argv[0]);
@@ -125,11 +128,13 @@ int main(int argc, char *argv[]) {
     if (((argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Read(argv[1]) : data->Read(stdin)) == DBFault) {
         delete data;
         if (argNum > 1) printf("File error in: %s", argv[1]);
+        _CMDprintUsage (argv[0]);
         return (DBFault);
     }
 
     if ((table = data->Table(tableName)) == (DBObjTable *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Invalid table!");
+        _CMDprintUsage (argv[0]);
         delete data;
         return (CMfailed);
     }

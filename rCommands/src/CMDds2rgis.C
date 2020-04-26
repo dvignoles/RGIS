@@ -125,6 +125,7 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (DBFault);
     }
     if (verbose) RGlibPauseOpen(argv[0]);
@@ -141,7 +142,6 @@ int main(int argc, char *argv[]) {
         delete tmpData;
         return (DBFault);
     }
-
 
     if (title == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Title is not set!");

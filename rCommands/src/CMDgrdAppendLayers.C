@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
 
     if (argNum < 2) {
         CMmsgPrint(CMmsgUsrError, "Nothing to append");
+        _CMDprintUsage (argv[0]);
         return (DBFault);
     }
     dataNum = argNum - 1;

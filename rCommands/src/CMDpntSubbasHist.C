@@ -107,17 +107,20 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (verbose) RGlibPauseOpen(argv[0]);
 
     if (pointName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Point coverage is not specified");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
 
     if (networkName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Network coverage is not specified");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
 

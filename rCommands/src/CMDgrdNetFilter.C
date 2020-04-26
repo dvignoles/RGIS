@@ -119,7 +119,11 @@ int main(int argc, char *argv[]) {
         argPos++;
     }
 
-    if (argNum > 3) { CMmsgPrint(CMmsgUsrError, "Extra arguments!"); return (CMfailed); }
+    if (argNum > 3) {
+        CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
+        return (CMfailed);
+    }
     if (network == (char *) NULL) { CMmsgPrint(CMmsgUsrError, "Missing network!"); return (CMfailed); }
     netData = new DBObjData ();
     if (netData->Read (network) != CMsucceeded) { delete netData; return (CMfailed); }

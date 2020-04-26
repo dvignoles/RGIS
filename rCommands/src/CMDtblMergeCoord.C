@@ -108,6 +108,7 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (verbose) RGlibPauseOpen(argv[0]);
@@ -122,12 +123,14 @@ int main(int argc, char *argv[]) {
 
     if ((table = data->Table(tableName)) == (DBObjTable *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Invalid table!");
+        _CMDprintUsage (argv[0]);
         delete data;
         return (CMfailed);
     }
 
     if (degFieldName != (char *) NULL) {
         if ((degField = table->Field(degFieldName)) == (DBObjTableField *) NULL) {
+            _CMDprintUsage (argv[0]);
             CMmsgPrint(CMmsgUsrError, "Invalid degree field [%s]!", degFieldName);
             delete data;
             return (CMfailed);
@@ -137,6 +140,7 @@ int main(int argc, char *argv[]) {
     if (minFieldName != (char *) NULL) {
         if ((minField = table->Field(minFieldName)) == (DBObjTableField *) NULL) {
             CMmsgPrint(CMmsgUsrError, "Invalid min field [%s]!", minFieldName);
+            _CMDprintUsage (argv[0]);
             delete data;
             return (CMfailed);
         }
@@ -145,6 +149,7 @@ int main(int argc, char *argv[]) {
     if (secFieldName != (char *) NULL) {
         if (minField == (DBObjTableField *) NULL) {
             CMmsgPrint(CMmsgUsrError, "Minute field is not set!");
+            _CMDprintUsage (argv[0]);
             delete data;
             return (CMfailed);
         }

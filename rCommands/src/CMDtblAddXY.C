@@ -16,6 +16,18 @@ bfekete@gc.cuny.edu
 #include <DBif.H>
 #include <RG.H>
 
+static void _CMDprintUsage (const char *arg0) {
+    CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "     -a,--table     [table name]");
+    CMmsgPrint(CMmsgInfo, "     -f,--field     [field name]");
+    CMmsgPrint(CMmsgInfo, "     -y,--type      [field type]");
+    CMmsgPrint(CMmsgInfo, "     -l,--length    [field length]");
+    CMmsgPrint(CMmsgInfo, "     -w,--width     [display width]");
+    CMmsgPrint(CMmsgInfo, "     -e,--decimals  [display decimals]");
+    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
+    CMmsgPrint(CMmsgInfo, "     -h,--help");
+}
+
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
     DBInt recID;
@@ -64,12 +76,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest (argv[argPos], "-h", "--help")) {
-            CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(argv[0]));
-            CMmsgPrint(CMmsgInfo, "     -a, --table   [ [DBItems | DBCells]]");
-            CMmsgPrint(CMmsgInfo, "     -x, --Xfield  <field name>");
-            CMmsgPrint(CMmsgInfo, "     -y, --Yfield  <field name>");
-            CMmsgPrint(CMmsgInfo, "     -V, --verbose");
-            CMmsgPrint(CMmsgInfo, "     -h, --help");
+            _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }
         if ((argv[argPos][0] == '-') && (strlen(argv[argPos]) > 1)) {
@@ -81,6 +88,7 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (verbose) RGlibPauseOpen(argv[0]);

@@ -87,11 +87,13 @@ int main(int argc, char *argv[]) {
     }
     if (argNum > 2) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         goto Stop;
     }
 
     if (fileName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Missing input file!");
+        _CMDprintUsage (argv[0]);
         goto Stop;
     }
     if ((outFile = (argNum > 2) && (strcmp(argv[1], "-") != 0) ? fopen(argv[1], "w") : stdout) == (FILE *) NULL) {

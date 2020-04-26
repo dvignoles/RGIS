@@ -155,6 +155,7 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         if (fields != (CMDtblSortField *) NULL) free(fields);
         return (CMfailed);
     }

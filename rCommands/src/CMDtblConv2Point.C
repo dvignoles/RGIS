@@ -135,6 +135,7 @@ int main(int argc, char *argv[]) {
 
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
+        _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if (verbose) RGlibPauseOpen(argv[0]);
@@ -143,27 +144,32 @@ int main(int argc, char *argv[]) {
     if (((argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Read(argv[1]) : data->Read(stdin)) == DBFault) {
         delete data;
         if (argNum > 1) printf("File error in: %s", argv[1]);
+        _CMDprintUsage (argv[0]);
         return (DBFault);
     }
 
     if ((table = data->Table(tableName)) == (DBObjTable *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Invalid table!");
+        _CMDprintUsage (argv[0]);
         delete data;
         return (CMfailed);
     }
     if (nameSTR == (char *) NULL) nField = (DBObjTableField *) NULL;
     else if ((nField = table->Field(nameSTR)) == ((DBObjTableField *) NULL)) {
         CMmsgPrint(CMmsgUsrError, "Name field!");
+        _CMDprintUsage (argv[0]);
         delete data;
         return (CMfailed);
     }
     if ((xField = table->Field(xcoordSTR)) == (DBObjTableField *) NULL) {
         CMmsgPrint(CMmsgUsrError, "XCoord field!");
+        _CMDprintUsage (argv[0]);
         delete data;
         return (CMfailed);
     }
     if ((yField = table->Field(ycoordSTR)) == (DBObjTableField *) NULL) {
         CMmsgPrint(CMmsgUsrError, "YCoord field!");
+        _CMDprintUsage (argv[0]);
         delete data;
         return (CMfailed);
     }
