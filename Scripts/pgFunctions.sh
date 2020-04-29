@@ -9,177 +9,6 @@
 if [[ "${GHAASDIR}" == "" ]]; then GHAASDIR="/usr/local/share/ghaas"; fi
 source "${GHAASDIR}/Scripts/RGISfunctions.sh"
 
-if [[ "${PGHOST}" != "" ]]; then export _GHAASpgHostName="${PGHOST}"; else export _GHAASpgHostName="localhost";  fi
-if [[ "${PGPORT}" != "" ]]; then export   _GHAASpgPortID="${PGPORT}"; else export _GHAASpgPortID="5432";         fi
-if [[ "${PGUSER}" != "" ]]; then export _GHAASpgUserName="${PGUSER}"
-else
-    if [[ -e "${HOME}/.pgpass" ]]
-    then
-        export _GHAASpgUserName="$(cat "${HOME}/.pgpass" | grep "${_GHAASpgHostName}:${_GHAASpgPortID}:.*:" | head -n 1 | sed "s|${_GHAASpgHostName}:${_GHAASpgPortID}:\(.*\):\(.*\):\(.*\)|\2|")"
-    else
-        export _GHAASpgUserName="${LOGNAME}";
-    fi
-fi
-
-export     _GHAASpgSSLhostCA=""
-export _GHAASpgSSLclientCert=""
-export  _GHAASpgSSLclientKey=""
-
-function PGsslDir ()
-{
-    local   sslDir="${1}"; shift
-
-    if [[ "${sslDir}" != "" ]]; then local sslDir="${HOME}/.pgssl"; fi
-    if [[   -e "${sslDir}"  ]]
-    then
-        export _GHAASpgSSLdir="${sslDir}"
-        PGhostName "${_GHAASpgHostName}"
-    else
-        _GHAASpgSSLdir=""
-        echo "Non existing ssl directory: ${sslDir}" > /dev/stderr
-    fi
-}
-
-function PGhostName () # Changes the hostname or returns its value
-{
-    local hostName="${1}"; shift
-
-	if [[ "${hostName}" == "" ]]
-	then
-	    echo "${_GHAASpgHostName}"
-	else
-	    export _GHAASpgHostName="${hostName}"
-        if [[ -e "${_GHAASpgSSLdir}" ]]
-        then
-            if [[ -e "${_GHAASpgSSLdir}/${hostName}-ca.pem" ]]
-            then
-                export _GHAASpgSSLhostCA="${_GHAASpgSSLdir}/${hostName}-ca.pem"
-                PGuserName "${_GHAASpgUserName}"
-            else
-                export _GHAASpgSSLhostCA=""
-            fi
-        else
-            export _GHAASpgSSLhostCA=""
-        fi
-	fi
-}
-
-function PGport () # Changes port or returns its value
-{
-    local portID="${1}"; shift
-
-	if [[ "${portID}" == "" ]]
-	then
-	    echo "${_GHAASpgPortID}"
-	else
-	    export _GHAASpgPortID="${protID}"
-	fi
-}
-
-function PGuserName () # Changes username or returns its value
-{
-	local userName="${1}"; shift
-
-	if [[ "${userName}" == "" ]]
-	then
-	    echo "${_GHAASpgUserName}"
-	else
-	    export _GHAASpgUserName="${userName}"
-        if [[ -e "${_GHAASpgSSLdir}" ]]
-        then
-            if [[ -e "${_GHAASpgSSLdir}/${userName}-cert.pem" ]]
-            then
-                export _GHAASpgSSLclientCert="${_GHAASpgSSLdir}/${userName}-cert.pem"
-            else
-                export _GHAASpgSSLclientCert=""
-                echo "Missing user certificate: ${userName}-cert.pem" > /dev/stderr
-            fi
-
-            if [[ -e "${_GHAASpgSSLdir}/${userName}-key.pem" ]]
-            then
-                export _GHAASpgSSLclientKey="${_GHAASpgSSLdir}/${userName}-key.pem"
-            else
-                export _GHAASpgSSLclientKey=""
-                echo "Missing user key: f${userName}-key.pem" > /dev/stderr
-            fi
-        else
-            export _GHAASpgSSLclientCert=""
-            export  _GHAASpgSSLclientKey=""
-        fi
-	fi
-}
-
-function PGuserPassword () # Returns the password from the ~/.pgpass file for a given user.
-{
-    	local userName="${1}"; shift
-        local passFile="${HOME}/.pgpass"
-
-        if [[ "${userName}" == "" ]]; then local userName="${_GHAASpgUserName}"; fi
-
-        if [[ -f "${passFile}" ]]
-        then
-            echo "$(cat "${passFile}" | grep "${_GHAASpgHostName}:${_GHAASpgPortID}:.*:${userName}:.*" | sed "s|${_GHAASpgHostName}:${_GHAASpgPortID}:.*:${userName}:\(.*\)|\1|" | head -n 1)"
-        else
-            echo ""
-        fi
-}
-
-function PGsslHostCA () # Changes the host CA or returns its value
-{
-	local hostCA="${1}"; shift
-
-	if [[ "${hostCA}" == "" ]]
-	then
-    	echo "${_GHAASpgSSLhostCA}"
-	else
-	    export _GHAASpgSSLhostCA="${hostCA}"
-	fi
-}
-
-function PGsslClientCert () # Changes the client certificate or returns its value
-{
-	local clientCert="${1}"; shift
-
-	if [[ "${clientCert}" == "" ]]
-	then
-    	echo "${_GHAASpgSSLclientCert}"
-	else
-	    export _GHAASpgSSLclientCert="${clientCert}"
-	fi
-}
-
-function PGsslClientKey () # Changes the client key or returns its value
-{
-	local clientKey="${1}"; shift
-
-	if [[ "${clientKey}" == "" ]]
-	then
-	    local  clientKey="${_GHAASpgSSLclientKey}"
-    	echo "${clientKey}"
-	else
-	    export _GHAASpgSSLclientKey="${clientKey}"
-	fi
-}
-
-function PGdbName ()
-{
-	local   dbName="${1}"; shift
-	local userName="${1}"; shift
-
-	USAGE="Usage: PGdbName <dbName> [userName]"
-    if [[ "${dbName}" == "" ]]; then echo "${USAGE}"; return 1; fi
-
-    if [[ "${userName}" == "" ]]; then local userName="$(PGuserName)"; fi
-
-    local sslString="host=${_GHAASpgHostName} dbname=${dbName} user=${userName}"
-    local userPassword="$(PGuserPassword "${userName}")"
-    if [[ "${userPassword}"          != "" ]]; then local sslString="${sslString} password=${userPassword}";                            fi
-	if [[ "${_GHAASpgSSLhostCA}"     != "" ]]; then local sslString="${sslString} sslmode=verify-ca sslrootcert=${_GHAASpgSSLhostCA}";  fi
-	if [[ "${_GHAASpgSSLclientCert}" != "" ]]; then local sslString="${sslString} sslcert=${_GHAASpgSSLclientCert}";                    fi
-    if [[ "${_GHAASpgSSLclientKey}"  != "" ]]; then local sslString="${sslString} sslkey=${_GHAASpgSSLclientKey}";                      fi
-    echo "${sslString}"
-}
-
 function PGattribTableSQL ()
 {
 	local    caseVal="${1}";                            shift
@@ -273,16 +102,16 @@ function PGimportShapeFile ()
     if [[ "${shapeFile}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
     if [[ "${caseVal}" == "lower" ]]; then local caseOpt=""; else caseOpt="-k"; fi
-	echo "DROP TABLE IF EXISTS \"${schema}\".\"${tblName}\";" | psql "$(PGdbName "${dbName}")"
+	echo "DROP TABLE IF EXISTS \"${schema}\".\"${tblName}\";" | psql "${dbName}"
 	shp2pgsql ${caseOpt} -s 4326 -W "latin1" "${shapeFile}" "${schema}.${tblName}" |\
-	psql "$(PGdbName "${dbName}")"
+	psql "${dbName}"
 
 	if [[ "${gid}" != "" ]]
 	then
 		if [[  "${geom}" == "" ]]; then local  geom="geom"; fi
 		if [[ "${color}" == "" ]]; then local color="$(RGIScase "${caseVal}" "Color")"; fi
 		PGpolygonColorizeSQL "${caseVal}" "${schema}" "${tblName}" "${geom}" "${gid}" "${color}" |\
-		psql "$(PGdbName "${dbName}")"
+		psql "${dbName}"
 	fi
 }
 
@@ -334,12 +163,12 @@ function PGrasterize ()
 		      ADD  COLUMN \"idField\" INTEGER;
 		      UPDATE      \"${schema}\".\"${tblName}\"
 		      SET \"idField\" = ${idField};" |\
-		psql -q "$(PGdbName "${dbName}")"
+		psql -q "${dbName}"
 		local idField="idField"
 	fi
 	gdal_rasterize -l "${schema}"."${tblName}" -a "${idField}" -init "${initVal}" -ot Integer  -of GTiff \
 	               -ts "${ncols}" "${nrows}" -te "${extent_llx}" "${extent_lly}" "${extent_urx}" "${extent_ury}" \
-	               "PG:$(PGdbName "${dbName}")" "${rgisFile%.gdbd*}.tif"
+	               "PG:${dbName}" "${rgisFile%.gdbd*}.tif"
 
 	gdal_translate -of AAIGrid  "${rgisFile%.gdbd*}.tif" "${rgisFile%.gdbd*}.grd"
 	(echo "2"
@@ -350,7 +179,7 @@ function PGrasterize ()
 	rm  "${rgisFile%.gdbd*}.tif" "${rgisFile%.gdbd*}.grd.aux.xml" "${rgisFile%.gdbd*}.prj" "${rgisFile%.gdbd*}.grd"
 
 	PGattribTableSQL "sensitive" "${schema}" "${tblName}" "${idField}" "${geom}" |\
-	psql -q "$(PGdbName "${dbName}")" |\
+	psql -q "${dbName}" |\
 	table2rgis - "${rgisFile%.gdbd*}.gdbt"
 
 	tblJoinTables -t "${schema} ${tblName}" -u "Zones" -a "${rgisFile%.gdbd*}.gdbt" -e "DBItems" -o "DBItems" -r "GridValue" -j "${idField}" "${rgisFile}" - |\
@@ -386,7 +215,7 @@ UPDATE \"${schema}\".\"${table}\"
 FROM \"RGISTemp_TABLE\"
 WHERE \"${schema}\".\"${table}\".\"${charField}\" like \"RGISTemp_TABLE\".\"${charField}\";
 
-DROP TABLE \"RGISTemp_TABLE\";" | psql -q "$(PGdbName "${dbName}")"
+DROP TABLE \"RGISTemp_TABLE\";" | psql -q "${dbName}"
 }
 
 function PGgpkgExportObject ()
@@ -440,5 +269,3 @@ function PGgpkgExportSchema ()
 	done
 	IFS="${ifs}"
 }
-
-if [[ "${GHAASsslDIR}" != "" ]]; then PGsslDir "${GHAASsslDIR}"; else export _GHAASpgSSLdir=""; fi
