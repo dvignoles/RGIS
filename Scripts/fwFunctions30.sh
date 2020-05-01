@@ -9,7 +9,18 @@
 if [ "${GHAASDIR}" == "" ]; then GHAASDIR="/usr/local/share/ghaas"; fi
 source "${GHAASDIR}/Scripts/RGISfunctions.sh"
 
-_fwMAXPROC=${GHAASprocessorNum}
+if (( "${GHAASprocessorNum}" < 0))
+then
+    _fwMAXPROC=1
+    export GHAASprocessorNum=${_fwMAXPROC}
+elif (( "${GHAASprocessorNum}" <= 16 ))
+then
+     _fwMAXPROC="${GHAASprocessorNum}"
+else
+    _fwMAXPROC=16
+    export GHAASprocessorNum=${_fwMAXPROC}
+fi
+
 _fwPASSNUM=5
 _fwRESTART=""
 
@@ -62,23 +73,20 @@ function FwArguments()
 	          _fwSPINUP="on"
 	        _fwFINALRUN="on"
 	_fwLENGTHCORRECTION=""
-	     _fwPOSTPROCESS="on"
-          _fwPREPROCESS="auto"
-          _fwPURGEFILES="on"
 	         FwWARNINGS="on"
 	        _fwTESTONLY="off"
 	    _fwOPTIONSPRINT="off"
-		    _fwOUTFORMAT="gdbc"
+		   _fwOUTFORMAT="gdbc"
 	     _fwDAILYOUTPUT="off"
 	          FwVERBOSE="off"
+	    _fwOPTIONSPIPED="off"
+
 	while [ "${1}" != "" ]
 	do
 		case ${1} in
-			(-a|--restart)
+			(-r|--restart)
 				shift
 				 _fwRESTART="${1}"
-				  _fwSPINUP="off"
-				_fwFINALRUN="on"
 			;;
 			(-s|--spinup)
 				shift
@@ -129,39 +137,6 @@ function FwArguments()
 					;;
 				esac
 				;;
-			(-r|--preprocess)
-				shift
-				case ${1} in
-					(auto|forced)
-						_fwPREPROCESS="${1}"
-					;;
-					(*)
-						echo "Invalid --preprocess argument [${1}]"
-					;;
-				esac
-			;;
-			(-p|--postprocess)
-				shift
-				case ${1} in
-					(on|off)
-						_fwPOSTPROCESS="${1}"
-					;;
-					(*)
-						echo "Invalid --postprocess argument [${1}]"
-					;;
-				esac
-			;;
-			(-u|--purgefiles)
-				shift
-				case ${1} in
-					(on|off)
-						_fwPURGEFILES="${1}"
-					;;
-					(*)
-						echo "Invalid --purgfiles argument [${1}]"
-					;;
-				esac
-			;;
 			(-W|--warnings)
 				shift
 				case ${1} in
@@ -173,16 +148,37 @@ function FwArguments()
 					;;
 				esac
 			;;
+			(-p|--piped)
+				shift
+				case ${1} in
+					(on)
+					    _fwOPTIONSPIPED="on"
+				    	export GHAASparallelIO="single"
+					;;
+					(off)
+						_fwOPTIONSPIPED="off"
+					;;
+					(*)
+						echo "Invalid --piped argument [${1}]"
+					;;
+				esac
+			;;
 			(-O|--optionsprint)
 				_fwOPTIONSPRINT="on"
 			;;
 			(-P|--processors)
 				shift
-				if (( "${1}" < 0 || "${1}" > 64 ))
+				if   (( "${1}"  <  0 ))
 				then
 					echo "Invalid --process number [${1}]"
-				else
+					_fwMAXPROC=1
+					export GHAASprocessorNum=${_fwMAXPROC}
+				elif (( "${1}" <= 16 ))
+				then
 					_fwMAXPROC="${1}"
+					export GHAASprocessorNum=${_fwMAXPROC}
+				else
+					_fwMAXPROC=16
 					export GHAASprocessorNum=${_fwMAXPROC}
 				fi
 			;;
@@ -206,26 +202,29 @@ function FwArguments()
 			(-h|--help)
 				_fwPROGNAME="${0##*/}" # I don't know how this one works.
 				echo "${_fwPROGNAME} [-s on|off] [-f on|off] [-p on|off] -W on|off -T -V"
-				echo "           -a, --restart      <year>"
+				echo "           -r, --restart      <year>"
 				echo "           -s, --spinup       on|off"
 				echo "           -f, --finalrun     on|off"
-				echo "           -l, --lengthcorrection    [value]"
+				echo "           -l, --lengthcorrection [value]"
 				echo "           -n, --passnum      [num]"
 				echo "           -m, --outputformat [rgis|netcdf]"
-				echo "           -r, --preprocess   auto|forced"
+				echo "           -p, --piped        on|off"
 				echo "           -P, --processors   [# of processors]"
-				echo "           -p, --postprocess  on|off"
-				echo "           -u, --purgefiles   on|off"
 				echo "           -W, --warnings     on|off"
 				echo "           -T, --testonly"
 				echo "           -O, --optionsprint"
 				echo "           -D, --dailyoutput  on|off"
 				echo "           -V, --verbose"
+                echo "           -g, --gdb"
 				return 1
 		esac
 		shift
 	done
-	if [ "${_fwRESTART}" == "on" ]; then _fwSPINUP="off"; fi
+	if [ "${_fwRESTART}" != "" ]
+	then
+		  _fwSPINUP="off"
+	    _fwFINALRUN="on"
+	fi
 	return 0
 }
 
@@ -239,13 +238,16 @@ function FwInit()
 
 	if [ "${6}" != "" ]; then export _fwRGISBIN="${6}/"; else export _fwRGISBIN=""; fi
 
-	    _fwDomainTYPE="${_fwRGISDomainFILE##*.}"
-         FwDomainRES="${_fwRGISDomainFILE%.*}"
+	    _fwDomainTYPE="${_fwRGISDomainFILE%.gz}"
+	    _fwDomainTYPE="${_fwDomainTYPE##*.}"
+			FwDomainRES="${_fwRGISDomainFILE%.gz}"
+         FwDomainRES="${FwDomainRES%.*}"
          FwDomainRES="${FwDomainRES%_*}"
          FwDomainRES="${FwDomainRES##*_}"
-	[ "${_fwRGISDomainFILE}" == "${FwDomainRES}" ] && FwDomainRES="unset"
+
+ 	[ "${_fwRGISDomainFILE}" == "${FwDomainRES}" ] && FwDomainRES="unset"
 	case ${_fwDomainTYPE} in
-		(gdbn|gdbn.gz)
+		(gdbn|gbdn.gz)
 			_fwDomainTYPE="Network"
 		;;
 		(gdbc|gdbc.gz|gdbd|gdbd.gz)
@@ -318,7 +320,7 @@ function FwOptions()
 		local     fwSET="${fwLINES[(( fwVARnum * 5 + 2))]}"
 		local    fwFLUX="${fwLINES[(( fwVARnum * 5 + 3))]}"
 		local fwINITIAL="${fwLINES[(( fwVARnum * 5 + 4))]}"
-		
+
 		if [ "${fwFLUX}"    == "no"  ]
 		then
 			_fwVariableARRAY[${fwVARnum}]="${_fwVariableITEM} avg"
@@ -375,10 +377,10 @@ function _fwPrintTest()
 			echo "  ${fwInputITEM[0]} is missing from data sources!"
 		elif [ "${fwSOURCE[3]}" == "const" ]
 		then
-			echo "  ${fwInputITEM[0]} Constant [${fwSOURCE[4]}] input"		
+			echo "  ${fwInputITEM[0]} Constant [${fwSOURCE[4]}] input"
 		elif [ "${fwSOURCE[3]}" == "pipe"  ]
 		then
-			echo "  ${fwInputITEM[0]} Piped input"		
+			echo "  ${fwInputITEM[0]} Piped input"
 		elif [ "${fwSOURCE[3]}" == "file"  ]
 		then
 			if [ -e "${fwSOURCE[4]}" ]
@@ -454,12 +456,17 @@ function _fwPreprocess()
 {
 	local    fwYEAR="${1}"; shift
 
-	local fwPROC
+	if [ "${fwYEAR}" == "" ]
+	then
+		local fwPiped="off"
+	else
+		local fwPiped="${_fwOPTIONSPIPED}"
+	fi
+	[ -e "${_fwRGISDomainFILE}" ] || ( echo "Missing domain file: ${_fwRGISDomainFILE}"; return 1; )
+
 	[ "${FwVERBOSE}" == "on" ] && echo "      Preprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"
-	(( fwPROC = 0 ))
-	[ -e "${_fwGDSDomainDIR}"        ] || mkdir -p "${_fwGDSDomainDIR}"
-	[ "${_fwPREPROCESS}" == "forced" ] && rm -f "${_fwGDSDomainFILE}";
-	[ -e "${_fwGDSDomainFILE}"       ] || ${_fwRGISBIN}rgis2domain ${_fwLENGTHCORRECTION} "${_fwRGISDomainFILE}" "${_fwGDSDomainFILE}";
+	[ -e "${_fwGDSDomainDIR}"  ] || mkdir -p "${_fwGDSDomainDIR}"
+	[ -e "${_fwGDSDomainFILE}" ] || ${_fwRGISBIN}rgis2domain ${_fwLENGTHCORRECTION} "${_fwRGISDomainFILE}" "${_fwGDSDomainFILE}"
 
 	for (( fwI = 0; fwI < ${#_fwInputARRAY[@]} ; ++fwI ))
 	do
@@ -482,25 +489,31 @@ function _fwPreprocess()
 		[ "${fwSOURCE[2]}" == "" ] && { echo "  ${fwInputITEM} version is missing!";                   return 1; }
 		[ "${fwSOURCE[3]}" == "" ] && { echo "  ${fwInputITEM} data source type is missing!";          return 1; }
 		[ "${fwSOURCE[4]}" == "" ] && { echo "  ${fwInputITEM} data source specification is missing!"; return 1; }
+
 		if [ "${fwSOURCE[3]}" == "const" ]
 		then
 			[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} Constant input"
 		elif [ "${fwSOURCE[3]}" == "file" ]
 		then
 			[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} File input"
-            [ -e "${fwSOURCE[4]}" ] || { echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!  At line 520"; return 1; }
-			[ -e "${_fwGDSDomainDIR}/${fwSOURCE[2]}" ] || mkdir -p "${_fwGDSDomainDIR}/${fwSOURCE[2]}"
-			local fwFILENAME="$(FwGDSFilename "${fwInputITEM}" "Input" "${fwSOURCE[2]}" "${fwInYEAR}" "d")"
-			[ "${_fwPREPROCESS}" == "forced" ] && rm -f "${fwFILENAME}"
-			[ -e "${fwFILENAME}" ] && continue
-			[ -e "${_fwRGISDomainFILE}" ] || { echo "Missing domain file: ${_fwRGISDomainFILE}"; return 1; }
-			[ "${fwPROC}" -ge "${_fwMAXPROC}" ] && { wait; (( fwPROC = 0 )) ; }
-            ${_fwRGISBIN}rgis2ds -m "${_fwRGISDomainFILE}" "${fwSOURCE[4]}" "${fwFILENAME}" &
-			(( ++fwPROC ))
-		fi
+
+            if [ -e "${fwSOURCE[4]}" ]
+            then
+					[ -e "${_fwGDSDomainDIR}/${fwSOURCE[2]}" ] || mkdir -p "${_fwGDSDomainDIR}/${fwSOURCE[2]}"
+					local fwFILENAME="$(FwGDSFilename "${fwInputITEM}" "Input" "${fwSOURCE[2]}" "${fwInYEAR}" "d")"
+					rm -f "${fwFILENAME}"
+					[ "${fwPiped}" == "on" ] && mkfifo "${fwFILENAME}"
+            	${_fwRGISBIN}rgis2ds -m "${_fwRGISDomainFILE}" "${fwSOURCE[4]}" "${fwFILENAME}" &
+            else
+            	echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
+        	fi
+        fi
 	done
-	wait
-	[ "${FwVERBOSE}" == "on" ] && echo "      Preprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"
+	if [ "${fwPiped}"   == "off" ]
+	then
+		wait
+		[ "${FwVERBOSE}" == "on"  ] && echo "      Preprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"
+	fi
 	return 0
 }
 
@@ -509,41 +522,47 @@ function _fwPostprocess()
     local fwVERSION="${1}"; shift
 	local    fwYEAR="${1}"; shift
 
-	local fwPROC
 	if [ "${fwYEAR}" == "" ]; then local fwSUFFIX="LT"; else local fwSUFFIX="TS${fwYEAR}"; fi
-	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"; }
-	(( fwPROC = 0 ))
+	[ "${_fwOPTIONSPIPED}" == "off" ] && [ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"; }
+
+	local files=""
 	for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
 	do
 		local fwVARIABLE="${_fwOutputARRAY[${fwI}]}"
 		local    fwAMODE="$(_fwVariable "${fwVARIABLE}")"
 		[ "${fwAMODE}" == "" ] && { echo "Skipping undefinded variable [${fwVARIABLE}]"; continue; }
 		local fwGDSFileNAME="$(FwGDSFilename "${fwVARIABLE}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
-		[ -e "${fwGDSFileNAME}" ] || local fwGDSFileNAME="$(FwGDSFilename "${fwVARIABLE}" "State" "${fwVERSION}" "${fwYEAR}" "d")"
-		[ -e "${fwGDSFileNAME}" ] || { echo "Skipping missing variable [${fwVARIABLE}]"; echo ${fwGDSFileNAME}; continue; }
+		[ -e "${fwGDSFileNAME}" ] || ( echo "Skipping missing variable [${fwVARIABLE}]"; echo ${fwGDSFileNAME}; continue; )
+
+      mkfifo "${fwGDSFileNAME}.FIFO1" "${fwGDSFileNAME}.FIFO2"
+
 		if [ "${_fwDAILYOUTPUT}" == "on" ]
 		then
 			local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "d" "${fwYEAR}")"
 			[ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
-			[ "${fwPROC}" -ge "${_fwMAXPROC}" ] && { wait; (( fwPROC = 0 )); }
-			${_fwRGISBIN}ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Daily${fwSUFFIX})"\
-			                     -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue ${fwGDSFileNAME} ${fwRGISFileNAME} &
-			(( ++fwPROC ))
-		fi
-		[ "${fwPROC}" -ge "${_fwMAXPROC}" ] && { wait; (( fwPROC = 0 )); }
+			mkfifo "${fwGDSFileNAME}.FIFO3"
+            (cat "${fwGDSFileNAME}" | tee "${fwGDSFileNAME}.FIFO1" "${fwGDSFileNAME}.FIFO2" > "${fwGDSFileNAME}.FIFO3"
+			 ${_fwRGISBIN}ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Daily${fwSUFFIX})"\
+			                      -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue \
+			                      "${fwGDSFileNAME}.FIFO3" "${fwRGISFileNAME}"
+             rm "${fwGDSFileNAME}.FIFO3"
+		     rm "${fwGDSFileNAME}") &
+		else
+            (cat "${fwGDSFileNAME}" | tee "${fwGDSFileNAME}.FIFO1" > "${fwGDSFileNAME}.FIFO2"
+            rm "${fwGDSFileNAME}") &
+        fi
 		local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "m" "${fwYEAR}")"
 		[ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
-		${_fwRGISBIN}dsAggregate -e month -a ${fwAMODE} ${fwGDSFileNAME} |\
-		${_fwRGISBIN}ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Monthly${fwSUFFIX})"\
-		                     -m ${_fwRGISDomainFILE}  -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue - ${fwRGISFileNAME} &
-		(( ++fwPROC ))
-		[ "${fwPROC}" -ge "${_fwMAXPROC}" ] && { wait; (( fwPROC = 0 )); }
+		(${_fwRGISBIN}dsAggregate -e month -a ${fwAMODE} "${fwGDSFileNAME}.FIFO1" - |\
+		 ${_fwRGISBIN}ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Monthly${fwSUFFIX})" \
+		                      -m ${_fwRGISDomainFILE}  -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue - ${fwRGISFileNAME}
+		 rm "${fwGDSFileNAME}.FIFO1") &
 		local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "a" "${fwYEAR}")"
 		[ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
-		${_fwRGISBIN}dsAggregate -e year -a ${fwAMODE} ${fwGDSFileNAME} |\
-		${_fwRGISBIN}ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Yearly${fwSUFFIX})"\
-		                     -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}"  -s blue - ${fwRGISFileNAME} &
-		(( ++fwPROC ))
+		(${_fwRGISBIN}dsAggregate -e year -a ${fwAMODE} "${fwGDSFileNAME}.FIFO2" - |\
+		 ${_fwRGISBIN}ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Yearly${fwSUFFIX})" \
+		                      -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}"  -s blue - ${fwRGISFileNAME}
+		 rm "${fwGDSFileNAME}.FIFO2") &
 	done
 	wait
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"; }
@@ -553,21 +572,39 @@ function _fwPostprocess()
 function _fwSpinup()
 {
 	local fwVERSION="${1}"; shift
+	local    fwYEAR="${1}"; shift
 
 	local fwPASS
 	local fwInputITEM
 	local fwOutputITEM
-
-	local fwOptionsFILE="${_fwGDSLogDIR}/Spinup0_Options.log"
-	local     fwUserLOG="file:${_fwGDSLogDIR}/Spinup0_UserError.log"
-	local    fwDebugLOG="file:${_fwGDSLogDIR}/Spinup0_Debug.log"
-	local  fwWarningLOG="file:${_fwGDSLogDIR}/Spinup0_Warnings.log"
-	local     fwInfoLOG="file:${_fwGDSLogDIR}/Spinup0_Info.log"
+	local doState="dostate"
 
 	[ "${FwVERBOSE}" == "on" ] && echo "Initialization started:  $(date '+%Y-%m-%d %H:%M:%S')"
-	_fwPreprocess "" || return 1
+	_fwPreprocess ""
 	for ((fwPASS = 1; fwPASS <= _fwPASSNUM; ++fwPASS))
 	do
+		if   (( fwPASS == 1 ))
+		then
+			local fwOptionsFILE="${_fwGDSLogDIR}/Spinup0_Options.log"
+			local     fwUserLOG="file:${_fwGDSLogDIR}/Spinup0_UserError.log"
+			local    fwDebugLOG="file:${_fwGDSLogDIR}/Spinup0_Debug.log"
+			local  fwWarningLOG="file:${_fwGDSLogDIR}/Spinup0_Warnings.log"
+			local     fwInfoLOG="file:${_fwGDSLogDIR}/Spinup0_Info.log"
+		elif (( fwPASS < _fwPASSNUM ))
+		then
+			local fwOptionsFILE="${_fwGDSLogDIR}/SpinupI_Options.log"
+			local     fwUserLOG="file:${_fwGDSLogDIR}/SpinupI_UserError.log"
+			local    fwDebugLOG="file:${_fwGDSLogDIR}/SpinupI_Debug.log"
+			local  fwWarningLOG="file:${_fwGDSLogDIR}/SpinupI_Warnings.log"
+			local     fwInfoLOG="file:${_fwGDSLogDIR}/SpinupI_Info.log"
+		else
+			local fwOptionsFILE="${_fwGDSLogDIR}/SpinupN_Options.log"
+			local     fwUserLOG="file:${_fwGDSLogDIR}/SpinupN_UserError.log"
+			local    fwDebugLOG="file:${_fwGDSLogDIR}/SpinupN_Debug.log"
+			local  fwWarningLOG="file:${_fwGDSLogDIR}/SpinupN_Warnings.log"
+			local     fwInfoLOG="file:${_fwGDSLogDIR}/SpinupN_Info.log"
+		fi
+
 		fwOptions=$(echo ${_fwGDSDomainFILE}
 		echo "-m sys_error=on"
 		echo "-m app_error=on"
@@ -584,7 +621,7 @@ function _fwSpinup()
 			then
 				echo "-i ${fwSOURCE[0]}=const:${fwSOURCE[4]}"
 			else
-				echo "-i ${fwSOURCE[0]}=file:$(FwGDSFilename "${fwSOURCE[0]}" "Input" "${fwSOURCE[2]}" "" "d")"
+				echo    "-i ${fwSOURCE[0]}=file:$(FwGDSFilename "${fwSOURCE[0]}" "Input" "${fwSOURCE[2]}" "" "d")"
 			fi
 		done
 		if (( fwPASS == 1 ))
@@ -612,45 +649,56 @@ function _fwSpinup()
 		for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
 		do
 			local fwOutputITEM=(${_fwStateARRAY[${fwI}]})
-			echo "-t ${fwOutputITEM}=file:$(FwGDSFilename "${fwOutputITEM[0]}" "State"  "${fwVERSION}" "" "d")"
+			echo "-t ${fwOutputITEM[0]}=file:$(FwGDSFilename "${fwOutputITEM[0]}" "State"  "${fwVERSION}" "" "d")"
 		done
-		for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
-		do
-			local fwOutputITEM=(${_fwOutputARRAY[${fwI}]})
-			if [ "$(_fwState ${fwOutputITEM})" == "" ]
-			then
-				echo "-o ${fwOutputITEM}=file:$(FwGDSFilename "${fwOutputITEM[0]}" "Output" "${fwVERSION}" "" "d")"
-			fi
-		done)
+		if (( fwPASS == _fwPASSNUM ))
+		then
+			for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
+			do
+				local fwOutputITEM=(${_fwOutputARRAY[${fwI}]})
+				echo "-o ${fwOutputITEM[0]}=file:$(FwGDSFilename "${fwOutputITEM[0]}" "Output" "${fwVERSION}" "" "d")"
+				[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo $(FwGDSFilename "${fwOutputITEM[0]}" "Output" "${fwVERSION}" "" "d")
+			done
+		fi)
 
 		echo "${fwOptions}" > ${fwOptionsFILE}
 		[ "${FwVERBOSE}" == "on" ] && echo "   Passnum [${fwPASS}] started:  $(date '+%Y-%m-%d %H:%M:%S')"
-		if echo ${fwOptions} | xargs ${_fwModelBIN}
+
+		if [ "${_fwOPTIONSPIPED}" == "on" ]
 		then
-			[ "${FwVERBOSE}" == "on" ] && echo "   Passnum [${fwPASS}] finished: $(date '+%Y-%m-%d %H:%M:%S')"
-			local fwOptionsFILE="${_fwGDSLogDIR}/SpinupN_Options.log"
-			local     fwUserLOG="file:${_fwGDSLogDIR}/SpinupN_UserError.log"
-			local    fwDebugLOG="file:${_fwGDSLogDIR}/SpinupN_Debug.log"
-			local  fwWarningLOG="file:${_fwGDSLogDIR}/SpinupN_Warnings.log"
-			local     fwInfoLOG="file:${_fwGDSLogDIR}/SpinupN_Info.log"
+			if ((fwPASS < _fwPASSNUM))
+			then
+    			echo ${fwOptions} | xargs ${_fwModelBIN}
+    		else
+    		    echo ${fwOptions} | xargs ${_fwModelBIN} &
+			fi
 		else
-			[ "${FwVERBOSE}" == "on" ] && echo "   Passnum [${fwPASS}] failed:   $(date '+%Y-%m-%d %H:%M:%S')"
-			return 1
+            echo ${fwOptions} | xargs ${_fwModelBIN}
 		fi
 	done
-	[ "${_fwPOSTPROCESS}" == "on" ] && { _fwPostprocess "${fwVERSION}" "" || return 1; }
+	_fwPostprocess "${fwVERSION}" ""
 	[ "${FwVERBOSE}"      == "on" ] && echo "Initialization finished: $(date '+%Y-%m-%d %H:%M:%S')"
+
+	local fwInputList=$(echo "${fwOptions}" | grep -e "-i" | grep -e "file:"| grep -e "Input" | sed "s:.*file\:\(.*\):\1:")
+	[ "${fwInputList}" == "" ] || rm -f ${fwInputList}
 	return 0
 }
 
 function _fwRun()
 {
-    local     fwVERSION="${1}"; shift
-    local   fwStartYEAR="${1}"; shift
+   local      fwVERSION="${1}"; shift
+	local   fwStartYEAR="${1}"; shift
 	local     fwEndYEAR="${1}"; shift
 
+	local fwStateList=""
 	[ "${FwVERBOSE}" == "on" ] && echo "Model run started:  $(date '+%Y-%m-%d %H:%M:%S')"
-	for (( fwYEAR = fwStartYEAR; fwYEAR <= fwEndYEAR; ++fwYEAR ))
+    if [ "${_fwRESTART}" == "" ]
+    then
+        fwFirstYEAR="${fwStartYEAR}"
+    else
+        fwFirstYEAR="${_fwRESTART}"
+    fi
+	for (( fwYEAR = fwFirstYEAR; fwYEAR <= fwEndYEAR; ++fwYEAR ))
 	do
 		local fwOptionsFILE="${_fwGDSLogDIR}/Run${fwYEAR}_Options.log"
 		local     fwUserLOG="file:${_fwGDSLogDIR}/Run${fwYEAR}_UserError.log"
@@ -666,20 +714,7 @@ function _fwRun()
 		echo "-m   warning=${fwWarningLOG}"
 		echo "-m      info=${fwInfoLOG}"
 		echo "$(_fwOptionList)"
-		if (( fwYEAR == fwStartYEAR ))
-		then
-			for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
-		 	do
-				local fwInputITEM=(${_fwStateARRAY[${fwI}]})
-				echo "-i ${fwInputITEM}=file:$(FwGDSFilename "${fwInputITEM[0]}" "State" "${fwVERSION}" "" "d")"
-			done
-		else
-			for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
-		 	do
-				local fwInputITEM=(${_fwStateARRAY[${fwI}]})
-				echo "-i ${fwInputITEM}=file:$(FwGDSFilename "${fwInputITEM[0]}" "State" "${fwVERSION}" "$(( fwYEAR - 1 ))" "d")"
-			done
-		fi
+
 		for (( fwI = 0; fwI < ${#_fwInputARRAY[@]} ; ++fwI ))
 		do
 			local  fwInputITEM=(${_fwInputARRAY[${fwI}]})
@@ -707,49 +742,47 @@ function _fwRun()
 				fi
 			fi
 		done
+		if (( fwYEAR == fwStartYEAR ))
+		then
+			for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
+		 	do
+				local fwInputITEM=(${_fwStateARRAY[${fwI}]})
+				echo "-i ${fwInputITEM}=file:$(FwGDSFilename "${fwInputITEM[0]}" "State" "${fwVERSION}" "" "d")"
+			done
+		else
+			for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
+		 	do
+				local fwInputITEM=(${_fwStateARRAY[${fwI}]})
+				echo "-i ${fwInputITEM}=file:$(FwGDSFilename "${fwInputITEM[0]}" "State" "${fwVERSION}" "$(( fwYEAR - 1 ))" "d")"
+			done
+		fi
+
 		for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
  		do
 			local fwStateITEM=(${_fwStateARRAY[${fwI}]})
 			echo "-t ${fwStateITEM}=file:$(FwGDSFilename "${fwStateITEM}" "State" "${fwVERSION}" "${fwYEAR}" "d")"
- 		done
+		done
 		for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
  		do
 			local fwOutputITEM=${_fwOutputARRAY[${fwI}]}
-			if [ "$(_fwState ${fwOutputITEM})" == "" ]
-			then
-				echo "-o ${fwOutputITEM}=file:$(FwGDSFilename "${fwOutputITEM[0]}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
-			fi
+			echo "-o ${fwOutputITEM}=file:$(FwGDSFilename "${fwOutputITEM[0]}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
+			[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "$(FwGDSFilename "${fwOutputITEM[0]}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
  		done)
+
 		echo "${fwOptions}" > ${fwOptionsFILE}
 
-		_fwPreprocess "${fwYEAR}" || return 1
 		[ "${FwVERBOSE}" == "on" ] && echo "   Running year [${fwYEAR}] started:  $(date '+%Y-%m-%d %H:%M:%S')"
-		if echo ${fwOptions} | xargs ${_fwModelBIN}
+		_fwPreprocess "${fwYEAR}"
+		if [ "${_fwOPTIONSPIPED}" == "on" ]
 		then
-			[ "${_fwPOSTPROCESS}" == "on" ] && { _fwPostprocess "${fwVERSION}" "${fwYEAR}" || return 1; }
-			[ "${FwVERBOSE}"      == "on" ] && echo "   Running year [${fwYEAR}] finished: $(date '+%Y-%m-%d %H:%M:%S')"
+			echo ${fwOptions} | xargs ${_fwModelBIN} &
 		else
-			[ "${FwVERBOSE}"      == "on" ] && echo "   Running year [${fwYEAR}] failed:   $(date '+%Y-%m-%d %H:%M:%S')"
-			return 1
+            echo ${fwOptions} | xargs ${_fwModelBIN}
 		fi
-		if [ "${_fwPURGEFILES}" == "on" ] && (( fwYEAR != fwStartYEAR ))
-		then
-			for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
-			 do
-				local fwInputITEM=(${_fwStateARRAY[${fwI}]})
-				rm -f "$(FwGDSFilename "${fwInputITEM[0]}" "State" "${fwVERSION}" "$(( fwYEAR - 1 ))" "d")"
-			done
-		fi
+		_fwPostprocess "${fwVERSION}" "${fwYEAR}"
+		local fwInputList=$(echo "${fwOptions}" | grep -e "-i" | grep -e "file:"| grep -e "Input" | sed "s:.*file\:\(.*\):\1:")
+		[ "${fwInputList}" == "" ] || rm -f ${fwInputList}
 	done
-	if [ "${_fwPURGEFILES}" == "on" ]
-	then
-		for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
-		 do
-			local fwInputITEM=(${_fwStateARRAY[${fwI}]})
-			rm -f "$(FwGDSFilename "${fwInputITEM[0]}" "State" "${fwVERSION}" "$(( fwYEAR - 1 ))" "d")"
-		done
-	fi
-
 	[ "${FwVERBOSE}" == "on" ] && echo "Model run finished: $(date '+%Y-%m-%d %H:%M:%S')"
 	return 0
 }
@@ -760,7 +793,7 @@ function FwRun()
 	local fwStartYEAR="${1}"; shift
 	local   fwEndYEAR="${1}"; shift
 
-	     _fwGDSLogDIR="${_fwGDSDomainDIR}/${fwVERSION}/logs"
+	     _fwGDSLogDIR="${_fwGDSDomainDIR}/${fwVERSION}"
 
 	[ "${_fwTESTONLY}" == "on" ] && { { _fwPrintTest || return 1; } && return 0; }
 	[ -e "${_fwGDSLogDIR}" ] || mkdir -p ${_fwGDSLogDIR}
