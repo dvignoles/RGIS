@@ -545,6 +545,7 @@ function _fwPostprocess()
     		 grdTSAggr -e month -a ${fwAMODE} \
     		           -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Monthly${fwSUFFIX})" \
     		           -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue "${fwRGISourceFileName}" "${fwRGISFileNAME}"
+			 local fwRGISourceFileName="${fwRGISFileNAME}"
 			 local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "a" "${fwYEAR}")"
     		 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
     		 grdTSAggr -e year -a ${fwAMODE} \
