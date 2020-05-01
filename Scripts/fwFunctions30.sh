@@ -539,6 +539,7 @@ function _fwPostprocess()
 			mkfifo "${fwGDSFileNAME}.FIFO3"
             (cat "${fwGDSFileNAME}" | tee "${fwGDSFileNAME}.FIFO1" | tee "${fwGDSFileNAME}.FIFO2" > "${fwGDSFileNAME}.FIFO3"
              rm "${fwGDSFileNAME}") &
+            sleep 1
 			(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "d" "${fwYEAR}")"
 			 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
 			 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Daily${fwSUFFIX})"  \
@@ -548,6 +549,7 @@ function _fwPostprocess()
 		else
             (cat "${fwGDSFileNAME}" | tee "${fwGDSFileNAME}.FIFO1" > "${fwGDSFileNAME}.FIFO2"
              rm "${fwGDSFileNAME}") &
+            sleep 1
         fi
 		(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "m" "${fwYEAR}")"
 		 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
