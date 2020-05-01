@@ -537,11 +537,11 @@ function _fwPostprocess()
 		if [ "${_fwDAILYOUTPUT}" == "on" ]
 		then
 			mkfifo "${fwGDSFileNAME}.FIFO3"
-            (cat "${fwGDSFileNAME}" | tee "${fwGDSFileNAME}.FIFO1" "${fwGDSFileNAME}.FIFO2" > "${fwGDSFileNAME}.FIFO3"
+            (cat "${fwGDSFileNAME}" | tee "${fwGDSFileNAME}.FIFO1" | tee "${fwGDSFileNAME}.FIFO2" > "${fwGDSFileNAME}.FIFO3"
              rm "${fwGDSFileNAME}") &
 			(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "d" "${fwYEAR}")"
 			 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
-			 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Daily${fwSUFFIX})"\
+			 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Daily${fwSUFFIX})"  \
 			                      -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue \
 			                      "${fwGDSFileNAME}.FIFO3" "${fwRGISFileNAME}"
              rm "${fwGDSFileNAME}.FIFO3") &
