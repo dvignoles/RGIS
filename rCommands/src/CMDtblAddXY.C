@@ -19,11 +19,8 @@ bfekete@gc.cuny.edu
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
     CMmsgPrint(CMmsgInfo, "     -a,--table     [table name]");
-    CMmsgPrint(CMmsgInfo, "     -f,--field     [field name]");
-    CMmsgPrint(CMmsgInfo, "     -y,--type      [field type]");
-    CMmsgPrint(CMmsgInfo, "     -l,--length    [field length]");
-    CMmsgPrint(CMmsgInfo, "     -w,--width     [display width]");
-    CMmsgPrint(CMmsgInfo, "     -e,--decimals  [display decimals]");
+    CMmsgPrint(CMmsgInfo, "     -x,--Xfield    [field name]");
+    CMmsgPrint(CMmsgInfo, "     -y,--Yfield    [field name]");
     CMmsgPrint(CMmsgInfo, "     -V,--verbose");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
