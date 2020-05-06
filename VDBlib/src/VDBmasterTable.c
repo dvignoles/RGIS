@@ -118,6 +118,7 @@ static VDBmasterTable_t _VDBmasterTable [] = {
         {"soil",          "coarse_percent_by_weight",          "Soil-CoarsePercentByWeight",      "Percent Coarse by Weight",          "continuous", "grey",        "avg"},
         {"soil",          "particle_density",                  "Soil-ParticleDensity",            "Particle Density",                  "continuous", "grey",        "avg"},
         {"soil",          "porosity",                          "Soil-Porosity",                   "Porosity",                          "continuous", "grey",        "avg"},
+        {"soil",          "probability_of_horizon",            "Soil-ProbabilityOfRHorizon",      "Probability of R Horizon",          "continuous", "grey",        "avg"},
         {"soil",          "rooting_depth",                     "Soil-RootingDepth",               "Rooting Depth",                     "continuous", "grey",        "sum"},
         {"soil",          "sand_percent_by_volume",            "Soil-SandPercentByVolume",        "Percent Sand by Volume",            "continuous", "grey",        "avg"},
         {"soil",          "sand_percent_by_weight",            "Soil-SandPercentByWeight",        "Percent Sand by Weight",            "continuous", "grey",        "avg"},
