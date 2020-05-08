@@ -335,18 +335,14 @@ public:
 
         GridIF = new DBGridIF(data);
         taskNum = GridIF->RowNum() * (size_t) GridIF->ColNum();
-        if (team.ThreadNum > 1) {
-            if ((job = CMthreadJobCreate(taskNum, userFunc, (void *) this)) ==
-                (CMthreadJob_p) NULL) {
-                CMmsgPrint(CMmsgAppError, "Job creation error in %s:%d", __FILE__, __LINE__);
-                CMthreadTeamDestroy(&team);
-                return ((DBObjData *) NULL);
-            }
-            for (threadId = 0; threadId < team.ThreadNum; ++threadId)
+        if (team.ThreadNum > 1) { job = CMthreadJobCreate(taskNum, userFunc, (void *) this); }
+        if (job != (CMthreadJob_p) NULL) {
+            for (threadId = 0; threadId < team.ThreadNum; ++threadId) {
                 if (Table->Add("TEMPRecord") == (DBObjRecord *) NULL) {
                     CMthreadTeamDestroy(&team);
                     return ((DBObjData *) NULL);
                 }
+            }
         }
         else {
             if ((record = Table->Add("TEMPRecord")) == (DBObjRecord *) NULL) return ((DBObjData *) NULL);
