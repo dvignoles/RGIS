@@ -147,9 +147,9 @@ static VDBmasterTable_t _VDBmasterTable [] = {
         {"station",       "reservoir",                         "Reservoir",                       "Reservoir",                         "point",      "N/A",         "N/A"},
         {"station",       "reservoir_catchment",               "Reservoir-Catchment",             "Reservoir Catchment",               "discrete",   "N/A",         "N/A"},
         {"station",       "drainage_area",                     "DrainageArea",                    "Drainage Area",                     "continuous", "grey",        "max"},
-        {"topography",    "bathymetry",                        "bathymetry",                      "Bathymetry",                        "continuous", "blue",        "avg"},
-        {"topography",    "bathymetry_min",                    "bathymetry-Min",                  "Minimum Depth",                     "continuous", "blue",        "avg"},
-        {"topography",    "bathymetry_max",                    "bathymetry-Max",                  "Maximum Depth",                     "continuous", "blue",        "avg"},
+        {"topography",    "bathymetry",                        "Bathymetry",                      "Bathymetry",                        "continuous", "blue",        "avg"},
+        {"topography",    "bathymetry_min",                    "Bathymetry-Min",                  "Minimum Depth",                     "continuous", "blue",        "avg"},
+        {"topography",    "bathymetry_max",                    "Bathymetry-Max",                  "Maximum Depth",                     "continuous", "blue",        "avg"},
         {"topography",    "elevation",                         "Elevation",                       "Elevation",                         "continuous", "elevation",   "avg"},
         {"topography",    "min_elevation",                     "Elevation-Min",                   "Minimum Elevation",                 "continuous", "elevation",   "avg"},
         {"topography",    "max_elevation",                     "Elevation-Max",                   "Maximum Elevation",                 "continuous", "elevation",   "avg"}};
