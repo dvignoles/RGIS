@@ -886,7 +886,7 @@ DBInt RGlibNetworkCellSlopes(DBObjData *netData, DBObjData *inGridData, DBObjDat
 
 DBInt RGlibNetworkConfluences(DBObjData *netData, DBObjData *outPntData) {
     char recordName[DBStringLength];
-    DBInt cellId, pntId = 0, cellOrder, maxOrder = 0;
+    DBInt cellId, pntId = 0, cellOrder, maxOrder = 0, minOrder = 0;
     DBCoordinate coord;
     DBNetworkIF *netIF = new DBNetworkIF(netData);
     DBVPointIF *pntIF = new DBVPointIF(outPntData);
@@ -900,13 +900,30 @@ DBInt RGlibNetworkConfluences(DBObjData *netData, DBObjData *outPntData) {
         cellOrder = netIF->CellOrder(cellId);
         maxOrder = maxOrder > cellOrder ? maxOrder : cellOrder;
     }
-    for (cellOrder = 0; cellOrder < maxOrder; ++cellOrder) {
+    switch (maxOrder) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+            minOrder = 0;
+            break;
+        case 4:
+            minOrder = 1;
+            break;
+        case 5:
+            minOrder = 2;
+            break;
+        case 6:
+            minOrder = 3;
+            break;
+    }
+    for (cellOrder = minOrder; cellOrder < maxOrder; ++cellOrder) {
         sprintf(recordName, "Order: %2d", cellOrder + 1);
         pntIF->NewSymbol(recordName);
     }
     for (cellId = 0; cellId < netIF->CellNum(); ++cellId) {
         cellRec = netIF->Cell(cellId);
-        cellOrder = netIF->CellOrder(cellRec);
+        if ((cellOrder = netIF->CellOrder(cellRec)) < minOrder) continue;
         if (((toCellRec = netIF->ToCell(cellRec)) != (DBObjRecord *) NULL) &&
             (netIF->CellOrder(toCellRec) == cellOrder))
             continue;
