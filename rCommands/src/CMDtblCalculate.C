@@ -30,6 +30,8 @@ int main(int argc, char *argv[]) {
     DBInt expr, expNum = 0, tmpVar;
     char *tableName = (char *) NULL;
     char *fieldName = (char *) NULL;
+    char *title = (char *) NULL, *subject = (char *) NULL;
+    char *domain = (char *) NULL, *version = (char *) NULL;
     CMDExpression **expressions = (CMDExpression **) NULL;
     DBInt recID;
     DBObjectLIST<DBObject> *variables = new DBObjectLIST<DBObject>("Variables");
@@ -73,6 +75,42 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) < argPos) break;
             continue;
         }
+        if (CMargTest (argv[argPos], "-t", "--title")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing title!");
+                return (CMfailed);
+            }
+            title = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-u", "--subject")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing subject!");
+                return (CMfailed);
+            }
+            subject = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-d", "--domain")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing domain!");
+                return (CMfailed);
+            }
+            domain = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-v", "--version")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing version!");
+                return (CMfailed);
+            }
+            version = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
         if (CMargTest (argv[argPos], "-V", "--verbose")) {
             verbose = true;
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) < argPos) break;
@@ -102,6 +140,10 @@ int main(int argc, char *argv[]) {
         if (argNum > 1) CMmsgPrint(CMmsgUsrError, "File error in: %s", argv[1]);
         return (DBFault);
     }
+    if (title   == (char *) NULL) data->Name(title);
+    if (subject == (char *) NULL) data->Document(DBDocSubject,   subject);
+    if (domain  == (char *) NULL) data->Document(DBDocGeoDomain, domain);
+    if (version == (char *) NULL) data->Document(DBDocVersion,   version);
 
     if (tableName == (char *) NULL) tableName = DBrNItems;
 
