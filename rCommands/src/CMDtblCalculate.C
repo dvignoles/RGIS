@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     DBInt expr, expNum = 0, tmpVar;
     char *tableName = (char *) NULL;
     char *fieldName = (char *) NULL;
-    char *title = (char *) NULL, *subject = (char *) NULL;
+    char *title = (char *) NULL,  *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     CMDExpression **expressions = (CMDExpression **) NULL;
     DBInt recID;
@@ -144,10 +144,10 @@ int main(int argc, char *argv[]) {
         if (argNum > 1) CMmsgPrint(CMmsgUsrError, "File error in: %s", argv[1]);
         return (DBFault);
     }
-    if (title   == (char *) NULL) data->Name(title);
-    if (subject == (char *) NULL) data->Document(DBDocSubject,   subject);
-    if (domain  == (char *) NULL) data->Document(DBDocGeoDomain, domain);
-    if (version == (char *) NULL) data->Document(DBDocVersion,   version);
+    if (title   != (char *) NULL) data->Name(title);
+    if (subject != (char *) NULL) data->Document(DBDocSubject,   subject);
+    if (domain  != (char *) NULL) data->Document(DBDocGeoDomain, domain);
+    if (version != (char *) NULL) data->Document(DBDocVersion,   version);
 
     if (tableName == (char *) NULL) tableName = DBrNItems;
 
