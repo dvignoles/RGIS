@@ -11,7 +11,6 @@ bfekete@gc.cuny.edu
 *******************************************************************************/
 
 #include <DB.H>
-#include <DBif.H>
 #include <RG.H>
 
 DBInt RGlibGenFuncFieldCompare(DBObjTable *table, char *f0Text, char *f1Text, char *rText, DBInt diffMethod) {

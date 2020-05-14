@@ -9,8 +9,8 @@ MDBgc_DOC.c  - Routing and processing of DOC
 wil.wollheim@unh.edu
 
 *******************************************************************************/
+
 #include <stdio.h>
-#include <cm.h>
 #include <MF.h>
 #include <MD.h>
 #include <math.h>

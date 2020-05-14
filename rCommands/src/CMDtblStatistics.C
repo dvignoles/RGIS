@@ -13,7 +13,6 @@ andras@ob.sr.unh.edu
 #include <math.h>
 #include <cm.h>
 #include <DB.H>
-#include <DBif.H>
 
 enum Functions {
     BAD, NUM, NONNULL, MIN, MAX, SUM, AVG, NAVG, PCT, MED, MOD, DEV

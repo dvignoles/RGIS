@@ -8,13 +8,9 @@ MDSedimentFlux.c
 
 *******************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
-#include <cm.h>
 #include <MF.h>
 #include <MD.h>
 #include <math.h>
-#include <stdlib.h>
 
 // Input
 static int _MDInDischargeID   	= MFUnset;

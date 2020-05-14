@@ -12,7 +12,6 @@ bfekete@gc.cuny.edu
 
 #include <Xm/DialogS.h>
 #include <Xm/Form.h>
-#include <Xm/RowColumn.h>
 #include <Xm/PushB.h>
 #include <Xm/DrawingA.h>
 #include <Xm/Separator.h>

@@ -13,10 +13,9 @@ MDQBARTpreprocess.c
 sagy.cohen@colorado.edu.au
 last update: May 16 2011
 *******************************************************************************/
+
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-#include <cm.h>
 #include <MF.h>
 #include <MD.h>
 #include <math.h>

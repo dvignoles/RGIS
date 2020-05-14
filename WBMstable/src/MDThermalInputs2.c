@@ -1,26 +1,19 @@
 /******************************************************************************
 GHAAS Water Balance/Transport Model V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2007, University of New Hampshire
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 MDThermalInputs2.c
 
 amiara00@CCNY.cuny.edu & rob.stewart@unh.edu
 
 Thermal Inputs, withdrawals, and energy of thermoelectric plants (second iteration)
-
 *******************************************************************************/
 
-
-#include <stdio.h>
 #include <string.h>
-#include <cm.h>
 #include <MF.h>
 #include <MD.h>
 #include <math.h>
-
-
-
 
 // Input
 static int _MDInDischargeID         = MFUnset;

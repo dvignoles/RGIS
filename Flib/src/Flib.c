@@ -6,7 +6,7 @@ Copyright 1994-2020, UNH - ASRC/CUNY
 
 Flib.c
 
-Unknown
+bfekete@gc.cuny.edu
 
 *******************************************************************************/
 #include <Flib.h>

@@ -10,10 +10,7 @@ bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
-#include <Xm/Form.h>
 #include <Xm/Label.h>
-#include <Xm/TextF.h>
-#include <Xm/PushB.h>
 #include <rgis.H>
 
 extern void RGISAnalyseFieldCalcAddCBK (Widget,void *,XmAnyCallbackStruct *);

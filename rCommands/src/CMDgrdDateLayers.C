@@ -9,11 +9,6 @@ CMDgrdDateLayers.C
 bfekete@gc.cuny.edu
 
 *******************************************************************************/
-/*
- run the program with no options to see the instructions!
- pfw@unh.edu
- oct 5, 2001
-*/
 
 #include <cm.h>
 #include <DB.H>

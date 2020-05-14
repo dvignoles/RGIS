@@ -10,19 +10,11 @@ bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
-/*
-  Fstat (formerly known as statf) version 3.0
-  Written by Pete weissbrod for complex systems UNH
-  pfw@unh.edu
-  Revisited by: Fekete Andras
-*/
-
 #include <cm.h>
 #include <Flib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include <math.h>
 
 void showUsage() {
     CMmsgPrint(CMmsgInfo, "FStat - statistical operations on a data file");

@@ -2,7 +2,7 @@
 
 GHAAS Water Balance/Transport Model V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2014, UNH - CCNY/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 MDSmallReservoirCap.c
 
@@ -10,13 +10,9 @@ dominik.wisser@unh.edu
 
 *******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <cm.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 //Input
 static int _MDInIrrAreaID                    = MFUnset;

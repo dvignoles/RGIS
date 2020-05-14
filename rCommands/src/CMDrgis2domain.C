@@ -13,7 +13,6 @@ bfekete@gc.cuny.edu
 #include <cm.h>
 #include <DB.H>
 #include <DBif.H>
-#include <RG.H>
 #include <MF.h>
 
 static void _CMDprintUsage (const char *arg0) {

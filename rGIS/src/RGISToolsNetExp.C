@@ -10,7 +10,6 @@ bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
-#include <ctype.h>
 #include <rgis.H>
 
 DBInt DBNetworkExportASCIIGridDir		(DBObjData *,char *);

@@ -3,7 +3,7 @@
 
 GHAAS Water Balance/Transport Model V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2007, University of New Hampshire
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 MDDIN.c  - transfer and processing of nutrients (transient storage and lakes)
 
@@ -11,15 +11,11 @@ rob.stewart@unh.edu
 
 *******************************************************************************/
 
-#include <cm.h>
 #include <MF.h>
 #include <MD.h>
 #include <math.h>
-#include <stdlib.h>
-
 
 // input
-
 static int _MDInDischarge0ID            	= MFUnset;		// RJS010609
 static int _MDInDischargeID			= MFUnset;
 static int _MDInRiverStorageID		    	= MFUnset;

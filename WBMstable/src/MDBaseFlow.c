@@ -11,8 +11,6 @@ bfekete@gc.cuny.edu
 *******************************************************************************/
 
 #include <stdio.h>
-#include <math.h>
-#include <cm.h>
 #include <MF.h>
 #include <MD.h>
 

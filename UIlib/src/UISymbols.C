@@ -10,7 +10,6 @@ bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
-#include <Xm/Form.h>
 #include <Xm/ScrolledW.h>
 #include <Xm/List.h>
 #include <Xm/Label.h>

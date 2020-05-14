@@ -11,7 +11,6 @@ bfekete@gc.cuny.edu
 *******************************************************************************/
 
 #include <DB.H>
-#include <DBif.H>
 
 #define BLOCKSIZE 128
 

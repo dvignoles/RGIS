@@ -9,19 +9,13 @@ CMDgrdImport.C
 bfekete@gc.cuny.edu
 
 *******************************************************************************/
-/*
- modified by pete weissbrod
- pfw@unh.edu
-*/
 
 #include <string.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
 #include <DB.H>
 #include <DBif.H>
-#include <RG.H>
 
 using namespace std;
 /*=========================================================================*/

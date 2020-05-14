@@ -2,7 +2,7 @@
 
 GHAAS Water Balance/Transport Model V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2014, UNH - CCNY/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 MDWaterBalance.c
 
@@ -11,9 +11,7 @@ This is meant to check the vertical water balance for each grid cell. It does
 NOT include any water that is flowing laterally and should not be used to call BCG....
 *******************************************************************************/
 
-#include <stdio.h>
 #include <math.h>
-#include <cm.h>
 #include <MF.h>
 #include <MD.h>
 

@@ -10,7 +10,6 @@ bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
-#include <unistd.h>
 #include <Xm/Form.h>
 #include <Xm/Label.h>
 #include <Xm/CascadeB.h>

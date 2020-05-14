@@ -14,14 +14,8 @@ bfekete@gc.cuny.edu
 #include <Xm/LabelG.h>
 #include <Xm/PushB.h>
 #include <Xm/PushBG.h>
-#include <Xm/CascadeBG.h>
-#include <Xm/Scale.h>
-#include <Xm/List.h>
 #include <Xm/Text.h>
 #include <Xm/TextF.h>
-#include <Xm/Form.h>
-#include <Xm/DialogS.h>
-#include <Xm/Frame.h>
 #include <Xm/Separator.h>
 #include <Xm/RowColumn.h>
 #include <UI.H>

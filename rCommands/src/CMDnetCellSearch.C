@@ -12,7 +12,6 @@ bfekete@gc.cuny.edu
 #include <cm.h>
 #include <DB.H>
 #include <DBif.H>
-#include <RG.H>
 
 static bool _CMDnetCellSearchPrintID(DBNetworkIF *netIF, DBObjRecord *cellRec, void *dataPtr) {
     printf("%d\n", cellRec->RowID() + 1);

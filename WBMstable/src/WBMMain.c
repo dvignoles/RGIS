@@ -2,13 +2,14 @@
 
 GHAAS Water Balance/Transport Model V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2014, UNH - CCNY/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 WBMMain.c
 
 bfekete@gc.cuny.edu
 
 *******************************************************************************/
+
 #include "wbm.h"
 
 enum { MDpet, MDsurplus, MDinfiltration, MDrunoff, MDdischarge,  MDwatertemp, MDthermal, MDthermal2, MDthermal3, MDbalance, MDgeometry, MDbgc, MDbgc_DIN, MDbgc_DINPLUSBIOMASS, MDbgc_DOC, MDfecal, MDDO2, MDDIN, MDsedimentflux, MDbedloadflux,MDBQARTinputs, MDBQARTpreprocess,MDbankfullQcalc,MDRiverbedShapeExponent};

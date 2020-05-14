@@ -2,7 +2,7 @@
 
 GHAAS Water Balance/Transport Model V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2014, UNH - CCNY/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 MDWind.c
 
@@ -10,10 +10,7 @@ bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
-#include <cm.h>
 #include <MD.h>
 
 float MDWindAdjustment (float za,float disp,float z0,float fetch, float zw, float z0w) {

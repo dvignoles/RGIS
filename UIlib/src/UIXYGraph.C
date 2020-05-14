@@ -12,8 +12,6 @@ bfekete@gc.cuny.edu
 
 #include <Xm/Form.h>
 #include <Xm/Label.h>
-#include <Xm/RowColumn.h>
-#include <Xm/PushB.h>
 #include <Xm/Scale.h>
 #include <Xm/ScrolledW.h>
 #include <Xm/ScrollBar.h>

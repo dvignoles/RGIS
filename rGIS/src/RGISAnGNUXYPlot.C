@@ -10,12 +10,10 @@ bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
-#include <Xm/Form.h>
 #include <Xm/Label.h>
 #include <Xm/TextF.h>
 #include <Xm/PushB.h>
 #include <Xm/ToggleB.h>
-#include <Xm/RowColumn.h>
 #include <rgis.H>
 
 void RGISAnGNUXYPlotCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbackStruct *callData)

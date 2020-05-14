@@ -15,7 +15,11 @@ bfekete@gc.cuny.edu
 
 #if defined(__cplusplus)
 extern "C" {
+#else
+#include <stdbool.h>
 #endif
+
+#include <cm.h>
 
 enum {
     MFStop = false,

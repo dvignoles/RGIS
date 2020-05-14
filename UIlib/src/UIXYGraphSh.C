@@ -11,8 +11,6 @@ bfekete@gc.cuny.edu
 *******************************************************************************/
 
 #include <Xm/DialogS.h>
-#include <Xm/BulletinB.h>
-#include <Xm/PanedW.h>
 #include <Xm/Form.h>
 #include <Xm/PushB.h>
 #include <Xm/TextF.h>

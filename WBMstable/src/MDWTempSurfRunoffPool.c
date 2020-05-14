@@ -2,31 +2,26 @@
 
 GHAAS Water Balance/Transport Model V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2014, UNH - CCNY/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 MDWTempSurfRunoffPool.c
 
 rob.stewart@unh.edu
 
-
 *******************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
-#include <cm.h>
 #include <MF.h>
 #include <MD.h>
 #include <math.h>
 
 // Input
-
 static int _MDInWTempSurfRunoffID 		  = MFUnset;
 static int _MDInRainSurfRunoffID          = MFUnset;
 static int _MDInRunoffPoolID              = MFUnset;
 
 // Output
 static int _MDOutWTempSurfRunoffPoolID  = MFUnset;
-
 
 static void _MDWTempSurfRunoffPool (int itemID) {
 

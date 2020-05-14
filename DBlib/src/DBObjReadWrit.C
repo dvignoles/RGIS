@@ -12,7 +12,6 @@ bfekete@gc.cuny.edu
 
 #include <DB.H>
 #include <time.h>
-#include <sys/types.h>
 #include <pwd.h>
 
 int DBVarString::Read(FILE *file, int swap) {

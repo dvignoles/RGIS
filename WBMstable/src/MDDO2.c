@@ -2,7 +2,7 @@
 
 GHAAS Water Balance/Transport Model V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2007, University of New Hampshire
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 MDDO2.c
 
@@ -11,8 +11,6 @@ ken.r.sheehan@gmail.com
 *******************************************************************************/
 
 #include <stdio.h>
-#include <cm.h>
-#include <math.h>
 #include <MF.h>
 #include <MD.h>
 

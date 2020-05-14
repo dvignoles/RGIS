@@ -9,16 +9,11 @@ CMDgetHeader.C
 andras@ob.sr.unh.edu
 
 *******************************************************************************/
-/*
- Aug. 29, 2003
-*/
 
 #include <stdio.h>
 #include <cm.h>
 #include <DB.H>
 #include <RG.H>
-
-#define FIELD_SIZE 100000
 
 static void _CMDprintUsage (char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <RiverGIS file>", CMfileName(arg0));

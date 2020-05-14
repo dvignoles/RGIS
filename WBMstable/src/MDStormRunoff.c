@@ -2,7 +2,7 @@
 
 GHAAS Water Balance/Transport Model V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2007, University of New Hampshire
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 MDStormRunoff.c
 
@@ -11,13 +11,11 @@ rob.stewart@unh.edu
 *******************************************************************************/
 
 #include <stdio.h>
-#include <cm.h>
 #include <math.h>
 #include <MF.h>
 #include <MD.h>
 
 // Input
-//static int _MDInH2OFractionID       = MFUnset;
 static int _MDInImpFractionID       = MFUnset;
 static int _MDInPrecipID            = MFUnset;
 static int _MDInSPackChgID          = MFUnset;
