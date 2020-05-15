@@ -84,7 +84,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -n,--number    [number of intervals]");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "        --domain    [domain]");
     CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
     CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
     CMmsgPrint(CMmsgInfo, "     -V,--verbose");
