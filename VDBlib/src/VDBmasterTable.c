@@ -130,6 +130,7 @@ static VDBmasterTable_t _VDBmasterTable [] = {
         {"soil",          "silt_percent_by_mass",              "Soil-SiltPercentByMass",          "Percent Silt by Mass",              "continuous", "grey",        "avg"},
         {"soil",          "wilting_point",                     "Soil-WiltingPoint",               "Wilting Point",                     "continuous", "grey",        "avg"},
         {"spatial_unit",  "continent",                         "Continent",                       "Continent",                         "discrete",   "N/A",         "N/A"},
+        {"spatial_unit",  "continent_mask",                    "ContinentMask",                   "Continent Mask",                    "continuous", "grey",        "avg"},
         {"spatial_unit",  "county",                            "County",                          "County",                            "discrete",   "N/A",         "N/A"},
         {"spatial_unit",  "country",                           "Country",                         "Country",                           "discrete",   "N/A",         "N/A"},
         {"spatial_unit",  "state",                             "State",                           "State",                             "discrete",   "N/A",         "N/A"},
