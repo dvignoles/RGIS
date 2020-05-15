@@ -81,8 +81,12 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -r,--hour      [beginning hour]");
     CMmsgPrint(CMmsgInfo, "     -i,--minute    [beginning minute]");
     CMmsgPrint(CMmsgInfo, "     -e,--step      [year|month|day|hour|minute]");
-    CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
     CMmsgPrint(CMmsgInfo, "     -n,--number    [number of intervals]");
+    CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
+    CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
     CMmsgPrint(CMmsgInfo, "     -V,--verbose");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
@@ -96,6 +100,8 @@ int main(int argc, char *argv[]) {
     int startMinute = DBDefaultMissingIntVal;
     int timeInterval = 1; // this is defined by the -n field
     int shadeSet = DBDataFlagDispModeContGreyScale;
+    char *title = (char *) NULL, *subject = (char *) NULL;
+    char *domain = (char *) NULL, *version = (char *) NULL;
     bool changeShadeSet = false;
     DBObjData *dbData;
     DBInt timeStep = DBFault;
@@ -194,6 +200,42 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
+        if (CMargTest (argv[argPos], "-t", "--title")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing title!");
+                return (CMfailed);
+            }
+            title = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-u", "--subject")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing subject!");
+                return (CMfailed);
+            }
+            subject = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-d", "--domain")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing domain!");
+                return (CMfailed);
+            }
+            domain = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-v", "--version")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing version!");
+                return (CMfailed);
+            }
+            version = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
         if (CMargTest (argv[argPos], "-s", "--shadeset")) {
             int shadeCodes[] = {DBDataFlagDispModeContStandard,
                                 DBDataFlagDispModeContGreyScale,
@@ -257,6 +299,11 @@ int main(int argc, char *argv[]) {
         delete dbData;
         return (CMfailed);
     }
+    if (title   != (char *) NULL) dbData->Name(title);
+    if (subject != (char *) NULL) dbData->Document(DBDocSubject,   subject);
+    if (domain  != (char *) NULL) dbData->Document(DBDocGeoDomain, domain);
+    if (version != (char *) NULL) dbData->Document(DBDocVersion,   version);
+    if (shadeSet == DBFault) shadeSet = DBDataFlagDispModeContGreyScale;
     if (changeShadeSet && (dbData->Type() == DBTypeGridContinuous)) {
         dbData->Flags(DBDataFlagDispModeContShadeSets, DBClear);
         dbData->Flags(shadeSet, DBSet);

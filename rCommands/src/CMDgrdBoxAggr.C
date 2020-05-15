@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
     if (version == (char *) NULL) version = (char *) "0.01pre";
     if (shadeSet == DBFault) shadeSet = DBDataFlagDispModeContGreyScale;
 
-    inGridIF = new DBGridIF(inData);
+     inGridIF = new DBGridIF(inData);
 
     extent = inData->Extent();
     cellSize.X = (extent.UpperRight.X - extent.LowerLeft.X) / (inGridIF->ColNum() / kernelSize);
