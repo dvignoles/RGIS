@@ -1569,6 +1569,7 @@ public:
         DBObjRecord *cellRec;
 
         Coordinates = (DBCoordinate *) NULL;
+        MaxVertex   = 0;
         CellTable = netData->Table (DBrNCells);
         LineTable = arcData->Table (DBrNItems);
         NetIF   = new DBNetworkIF (netData);
