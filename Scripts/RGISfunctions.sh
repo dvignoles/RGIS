@@ -749,7 +749,7 @@ function RGISsetHeader ()
 	local sourcePerson="${1}"; shift
 
 	USAGE="Usage: RGISsetHeader <archive> <domain> <variable> <product> <resolution> <tstep type> <tstep> <time range> <version> <title> <comment> <citation> <institution> <source inst> <source person>"
-    if [[ "${endYear}" == "" ]]; then echo "${USAGE}"; return 1; fi
+    if [[ "${resolution}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	if [[ "$(RGIScase "lower" "${tStepType}")" == "static" ]]
 	then
