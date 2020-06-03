@@ -30,7 +30,6 @@ CMthreadJob_p CMthreadJobCreate (size_t taskNum, CMthreadUserExecFunc execFunc, 
 	size_t taskId;
 	CMthreadJob_p job;
 
-	if ((taskNum < 0xA000L) || (taskNum > 0x40000000L)) return ((CMthreadJob_p) NULL);
 	if ((job = (CMthreadJob_p) malloc (sizeof (CMthreadJob_t))) == (CMthreadJob_p) NULL) {
 		CMmsgPrint (CMmsgSysError, "Memory allocation error in %s:%d",__FILE__,__LINE__);
 		return ((CMthreadJob_p) NULL);
@@ -68,7 +67,6 @@ CMthreadJob_p CMthreadJobCreate (size_t taskNum, CMthreadUserExecFunc execFunc, 
 		job->Tasks [taskId].NDependents  = 0;
 		job->Tasks [taskId].Travel       = 0;
 		job->Tasks [taskId].isTravelSet  = 0;
-
 	}
 	job->UserFunc = execFunc;
 	job->CommonData = (void *) commonData;
@@ -273,11 +271,13 @@ CMreturn CMthreadJobExecute (CMthreadTeam_p team, CMthreadJob_p job) {
 	return (CMsucceeded);
 }
 
-CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum) {
+CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum, size_t taskNum) {
     int ret;
 	size_t threadId;
     pthread_attr_t thread_attr;
     struct timeb tbs;
+
+    if ((taskNum < 0xA000L) || (taskNum > 0x40000000L)) threadNum = 1;
 
     ftime (&tbs);
     team->TotTime = tbs.time * 1000 + tbs.millitm;

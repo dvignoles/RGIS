@@ -20,7 +20,7 @@ int main(int argv, char *argc[]) {
     if ((argv > 4) && (sscanf(argc[4], "%d", &ret) == 1)) loopNum = (size_t) ret;
     printf("%d %d %d %d\n", (int) threadNum, (int) taskNum, (int) _Iteration, (int) loopNum);
 
-    if (CMthreadTeamInitialize(&team, threadNum) == (CMthreadTeam_p) NULL) {
+    if (CMthreadTeamInitialize(&team, threadNum, taskNum) == (CMthreadTeam_p) NULL) {
         CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
         return (CMfailed);
     }
