@@ -278,13 +278,15 @@ CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum, si
     struct timeb tbs;
 
     if ((taskNum < 0xA000L) || (taskNum > 0x40000000L)) threadNum = 1;
-
+    else threadNum = taskNum / 0x4000L < threadNum ? taskNum / 0x4000L : threadNum;
+    
     ftime (&tbs);
     team->TotTime = tbs.time * 1000 + tbs.millitm;
 	team->ThreadNum      = threadNum;
 	team->JobPtr         = (void *) NULL;
     team->ExecTime       = 0;
     team->ThreadTime     = 0;
+    team->Threads        = (CMthreadData_p) NULL;
     team->Time           = 0;
 
     if (team->ThreadNum > 1) {
