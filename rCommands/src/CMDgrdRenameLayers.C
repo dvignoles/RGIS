@@ -18,6 +18,10 @@ bfekete@gc.cuny.edu
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input grid> <output grid>", CMfileName(arg0));
     CMmsgPrint(CMmsgInfo, "     -r,--rename    [layerID layerName]");
+    CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
     CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
     CMmsgPrint(CMmsgInfo, "     -V,--verbose");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
@@ -26,6 +30,8 @@ static void _CMDprintUsage (const char *arg0) {
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
     int layerID;
+    char *title = (char *) NULL, *subject = (char *) NULL;
+    char *domain = (char *) NULL, *version = (char *) NULL;
     int shadeSet = DBDataFlagDispModeContGreyScale;
     bool changeShadeSet = false;
     DBObjData *dbData;
@@ -86,6 +92,42 @@ int main(int argc, char *argv[]) {
             }
             if (renameCLS == (RenameCLS *) NULL) renameCLS = new RenameCLS(layerID, argv[argPos]);
             else renameCLS->AddLink(new RenameCLS(layerID, argv[argPos]));
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-t", "--title")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing title!");
+                return (CMfailed);
+            }
+            title = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-u", "--subject")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing subject!");
+                return (CMfailed);
+            }
+            subject = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-d", "--domain")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing domain!");
+                return (CMfailed);
+            }
+            domain = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-v", "--version")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing version!");
+                return (CMfailed);
+            }
+            version = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
@@ -152,6 +194,11 @@ int main(int argc, char *argv[]) {
         }
         return (CMfailed);
     }
+    if (title   != (char *) NULL) dbData->Name(title);
+    if (subject != (char *) NULL) dbData->Document(DBDocSubject, subject);
+    if (domain  != (char *) NULL) dbData->Document(DBDocGeoDomain, domain);
+    if (version != (char *) NULL) dbData->Document(DBDocVersion, version);
+
     gridIF = new DBGridIF(dbData);
 
     if (renameCLS != (RenameCLS *) NULL) renameCLS->RenameLayer(gridIF);
