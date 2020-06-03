@@ -30,7 +30,7 @@ CMthreadJob_p CMthreadJobCreate (size_t taskNum, CMthreadUserExecFunc execFunc, 
 	size_t taskId;
 	CMthreadJob_p job;
 
-	if ((taskNum < 0x4000L) || (taskNum > 0x40000000L)) return ((CMthreadJob_p) NULL);
+	if ((taskNum < 0xA000L) || (taskNum > 0x40000000L)) return ((CMthreadJob_p) NULL);
 	if ((job = (CMthreadJob_p) malloc (sizeof (CMthreadJob_t))) == (CMthreadJob_p) NULL) {
 		CMmsgPrint (CMmsgSysError, "Memory allocation error in %s:%d",__FILE__,__LINE__);
 		return ((CMthreadJob_p) NULL);
