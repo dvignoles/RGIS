@@ -23,6 +23,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
     CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
     CMmsgPrint(CMmsgInfo, "     -V,--verbose");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
@@ -111,6 +112,15 @@ int main(int argc, char *argv[]) {
                 return (CMfailed);
             }
             domain = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-v", "--version")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing version!");
+                return (CMfailed);
+            }
+            version = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }

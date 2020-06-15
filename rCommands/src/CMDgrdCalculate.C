@@ -326,15 +326,16 @@ public:
         CMthreadTeam_t team;
         CMthreadJob_p job = (CMthreadJob_p) NULL;
 
-        if (CMthreadTeamInitialize(&team, threadsNum) == (CMthreadTeam_p) NULL) {
-            CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
-            return ((DBObjData *) NULL);
-        }
         if ((data = DBGridCreate(title, Extent, CellSize)) == (DBObjData *) NULL) return ((DBObjData *) NULL);
         data->Projection(GrdVar[0]->Projection()); // Taking projection from first grid variable
-
         GridIF = new DBGridIF(data);
         taskNum = GridIF->RowNum() * (size_t) GridIF->ColNum();
+        if (CMthreadTeamInitialize(&team, threadsNum, taskNum) == (CMthreadTeam_p) NULL) {
+            CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
+            delete GridIF;
+            delete data;
+            return ((DBObjData *) NULL);
+        }
         if (team.ThreadNum > 1) { job = CMthreadJobCreate(taskNum, userFunc, (void *) this); }
         if (job != (CMthreadJob_p) NULL) {
             for (threadId = 0; threadId < team.ThreadNum; ++threadId) {

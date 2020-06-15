@@ -455,10 +455,6 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
     pthread_attr_t thread_attr;
     MFsingleIO_t inIO, outIO;
 
-    if (CMthreadTeamInitialize (&team,threadsNum) == (CMthreadTeam_p) NULL){
-        CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
-        return (CMfailed);
-    }
     inIO.Ret  = CMsucceeded;
     outIO.Ret = CMsucceeded;
     if ((buffer = getenv ("GHAASparallelIO")) != (char *) NULL) {
@@ -490,6 +486,10 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
 		return (CMfailed);
 	}
 	if ((_MFDomain = MFDomainRead (inFile)) == (MFDomain_p) NULL)	return (CMfailed);
+    if (CMthreadTeamInitialize (&team,threadsNum,_MFDomain->ObjNum) == (CMthreadTeam_p) NULL) {
+        CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
+        return (CMfailed);
+    }
     if ((bifurFileName = MFOptionGet(MFBifurcationOpt)) != (char *) NULL) {
         if (MFDomainSetBifurcations(_MFDomain, bifurFileName) == CMfailed) return (CMfailed);
     }
@@ -576,9 +576,11 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
         CMthreadTeamDestroy(&team);
         return (CMfailed);
     }
-    for (taskId = 0; taskId < _MFDomain->ObjNum; ++taskId) {
-        dlinks  = _MFDomain->Objects[taskId].DLinkNum > 0 ? _MFDomain->Objects[taskId].DLinks : (size_t *) &taskId;
-        CMthreadJobTaskDependent(job, taskId, dlinks, _MFDomain->Objects[taskId].DLinkNum);
+    else {
+        for (taskId = 0; taskId < _MFDomain->ObjNum; ++taskId) {
+            dlinks  = _MFDomain->Objects[taskId].DLinkNum > 0 ? _MFDomain->Objects[taskId].DLinks : (size_t *) &taskId;
+            CMthreadJobTaskDependent(job, taskId, dlinks, _MFDomain->Objects[taskId].DLinkNum);
+        }
     }
     time(&sec);
     strcpy (dateCur,  MFDateGetCurrent ());

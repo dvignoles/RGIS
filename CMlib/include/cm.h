@@ -98,7 +98,7 @@ typedef struct CMthreadTeam_s {
     long long TotTime, ExecTime, ThreadTime, Time;
 } CMthreadTeam_t, *CMthreadTeam_p;
 
-CMthreadTeam_p CMthreadTeamInitialize(CMthreadTeam_p, size_t threadNum);
+CMthreadTeam_p CMthreadTeamInitialize(CMthreadTeam_p, size_t threadNum, size_t taskNum);
 
 void CMthreadTeamDestroy(CMthreadTeam_p);
 

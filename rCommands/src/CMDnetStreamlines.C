@@ -28,7 +28,7 @@ static void _CMDprintUsage (const char *arg0) {
 int main(int argc, char *argv[]) {
     DBInt minOrder = 3;
     int argPos, argNum = argc, ret, verbose = false;
-    char *title = (char *) NULL, *subject = (char *) NULL;
+    char *title  = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     DBObjData *netData, *arcData;
 

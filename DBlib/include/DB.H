@@ -177,11 +177,6 @@ public:
         LengthVAR = 0;
     }
 
-    DBVarString(const char *string) {
-        StringPTR = (DBAddress) NULL;
-        VString(string);
-    }
-
     ~DBVarString() { if (StringPTR != (DBAddress) NULL) free((char *) NULL + StringPTR); }
 
     DBVarString(const DBVarString &string) {
