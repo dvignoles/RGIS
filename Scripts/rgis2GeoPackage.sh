@@ -4,9 +4,9 @@ function PrintUsage ()
 {
 	echo "Usage ${0##*/} [options] <rgisfile>"
 	echo "      -c, --case [sensitive|lower|upper]"
-	echo "      -d, --dbname  <dbname>"
-	echo "      -s, --schema  <schema>"
-	echo "      -t, --tblname <tblname>"
+	echo "      -g, --geopackage <geopackage>"
+	echo "      -s, --schema     <schema>"
+	echo "      -t, --tblname    <tblname>"
 	exit 1
 }
 
@@ -29,7 +29,7 @@ function caseFunc ()
 }
 
 RGISFILE=""
-  DBNAME=""
+  GEOPACKAGE=""
   SCHEMA=""
  TBLNAME=""
     CASE="sensitive"
@@ -50,9 +50,9 @@ do
 	    esac
 	    shift;
 	    ;;
-	(-d|--dbname)
+	(-g|--geopackage)
 		shift; if [ "${1}" == "" ]; then PrintUsage; fi
-		DBNAME="${1}"
+		GEOPACKAGE="${1}"
 		shift
 	;;
 	(-s|--schema)
@@ -79,44 +79,46 @@ EXTENSION="${RGISFILE#*.}"
 if [ "${SCHEMA}"  == "" ]; then  SCHEMA="public"; fi
 if [ "${TBLNAME}" == "" ]; then TBLNAME="${FILENAME}"; fi
 
-   DBNAME="${DBNAME}"
+   GEOPACKAGE="${GEOPACKAGE}"
    SCHEMA=$(caseFunc "${CASE}" "${SCHEMA}")
   TBLNAME=$(caseFunc "${CASE}" "${TBLNAME}")
        ID=$(caseFunc "${CASE}" "ID")
 GRIDVALUE=$(caseFunc "${CASE}" "GridValue")
 
-TEMPFILE="$(tempfile -p "rgis2PostGIS" -s $(caseFunc "${CASE}" ${FILENAME}))"
+#TEMPFILE="$(tempfile -p "rgis2geopackage" -s $(caseFunc "${CASE}" ${FILENAME}))"
+TEMPFILE="TEMP_${FILENAME}"
 
 case "${EXTENSION}" in
 	(gdbp|gdbp.gz|gdbl|gdbl.gz)
     rgis2ascii "${RGISFILE}" "${TEMPFILE}.asc"
-    rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" "${RGISFILE}" | psql "${DBNAME}"
+    rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | sqlite3 "${GEOPACKAGE}"
     ogr2ogr -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
-    shp2pgsql -k -s 4326 "${TEMPFILE}.shp" "${SCHEMA}"."${TBLNAME}_geom" | psql "${DBNAME}"
-    echo "ALTER TABLE \"${SCHEMA}\".\"${TBLNAME}\" ADD COLUMN \"geom\" geometry;
-      		  UPDATE \"${SCHEMA}\".\"${TBLNAME}\"
-        	  SET \"geom\" = \"${SCHEMA}\".\"${TBLNAME}_geom\".\"geom\"
-         	  FROM   \"${SCHEMA}\".\"${TBLNAME}_geom\"
-        	  WHERE  \"${SCHEMA}\".\"${TBLNAME}\".\"${ID}\" =  \"${SCHEMA}\".\"${TBLNAME}_geom\".\"gid\";
-         	  DROP TABLE \"${SCHEMA}\".\"${TBLNAME}_geom\";" | psql "${DBNAME}"
+    shp2pgsql -k -s 4326 "${TEMPFILE}.shp" "${SCHEMA}.${TBLNAME}_geom" | sqlite3 "${GEOPACKAGE}"
+    echo "ALTER TABLE \"${SCHEMA}.${TBLNAME}\" ADD COLUMN \"geom\" geometry;
+      		  UPDATE \"${SCHEMA}.${TBLNAME}\"
+        	  SET \"geom\" = \"${SCHEMA}.${TBLNAME}_geom\".\"geom\"
+         	  FROM   \"${SCHEMA}.${TBLNAME}_geom\"
+        	  WHERE  \"${SCHEMA}.${TBLNAME}\".\"${ID}\" =  \"${SCHEMA}.${TBLNAME}_geom\".\"gid\";
+         	  DROP TABLE \"${SCHEMA}.${TBLNAME}_geom\";" | psql "${GEOPACKAGE}"
     rm "${TEMPFILE}".*
 	;;
 	(gdbd|gdbd.gz)
+    	UPDATEFLAG=""
+	    [ -e "${GEOPACKAGE}" ] && UPDATEFLAG="-update"
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
-		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" "${RGISFILE}" | psql "${DBNAME}"
 		gdal_translate -a_srs EPSG:4326 "${TEMPFILE}.grd" "${TEMPFILE}.tif"
 		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
-		ogr2ogr -makevalid "${TEMPFILE}valid.shp" "${TEMPFILE}.shp"
-		shp2pgsql -k -s 4326 "${TEMPFILE}valid.shp" "${SCHEMA}"."${TBLNAME}_geom" | psql "${DBNAME}"
-		echo "ALTER TABLE \"${SCHEMA}\".\"${TBLNAME}\" ADD COLUMN \"geom\" geometry;
-      		  UPDATE \"${SCHEMA}\".\"${TBLNAME}\"
-        	  SET \"geom\" = \"${TBLNAME}_SELECTION\".\"geom\"
-         	  FROM  (SELECT \"DN\", ST_BUFFER (ST_UNION (\"geom\"),0.0) AS \"geom\" FROM \"${SCHEMA}\".\"${TBLNAME}_geom\"
-         	         GROUP BY \"${SCHEMA}\".\"${TBLNAME}_geom\".\"DN\") AS \"${TBLNAME}_SELECTION\"
-        	  WHERE  \"${SCHEMA}\".\"${TBLNAME}\".\"${GRIDVALUE}\" = \"${TBLNAME}_SELECTION\".\"DN\";
-			  DELETE FROM \"${SCHEMA}\".\"${TBLNAME}\" WHERE \"geom\" IS NULL; 
-			  DROP TABLE  \"${SCHEMA}\".\"${TBLNAME}_geom\";" |  psql "${DBNAME}"
-         rm "${TEMPFILE}".* "${TEMPFILE}valid".*
+		ogr2ogr ${UPDATEFLAG} -makevalid -f "GPKG" -nln "${SCHEMA}.${TBLNAME}_geom" -nlt polygon "${GEOPACKAGE}" "${TEMPFILE}.shp"
+		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}_attrib" -d "sqlite" -r off "${RGISFILE}" | spatialite "${GEOPACKAGE}"
+        (echo "CREATE TABLE \"${SCHEMA}.${TBLNAME}\" AS"
+         echo "SELECT \"${SCHEMA}.${TBLNAME}_attrib\".*, \"SELECTION\".\"geom\""
+         echo "FROM (SELECT \"DN\" AS \"${GRIDVALUE}\", ST_UNION (\"geom\") AS \"geom\""
+         echo "      FROM \"${SCHEMA}.${TBLNAME}_geom\" GROUP BY \"DN\") AS SELECTION"
+         echo "JOIN \"${SCHEMA}.${TBLNAME}_attrib\" ON \"${SCHEMA}.${TBLNAME}_attrib\".\"${GRIDVALUE}\" = \"SELECTION\".\"${GRIDVALUE}\";") |\
+        spatialite "${GEOPACKAGE}"
+##DELETE FROM \"${SCHEMA}.${TBLNAME}\" WHERE \"geom\" IS NULL;
+##DROP TABLE  \"${SCHEMA}.${TBLNAME}_geom\";" | sqlite3 "${GEOPACKAGE}"
+        rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
         rgis2netcdf "${RGISFILE}" "${TEMPFILE}.nc"
@@ -124,7 +126,7 @@ case "${EXTENSION}" in
         raster2pgsql "${TEMPFILE}.tif" "${SCHEMA}"."${TBLNAME}_Raster" |\
         sed "s:$(echo "${SCHEMA}"  | tr "[A-Z]" "[a-z]"):${SCHEMA}:g"  |\
         sed "s:$(echo "${TBLNAME}" | tr "[A-Z]" "[a-z]"):${TBLNAME}:g" |\
-        psql "${DBNAME}"
+        psql "${GEOPACKAGE}"
         rm "${TEMPFILE}.nc" "${TEMPFILE}.tif"
 	;;
 	(*)
