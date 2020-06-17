@@ -108,14 +108,14 @@ case "${EXTENSION}" in
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
 		gdal_translate -a_srs EPSG:4326 "${TEMPFILE}.grd" "${TEMPFILE}.tif"
 		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
-		ogr2ogr ${UPDATEFLAG} -makevalid -f "GPKG" -nln "${SCHEMA}.${TBLNAME}_geom" -nlt polygon "${GEOPACKAGE}" "${TEMPFILE}.shp"
+		ogr2ogr ${UPDATEFLAG} -makevalid -f "GPKG" -nln "${SCHEMA}.${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}_attrib" -d "sqlite" -r off "${RGISFILE}" | spatialite "${GEOPACKAGE}"
-        (echo "CREATE TABLE \"${SCHEMA}.${TBLNAME}\" AS"
-         echo "SELECT \"${SCHEMA}.${TBLNAME}_attrib\".*, \"SELECTION\".\"geom\""
-         echo "FROM (SELECT \"DN\" AS \"${GRIDVALUE}\", ST_UNION (\"geom\") AS \"geom\""
-         echo "      FROM \"${SCHEMA}.${TBLNAME}_geom\" GROUP BY \"DN\") AS SELECTION"
-         echo "JOIN \"${SCHEMA}.${TBLNAME}_attrib\" ON \"${SCHEMA}.${TBLNAME}_attrib\".\"${GRIDVALUE}\" = \"SELECTION\".\"${GRIDVALUE}\";") |\
-        spatialite "${GEOPACKAGE}"
+#        (echo "CREATE TABLE \"${SCHEMA}.${TBLNAME}\" AS"
+#        echo "SELECT \"${SCHEMA}.${TBLNAME}_attrib\".*, \"SELECTION\".\"geom\""
+#        echo "FROM (SELECT \"DN\" AS \"${GRIDVALUE}\", ST_UNION (\"geom\") AS \"geom\""
+#         echo "      FROM \"${SCHEMA}.${TBLNAME}_geom\" GROUP BY \"DN\") AS SELECTION"
+#         echo "JOIN \"${SCHEMA}.${TBLNAME}_attrib\" ON \"${SCHEMA}.${TBLNAME}_attrib\".\"${GRIDVALUE}\" = \"SELECTION\".\"${GRIDVALUE}\";") |\
+#       spatialite "${GEOPACKAGE}"
 ##DELETE FROM \"${SCHEMA}.${TBLNAME}\" WHERE \"geom\" IS NULL;
 ##DROP TABLE  \"${SCHEMA}.${TBLNAME}_geom\";" | sqlite3 "${GEOPACKAGE}"
         rm "${TEMPFILE}".*

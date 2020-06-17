@@ -106,7 +106,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
     DBObjRecord *record;
     DBObjTableField *field;
     DBInt bufferLen [2] = {0,0}, recordID, nameLength = 1;
-    char *bufferPtr [2] = {(char *) NULL, (char *) NULL}, *notExists, *separator = (char *) " ", *encaps;
+    char *bufferPtr [2] = {(char *) NULL, (char *) NULL}, *notExists, *separator = (char *) " ", *encap_begin, *encap_end;
 
     if ((RGlibTableCopy == mode) || (RGlibTableBlank == mode) || (RGlibTableReplace == mode)) {
         notExists = RGlibTableCopy == mode ? (char *) " IF NOT EXISTS " : (char *) " ";
@@ -126,7 +126,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
                         fprintf (outFile, "DROP TABLE IF EXISTS \"%s\".\"%s\";\n", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                     }
                     fprintf (outFile, "CREATE TABLE%s\"%s\".\"%s\" (\n",         notExists, _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
-                    encaps = (char *) "$$";
+                    encap_begin = encap_end = (char *) "$$";
                     break;
                 case RGlibSQLite:
                     fprintf (outFile, "-- Table: \"%s.%s\"\n",             _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
@@ -134,7 +134,8 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
                         fprintf (outFile, "DROP TABLE IF EXISTS \"%s.%s\";\n", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                     }
                     fprintf (outFile, "CREATE TABLE%s\"%s.%s\" (\n",         notExists, _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
-                    encaps = (char *) "\"";
+                    encap_begin = (char *) "quote('";
+                    encap_end   = (char *) "')";
                     break;
             }
         }
@@ -238,19 +239,19 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
         fprintf (outFile,") VALUES\n");
         for (record = table->First (); record != (DBObjRecord *) NULL; record = table->Next ()) {
             if (record->RowID () == 0) {
-                if (recordName) { fprintf (outFile,     "(%s%s%s", encaps, record->Name(), encaps); separator = (char *) ", "; }
-                else            { fprintf (outFile,     "(");                                       separator = (char *) ""; }
+                if (recordName) { fprintf (outFile,    "(%s%s%s", encap_begin, record->Name(), encap_end); separator = (char *) ", "; }
+                else            { fprintf (outFile,    "(");                                               separator = (char *) ""; }
             }
             else {
-                if (recordName) { fprintf (outFile,"),\n(%s%s%s", encaps, record->Name(), encaps);  separator = (char *) ", "; }
-                else            { fprintf (outFile,"),\n(");                                        separator = (char *) ""; }
+                if (recordName) { fprintf (outFile,"),\n(%s%s%s", encap_begin, record->Name(), encap_end);  separator = (char *) ", "; }
+                else            { fprintf (outFile,"),\n(");                                                separator = (char *) ""; }
             }
             for (field = fields->First(); field != (DBObjTableField *) NULL; field = fields->Next()) {
                 if (DBTableFieldIsVisible (field)) {
                     switch (field->Type()) {
                         default:
                         case DBTableFieldString:
-                            fprintf(outFile, "%s%s%s%s", separator, encaps, field->String(record), encaps);
+                            fprintf(outFile, "%s%s%s%s", separator, encap_begin, field->String(record), encap_end);
                             break;
                         case DBTableFieldInt:
                             fprintf(outFile, "%s%d",     separator, field->Int(record));
