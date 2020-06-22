@@ -82,7 +82,7 @@ function RGISlookupSubject ()
     local   variable="${1}"; shift
     local vdbVersion="${1}"; shift
 
-    if [ "${vdbVersion}" == "" ]
+    if [[ "${vdbVersion}" == "" ]]
     then
         local subject="$(vdbLookup -g "${variable}")"
     else
@@ -104,7 +104,7 @@ function RGISlookupFullName ()
     local   variable="${1}"; shift
     local vdbVersion="${1}"; shift
 
-    if [ "${vdbVersion}" == "" ]
+    if [[ "${vdbVersion}" == "" ]]
     then
         local fullName="$(vdbLookup -l "${variable}")"
     else
@@ -126,7 +126,7 @@ function RGISlookupShadeset ()
     local   variable="${1}"; shift
     local vdbVersion="${1}"; shift
 
-    if [ "${vdbVersion}" == "" ]
+    if [[ "${vdbVersion}" == "" ]]
     then
         local shadeSet="$(vdbLookup -s "${variable}")"
     else
@@ -148,7 +148,7 @@ function RGISlookupAggrMethod ()
     local   variable="${1}"; shift
     local vdbVersion="${1}"; shift
 
-    if [ "${vdbVersion}" == "" ]
+    if [[ "${vdbVersion}" == "" ]]
     then
         local aggreg="$(vdbLookup -a "${variable}")"
     else
