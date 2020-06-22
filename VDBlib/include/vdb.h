@@ -27,12 +27,14 @@ typedef struct VDBmasterTable_s {
     const char *Aggregation;
 } VDBmasterTable_t;
 
-const char *VDBrgName      (const char*);
-const char *VDBlongName    (const char*);
-const char *VDBcfName      (const char*);
-const char *VDBdataType    (const char*);
-const char *VDBshadset     (const char*);
-const char *VDBaggregation (const char*);
+typedef enum { VDBversion2 = 2, VDBversion3 = 3 } VDBversion;
+
+const char *VDBrgName      (VDBversion, const char*);
+const char *VDBlongName    (VDBversion, const char*);
+const char *VDBcfName      (VDBversion, const char*);
+const char *VDBdataType    (VDBversion, const char*);
+const char *VDBshadset     (VDBversion, const char*);
+const char *VDBaggregation (VDBversion, const char*);
 
 #if defined(__cplusplus)
 }

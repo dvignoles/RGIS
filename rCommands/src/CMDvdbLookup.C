@@ -22,6 +22,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -a,--aggregation [variable name]");
     CMmsgPrint(CMmsgInfo, "     -s,--shadeset    [variable name]");
     CMmsgPrint(CMmsgInfo, "     -t,--datatype    [variable name]");
+    CMmsgPrint(CMmsgInfo, "     -v,--version     [vdb2|vdb3]");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
 
@@ -33,6 +34,7 @@ int main(int argc, char *argv[]) {
     const char *dtType = (const char *) NULL;
     const char *shdSet = (const char *) NULL;
     const char *aggreg = (const char *) NULL;
+    VDBversion version = VDBversion2;
 
     if (argNum != 3) {
         _CMDprintUsage (argv[0]);
@@ -94,6 +96,24 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
+        if (CMargTest (argv[argPos], "-v", "--version")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing version!");
+                return (CMfailed);
+            }
+            else {
+                const char *options[] = {"vdb2", "vdb3", (char *) NULL};
+                VDBversion methods[] = { VDBversion2, VDBversion3};
+                int code;
+
+                if ((code = CMoptLookup(options, argv[argPos], false)) == CMfailed) {
+                    CMmsgPrint(CMmsgWarning, "Ignoring illformed aggregate method [%s]!", argv[argPos]);
+                }
+                else version = methods[code];
+            }
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
         if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage (argv[0]);
             return (CMsucceeded);
@@ -106,29 +126,29 @@ int main(int argc, char *argv[]) {
     }
 
     if       (cfName != (const char *) NULL) {
-        if ((rgName = VDBrgName (cfName)) != (const char *) NULL) printf ("%s",rgName);
+        if ((rgName = VDBrgName (version, cfName)) != (const char *) NULL) printf ("%s",rgName);
         return (0);
     } else if (rgName != (const char*) NULL) {
-        if ((cfName = VDBcfName (rgName)) != (const char *) NULL) printf ("%s",cfName);
+        if ((cfName = VDBcfName (version, rgName)) != (const char *) NULL) printf ("%s",cfName);
     } else if (lgName != (const char *) NULL) {
         cfName = lgName;
-        if (((lgName = VDBlongName(cfName)) != NULL) ||
-            (((cfName = VDBcfName(cfName)) != NULL) && ((lgName = VDBlongName(cfName)) != NULL)))
+        if (((lgName = VDBlongName(version, cfName)) != NULL) ||
+            (((cfName = VDBcfName(version, cfName)) != NULL) && ((lgName = VDBlongName(version, cfName)) != NULL)))
             printf("%s",lgName);
     } else if (dtType != (const char *) NULL) {
         cfName = dtType;
-        if (((dtType = VDBdataType(cfName)) != NULL) ||
-            (((cfName = VDBcfName(cfName)) != NULL) && ((dtType = VDBdataType(cfName)) != NULL)))
+        if (((dtType = VDBdataType(version, cfName)) != NULL) ||
+            (((cfName = VDBcfName(version, cfName)) != NULL) && ((dtType = VDBdataType(version, cfName)) != NULL)))
             printf("%s",dtType);
     } else if (shdSet != (const char *) NULL) {
         cfName = shdSet;
-        if (((shdSet = VDBshadset(cfName)) != NULL) ||
-            (((cfName = VDBcfName(cfName)) != NULL) && ((shdSet = VDBshadset(cfName)) != NULL)))
+        if (((shdSet = VDBshadset(version, cfName)) != NULL) ||
+            (((cfName = VDBcfName(version, cfName)) != NULL) && ((shdSet = VDBshadset(version, cfName)) != NULL)))
             printf("%s",shdSet);
     } else if (aggreg != (const char *) NULL) {
         cfName = aggreg;
-        if (((aggreg = VDBaggregation(cfName)) != NULL) ||
-            (((cfName = VDBcfName(cfName)) != NULL) && ((aggreg = VDBaggregation(cfName)) != NULL)))
+        if (((aggreg = VDBaggregation(version, cfName)) != NULL) ||
+            (((cfName = VDBcfName(version, cfName)) != NULL) && ((aggreg = VDBaggregation(version, cfName)) != NULL)))
             printf("%s",aggreg);
     }
     return (ret);
