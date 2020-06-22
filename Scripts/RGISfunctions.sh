@@ -96,8 +96,8 @@ function RGISlookupSubject ()
     fi
 }
 
-function RGISlookupSubject2 () { RGISlookupSubject "${1}" "vdb2" }
-function RGISlookupSubject3 () { RGISlookupSubject "${1}" "vdb3" }
+#function RGISlookupSubject2 () { RGISlookupSubject "${1}" "vdb2" }
+#function RGISlookupSubject3 () { RGISlookupSubject "${1}" "vdb3" }
 
 function RGISlookupFullName ()
 {
@@ -118,8 +118,8 @@ function RGISlookupFullName ()
     fi
 }
 
-function RGISlookupFullName2 () { RGISlookupFullName "${1}" "vdb2" }
-function RGISlookupFullName3 () { RGISlookupFullName "${1}" "vdb3" }
+#function RGISlookupFullName2 () { RGISlookupFullName "${1}" "vdb2" }
+#function RGISlookupFullName3 () { RGISlookupFullName "${1}" "vdb3" }
 
 function RGISlookupShadeset ()
 {
@@ -140,8 +140,8 @@ function RGISlookupShadeset ()
     fi
 }
 
-function RGISlookupShadeset2 () { RGISlookupShadeset "${1}" "vdb2" }
-function RGISlookupShadeset3 () { RGISlookupShadeset "${1}" "vdb3" }
+#function RGISlookupShadeset2 () { RGISlookupShadeset "${1}" "vdb2" }
+#function RGISlookupShadeset3 () { RGISlookupShadeset "${1}" "vdb3" }
 
 function RGISlookupAggrMethod ()
 {
@@ -162,8 +162,8 @@ function RGISlookupAggrMethod ()
     fi
 }
 
-function RGISlookupAggrMethod2 () { RGISlookupAggrMethod "${1}" "vdb2" }
-function RGISlookupAggrMethod3 () { RGISlookupAggrMethod "${1}" "vdb3" }
+#function RGISlookupAggrMethod2 () { RGISlookupAggrMethod "${1}" "vdb2" }
+#function RGISlookupAggrMethod3 () { RGISlookupAggrMethod "${1}" "vdb3" }
 
 function RGISlookupTimeStep ()
 {
@@ -315,7 +315,7 @@ function RGISgeoResolutionInSecond ()
     return 0
 }
 
-RGISgeoResolutionMultiplier () # Destination resolution is devided by source resolution. Decimals ar chapped off.
+function RGISgeoResolutionMultiplier () # Destination resolution is devided by source resolution. Decimals ar chapped off.
 {
     local srcRes="$(RGISgeoResolutionInSecond "${1}")"; shift
     local dstRes="$(RGISgeoResolutionInSecond "${1}")"; shift
@@ -857,7 +857,7 @@ function RGISaggregateTS ()
    done
 }
 
-RGISclimatology ()
+function RGISclimatology ()
 {
 	local    archive="${1}"; shift
 	local     domain="${1}"; shift
