@@ -80,7 +80,7 @@ function RGIScase ()
 function RGISlookupSubject ()
 {
     local   variable="${1}"; shift
-    local vdbVersion="${1}"; shift
+    local vdbVersion="${1}";
 
     if [[ "${vdbVersion}" == "" ]]
     then
@@ -102,7 +102,7 @@ function RGISlookupSubject3 () { RGISlookupSubject "${1}" "vdb3" }
 function RGISlookupFullName ()
 {
     local   variable="${1}"; shift
-    local vdbVersion="${1}"; shift
+    local vdbVersion="${1}";
 
     if [[ "${vdbVersion}" == "" ]]
     then
@@ -124,7 +124,7 @@ function RGISlookupFullName3 () { RGISlookupFullName "${1}" "vdb3" }
 function RGISlookupShadeset ()
 {
     local   variable="${1}"; shift
-    local vdbVersion="${1}"; shift
+    local vdbVersion="${1}";
 
     if [[ "${vdbVersion}" == "" ]]
     then
@@ -146,7 +146,7 @@ function RGISlookupShadeset3 () { RGISlookupShadeset "${1}" "vdb3" }
 function RGISlookupAggrMethod ()
 {
     local   variable="${1}"; shift
-    local vdbVersion="${1}"; shift
+    local vdbVersion="${1}";
 
     if [[ "${vdbVersion}" == "" ]]
     then

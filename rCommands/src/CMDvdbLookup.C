@@ -36,11 +36,6 @@ int main(int argc, char *argv[]) {
     const char *aggreg = (const char *) NULL;
     VDBversion version = VDBversion2;
 
-    if (argNum != 3) {
-        _CMDprintUsage (argv[0]);
-        return (CMsucceeded);
-    }
-
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-c", "--cfname")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
