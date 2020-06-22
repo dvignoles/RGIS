@@ -142,7 +142,7 @@ static VDBmasterTable_t _VDBmasterTable [] = {
         {"weather",       "weather_heatindex",                                 "Weather-Heatindex",                          "Heatindex",                          "continuous", "blue-to-red", "avg"},
         {"weather",       "weather_heatindex_max",                             "Weather-Heatindex-Max",                      "Maximum Heatindex",                  "continuous", "blue-to-red", "avg"},
         {"weather",       "weather_heatindex_min",                             "Weather-Heatindex-Min",                      "Minimum Heatindex",                  "continuous", "blue-to-red", "avg"},
-        {"weather",       "weather_humidity_dewpoint_temperature",             "Weather-Humidity-Dewpoint",                  "Dewpoint Temperature",               "continuous", "bllue-to-red","avg"},
+        {"weather",       "weather_humidity_dewpoint",                         "Weather-Humidity-Dewpoint",                  "Dewpoint Temperature",               "continuous", "bllue-to-red","avg"},
         {"weather",       "weather_humidity_relative",                         "Weather-Humidity-Relative",                  "Relative Humidity",                  "continuous", "blue",        "avg"},
         {"weather",       "weather_humidity_specific",                         "Weather-Humidity-Specific",                  "Specific Humidity",                  "continuous", "blue",        "avg"},
         {"weather",       "weather_humidity_vapor_pressure",                   "Weather-Humidity-VaporPressure",             "Vapor Pressure",                     "continuous", "blue",        "avg"},
