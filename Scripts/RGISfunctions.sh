@@ -79,9 +79,15 @@ function RGIScase ()
 
 function RGISlookupSubject ()
 {
-    local variable="${1}"; shift
+    local   variable="${1}"; shift
+    local vdbVersion="${1}"; shift
 
-    local subject="$(vdbLookup -g "${variable}")"
+    if [ "${vdbVersion}" == "" ]
+    then
+        local subject="$(vdbLookup -g "${variable}")"
+    else
+        local subject="$(vdbLookup -g "${variable}" -v "${vdbVersion}")"
+    fi
     if [[ "${subject}" == "" ]]
     then
         echo "${variable}"
@@ -90,11 +96,20 @@ function RGISlookupSubject ()
     fi
 }
 
+function RGISlookupSubject2 () { RGISlookupSubject "${1}" "vdb2" }
+function RGISlookupSubject3 () { RGISlookupSubject "${1}" "vdb3" }
+
 function RGISlookupFullName ()
 {
-    local variable="${1}"; shift
+    local   variable="${1}"; shift
+    local vdbVersion="${1}"; shift
 
-    local fullName="$(vdbLookup -l "${variable}")"
+    if [ "${vdbVersion}" == "" ]
+    then
+        local fullName="$(vdbLookup -l "${variable}")"
+    else
+        local fullName="$(vdbLookup -l "${variable}" -v "${vdbVersion}")"
+    fi
     if [[ "${fullName}" == "" ]]
     then
         echo "${variable}"
@@ -103,11 +118,20 @@ function RGISlookupFullName ()
     fi
 }
 
+function RGISlookupFullName2 () { RGISlookupFullName "${1}" "vdb2" }
+function RGISlookupFullName3 () { RGISlookupFullName "${1}" "vdb3" }
+
 function RGISlookupShadeset ()
 {
-    local variable="${1}"; shift
+    local   variable="${1}"; shift
+    local vdbVersion="${1}"; shift
 
-    local shadeSet="$(vdbLookup -s "${variable}")"
+    if [ "${vdbVersion}" == "" ]
+    then
+        local shadeSet="$(vdbLookup -s "${variable}")"
+    else
+        local shadeSet="$(vdbLookup -s "${variable}" -v "${vdbVersion}")"
+    fi
     if [[ "${shadeSet}" == "" ]]
     then
         echo "grey"
@@ -116,11 +140,20 @@ function RGISlookupShadeset ()
     fi
 }
 
+function RGISlookupShadeset2 () { RGISlookupShadeset "${1}" "vdb2" }
+function RGISlookupShadeset3 () { RGISlookupShadeset "${1}" "vdb3" }
+
 function RGISlookupAggrMethod ()
 {
-    local variable="${1}"; shift
+    local   variable="${1}"; shift
+    local vdbVersion="${1}"; shift
 
-    local aggreg="$(vdbLookup -a "${variable}")"
+    if [ "${vdbVersion}" == "" ]
+    then
+        local aggreg="$(vdbLookup -a "${variable}")"
+    else
+        local aggreg="$(vdbLookup -a "${variable}" -v "${vdbVersion}")"
+    fi
     if [[ "${aggreg}" == "" ]]
     then
         echo "avg"
@@ -128,6 +161,9 @@ function RGISlookupAggrMethod ()
         echo "${aggreg}"
     fi
 }
+
+function RGISlookupAggrMethod2 () { RGISlookupAggrMethod "${1}" "vdb2" }
+function RGISlookupAggrMethod3 () { RGISlookupAggrMethod "${1}" "vdb3" }
 
 function RGISlookupTimeStep ()
 {
