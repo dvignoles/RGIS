@@ -1039,11 +1039,11 @@ function RGISstatistics ()
 	return 0
 }
 
-if [[ $0 == "${BASH_SOURCE}" ]]
+if [[ ${0} == "${BASH_SOURCE}" ]]
 then
     if (( $# > 1))
     then
-        FUNCTION="$1"; shift
+        FUNCTION="${1}"; shift
         ARGUMENTS="$@"
         ${FUNCTION} ${ARGUMENTS}
     fi
