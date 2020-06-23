@@ -9,8 +9,7 @@
 if [[ "${GHAASDIR}" == "" ]]; then GHAASDIR="/usr/local/share/ghaas"; fi
 source "${GHAASDIR}/Scripts/RGISfunctions.sh"
 
-function PGattribTableSQL ()
-{
+function PGattribTableSQL () {
 	local    caseVal="${1}";                            shift
 	local     schema="$(RGIScase "${caseVal}" "${1}")"; shift
 	local    tblname="$(RGIScase "${caseVal}" "${1}")"; shift
@@ -27,8 +26,7 @@ function PGattribTableSQL ()
  	      DROP TABLE \"public\".\"temp_tb\";"
 }
 
-function PGpolygonColorizeSQL ()
-{
+function PGpolygonColorizeSQL () {
     local   caseVal="${1}";                            shift
     local    schema="$(RGIScase "${caseVal}" "${1}")"; shift
     local   tblName="$(RGIScase "${caseVal}" "${1}")"; shift
@@ -87,8 +85,7 @@ function PGpolygonColorizeSQL ()
           ORDER BY \"${schema}\".\"${tblName}\".\"${colorFLD}\";"
 }
 
-function PGimportShapeFile ()
-{
+function PGimportShapeFile () {
 	local   caseVal="${1}";                            shift
 	local    dbName="$(RGIScase "${caseVal}" "${1}")"; shift
 	local    schema="$(RGIScase "${caseVal}" "${1}")"; shift
@@ -115,8 +112,7 @@ function PGimportShapeFile ()
 	fi
 }
 
-function PGrasterDimension ()
-{
+function PGrasterDimension () {
 	local resolution="${1}"; shift
 	local     coord0="${1}"; shift
 	local     coord1="${1}"; shift
@@ -127,8 +123,7 @@ function PGrasterDimension ()
 	echo $(echo "(${coord1} - ${coord0}) * 3600 / $(RGISgeoResolutionInSecond "${resolution}")" | bc)
 }
 
-function PGrasterize ()
-{
+function PGrasterize () {
 	local     dbName="${1}"; shift
 	local     schema="${1}"; shift
 	local    tblName="${1}"; shift
@@ -189,8 +184,7 @@ function PGrasterize ()
 	RGISsetHeader "${rgisArchiv}" "${domain}" "${subject}" "${product}" "${resolution}" "static"
 }
 
-PGaddCodeField ()
-{
+function PGaddCodeField () {
     local    dbName="${1}"; shift
     local    schema="${1}"; shift
     local     table="${1}"; shift
@@ -218,8 +212,7 @@ WHERE \"${schema}\".\"${table}\".\"${charField}\" like \"RGISTemp_TABLE\".\"${ch
 DROP TABLE \"RGISTemp_TABLE\";" | psql -q "${dbName}"
 }
 
-function PGgpkgExportObject ()
-{
+function PGgpkgExportObject () {
 	local   dbName="${1}"; shift
 	local   schema="${1}"; shift
 	local  objName="${1}"; shift
@@ -234,8 +227,7 @@ function PGgpkgExportObject ()
 	ogr2ogr -f GPKG -nln "${schema}.${objName}" "${gpkgFile}" ${updateFlag} -sql "SELECT * FROM \"${schema}\".\"${objName}\"" PG:dbname="${dbName}"
 }
 
-function PGgpkgExportSchema ()
-{
+function PGgpkgExportSchema () {
 	local     dbName="${1}"; shift
 	local     schema="${1}"; shift
 	local    objects="${1}"; shift

@@ -7,10 +7,7 @@ USAGE="Usage ${0##*/} <rgis directory> <netcdf directory>"
           NCDIR="${1}"; shift
 if [[ "${NCDIR}" == "" ]]; then echo "${USAGE}"; exit 1; fi
 
-
- 
-function RGIStoNC ()
-{
+function RGIStoNC () {
 	local rgisDir="${1}"; shift;
 	local   ncDir="${1}"; shift;
 
@@ -41,8 +38,7 @@ function RGIStoNC ()
 	done)
 }
 
-function PurgeNCfiles ()
-{
+function PurgeNCfiles () {
 	local rgisDir="${1}"; shift;
 	local   ncDir="${1}"; shift;
 
@@ -54,8 +50,7 @@ function PurgeNCfiles ()
 	done)
 }
 
-function PurgeNCdirs ()
-{
+function PurgeNCdirs () {
 	local rgisDir="${1}"; shift;
 	local   ncDir="${1}"; shift;
 

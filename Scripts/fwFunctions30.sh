@@ -24,8 +24,7 @@ fi
 _fwPASSNUM=5
 _fwRESTART=""
 
-function _fwDataSource()
-{
+function _fwDataSource () {
 	for (( fwI = 0; fwI < ${#_fwDSourceARRAY[@]} ; ++fwI ))
 	do
 		local fwTEMP=(${_fwDSourceARRAY[${fwI}]})
@@ -35,8 +34,7 @@ function _fwDataSource()
 	return 1
 }
 
-function _fwVariable()
-{
+function _fwVariable () {
 	local fwRETURN=""
 	for (( fwI = 0; fwI < ${#_fwVariableARRAY[@]} ; ++fwI ))
 	do
@@ -46,8 +44,7 @@ function _fwVariable()
 	echo "${fwRETURN}"
 }
 
-function _fwOutput()
-{
+function _fwOutput () {
 	local fwRETURN=""
 	for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
 	do
@@ -57,8 +54,7 @@ function _fwOutput()
 	echo "${fwRETURN}"
 }
 
-function _fwState()
-{
+function _fwState () {
 	local fwRETURN=""
 	for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
 	do
@@ -68,8 +64,7 @@ function _fwState()
 	echo "${fwRETURN}"
 }
 
-function FwArguments()
-{
+function FwArguments () {
 	          _fwSPINUP="on"
 	        _fwFINALRUN="on"
 	_fwLENGTHCORRECTION=""
@@ -228,8 +223,7 @@ function FwArguments()
 	return 0
 }
 
-function FwInit()
-{
+function FwInit () {
 	     _fwModelBIN="${1}"; shift
        _fwDomainNAME="${1}"; shift
    _fwRGISDomainFILE="${1}"; shift
@@ -260,8 +254,7 @@ function FwInit()
 	_fwGDSDomainFILE="${_fwGDSDomainDIR}/${_fwDomainNAME}${_fwDomainTYPE}_${FwDomainRES}.ds"
 }
 
-function FwDataSrc()
-{
+function FwDataSrc () {
 	unset _fwDSourceARRAY
 	(( fwI = 0 ))
 	while [ "${1}"	!= "" ]
@@ -273,16 +266,14 @@ function FwDataSrc()
 	done
 }
 
-function _fwOptionList()
-{
+function _fwOptionList () {
 	for (( fwI = 0; fwI < ${#_fwOptionARRAY[@]} ; ++fwI ))
 	do
 		echo "-p ${_fwOptionARRAY[${fwI}]}"
 	done
 }
 
-function FwOptions()
-{
+function FwOptions () {
 	(( fwI = 0 ))
 	(( fwVARnum   = 0 ))
 	(( fwINPUTnum = 0 ))
@@ -339,8 +330,7 @@ function FwOptions()
 	return 0
 }
 
-function FwOutputs()
-{
+function FwOutputs () {
 	unset _fwOutputARRAY
 	local fwI
 	local fwJ
@@ -358,8 +348,7 @@ function FwOutputs()
 	done
 }
 
-function _fwPrintTest()
-{
+function _fwPrintTest () {
 	echo "Variables"
 	for (( fwI = 0; fwI < ${#_fwVariableARRAY[@]} ; ++fwI ))
 	do
@@ -401,8 +390,7 @@ function _fwPrintTest()
 	done
 }
 
-function FwGDSFilename()
-{
+function FwGDSFilename () {
 	local fwVARIABLE="${1}"; shift
 	local     fwMODE="${1}"; shift
 	local  fwVERSION="${1}"; shift
@@ -418,8 +406,7 @@ function FwGDSFilename()
 	echo ${fwFILENAME}
 }
 
-function FwRGISFilename()
-{
+function FwRGISFilename () {
 	local fwVARIABLE="${1}"; shift
 	local  fwVERSION="${1}"; shift
 	local     fwSTEP="${1}"; shift
@@ -450,8 +437,7 @@ function FwRGISFilename()
 	echo "${fwFILENAME}"
 }
 
-function _fwPreprocess()
-{
+function _fwPreprocess () {
 	local    fwYEAR="${1}"; shift
 
 	if [ "${fwYEAR}" == "" ]
@@ -515,8 +501,7 @@ function _fwPreprocess()
 	return 0
 }
 
-function _fwPostprocess()
-{
+function _fwPostprocess () {
     local fwVERSION="${1}"; shift
 	local    fwYEAR="${1}"; shift
 
@@ -570,8 +555,7 @@ function _fwPostprocess()
 	return 0
 }
 
-function _fwSpinup()
-{
+function _fwSpinup () {
 	local fwVERSION="${1}"; shift
 	local    fwYEAR="${1}"; shift
 
@@ -685,8 +669,7 @@ function _fwSpinup()
 	return 0
 }
 
-function _fwRun()
-{
+function _fwRun () {
    local      fwVERSION="${1}"; shift
 	local   fwStartYEAR="${1}"; shift
 	local     fwEndYEAR="${1}"; shift
@@ -788,8 +771,7 @@ function _fwRun()
 	return 0
 }
 
-function FwRun()
-{
+function FwRun () {
 	local   fwVERSION="${1}"; shift
 	local fwStartYEAR="${1}"; shift
 	local   fwEndYEAR="${1}"; shift

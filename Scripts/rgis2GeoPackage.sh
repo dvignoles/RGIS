@@ -1,7 +1,6 @@
 #!/bin/bash
 
-function PrintUsage ()
-{
+function PrintUsage () {
 	echo "Usage ${0##*/} [options] <rgisfile>"
 	echo "      -c, --case [sensitive|lower|upper]"
 	echo "      -g, --geopackage <geopackage>"
@@ -10,8 +9,7 @@ function PrintUsage ()
 	exit 1
 }
 
-function caseFunc ()
-{
+function caseFunc () {
     local caseVal="${1}"; shift
     local  string="${1}"; shift
 

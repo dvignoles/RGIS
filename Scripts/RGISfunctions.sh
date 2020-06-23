@@ -12,8 +12,7 @@ case "$(uname)" in
     ;;
 esac
 
-function GHAASprojectDir ()
-{
+function GHAASprojectDir () {
     local arg="${1}"; shift;
 
     if [[ "${arg%/*}"     != "." ]]; then projectDir="${arg%/*}"; projectDir="${projectDir%/Scripts}"; else prodjectDir=".."; fi
@@ -22,25 +21,22 @@ function GHAASprojectDir ()
     echo "${projectDir}"
 }
 
-function GHAASscriptName ()
-{
+function GHAASscriptName () {
     local arg="${1}"; shift;
 
      scriptName="${arg##*/}"; scriptName="${scriptName%.sh}";
      echo "${scriptName}"
 }
 
-export __RGISarchiveFormat="gzipped"
-
-function RGISprocessorNum ()
-{
+function RGISprocessorNum () {
     local processorNum="${0}"; shift
 
     export GHAASprocessorNum="${processorNum}"
 }
-function RGISarchiveFormat ()
-{
-   local format="${1}"
+export __RGISarchiveFormat="gzipped"
+
+function RGISarchiveFormat () {
+   local format="${1}"; shift
 
    case "${format}" in
         (plain)
@@ -59,8 +55,23 @@ function RGISarchiveFormat ()
    esac
 }
 
-function RGIScase ()
-{
+export __RGISarchiveVDBversion="vbd2"
+
+function RGISarchiveVDBversion () {
+   local vdbVersion="${1}"; shift
+
+   case "${vdbVersion}" in
+        (vdb2|vdb3)
+            export __RGISarchiveVDBversion="${vdbVersion}"
+        ;;
+        (*)
+            echo "Unrecognised VDBversion:${vdbVersion} in: RGISarchiveVDBversion"
+            export __RGISarchiveVDBversion="${vdbVersion}"
+        ;;
+   esac
+}
+
+function RGIScase () {
     local caseVal="${1}"; shift
     local  string="${1}"; shift
 
@@ -77,17 +88,10 @@ function RGIScase ()
     esac
 }
 
-function RGISlookupSubject ()
-{
+function RGISlookupSubject () {
     local   variable="${1}"; shift
-    local vdbVersion="${1}";
 
-    if [[ "${vdbVersion}" == "" ]]
-    then
-        local subject="$(vdbLookup -g "${variable}")"
-    else
-        local subject="$(vdbLookup -g "${variable}" -v "${vdbVersion}")"
-    fi
+    local subject="$(vdbLookup -g "${variable}" -v "${__RGISarchiveVDBversion}")"
     if [[ "${subject}" == "" ]]
     then
         echo "${variable}"
@@ -96,20 +100,11 @@ function RGISlookupSubject ()
     fi
 }
 
-function RGISlookupSubject2 () { RGISlookupSubject "${1}" "vdb2" }
-function RGISlookupSubject3 () { RGISlookupSubject "${1}" "vdb3" }
-
-function RGISlookupFullName ()
-{
+function RGISlookupFullName () {
     local   variable="${1}"; shift
     local vdbVersion="${1}";
 
-    if [[ "${vdbVersion}" == "" ]]
-    then
-        local fullName="$(vdbLookup -l "${variable}")"
-    else
-        local fullName="$(vdbLookup -l "${variable}" -v "${vdbVersion}")"
-    fi
+    local fullName="$(vdbLookup -l "${variable}" -v "${__RGISarchiveVDBversion}")"
     if [[ "${fullName}" == "" ]]
     then
         echo "${variable}"
@@ -118,20 +113,11 @@ function RGISlookupFullName ()
     fi
 }
 
-function RGISlookupFullName2 () { RGISlookupFullName "${1}" "vdb2" }
-function RGISlookupFullName3 () { RGISlookupFullName "${1}" "vdb3" }
-
-function RGISlookupShadeset ()
-{
+function RGISlookupShadeset () {
     local   variable="${1}"; shift
     local vdbVersion="${1}";
 
-    if [[ "${vdbVersion}" == "" ]]
-    then
-        local shadeSet="$(vdbLookup -s "${variable}")"
-    else
-        local shadeSet="$(vdbLookup -s "${variable}" -v "${vdbVersion}")"
-    fi
+    local shadeSet="$(vdbLookup -s "${variable}" -v "${__RGISarchiveVDBversion}")"
     if [[ "${shadeSet}" == "" ]]
     then
         echo "grey"
@@ -140,20 +126,11 @@ function RGISlookupShadeset ()
     fi
 }
 
-function RGISlookupShadeset2 () { RGISlookupShadeset "${1}" "vdb2" }
-function RGISlookupShadeset3 () { RGISlookupShadeset "${1}" "vdb3" }
-
-function RGISlookupAggrMethod ()
-{
+function RGISlookupAggrMethod () {
     local   variable="${1}"; shift
     local vdbVersion="${1}";
 
-    if [[ "${vdbVersion}" == "" ]]
-    then
-        local aggreg="$(vdbLookup -a "${variable}")"
-    else
-        local aggreg="$(vdbLookup -a "${variable}" -v "${vdbVersion}")"
-    fi
+    local aggreg="$(vdbLookup -a "${variable}" -v "${__RGISarchiveVDBversion}")"
     if [[ "${aggreg}" == "" ]]
     then
         echo "avg"
@@ -162,11 +139,7 @@ function RGISlookupAggrMethod ()
     fi
 }
 
-function RGISlookupAggrMethod2 () { RGISlookupAggrMethod "${1}" "vdb2" }
-function RGISlookupAggrMethod3 () { RGISlookupAggrMethod "${1}" "vdb3" }
-
-function RGISlookupTimeStep ()
-{
+function RGISlookupTimeStep () {
 	local timeStep=$(echo "${1}" | tr "[A-Z]" "[a-z]")
 
 	case "${timeStep}" in
@@ -182,8 +155,7 @@ function RGISlookupTimeStep ()
 	esac
 }
 
-function RGIStimeNumberOfDays ()
-{
+function RGIStimeNumberOfDays () {
 	local    year="${1}";          shift
 	local   month="$((${1} - 1))"; shift
 	local century="${year%??}"
@@ -215,8 +187,7 @@ function RGIStimeNumberOfDays ()
 	echo $((${monthLength[${month}]} + ${leapYear}))
 }
 
-function _RGISvariableDir ()
-{
+function _RGISvariableDir () {
 	local      archive="${1}"; shift
 	local       domain="${1}"; shift
 	local     variable="${1}"; shift
@@ -248,8 +219,7 @@ function _RGISvariableDir ()
 	return 0
 }
 
-function RGISgeoResolutionInSecond ()
-{
+function RGISgeoResolutionInSecond () {
     local resolution="${1}"; shift
 
    	case "${resolution}" in
@@ -315,8 +285,7 @@ function RGISgeoResolutionInSecond ()
     return 0
 }
 
-function RGISgeoResolutionMultiplier () # Destination resolution is devided by source resolution. Decimals ar chapped off.
-{
+function RGISgeoResolutionMultiplier () { # Destination resolution is devided by source resolution. Decimals ar chapped off.
     local srcRes="$(RGISgeoResolutionInSecond "${1}")"; shift
     local dstRes="$(RGISgeoResolutionInSecond "${1}")"; shift
 
@@ -331,8 +300,7 @@ function RGISgeoResolutionMultiplier () # Destination resolution is devided by s
     return 0
 
 }
-function _RGISresolutionDir ()
-{
+function _RGISresolutionDir () {
 	local      archive="${1}"; shift
 	local       domain="${1}"; shift
 	local     variable="${1}"; shift
@@ -414,8 +382,8 @@ function _RGISresolutionDir ()
 	fi
 	return 0
 }
-function _RGIStStepDir ()
-{
+
+function _RGIStStepDir () {
 	local tStepType="${1}"; shift
 	local     tStep="${1}"; shift
 
@@ -452,8 +420,7 @@ function _RGIStStepDir ()
 	return 0
 }
 
-function RGISdirectoryPath ()
-{
+function RGISdirectoryPath () {
 	local    archive="${1}"; shift
 	local     domain="${1}"; shift
 	local   variable="${1}"; shift
@@ -468,8 +435,7 @@ function RGISdirectoryPath ()
 	echo "${archive}/${domain}/${varDir}/${product}/${resolution}/${dir}"
 }
 
-function RGISdirectory ()
-{
+function RGISdirectory () {
 	local    archive="${1}"; shift
 	local     domain="${1}"; shift
 	local   variable="${1}"; shift
@@ -490,8 +456,7 @@ function RGISdirectory ()
 	return 0
 }
 
-function RGISfileExtension ()
-{
+function RGISfileExtension () {
 	local variable="${1}"; shift
 
     local dataType="$(vdbLookup -t "${variable}")"
@@ -522,8 +487,7 @@ function RGISfileExtension ()
     echo "${extension}"
 }
 
-function RGISfilePath ()
-{
+function RGISfilePath () {
 	local      archive="${1}"; shift
 	local       domain="${1}"; shift
 	local     variable="${1}"; shift
@@ -594,8 +558,7 @@ function RGISfilePath ()
     esac
 }
 
-function RGISfile ()
-{
+function RGISfile () {
 	local      archive="${1}"; shift
 	local       domain="${1}"; shift
 	local     variable="${1}"; shift
@@ -669,8 +632,7 @@ function RGISfile ()
    return 1
 }
 
-function RGIStitle ()
-{
+function RGIStitle () {
 	local     domain="${1}"; shift
 	local   variable="${1}"; shift
 	local    product="${1}"; shift
@@ -733,8 +695,7 @@ function RGIStitle ()
 	return 0
 }
 
-function RGISappend ()
-{
+function RGISappend () {
     local    archive="${1}"; shift
     local     domain="${1}"; shift
     local   variable="${1}"; shift
@@ -766,8 +727,7 @@ function RGISappend ()
 	grdAppendLayers -t "${title}" -d "${domain}" -u "${subject}" -v "${version}" -o "${filename}" ${files}
 }
 
-function RGISsetHeader ()
-{
+function RGISsetHeader () {
 	local      archive="${1}"; shift
 	local       domain="${1}"; shift
 	local     variable="${1}"; shift
@@ -824,8 +784,7 @@ function RGISsetHeader ()
 	setHeader  -t "${title}" -d "${domain}" -u "$(RGISlookupSubject "${variable}")" -y "on" -c "${comment}" -i "${citation}" -n "${institution}" -o "${sourceInst}" -p "${sourcePerson}" -v "${version}" "${rgisFile}" "${rgisFile}"
 }
 
-function RGISaggregateTS ()
-{
+function RGISaggregateTS () {
 	local    archive="${1}"; shift
 	local     domain="${1}"; shift
 	local   variable="${1}"; shift
@@ -857,8 +816,7 @@ function RGISaggregateTS ()
    done
 }
 
-function RGISclimatology ()
-{
+function RGISclimatology () {
 	local    archive="${1}"; shift
 	local     domain="${1}"; shift
 	local   variable="${1}"; shift
@@ -956,8 +914,7 @@ function RGISclimatology ()
 	grdDateLayers -e "${tStepUnit}" - "${fileName}"
 }
 
-function RGIScellStats ()
-{
+function RGIScellStats () {
 	local    archive="${1}"; shift
 	local     domain="${1}"; shift
 	local   variable="${1}"; shift
@@ -1009,12 +966,10 @@ function RGIScellStats ()
 	grdExtractLayers -t "${title}" -f "StdDev" -l "StdDev" -d "${domain}" -u "$(RGISlookupSubject ${variable})" "${statsFile}" |\
 	grdDateLayers -e "year" - "${stdDevLTfile}" || return 1
 
-#	rm "${statsFile}"
 	return 0
 }
 
-function RGISstatistics ()
-{
+function RGISstatistics () {
 	local    archive="${1}"; shift
 	local     domain="${1}"; shift
 	local   variable="${1}"; shift
