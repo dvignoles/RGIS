@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
                 int code;
 
                 if ((code = CMoptLookup(options, argv[argPos], false)) == CMfailed) {
-                    CMmsgPrint(CMmsgWarning, "Ignoring illformed aggregate method [%s]!", argv[argPos]);
+                    CMmsgPrint(CMmsgWarning, "Ignoring illformed VDB version [%s]!", argv[argPos]);
                 }
                 else version = methods[code];
             }

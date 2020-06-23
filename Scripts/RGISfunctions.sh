@@ -55,7 +55,7 @@ function RGISarchiveFormat () {
    esac
 }
 
-export __RGISarchiveVDBversion="vbd2"
+export __RGISarchiveVDBversion="vdb2"
 
 function RGISarchiveVDBversion () {
    local vdbVersion="${1}"; shift
