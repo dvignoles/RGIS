@@ -202,7 +202,7 @@ static void *_CMthreadWork (void *dataPtr) {
                 }
                 req.tv_sec  = 0;
                 req.tv_nsec = 1;
-                workerNum = chunkSize > 1 ? threadNum : start - end;
+                workerNum = chunkSize > 1 ? threadNum : end - start;
                 while (true) {
                     completed = 0;
                     for (num = 0; num < workerNum; ++num) {
