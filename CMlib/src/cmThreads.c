@@ -174,7 +174,7 @@ void CMthreadJobDestroy (CMthreadJob_p job) {
 
 static void *_CMthreadWork (void *dataPtr) {
 	CMthreadData_p data = (CMthreadData_p) dataPtr;
-	size_t taskId, groupId, start, end, chunkSize, threadNum, completed;
+	size_t taskId, groupId, start, end, chunkSize, threadNum, workerNum, num, completed;
 	CMthreadTeam_p team = (CMthreadTeam_p) data->TeamPtr;
 	CMthreadJob_p  job;
     struct timeb tbs;
@@ -196,18 +196,22 @@ static void *_CMthreadWork (void *dataPtr) {
                 chunkSize = (size_t) ceil ((double) (end - start) / (double) threadNum);
                 start = start + data->Id * chunkSize;
                 end   = start + chunkSize < end ? start + chunkSize : end;
-                 for (taskId = start; taskId < end; ++taskId) {
+                for (taskId = start; taskId < end; ++taskId) {
                     job->UserFunc(data->Id, job->SortedTasks[taskId]->Id, job->CommonData);
                     job->SortedTasks[taskId]->Completed = 1;
                 }
                 req.tv_sec  = 0;
                 req.tv_nsec = 1;
-                do {
+                workerNum = chunkSize > 1 ? threadNum : start - end;
+                while (true) {
                     completed = 0;
-                    for (taskId = job->Groups[groupId].End - threadNum;taskId < job->Groups[groupId].End;++taskId)
+                    for (num = 0; num < workerNum; ++num) {
+                        taskId = start + num * chunkSize - 1 < end - 1 ? start + num * chunkSize - 1 : end - 1;
                         completed += job->SortedTasks [taskId]->Completed;
-                    if  (completed < threadNum) nanosleep(&req , &rem);
-                } while (completed < threadNum);
+                    }
+                    if  (completed ==  workerNum) break;
+                    nanosleep(&req , &rem);
+                }
             }
             ftime (&tbs);
             data->Time += (tbs.time * 1000 + tbs.millitm - startTime);
