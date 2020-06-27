@@ -193,23 +193,17 @@ static void *_CMthreadWork (void *dataPtr) {
                 start = job->Groups[groupId].Start;
                 end   = job->Groups[groupId].End;
                 threadNum = end - start < team->ThreadNum ? end - start : team->ThreadNum;
-                chunkSize = (size_t) ceil ((double) (end - start) / (double) threadNum);
-                start = start + data->Id * chunkSize;
-                end   = start + chunkSize < end ? start + chunkSize : end;
-                for (taskId = start; taskId < end; ++taskId) {
+                for (taskId = start + data->Id; taskId < end; taskId += threadNum) {
                     job->UserFunc(data->Id, job->SortedTasks[taskId]->Id, job->CommonData);
                     job->SortedTasks[taskId]->Completed = 1;
                 }
                 req.tv_sec  = 0;
                 req.tv_nsec = 1;
-                workerNum = chunkSize > 1 ? threadNum : end - start;
                 while (true) {
                     completed = 0;
-                    for (num = 0; num < workerNum; ++num) {
-                        taskId = start + num * chunkSize - 1 < end - 1 ? start + num * chunkSize - 1 : end - 1;
+                    for (taskId = job->Groups[groupId].End - threadNum;taskId < job->Groups[groupId].End;++taskId)
                         completed += job->SortedTasks [taskId]->Completed;
-                    }
-                    if  (completed ==  workerNum) break;
+                    if  (completed == threadNum) break;
                     nanosleep(&req , &rem);
                 }
             }
