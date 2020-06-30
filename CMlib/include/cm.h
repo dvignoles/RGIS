@@ -109,8 +109,8 @@ typedef void  (*CMthreadUserExecFunc)(size_t, size_t, void *);
 typedef struct CMthreadTask_s {
     size_t Id;
     size_t Travel;
-    size_t Completed;
-    int isTravelSet;
+    bool Completed;
+    bool TravelSet;
     struct CMthreadTask_s **Dependents;
     size_t NDependents;
 } CMthreadTask_t, *CMthreadTask_p;

@@ -66,7 +66,7 @@ CMthreadJob_p CMthreadJobCreate (size_t taskNum, CMthreadUserExecFunc execFunc, 
 		job->Tasks [taskId].Dependents   = (CMthreadTask_p *) NULL;
 		job->Tasks [taskId].NDependents  = 0;
 		job->Tasks [taskId].Travel       = 0;
-		job->Tasks [taskId].isTravelSet  = 0;
+		job->Tasks [taskId].TravelSet    = false;
 	}
 	job->UserFunc = execFunc;
 	job->CommonData = (void *) commonData;
@@ -109,35 +109,29 @@ static int _CMthreadJobTaskCompare (const void *lPtr,const void *rPtr) {
     return 0;
 }
 
-size_t _travel_dist(CMthreadTask_t *task) { // RECURSIVE
+static size_t _CMtravel_dist(CMthreadTask_t *task) { // RECURSIVE
     int depi;
     size_t travel, maxtravel = 0;
-    if (task->isTravelSet) // been set already, quit early
-        return task->Travel;
+    if (task->TravelSet) return task->Travel;
     if (task->Dependents != (CMthreadTask_p *) NULL) {
         for (depi = 0; depi < task->NDependents; depi++) {
-            travel = _travel_dist(task->Dependents[depi]) + 1;
-            if (travel > maxtravel) {
-                maxtravel = travel;
-            }
+            travel = _CMtravel_dist(task->Dependents[depi]) + 1;
+            if (travel > maxtravel) maxtravel = travel;
         }
     }
     task->Travel = maxtravel;
-    task->isTravelSet = 1;
+    task->TravelSet = true;
     return maxtravel;
 }
 
-CMreturn _CMthreadJobTaskSort (CMthreadJob_p job) {
+static CMreturn _CMthreadJobTaskSort (CMthreadJob_p job) {
 	size_t taskId, start;
 	size_t travel;
 	CMthreadTask_p *dependent;
 
 	for (taskId = 0;taskId < job->TaskNum; ++taskId) {
-        // walks downstream along path computing travel (dist from node to mouth)
-        // fills in travel dist for each node on path. start from each node to ensure
-        // visiting all nodes. skip if cell has already been reached
-        if (job->Tasks[taskId].isTravelSet == 0) // unset
-            job->Tasks[taskId].Travel = _travel_dist(job->Tasks + taskId);
+        if (job->Tasks[taskId].TravelSet) continue;
+        job->Tasks[taskId].Travel = _CMtravel_dist(job->Tasks + taskId);
 	}
 
     qsort (job->SortedTasks,job->TaskNum,sizeof (CMthreadTask_p),_CMthreadJobTaskCompare);
@@ -152,14 +146,12 @@ CMreturn _CMthreadJobTaskSort (CMthreadJob_p job) {
 		if (travel != job->GroupNum - job->SortedTasks [taskId]->Travel - 1) {
 			job->Groups [travel].Start = (size_t) start;
 			job->Groups [travel].End   = (size_t) taskId;
-//            printf ("%3d/%3d %5d  %5d %5d\n",travel,job->GroupNum, job->Groups [travel].End - job->Groups [travel].Start, job->Groups [travel].Start,job->Groups [travel].End);
 			travel = job->GroupNum - job->SortedTasks [taskId]->Travel - 1;
 			start = taskId;
 		}
 	}
     job->Groups [travel].Start = (size_t) start;
     job->Groups [travel].End   = (size_t) taskId;
-//    printf ("%3d/%3d %5d  %5d %5d\n",travel,job->GroupNum, job->Groups [travel].End - job->Groups [travel].Start, job->Groups [travel].Start,job->Groups [travel].End);
     job->Sorted = true;
 	return (CMsucceeded);
 }
@@ -198,7 +190,7 @@ static void *_CMthreadWork (void *dataPtr) {
                 end   = start + chunkSize < end ? start + chunkSize : end;
                 for (taskId = start; taskId < end; ++taskId) {
                     job->UserFunc(data->Id, job->SortedTasks[taskId]->Id, job->CommonData);
-                    job->SortedTasks[taskId]->Completed = 1;
+                    job->SortedTasks[taskId]->Completed = true;
                 }
                 req.tv_sec  = 0;
                 req.tv_nsec = 1;
@@ -207,7 +199,7 @@ static void *_CMthreadWork (void *dataPtr) {
                     completed = 0;
                     for (num = 0; num < workerNum; ++num) {
                         taskId = start + num * chunkSize - 1 < end - 1 ? start + num * chunkSize - 1 : end - 1;
-                        completed += job->SortedTasks [taskId]->Completed;
+                        if (job->SortedTasks [taskId]->Completed) completed++;
                     }
                     if  (completed ==  workerNum) break;
                     nanosleep(&req , &rem);
@@ -266,8 +258,9 @@ CMreturn CMthreadJobExecute (CMthreadTeam_p team, CMthreadJob_p job) {
         for (groupId = 0; groupId < job->GroupNum; groupId++) {
             start = job->Groups[groupId].Start;
             end   = job->Groups[groupId].End;
-            for (taskId = start; taskId < end; ++taskId)
-                job->SortedTasks[taskId]->Completed = 0;
+            for (taskId = start; taskId < end; ++taskId) {
+                job->SortedTasks[taskId]->Completed = false;
+            }
         }
     }
     ftime (&tbs);
