@@ -140,18 +140,18 @@ static CMreturn _CMthreadJobTaskSort (CMthreadJob_p job) {
 		CMmsgPrint (CMmsgSysError,"Memory allocation error in: %s:%d",__FILE__,__LINE__);
 		return (CMfailed);
 	}
-	travel = 0;
-	start = 0;
+	travel = job->SortedTasks [0]->Travel;
+	start  = 0;
 	for (taskId = 0;taskId < job->TaskNum; ++taskId) {
-		if (travel != job->GroupNum - job->SortedTasks [taskId]->Travel - 1) {
-			job->Groups [travel].Start = (size_t) start;
-			job->Groups [travel].End   = (size_t) taskId;
-			travel = job->GroupNum - job->SortedTasks [taskId]->Travel - 1;
+		if (travel != job->SortedTasks [taskId]->Travel) {
+			job->Groups [job->GroupNum  - travel - 1].Start = (size_t) start;
+			job->Groups [job->GroupNum  - travel - 1].End   = (size_t) taskId;
+			travel = job->SortedTasks [taskId]->Travel;
 			start = taskId;
 		}
 	}
-    job->Groups [travel].Start = (size_t) start;
-    job->Groups [travel].End   = (size_t) taskId;
+    job->Groups [job->GroupNum  - travel - 1].Start = (size_t) start;
+    job->Groups [job->GroupNum  - travel - 1].End   = (size_t) taskId;
     job->Sorted = true;
 	return (CMsucceeded);
 }
@@ -194,14 +194,14 @@ static void *_CMthreadWork (void *dataPtr) {
                 }
                 req.tv_sec  = 0;
                 req.tv_nsec = 1;
-                workerNum = chunkSize > 1 ? threadNum : end - start;
+                workerNum = chunkSize > 1 ? threadNum : job->Groups[groupId].End - job->Groups[groupId].Start;
                 while (true) {
                     completed = 0;
                     for (num = 0; num < workerNum; ++num) {
                         taskId = start + num * chunkSize - 1 < end - 1 ? start + num * chunkSize - 1 : end - 1;
                         if (job->SortedTasks [taskId]->Completed) completed++;
                     }
-                    if  (completed ==  workerNum) break;
+                    if  (completed == workerNum) break;
                     nanosleep(&req , &rem);
                 }
             }
@@ -274,8 +274,8 @@ CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum, si
     pthread_attr_t thread_attr;
     struct timeb tbs;
 
-    if ((taskNum < 0x2000L) || (taskNum > 0x40000000L)) threadNum = 1;
-    else threadNum = taskNum / 0x2000L < threadNum ? taskNum / 0x2000L : threadNum;
+    if (((taskNum >> 0x000CL) <= 1) || (taskNum > 0x40000000L)) threadNum = 1;
+    else threadNum = (taskNum >> 0x000CL) < threadNum ? (taskNum >> 0x000C) : threadNum;
     
     ftime (&tbs);
     team->TotTime = tbs.time * 1000 + tbs.millitm;
