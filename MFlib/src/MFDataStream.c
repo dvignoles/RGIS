@@ -100,7 +100,7 @@ CMreturn MFdsRecordRead (MFVariable_p var) {
 	MFdsHeader_t header;
 
     if (var->InStream->Type == MFConst) {
-		if (var->InBuffer == (void *) NULL) {
+		if (var->Buffer == (void *) NULL) {
 			sLen = strlen (var->InputPath);
 			for (i = strlen (MFconstStr);i < sLen;++i) if (var->InputPath [i] == '.') break;
 			if (i == sLen) {
@@ -131,9 +131,7 @@ CMreturn MFdsRecordRead (MFVariable_p var) {
 				var->Missing.Float = CMmathEqualValues (var->InStream->Handle.Float,MFDefaultMissingFloat) ?
 									 (float) 0.0 : MFDefaultMissingFloat;
 			}
-			var->InBuffer   = (void *) calloc (var->ItemNum,MFVarItemSize (var->Type));
-            var->ProcBuffer = (void *) calloc (var->ItemNum,MFVarItemSize (var->Type));
- 			if ((var->InBuffer == (void *) NULL) || (var->ProcBuffer == (void *) NULL)) {
+ 			if ((var->Buffer = (void *) calloc (var->ItemNum,MFVarItemSize (var->Type))) == (void *) NULL) {
 				CMmsgPrint (CMmsgSysError,"Memory allocation error in: %s:%d",__FILE__,__LINE__);
 				return (CMfailed);
 			}
@@ -141,19 +139,19 @@ CMreturn MFdsRecordRead (MFVariable_p var) {
 		switch (var->Type) {
 			case MFByte:
 				for (i = 0; i < var->ItemNum; ++i)
-					((char *)  (var->InBuffer)) [i]  = (char)   (var->InStream->Handle.Int);
+					((char *)  (var->Buffer)) [i]  = (char)   (var->InStream->Handle.Int);
 				break;
 			case MFShort:
 				for (i = 0; i < var->ItemNum; ++i)
-					((short *) (var->InBuffer)) [i ] = (short)  (var->InStream->Handle.Int);
+					((short *) (var->Buffer)) [i ] = (short)  (var->InStream->Handle.Int);
 				break;
 			case MFInt:
 				for (i = 0; i < var->ItemNum; ++i)
-					((int *)   (var->InBuffer)) [i]  = (int)    (var->InStream->Handle.Int);
+					((int *)   (var->Buffer)) [i]  = (int)    (var->InStream->Handle.Int);
 				break;
 			case MFFloat:
 				for (i = 0; i < var->ItemNum; ++i)
-					((float *) (var->InBuffer)) [i]  = (float)  (var->InStream->Handle.Float);
+					((float *) (var->Buffer)) [i]  = (float)  (var->InStream->Handle.Float);
 				break;
             default:
                 break;
@@ -177,11 +175,9 @@ CMreturn MFdsRecordRead (MFVariable_p var) {
 					return (CMfailed);
 				}
 
-				if (var->InBuffer == (void *) NULL) {
+				if (var->Buffer == (void *) NULL) {
 					var->Type = header.Type;
-                    var->InBuffer   = (void *) calloc (var->ItemNum,MFVarItemSize (var->Type));
-                    var->ProcBuffer = (void *) calloc (var->ItemNum,MFVarItemSize (var->Type));
-                    if ((var->InBuffer == (void *) NULL) || (var->ProcBuffer == (void *) NULL)) {
+                    if ((var->Buffer   = (void *) calloc (var->ItemNum,MFVarItemSize (var->Type))) == (void *) NULL) {
 						CMmsgPrint(CMmsgSysError, "Variable [%s] allocation error in: %s:%d", var->Name, __FILE__,
 								   __LINE__);
 						return (CMfailed);
@@ -230,7 +226,7 @@ CMreturn MFdsRecordRead (MFVariable_p var) {
 							   __FILE__, __LINE__);
 					return (CMfailed);
 				}
-				if ((int) fread(var->InBuffer, MFVarItemSize(var->Type), var->ItemNum, var->InStream->Handle.File) !=
+				if ((int) fread(var->Buffer, MFVarItemSize(var->Type), var->ItemNum, var->InStream->Handle.File) !=
 					var->ItemNum) {
 					CMmsgPrint(CMmsgSysError, "Data Reading error (%s:%d)!", __FILE__, __LINE__);
 					return (CMfailed);
@@ -239,10 +235,10 @@ CMreturn MFdsRecordRead (MFVariable_p var) {
 			} while (MFDateCompare(header.Date, var->InDate) < 0);
 			if (header.Swap != 1)
 				switch (var->Type) {
-					case MFShort:  for (i = 0; i < var->ItemNum; ++i) MFSwapHalfWord((short *)  (var->InBuffer) + i); break;
-					case MFInt:    for (i = 0; i < var->ItemNum; ++i) MFSwapWord((int *)        (var->InBuffer) + i); break;
-					case MFFloat:  for (i = 0; i < var->ItemNum; ++i) MFSwapWord((float *)      (var->InBuffer) + i); break;
-					case MFDouble: for (i = 0; i < var->ItemNum; ++i) MFSwapLongWord((double *) (var->InBuffer) + i); break;
+					case MFShort:  for (i = 0; i < var->ItemNum; ++i) MFSwapHalfWord((short *)  (var->Buffer) + i); break;
+					case MFInt:    for (i = 0; i < var->ItemNum; ++i) MFSwapWord((int *)        (var->Buffer) + i); break;
+					case MFFloat:  for (i = 0; i < var->ItemNum; ++i) MFSwapWord((float *)      (var->Buffer) + i); break;
+					case MFDouble: for (i = 0; i < var->ItemNum; ++i) MFSwapLongWord((double *) (var->Buffer) + i); break;
 					default: break;
 				}
 			if ((var->NStep = MFDateTimeStepLength(var->InDate, var->TStep)) == 0) {
@@ -270,7 +266,7 @@ CMreturn MFdsRecordWrite (MFVariable_p var) {
 		default:	break;
 	}
 	if (MFdsHeaderWrite (&(header),var->OutStream->Handle.File) != CMsucceeded) return (CMfailed);
-	if (fwrite (var->OutBuffer, (size_t) MFVarItemSize (var->Type), var->ItemNum, var->OutStream->Handle.File) != var->ItemNum) {
+	if (fwrite (var->Buffer, (size_t) MFVarItemSize (var->Type), var->ItemNum, var->OutStream->Handle.File) != var->ItemNum) {
 		CMmsgPrint (CMmsgSysError,"Data writing error (%s:%d)!"__FILE__,__LINE__);
 		return (CMfailed);
 	}

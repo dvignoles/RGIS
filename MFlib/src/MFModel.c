@@ -367,75 +367,6 @@ static void _MFUserFunc (size_t threadId, size_t objectId, void *commonPtr) {
 	for (iFunc = 0;iFunc < _MFFunctionNum; ++iFunc) (_MFFunctions [iFunc]) (objectId);
 }
 
-typedef struct MFsingleIO_s {
-    pthread_t       Thread;
-    pthread_mutex_t Mutex;
-    pthread_cond_t  Cond;
-    bool            Cont;
-    int             Ret;
-} MFsingleIO_t, *MFsingleIO_p;
-
-static void *_MFInputSingleThreadWork (void *dataPtr) {
-    int varID;
-    MFsingleIO_p io = (MFsingleIO_p) dataPtr;
-    MFVariable_p var;
-
-    pthread_mutex_lock(&(io->Mutex));
-    while (io->Cont) {
-        io->Ret = CMsucceeded;
-        for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID)) {
-            if (var->InStream != (MFDataStream_p) NULL)
-                if (MFdsRecordRead(var) == CMfailed) io->Ret = CMfailed;
-        }
-        pthread_cond_wait (&(io->Cond), &(io->Mutex));
-    }
-    pthread_mutex_unlock(&(io->Mutex));
-    pthread_exit ((void *) NULL);
-}
-
-static void *_MFOutputSingleThreadWork (void *dataPtr) {
-    int varID;
-    MFsingleIO_p io = (MFsingleIO_p) dataPtr;
-    MFVariable_p var;
-
-    pthread_mutex_lock(&(io->Mutex));
-    do {
-        pthread_cond_wait (&(io->Cond), &(io->Mutex));
-        io->Ret = CMsucceeded;
-        for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID))
-            if (var->OutStream != (MFDataStream_p) NULL)
-                if (MFdsRecordWrite(var) == CMfailed) io->Ret = CMfailed;
-    } while (io->Cont);
-    pthread_mutex_unlock(&(io->Mutex));
-    pthread_exit ((void *) NULL);
-}
-
-static void *_MFInputMultiThreadWork (void *dataPtr) {
-    MFVariable_p var = (MFVariable_p) dataPtr;
-
-    pthread_mutex_lock(&(var->InMutex));
-    while (var->Read) {
-        var->ReadRet = MFdsRecordRead(var);
-        pthread_cond_wait (&(var->InCond), &(var->InMutex));
-    }
-    pthread_mutex_unlock(&(var->InMutex));
-    pthread_exit ((void *) NULL);
-}
-
-static void *_MFOutputMultiThreadWork (void *dataPtr) {
-    MFVariable_p var = (MFVariable_p) dataPtr;
-
-    pthread_mutex_lock(&(var->OutMutex));
-    do {
-        pthread_cond_wait (&(var->OutCond), &(var->OutMutex));
-        var->WriteRet = MFdsRecordWrite(var);
-    } while (!var->LastWrite);
-    pthread_mutex_unlock(&(var->OutMutex));
-    pthread_exit ((void *) NULL);
-}
-
-enum { MFparIOnone, MFparIOsingle, MFparIOmulti };
-
 int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
 	FILE *inFile;
 	int i, varID, ret = CMsucceeded, timeStep;
@@ -450,24 +381,7 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
 	size_t threadsNum = CMthreadProcessorNum ();
 	CMthreadTeam_t team;
  	CMthreadJob_p  job;
-    int parallelIO;
     pthread_attr_t thread_attr;
-    MFsingleIO_t inIO, outIO;
-
-    inIO.Ret  = CMsucceeded;
-    outIO.Ret = CMsucceeded;
-    if ((buffer = getenv ("GHAASparallelIO")) != (char *) NULL) {
-        if      (strcmp (buffer, "single") == 0) parallelIO = MFparIOsingle;
-        else if (strcmp (buffer, "multi")  == 0) parallelIO = MFparIOmulti;
-        else                                     parallelIO = MFparIOnone;
-    }
-    else parallelIO = MFparIOnone;
-
-    if (parallelIO != MFparIOnone) {
-        pthread_attr_init (&thread_attr);
-        pthread_attr_setdetachstate (&thread_attr, PTHREAD_CREATE_JOINABLE);
-		pthread_attr_setscope       (&thread_attr, PTHREAD_SCOPE_PROCESS);
-	}
 
     if (_MFModelParse (argc,argv,argNum, mainDefFunc, &domainFileName, &startDate, &endDate, &testOnly) == CMfailed) return (CMfailed);
  	if (testOnly) return (CMsucceeded);
@@ -503,27 +417,11 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
                 if (MFdsRecordRead(var)              == CMfailed) return (CMfailed);
                 if (MFDataStreamClose(var->InStream) == CMfailed) return (CMfailed);
                 var->InStream   = (MFDataStream_p) NULL;
-                var->ProcBuffer = var->InBuffer;
             }
             else {
                 strcpy (var->InDate, startDate);
                 var->Read = true;
-                switch (parallelIO) {
-                    case MFparIOsingle: break;
-                    case MFparIOmulti:
-                        pthread_mutex_init(&(var->InMutex), NULL);
-                        pthread_cond_init (&(var->InCond),  NULL);
-                        if (pthread_create(&(var->InThread), &thread_attr, _MFInputMultiThreadWork, (void *) var) != 0) {
-                            CMmsgPrint(CMmsgSysError, "Thread creation returned with error (%s:%d).",__FILE__,__LINE__);
-                            return (CMfailed);
-                        }
-                        break;
-                    default:
-                        if (MFdsRecordRead(var) == CMfailed) return (CMfailed);
-                        memcpy (var->ProcBuffer, var->InBuffer, var->ItemNum * MFVarItemSize(var->Type));
-                        var->OutBuffer = var->ProcBuffer;
-                        break;
-                }
+                if (MFdsRecordRead(var) == CMfailed) return (CMfailed);
             }
         }
 		else {
@@ -539,34 +437,17 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
                     var->Missing.Float = MFDefaultMissingFloat;
                 default: strcpy (var->InDate,"computed"); break;
             }
-            if ((var->ProcBuffer = (void *) calloc(var->ItemNum, MFVarItemSize(var->Type))) == (void *) NULL) {
+            if ((var->Buffer = (void *) calloc(var->ItemNum, MFVarItemSize(var->Type))) == (void *) NULL) {
                 CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s:%d", __FILE__, __LINE__);
                 return (CMfailed);
-			var->OutBuffer = var->ProcBuffer;
             }
             for (i = 0; i < var->ItemNum; ++i) MFVarSetFloat(var->ID,i,0.0);
         }
         if (var->Flux) sprintf (var->Unit + strlen(var->Unit), "/%s", MFDateTimeStepUnit(var->TStep));
         if (var->OutputPath != (char *) NULL) {
             if ((var->OutStream = MFDataStreamOpen(var->OutputPath,"w")) == (MFDataStream_p) NULL) return (CMfailed);
-            if (parallelIO == MFparIOnone) var->OutBuffer = var->ProcBuffer;
         }
 	}
-    if (parallelIO == MFparIOsingle) {
-        inIO.Cont = true;
-        pthread_mutex_init(&(inIO.Mutex), NULL);
-        pthread_cond_init (&(inIO.Cond),  NULL);
-        if (pthread_create(&(inIO.Thread), &thread_attr, _MFInputSingleThreadWork, (void *) (&inIO)) != 0) {
-            CMmsgPrint(CMmsgSysError, "Thread creation returned with error (%s:%d).",__FILE__,__LINE__);
-            return (CMfailed);
-        }
-        pthread_mutex_init(&(outIO.Mutex), NULL);
-        pthread_cond_init (&(outIO.Cond),  NULL);
-        if (pthread_create(&(outIO.Thread), &thread_attr, _MFOutputSingleThreadWork, (void *) (&outIO)) != 0) {
-            CMmsgPrint(CMmsgSysError, "Thread creation returned with error (%s:%d).",__FILE__,__LINE__);
-            return (CMfailed);
-        }
-    }
     _MFModelVarPrintOut ("Start date");
 	if (ret == CMfailed) return (CMfailed);
 
@@ -588,140 +469,37 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
 
     do {
         CMmsgPrint(CMmsgDebug, "Computing: %s", dateCur);
-        switch (parallelIO) {
-            case MFparIOsingle:
-                pthread_mutex_lock(&(inIO.Mutex));
-                if (inIO.Ret == CMfailed) return (CMfailed);
-                for (var = MFVarGetByID (varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID)) {
-                    if (var->InStream != (MFDataStream_p) NULL) {
-                        memcpy (var->ProcBuffer, var->InBuffer, var->ItemNum * MFVarItemSize(var->Type));
-                        strcpy (var->InDate,  dateNext);
-                    }
-                    else strcpy (var->CurDate, dateCur);
-                 }
-                inIO.Cont = (MFDateCompare(startDate, dateNext) < 0) && (MFDateCompare (dateNext,endDate) <= 0) ? true : false;
-                pthread_cond_broadcast(&(inIO.Cond));
-                pthread_mutex_unlock  (&(inIO.Mutex));
-                break;
-            case MFparIOmulti:
-                for (var = MFVarGetByID(varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID))
-                    if (var->InStream != (MFDataStream_p) NULL) {
-                        pthread_mutex_lock(&(var->InMutex));
-                        if (var->ReadRet == CMfailed) {
-                            CMmsgPrint(CMmsgAppError, "Variable (%s) Reading error!", var->Name);
-                            return (CMfailed);
-                        }
-                        memcpy (var->ProcBuffer, var->InBuffer, var->ItemNum * MFVarItemSize(var->Type));
-                        strcpy (var->InDate,  dateNext);
-                        var->Read = (MFDateCompare(startDate, dateNext) < 0) && (MFDateCompare (dateNext, endDate) <= 0) ? true : false;
-                        pthread_cond_signal (&(var->InCond));
-                        pthread_mutex_unlock(&(var->InMutex));
-                    }
-                else strcpy (var->CurDate,dateCur);
-                break;
-            default: break;
-        }
 
         CMthreadJobExecute(&team, job);
-
-        switch (parallelIO) {
-            case MFparIOsingle:
-                pthread_mutex_lock(&(outIO.Mutex));
-                if (outIO.Ret == CMfailed) return (CMfailed);
-                for (var = MFVarGetByID(varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID))
-                    if (var->OutStream != (MFDataStream_p) NULL) {
-                        if ((var->OutBuffer == (void *) NULL) || (var->OutBuffer == var->ProcBuffer)) {
-                            if ((var->OutBuffer = (void *) malloc(var->ItemNum * MFVarItemSize(var->Type))) == (void *) NULL) {
-                                CMmsgPrint(CMmsgSysError, "Variable [%s] allocation error (%s:%d)!", var->Name,__FILE__,__LINE__);
-                                return (CMfailed);
-                            }
-                        }
-                        memcpy (var->OutBuffer,var->ProcBuffer,var->ItemNum * MFVarItemSize(var->Type));
-                        strcpy (var->OutDate, dateCur);
-                    }
-                outIO.Cont = (MFDateCompare (dateCur, endDate) < 0) ? true : false;
-                pthread_cond_signal  (&(outIO.Cond));
-                pthread_mutex_unlock (&(outIO.Mutex));
-                break;
-            case MFparIOmulti:
-                for (var = MFVarGetByID(varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID)) {
-                    if (var->OutStream != (MFDataStream_p) NULL) {
-                        if ((var->OutBuffer == (void *) NULL) || (var->OutBuffer == var->ProcBuffer)) {
-                            if ((var->OutBuffer = (void *) malloc(var->ItemNum * MFVarItemSize(var->Type))) ==
-                                (void *) NULL) {
-                                CMmsgPrint(CMmsgSysError, "Variable [%s] allocation error (%s:%d)", var->Name,
-                                           __FILE__, __LINE__);
-                                return (CMfailed);
-                            }
-                            pthread_mutex_init(&(var->OutMutex), NULL);
-                            pthread_cond_init (&(var->OutCond), NULL);
-                            if (pthread_create(&(var->OutThread), &thread_attr, _MFOutputMultiThreadWork, (void *) var) != 0) {
-                                CMmsgPrint(CMmsgSysError, "Thread creation returned with error (%s:%d)!", __FILE__, __LINE__);
-                                return (CMfailed);
-                            }
-                            while (pthread_kill (var->OutThread, 0) != 0); // TODO possibly sloppy
-                            var->WriteRet = CMsucceeded;
-                        }
-                        pthread_mutex_lock(&(var->OutMutex));
-                        if (var->WriteRet == CMfailed) {
-                            CMmsgPrint(CMmsgAppError, "Variable (%s) writing error!", var->Name);
-                            return (CMfailed); // TODO this should be more civilized
-                        }
-                        memcpy (var->OutBuffer,var->ProcBuffer,var->ItemNum * MFVarItemSize(var->Type));
-                        strcpy (var->OutDate, dateCur);
-                        var->LastWrite = MFDateCompare (dateCur,endDate) == 0 ? true : false;
-                        pthread_cond_signal  (&(var->OutCond));
-                        pthread_mutex_unlock (&(var->OutMutex));
+        for (var = MFVarGetByID(varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID)) {
+            strcpy (var->OutDate, dateCur);
+            if (var->OutStream != (MFDataStream_p) NULL) {
+                if ((ret = MFdsRecordWrite(var)) == CMfailed) {
+                    CMmsgPrint(CMmsgAppError, "Variable (%s) writing error!", var->Name);
+                    return (CMfailed);
+                }
+            }
+            if (var->InStream != (MFDataStream_p) NULL) {
+                if ((MFDateCompare(startDate, dateNext) < 0) && (MFDateCompare(dateNext,endDate) <= 0)) {
+                    strcpy (var->InDate, dateNext);
+                    if ((ret = MFdsRecordRead(var)) == CMfailed) {
+                        CMmsgPrint(CMmsgAppError, "Variable (%s) Reading error!", var->Name);
+                        return (CMfailed);
                     }
                 }
-                break;
-            default:
-                for (var = MFVarGetByID(varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID)) {
-                    strcpy (var->OutDate, dateCur);
-                    if (var->OutStream != (MFDataStream_p) NULL) {
-                        if ((ret = MFdsRecordWrite(var)) == CMfailed) {
-                            CMmsgPrint(CMmsgAppError, "Variable (%s) writing error!", var->Name);
-                            return (CMfailed);
-                        }
-                    }
-                    if (var->InStream != (MFDataStream_p) NULL) {
-                        if ((MFDateCompare(startDate, dateNext) < 0) && (MFDateCompare(dateNext,endDate) <= 0)) {
-                            strcpy (var->InDate, dateNext);
-                            if ((ret = MFdsRecordRead(var)) == CMfailed) {
-                                CMmsgPrint(CMmsgAppError, "Variable (%s) Reading error!", var->Name);
-                                return (CMfailed);
-                            }
-                        }
-                        memcpy (var->ProcBuffer, var->InBuffer, var->ItemNum * MFVarItemSize(var->Type));
-                    }
-                    else strcpy (var->CurDate,dateCur);
-                }
-                break;
+            }
+            else strcpy (var->CurDate,dateCur);
         }
         strcpy (dateCur,  dateNext);
         MFDateSetCurrent(dateCur);
         strcpy (dateNext, MFDateGetNext ());
     } while ((ret == CMsucceeded) && (MFDateCompare(startDate, dateCur) < 0) && (MFDateCompare (dateCur,endDate) <= 0));
 
-    switch (parallelIO) {
-        case MFparIOsingle:
-            pthread_join (inIO.Thread,  &status);
-            pthread_join (outIO.Thread, &status);
-            break;
-        case MFparIOmulti:
-            for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID)) {
-                if (var->InStream  != (MFDataStream_p) NULL) pthread_join (var->InThread,  &status);
-                if (var->OutStream != (MFDataStream_p) NULL) pthread_join (var->OutThread, &status);
-            }
-            break;
-        default: break;
-    }
 	for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID)) {
 		if (var->InStream  != (MFDataStream_p) NULL) MFDataStreamClose (var->InStream);
 		if (var->OutStream != (MFDataStream_p) NULL) MFDataStreamClose (var->OutStream);
         if (var->StatePath != (char *) NULL) {
             if ((var->OutStream = MFDataStreamOpen (var->StatePath,"w")) == (MFDataStream_p) NULL) ret = CMfailed;
-            var->OutBuffer = var->ProcBuffer;
             strcpy (var->OutDate,dateCur);
 			if (MFdsRecordWrite(var) == CMfailed) {
                 CMmsgPrint (CMmsgAppError,"Variable (%s) writing error!",var->Name);
@@ -729,12 +507,9 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
             }
 			MFDataStreamClose (var->OutStream);
 		}
-        if ((var->InBuffer  != (void *) NULL) && (var->InBuffer  != var->ProcBuffer)) free (var->InBuffer);
-        if ((var->OutBuffer != (void *) NULL) && (var->OutBuffer != var->ProcBuffer)) free (var->OutBuffer);
-		free (var->ProcBuffer);
+		free (var->Buffer);
 	}
     CMthreadJobDestroy  (job);
-    if (parallelIO != MFparIOnone) pthread_attr_destroy(&thread_attr);
     CMthreadTeamDestroy(&team);
     CMmsgPrint (CMmsgInfo,"Total Time: %.1f, Execute Time: %.1f, Average Thread Time %.1f, Master Time %.1f",
                 (float) team.TotTime    / 1000.0,

@@ -95,7 +95,7 @@ typedef struct MFVariable_s {
     char Name[MFNameLength];
     char Unit[MFNameLength];
     char InDate[MFDateStringLength], CurDate[MFDateStringLength], OutDate[MFDateStringLength];
-    bool Flux, Initial, Set, Route, State;
+    bool Flux, Initial, Set, Route;
     int  Type;
     int  ItemNum;
     union {
@@ -103,15 +103,11 @@ typedef struct MFVariable_s {
         double Float;
     } Missing;
     short TStep;
-    void *InBuffer,  *OutBuffer,  *ProcBuffer;
+    void *Buffer;
     char *InputPath, *OutputPath, *StatePath;
     int   NStep;
     MFDataStream_t *InStream, *OutStream;
-    pthread_t       InThread,  OutThread;
-    pthread_mutex_t InMutex,   OutMutex;
-    pthread_cond_t  InCond,    OutCond;
-    int             ReadRet,   WriteRet;
-    bool   Read,    LastWrite;
+    bool   Read;
 } MFVariable_t, *MFVariable_p;
 
 typedef void (*MFFunction)(int);

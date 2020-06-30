@@ -146,12 +146,8 @@ function FwArguments () {
 			(-p|--piped)
 				shift
 				case ${1} in
-					(on)
-					    _fwOPTIONSPIPED="on"
-				    	export GHAASparallelIO="single"
-					;;
-					(off)
-						_fwOPTIONSPIPED="off"
+					(on|off)
+					    _fwOPTIONSPIPED="${1}"
 					;;
 					(*)
 						echo "Invalid --piped argument [${1}]"

@@ -53,9 +53,7 @@ static MFVariable_p _MFVarNewEntry (const char *name) {
 	strcpy  (var->CurDate, "NOT SET");
 	var->ItemNum  = 0;
 	var->Type = MFInput;
-	var->InBuffer   = (void *) NULL;
-	var->OutBuffer  = (void *) NULL;
-	var->ProcBuffer = (void *) NULL;
+	var->Buffer     = (void *) NULL;
 	var->InputPath  = (char *) NULL;
 	var->OutputPath = (char *) NULL;
 	var->StatePath  = (char *) NULL;
@@ -67,10 +65,7 @@ static MFVariable_p _MFVarNewEntry (const char *name) {
 	var->Flux       = false;
 	var->Initial    = false;
 	var->Route      = false;
-    var->ReadRet    = CMfailed;
-    var->WriteRet   = CMfailed;
     var->Read       = false;
-    var->LastWrite  = true;
 	_MFVariableNum++;
 	return (var);
 }
@@ -143,11 +138,11 @@ int MFVarGetID (char *name,char *unit,int type, bool flux, bool initial) {
 static bool _MFVarTestMissingVal (MFVariable_p var,int itemID)
 	{
 	switch (var->Type) {
-		case MFByte:   return ((int) (((char *)  var->ProcBuffer) [itemID]) == var->Missing.Int);
-		case MFShort:  return ((int) (((short *) var->ProcBuffer) [itemID]) == var->Missing.Int);
-		case MFInt:	   return ((int) (((int *)   var->ProcBuffer) [itemID]) == var->Missing.Int);
-		case MFFloat:  return (CMmathEqualValues ((((float *)  var->ProcBuffer) [itemID]),var->Missing.Float));
-		case MFDouble: return (CMmathEqualValues ((((double *) var->ProcBuffer) [itemID]),var->Missing.Float));
+		case MFByte:   return ((int) (((char *)  var->Buffer) [itemID]) == var->Missing.Int);
+		case MFShort:  return ((int) (((short *) var->Buffer) [itemID]) == var->Missing.Int);
+		case MFInt:	   return ((int) (((int *)   var->Buffer) [itemID]) == var->Missing.Int);
+		case MFFloat:  return (CMmathEqualValues ((((float *)  var->Buffer) [itemID]),var->Missing.Float));
+		case MFDouble: return (CMmathEqualValues ((((double *) var->Buffer) [itemID]),var->Missing.Float));
 	}
 	CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%s,%d] type [%d] in %s:%d",var->Name, itemID, var->Type,__FILE__,__LINE__);
 	return (true);
@@ -177,11 +172,11 @@ void MFVarSetMissingVal (int id, int itemID)
 		return;
 	}
 	switch (var->Type) {
-		case MFByte:	((char *)   var->ProcBuffer) [itemID] = (char)   var->Missing.Int;		break;
-		case MFShort:	((short *)  var->ProcBuffer) [itemID] = (short)  var->Missing.Int;		break;
-		case MFInt:		((int *)    var->ProcBuffer) [itemID] = (int)    var->Missing.Int;		break;
-		case MFFloat:	((float *)  var->ProcBuffer) [itemID] = (float)  var->Missing.Float;	break;
-		case MFDouble:	((double *) var->ProcBuffer) [itemID] = (double) var->Missing.Float;	break;
+		case MFByte:	((char *)   var->Buffer) [itemID] = (char)   var->Missing.Int;		break;
+		case MFShort:	((short *)  var->Buffer) [itemID] = (short)  var->Missing.Int;		break;
+		case MFInt:		((int *)    var->Buffer) [itemID] = (int)    var->Missing.Int;		break;
+		case MFFloat:	((float *)  var->Buffer) [itemID] = (float)  var->Missing.Float;	break;
+		case MFDouble:	((double *) var->Buffer) [itemID] = (double) var->Missing.Float;	break;
 	}
 }
 
@@ -196,11 +191,11 @@ void MFVarSetFloat (int id,int itemID,double val) {
 	var->Set = true;
 	if (var->Flux) val = val * (double) var->NStep;
 	switch (var->Type) {
-		case MFByte:	((char *)   var->ProcBuffer) [itemID] = (char)  val; break;
-		case MFShort:	((short *)  var->ProcBuffer) [itemID] = (short) val; break;
-		case MFInt:		((int *)    var->ProcBuffer) [itemID] = (int)   val; break;
-		case MFFloat:	((float *)  var->ProcBuffer) [itemID] = (float) val; break;
-		case MFDouble:	((double *) var->ProcBuffer) [itemID] =         val; break;
+		case MFByte:	((char *)   var->Buffer) [itemID] = (char)  val; break;
+		case MFShort:	((short *)  var->Buffer) [itemID] = (short) val; break;
+		case MFInt:		((int *)    var->Buffer) [itemID] = (int)   val; break;
+		case MFFloat:	((float *)  var->Buffer) [itemID] = (float) val; break;
+		case MFDouble:	((double *) var->Buffer) [itemID] =         val; break;
 		default:
 			CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%s,%d] type [%d] in %s:%d\n",var->Name, itemID, var->Type,__FILE__,__LINE__);
 			break;
@@ -219,11 +214,11 @@ double MFVarGetFloat (int id,int itemID,double missingVal) {
 	if (_MFVarTestMissingVal (var,itemID)) return (missingVal);
 
 	switch (var->Type) {
-		case MFByte:	val = (double) (((char *)   var->ProcBuffer) [itemID]); break;
-		case MFShort:	val = (double) (((short *)  var->ProcBuffer) [itemID]); break;
-		case MFInt:		val = (double) (((int *)    var->ProcBuffer) [itemID]); break;
-		case MFFloat:	val = (double) (((float *)  var->ProcBuffer) [itemID]); break;
-		case MFDouble:	val = (double) (((double *) var->ProcBuffer) [itemID]); break;
+		case MFByte:	val = (double) (((char *)   var->Buffer) [itemID]); break;
+		case MFShort:	val = (double) (((short *)  var->Buffer) [itemID]); break;
+		case MFInt:		val = (double) (((int *)    var->Buffer) [itemID]); break;
+		case MFFloat:	val = (double) (((float *)  var->Buffer) [itemID]); break;
+		case MFDouble:	val = (double) (((double *) var->Buffer) [itemID]); break;
 		default:
 			CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%s,%d] type [%d] in %s:%d\n",var->Name, itemID, var->Type,__FILE__,__LINE__);
 			return (MFDefaultMissingFloat);
@@ -242,11 +237,11 @@ void MFVarSetInt (int id,int itemID,int val) {
 	var->Set = true;
 	if (var->Flux) val = val * var->NStep;
 	switch (var->Type) {
-		case MFByte:	((char *)   var->ProcBuffer) [itemID] = (char)   val;	break;
-		case MFShort:	((short *)  var->ProcBuffer) [itemID] = (short)  val;	break;
-		case MFInt:		((int *)    var->ProcBuffer) [itemID] = (int)    val;	break;
-		case MFFloat:	((float *)  var->ProcBuffer) [itemID] = (float)  val;	break;
-		case MFDouble:	((double *) var->ProcBuffer) [itemID] = (double) val;	break;
+		case MFByte:	((char *)   var->Buffer) [itemID] = (char)   val;	break;
+		case MFShort:	((short *)  var->Buffer) [itemID] = (short)  val;	break;
+		case MFInt:		((int *)    var->Buffer) [itemID] = (int)    val;	break;
+		case MFFloat:	((float *)  var->Buffer) [itemID] = (float)  val;	break;
+		case MFDouble:	((double *) var->Buffer) [itemID] = (double) val;	break;
 		default:
 			CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%s,%d] type [%d] in %s:%d\n",var->Name, itemID, var->Type,__FILE__,__LINE__);
 			break;
@@ -266,11 +261,11 @@ int MFVarGetInt (int id,int itemID, int missingVal) {
 	if (_MFVarTestMissingVal (var,itemID)) return (missingVal);
 	
 	switch (var->Type) {
-		case MFByte:	val = (int) (((char *)   var->ProcBuffer) [itemID]); break;
-		case MFShort:	val = (int) (((short *)  var->ProcBuffer) [itemID]); break;
-		case MFInt:		val = (int) (((int *)    var->ProcBuffer) [itemID]); break;
-		case MFFloat:	val = (int) (((float *)  var->ProcBuffer) [itemID]); break;
-		case MFDouble:	val = (int) (((double *) var->ProcBuffer) [itemID]); break;
+		case MFByte:	val = (int) (((char *)   var->Buffer) [itemID]); break;
+		case MFShort:	val = (int) (((short *)  var->Buffer) [itemID]); break;
+		case MFInt:		val = (int) (((int *)    var->Buffer) [itemID]); break;
+		case MFFloat:	val = (int) (((float *)  var->Buffer) [itemID]); break;
+		case MFDouble:	val = (int) (((double *) var->Buffer) [itemID]); break;
 		default:
 			CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%s,%d] type [%d] in %s:%d\n",var->Name, itemID, var->Type,__FILE__,__LINE__);
 			return (MFDefaultMissingInt);
