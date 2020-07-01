@@ -12,8 +12,7 @@ bfekete@gc.cuny.edu
 
 #include <stdlib.h>
 #include <math.h>
-#include <unistd.h>
-#include <sys/timeb.h>
+#include <sys/time.h>
 #include <signal.h>
 #include <cm.h>
 
@@ -127,7 +126,6 @@ static size_t _CMtravel_dist(CMthreadTask_t *task) { // RECURSIVE
 static CMreturn _CMthreadJobTaskSort (CMthreadJob_p job) {
 	size_t taskId, start;
 	size_t travel;
-	CMthreadTask_p *dependent;
 
 	for (taskId = 0;taskId < job->TaskNum; ++taskId) {
         if (job->Tasks[taskId].TravelSet) continue;
@@ -169,9 +167,10 @@ static void *_CMthreadWork (void *dataPtr) {
 	size_t taskId, groupId, start, end, chunkSize, threadNum, workerNum, num, completed;
 	CMthreadTeam_p team = (CMthreadTeam_p) data->TeamPtr;
 	CMthreadJob_p  job;
-    struct timeb tbs;
     struct timespec req, rem;
     long long startTime;
+    struct timeval  tp;
+    struct timezone tzp;
 
     pthread_mutex_lock (&(team->SMutex));
     do {
@@ -179,8 +178,8 @@ static void *_CMthreadWork (void *dataPtr) {
         job = team->JobPtr;
         if (job != (CMthreadJob_p) NULL) {
             pthread_mutex_unlock(&(team->SMutex));
-            ftime (&tbs);
-            startTime = tbs.time * 1000 + tbs.millitm;
+            gettimeofday(&tp, &tzp);
+            startTime = tp.tv_sec * 1000000 + tp.tv_usec;
             for (groupId = 0; groupId < job->GroupNum; groupId++) {
                 start = job->Groups[groupId].Start;
                 end   = job->Groups[groupId].End;
@@ -205,8 +204,8 @@ static void *_CMthreadWork (void *dataPtr) {
                     nanosleep(&req , &rem);
                 }
             }
-            ftime (&tbs);
-            data->Time += (tbs.time * 1000 + tbs.millitm - startTime);
+            gettimeofday(&tp, &tzp);
+            data->Time += (tp.tv_sec * 1000000 + tp.tv_usec - startTime);
             pthread_mutex_lock (&(team->SMutex));
             job->Completed++;
             if (job->Completed == team->ThreadNum) {
@@ -222,31 +221,32 @@ static void *_CMthreadWork (void *dataPtr) {
 
 CMreturn CMthreadJobExecute (CMthreadTeam_p team, CMthreadJob_p job) {
     size_t taskId, groupId, start, end;
-    struct timeb tbs;
     long long startTime, localStart;
+    struct timeval  tp;
+    struct timezone tzp;
 
-    ftime (&tbs);
-    startTime = tbs.time * 1000 + tbs.millitm;
+    gettimeofday(&tp, &tzp);
+    startTime = tp.tv_sec * 1000000 + tp.tv_usec;
 
     if (job->Sorted == false) {
         _CMthreadJobTaskSort(job);
-        ftime (&tbs);
-        team->ExecTime += (tbs.time * 1000 + tbs.millitm - startTime);
+        gettimeofday(&tp, &tzp);
+        team->ExecTime += (tp.tv_sec * 1000000 + tp.tv_usec - startTime);
     }
-    ftime (&tbs);
-    startTime = tbs.time * 1000 + tbs.millitm;
+    gettimeofday(&tp, &tzp);
+    startTime = tp.tv_sec * 1000000 + tp.tv_usec;
 
     if (team->ThreadNum <= 1) {
-        ftime (&tbs);
-        localStart = tbs.time * 1000 + tbs.millitm;
+        gettimeofday(&tp, &tzp);
+        localStart = tp.tv_sec * 1000000 + tp.tv_usec;
         for (groupId = 0; groupId < job->GroupNum; groupId++) {
             start = job->Groups[groupId].Start;
             end   = job->Groups[groupId].End;
             for (taskId = start; taskId < end; ++taskId)
                 job->UserFunc(0, job->SortedTasks[taskId]->Id, job->CommonData);
         }
-        ftime (&tbs);
-        team->Time += (tbs.time * 1000 + tbs.millitm - localStart);
+        gettimeofday(&tp, &tzp);
+        team->Time += (tp.tv_sec * 1000000 + tp.tv_usec - localStart);
     }
     else {
         pthread_mutex_lock     (&(team->SMutex));
@@ -263,8 +263,8 @@ CMreturn CMthreadJobExecute (CMthreadTeam_p team, CMthreadJob_p job) {
             }
         }
     }
-    ftime (&tbs);
-    team->ExecTime += (tbs.time * 1000 + tbs.millitm - startTime);
+    gettimeofday(&tp, &tzp);
+    team->ExecTime += (tp.tv_sec * 1000000 + tp.tv_usec - startTime);
 	return (CMsucceeded);
 }
 
@@ -272,13 +272,14 @@ CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum, si
     int ret;
 	size_t threadId;
     pthread_attr_t thread_attr;
-    struct timeb tbs;
+    struct timeval  tp;
+    struct timezone tzp;
 
     if (((taskNum >> 0x000CL) <= 1) || (taskNum > 0x40000000L)) threadNum = 1;
     else threadNum = (taskNum >> 0x000CL) < threadNum ? (taskNum >> 0x000CL) : threadNum;
-    
-    ftime (&tbs);
-    team->TotTime = tbs.time * 1000 + tbs.millitm;
+
+    gettimeofday(&tp, &tzp);
+    team->TotTime = tp.tv_sec * 1000000 + tp.tv_usec;
 	team->ThreadNum      = threadNum;
 	team->JobPtr         = (void *) NULL;
     team->ExecTime       = 0;
@@ -323,7 +324,8 @@ CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum, si
 void CMthreadTeamDestroy (CMthreadTeam_p team) { // Does not free the team pointer so
     size_t threadId;
     void *status;
-    struct timeb tbs;
+    struct timeval  tp;
+    struct timezone tzp;
 
     if (team->ThreadNum > 1) {
         team->JobPtr = (CMthreadJob_p) NULL;
@@ -339,7 +341,7 @@ void CMthreadTeamDestroy (CMthreadTeam_p team) { // Does not free the team point
         pthread_mutex_destroy(&(team->SMutex));
         pthread_cond_destroy (&(team->SCond));
         free(team->Threads);
-   }
-    ftime (&tbs);
-    team->TotTime = tbs.time * 1000 + tbs.millitm - team->TotTime;
+    }
+    gettimeofday(&tp, &tzp);
+    team->TotTime = tp.tv_sec * 1000000 + tp.tv_usec - team->TotTime;
 }

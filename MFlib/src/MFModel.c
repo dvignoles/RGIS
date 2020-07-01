@@ -512,9 +512,9 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
     CMthreadJobDestroy  (job);
     CMthreadTeamDestroy(&team);
     CMmsgPrint (CMmsgInfo,"Total Time: %.1f, Execute Time: %.1f, Average Thread Time %.1f, Master Time %.1f",
-                (float) team.TotTime    / 1000.0,
-                (float) team.ExecTime   / 1000.0,
-                (float) team.ThreadTime / (team.ThreadNum > 0 ? (float) team.ThreadNum : 1.0) / 1000.0,
-                (float) team.Time       / 1000.0);
+                (float) team.TotTime    / 1000000.0,
+                (float) team.ExecTime   / 1000000.0,
+                (float) team.ThreadTime / (team.ThreadNum > 0 ? (float) team.ThreadNum : 1.0) / 1000000.0,
+                (float) team.Time       / 1000000.0);
 	return (ret);
 }
