@@ -275,7 +275,7 @@ CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum, si
     struct timeb tbs;
 
     if (((taskNum >> 0x000CL) <= 1) || (taskNum > 0x40000000L)) threadNum = 1;
-    else threadNum = (taskNum >> 0x000CL) < threadNum ? (taskNum >> 0x000C) : threadNum;
+    else threadNum = (taskNum >> 0x000CL) < threadNum ? (taskNum >> 0x000CL) : threadNum;
     
     ftime (&tbs);
     team->TotTime = tbs.time * 1000 + tbs.millitm;
