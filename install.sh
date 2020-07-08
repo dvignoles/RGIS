@@ -19,7 +19,7 @@ then
 	exit 1;
 fi
 
-  build_dir=/tmp/ghaas_build
+  build_dir=/tmp/rgis_build
  source_dir="${0%/*}"
 [ "${source_dir}" == "." ] && source_dir=$(pwd)
 

@@ -34,7 +34,6 @@ add_subdirectory(UIlib)
 add_subdirectory(VDBlib)
 add_subdirectory(tfCommands)
 add_subdirectory(threadTest)
-add_subdirectory(WBMstable)
 
 install(DIRECTORY f          DESTINATION ghaas)
 install(DIRECTORY Scripts    DESTINATION ghaas)

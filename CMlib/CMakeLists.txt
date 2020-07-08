@@ -1,5 +1,5 @@
 FILE(GLOB sources src/*.c)
-add_library(CM10 ${sources})
-target_include_directories(CM10 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-install(TARGETS CM10 DESTINATION ghaas/lib)
+add_library(CM30 ${sources})
+target_include_directories(CM30 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+install(TARGETS CM30 DESTINATION ghaas/lib)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/cm.h DESTINATION ghaas/include)

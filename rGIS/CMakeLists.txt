@@ -1,5 +1,5 @@
 FILE(GLOB sources src/*.C)
 add_executable(rgis30 ${sources})
 target_include_directories(rgis30 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ../UIlib/include ../DBlib/include ../CMlib/include ../RGlib/include)
-target_link_libraries(rgis30 UI30 DB30 CM10 RG30 -lXm -lXt -lXext -lX11 -lnetcdf -ludunits2)
+target_link_libraries(rgis30 CM30 DB30 RG30 UI30 -lXm -lXt -lXext -lX11 -lnetcdf -ludunits2)
 install (TARGETS rgis30 RUNTIME DESTINATION ghaas/bin)

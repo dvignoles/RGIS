@@ -1,5 +1,5 @@
 FILE(GLOB sources src/*.c)
-add_library(VDB ${sources})
-target_include_directories(VDB PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-install(TARGETS VDB DESTINATION ghaas/lib)
+add_library(VDB30 ${sources})
+target_include_directories(VDB30 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+install(TARGETS VDB30 DESTINATION ghaas/lib)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/vdb.h DESTINATION ghaas/include)

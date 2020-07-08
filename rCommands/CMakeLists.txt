@@ -1,4 +1,9 @@
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ../VDBlib/include ../CMlib/include ../DBlib/include ../RGlib/include ../MFlib/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include
+		            ${CMAKE_CURRENT_SOURCE_DIR}/../VDBlib/include
+		            ${CMAKE_CURRENT_SOURCE_DIR}/../CMlib/include
+		            ${CMAKE_CURRENT_SOURCE_DIR}/../DBlib/include
+		            ${CMAKE_CURRENT_SOURCE_DIR}/../RGlib/include
+		            ${CMAKE_CURRENT_SOURCE_DIR}/../MFlib/include)
 
 foreach(loop_var ds2rgis dsAggregate dsDuration dsSampling getHeader grdAppendLayers grdBoxAggr grdCalculate grdCellStats grdCreateNetwork
 grdCycleMean grdDateLayers grdDifference grdExtractLayers grdHeatIndex grdImport grdMerge grdMinMax grdNetFilter grdNoNeg grdOperation grdReclassDisc  grdRemovePits grdRenameLayers grdRunningMean
@@ -10,9 +15,9 @@ tblConvCoord tblDecimalDate tblDeleteField tblDeleteRec tblIdleRec tblJoinTables
 tblSortRec tblSplitDate tblStatistics tblTopoCalc )
 	add_executable(${loop_var} src/CMD${loop_var}.C)
 	if(${CMAKE_HOST_APPLE})
-		target_link_libraries(${loop_var} LINK_PUBLIC RG30 DB30 MF10 VDB CM10 -lnetcdf -ludunits2 -lm)
+		target_link_libraries(${loop_var} LINK_PUBLIC CM30 DB30 MF30 RG30 VDB30 -lnetcdf -ludunits2 -lm)
 	else(${CMAKE_HOST_APPLE})
-		target_link_libraries(${loop_var} LINK_PUBLIC RG30 DB30 MF10 VDB CM10 -lnetcdf -ludunits2 -lm -pthread)
+		target_link_libraries(${loop_var} LINK_PUBLIC CM30 DB30 MF30 RG30 VDB30 -lnetcdf -ludunits2 -lm -pthread)
 	endif(${CMAKE_HOST_APPLE})
 	install (TARGETS ${loop_var} RUNTIME DESTINATION ghaas/bin)
 endforeach(loop_var)
