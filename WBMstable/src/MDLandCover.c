@@ -10,10 +10,8 @@ dominik.wisser@unh.edu
 
 *******************************************************************************/
 
-#include <stdio.h>
 #include <MF.h>
 #include <MD.h>
-
 
 static int _MDOutCoverID      = MFUnset;
 static int _MDInCroplandPctID = MFUnset;

@@ -11,9 +11,9 @@ rob.stewart@unh.edu
 
 *******************************************************************************/
 
+#include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 // input
 static int _MDInDischarge0ID            	= MFUnset;		// RJS010609

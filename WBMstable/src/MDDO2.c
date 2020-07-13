@@ -10,7 +10,6 @@ ken.r.sheehan@gmail.com
 
 *******************************************************************************/
 
-#include <stdio.h>
 #include <MF.h>
 #include <MD.h>
 

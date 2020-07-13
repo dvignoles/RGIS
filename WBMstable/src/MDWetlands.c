@@ -10,10 +10,9 @@ dominik.wisser@unh.edu
 
 *******************************************************************************/
 
-#include <stdio.h>
+#include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 enum { FAO_ID = 0, IWMI_ID = 1 };
 
@@ -23,6 +22,7 @@ static int  _MDInSPackChgID					=MFUnset;
 static int  _MDInWetlandAreaFracID = 		MFUnset;
 static int _MDInPotETPID = MFUnset;
 static int _MDInWetlandCatchAreaFactorID =MFUnset;
+
 //Output
 static int _MDOutWetlandEvapotranspID		=			MFUnset;
 static int _MDOutWetlandStorageChangeID		=			MFUnset;

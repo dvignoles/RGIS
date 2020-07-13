@@ -12,11 +12,10 @@ Estimate light inputs to water surface and to river bottom
 
 *******************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 // Model
 static int _MDRiverLightID          = MFUnset;

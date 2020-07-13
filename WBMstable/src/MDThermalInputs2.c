@@ -11,9 +11,9 @@ Thermal Inputs, withdrawals, and energy of thermoelectric plants (second iterati
 *******************************************************************************/
 
 #include <string.h>
+#include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 // Input
 static int _MDInDischargeID         = MFUnset;

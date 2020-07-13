@@ -10,7 +10,6 @@ dominik.wisser@unh.edu
 
 *******************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
 #include <MF.h>
 #include <MD.h>

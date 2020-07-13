@@ -10,10 +10,9 @@ dominik.wisser@unh.edu
 
 *******************************************************************************/
 
-#include <stdio.h>
+#include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 //Input
 static int _MDInIrrAreaFracID         = MFUnset;
@@ -21,6 +20,7 @@ static int _MDInRainSurfRunoffID      = MFUnset;
 static int _MDInIrrGrossDemandID      = MFUnset;
 static int _MDInSmallResCapacityID    = MFUnset;
 static int _MDInPotEvapotransID       = MFUnset;
+
 //Output
 static int _MDOutSmallResReleaseID    = MFUnset;
 static int _MDOutSmallResStorageID    = MFUnset;
@@ -139,7 +139,3 @@ int MDSmallReservoirReleaseDef () {
 	MFDefLeaving("Small Reservoirs");
 	return (_MDOutSmallResReleaseID);
 }
-
-
-
-

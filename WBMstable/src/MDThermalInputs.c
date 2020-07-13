@@ -12,9 +12,9 @@ Thermal Inputs and withdrawals
 *******************************************************************************/
 
 #include <string.h>
+#include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 
 // Input

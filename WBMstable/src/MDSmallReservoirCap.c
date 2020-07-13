@@ -10,7 +10,6 @@ dominik.wisser@unh.edu
 
 *******************************************************************************/
 
-#include <string.h>
 #include <MF.h>
 #include <MD.h>
 
@@ -18,6 +17,7 @@ dominik.wisser@unh.edu
 static int _MDInIrrAreaID                    = MFUnset;
 static int _MDInRainSurfRunoffID             = MFUnset;
 static int _MDInIrrGrossDemandID             = MFUnset;
+
 //Output
 static int _MDOutRainSurfRunoffAccumulatedID = MFUnset;
 static int _MDOutIrrGrossDemandAccumulatedID = MFUnset;

@@ -11,9 +11,9 @@ rob.stewart@unh.edu
 *******************************************************************************/
 
 #include <string.h>
+#include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 // Input
 static int _MDInWTempSurfRunoffID 		  = MFUnset;

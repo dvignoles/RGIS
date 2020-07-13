@@ -13,9 +13,9 @@ Irrigation inputs are not accounted here.
 
 *******************************************************************************/
 
+#include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 // Input
 static int _MDInAirTempID  = MFUnset;

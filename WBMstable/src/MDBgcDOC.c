@@ -2,7 +2,7 @@
 
 GHAAS Water Balance/Transport Model V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2014, UNH - CCNY/CUNY
+Copyright 1994-2020, UNH - ASRC/CUNY
 
 MDBgc_DOC.c  - Routing and processing of DOC 
 
@@ -10,10 +10,9 @@ wil.wollheim@unh.edu
 
 *******************************************************************************/
 
-#include <stdio.h>
+#include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 static int _MDInDischargeID            = MFUnset;
 static int _MDInRiverWidthID           = MFUnset;

@@ -11,11 +11,10 @@ amiara00@CCNY.cuny.edu & rob.stewart@unh.edu
 Thermal Inputs, withdrawals, and energy of thermoelectric plants (second iteration)
 *******************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 // Input
 static int _MDInDischargeID         = MFUnset;

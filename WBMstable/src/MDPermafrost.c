@@ -10,11 +10,10 @@ dominik.wisser@unh.edu
 
 *******************************************************************************/
 
-#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <stdlib.h>
 
 // Input
 static int _MDNumberOfSoilComputationNodes =114;

@@ -15,7 +15,6 @@ Feb. 2009 DW
 
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
  
 // Input
 static int _MDInDischargeID       = MFUnset;

@@ -13,11 +13,10 @@ Rain recharge temperature is calculated in MDWTempSurfRunoff
 Irrigation return flow is assumed to have air temperature.
 *******************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include <MF.h>
 #include <MD.h>
-#include <math.h>
 
 // Input
 static int _MDInAirTempID         = MFUnset;

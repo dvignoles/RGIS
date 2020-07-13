@@ -10,7 +10,6 @@ bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
-#include <string.h>
 #include <MF.h>
 #include <MD.h>
 
@@ -29,7 +28,6 @@ static void _MDDischarge (int itemID) {
 	if (_MDInDischObservedID != MFUnset)
 		 discharge = MFVarGetFloat (_MDInDischObservedID, itemID, discharge);
 
-//	if (itemID == 1224 || itemID == 531) printf("**MDDischarge** itemID = %d, day = %d, discharge = %f\n", itemID, MFDateGetCurrentDay(), discharge);
 	MFVarSetFloat (_MDOutDischargeID, itemID, discharge);
 }
 
