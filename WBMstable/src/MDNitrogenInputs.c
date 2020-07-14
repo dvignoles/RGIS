@@ -175,8 +175,8 @@ enum {MDcalculate, MDinput, MDnone};
 int MDNitrogenInputsDef () {
 
 			int  optID = MFUnset;													    //RJS 10-28-10
-			const char *optStr, *optName = MDOptDINInputs;								//RJS 10-28-10
-			const char *options [] = { MDCalculateStr, MDInputStr, MDNoneStr, (char *) NULL };		//RJS 10-28-10
+			char *optStr, *optName = MDOptDINInputs;								//RJS 10-28-10
+			char *options [] = { MDCalculateStr, MDInputStr, MDNoneStr, (char *) NULL };		//RJS 10-28-10
 
 	MFDefEntering ("Nitrogen Inputs");
 

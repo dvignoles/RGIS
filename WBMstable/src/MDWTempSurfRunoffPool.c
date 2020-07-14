@@ -74,8 +74,8 @@ static void _MDWTempNoSurfRunoffPool (int itemID) {
 enum {MDnone, MDcalculate, MDinput};																							// RJS 061312 added MDinput
 int MDWTempSurfRunoffPoolDef () {
 	int  optID = MDnone;	// was MFUnset
-	const char *optStr, *optName = MDOptSurfRunoffPool;
-	const char *options [] = { MDNoneStr, MDCalculateStr, MDInputStr, (char *) NULL };											// RJS 061312 added MDInputStr
+	char *optStr, *optName = MDOptSurfRunoffPool;
+	char *options [] = { MDNoneStr, MDCalculateStr, MDInputStr, (char *) NULL };											// RJS 061312 added MDInputStr
 
 	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);
 

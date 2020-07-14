@@ -77,7 +77,7 @@ static void _MDDischRouteMuskingumCoeff (int itemID) {
 	C0 = (-1 + C + D) / (1 + C + D);
 	C1 = ( 1 + C - D) / (1 + C + D);
 	C2 = ( 1 - C + D) / (1 + C + D);
-//   if ((C0 < 0.0) || (C1 < 0.0) || (C2 < 0.0)) { C0 = 1.0; C1 = 0; C2 = 0; } // According to Pounce C1 and C2 can be negative
+//	if ((C0 < 0.0) || (C1 < 0.0) || (C2 < 0.0)) { C0 = 1.0; C1 = 0; C2 = 0; } // According to Pounce C1 and C2 can be negative
 
 	MFVarSetFloat (_MDOutMuskingumC0ID, itemID, C0);
 	MFVarSetFloat (_MDOutMuskingumC1ID, itemID, C1);
@@ -89,8 +89,8 @@ enum { MDinput, MDstatic };
 
 int MDDischLevel3MuskingumCoeffDef () {
 	int  optID = MFUnset;
-	const char *optStr, *optName = MDOptMuskingum;
-	const char *options [] = { MDInputStr, "static", (char *) NULL };
+	char *optStr, *optName = MDOptMuskingum;
+	char *options [] = { MDInputStr, "static", (char *) NULL };
 
 	if (_MDOutMuskingumC0ID != MFUnset) return (_MDOutMuskingumC0ID);
 

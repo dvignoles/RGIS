@@ -459,8 +459,8 @@ enum { MDnone, MDcalculate, MDneuralnet };
 
 int MDReservoirDef () {
 	int optID = MFUnset;
-	const char *optStr, *optName = MDOptReservoirs;
-	const char *options [] = { MDNoneStr, MDCalculateStr, "neuralnet", (char *) NULL };
+	char *optStr, *optName = MDOptReservoirs;
+	char *options [] = { MDNoneStr, MDCalculateStr, "neuralnet", (char *) NULL };
  
 	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);
  

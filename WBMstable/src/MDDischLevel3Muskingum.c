@@ -50,27 +50,11 @@ static void _MDDischLevel3Muskingum (int itemID) {
 	inDischCurrent  = MFVarGetFloat (_MDInDischargeID,     itemID, 0.0) + runoff;
 	storage         = MFVarGetFloat (_MDOutRiverStorageID, itemID, 0.0);
 
-	//float _inDischCurrent;
-	//float _outDisch;
-	//_outDisch =outDisch;
-	//for (i=1;i<24:i++){
-
-// original
 	outDisch = C0 * inDischCurrent + C1 * inDischPrevious + C2 * outDisch;
 	storChg  = inDischCurrent - outDisch;
 	storage = storage + storChg > 0.0 ? storage + storChg : 0.0;
 
-// test
-//	Qin_t1  = inDischCurrent;
-//	Qin_t0  = inDischPrevious;
-//	Qout_t0 = outDischPrevious;
-	//}
-	
-//	if (itemID == 33 || itemID == 32) printf("**Discharge Musk** itemID=%d, day = %d, outDisch = %f, inDischCurrent = %f, inDischPrevious = %f\n", itemID, MFDateGetCurrentDay(), outDisch, inDischCurrent, inDischPrevious);
-//	if (itemID == 33 || itemID == 32) printf("C0 = %f, C1 = %f, C2 = %f, storage = %f, storChg = %f\n", C0, C1, C2, storage, storChg);
-
 	MFVarSetFloat (_MDOutDischAux0ID,    itemID, inDischCurrent);
-//	MFVarSetFloat (_MDOutDischAux0ID,    itemID, outDisch);		// 030113 RJS
 	MFVarSetFloat (_MDOutDischAux1ID,    itemID, outDisch);
 	MFVarSetFloat (_MDOutDischLevel3ID,  itemID, outDisch);
 	MFVarSetFloat (_MDOutRiverStorChgID, itemID, storChg);

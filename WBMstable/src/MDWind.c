@@ -21,7 +21,7 @@ float MDWindAdjustment (float za,float disp,float z0,float fetch, float zw, floa
  * fetch     - fetch to weather station [m]
  * zw        - height of wind sensor at weather station [m]
  * z0w       - roughness parameter at weather station [m] */
-	float hibl; /* height of internal boundary layer [m]  */
+	float hibl; /* height of internal boundary layer [m] */
 
  	hibl= 0.334 * pow ((double) fetch,0.875) * pow (z0w,0.125); /* Brutsaert equation 7-39 */
 

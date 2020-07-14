@@ -49,8 +49,6 @@ static void _MDRiverbedShapeExponent (int itemID) {
 		// Slope independent riverbed geometry
 		yMean = eta * pow (discharge, nu);
 		wMean = tau * pow (discharge, phi);
-//		printf("eta = %f, nu = %f, tau = %f, phi = %f\n", eta, nu, tau, phi);
-
 		MFVarSetFloat (_MDOutRiverbedAvgDepthMeanID,  itemID, yMean);
 		MFVarSetFloat (_MDOutRiverbedWidthMeanID,     itemID, wMean);
 		MFVarSetFloat (_MDOutRiverbedVelocityMeanID,  itemID, discharge / (yMean * wMean));
@@ -62,7 +60,6 @@ static void _MDRiverbedShapeExponent (int itemID) {
 
 	yMean = eta * pow (discharge, nu);
 	wMean = tau * pow (discharge, phi);
-
 	MFVarSetFloat (_MDOutRiverbedAvgDepthMeanID,      itemID, yMean);
 	MFVarSetFloat (_MDOutRiverbedWidthMeanID,         itemID, wMean);
 	MFVarSetFloat (_MDOutRiverbedVelocityMeanID,      itemID, discharge / (yMean * wMean));
@@ -73,8 +70,8 @@ enum { MDinput, MDindependent, MDdependent };
 
 int MDRiverbedShapeExponentDef () {
 	int  optID = MFUnset;
-	const char *optStr, *optName = MDOptRiverbed;
-	const char *options [] = { MDInputStr, "slope-independent", "slope-dependent", (char *) NULL };
+	char *optStr, *optName = MDOptRiverbed;
+	char *options [] = { MDInputStr, "slope-independent", "slope-dependent", (char *) NULL };
 
 	if (_MDOutRiverbedShapeExponentID != MFUnset) return (_MDOutRiverbedShapeExponentID);
 
