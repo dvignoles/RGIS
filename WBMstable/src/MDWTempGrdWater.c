@@ -88,8 +88,8 @@ static void _MDWTempGrdWater (int itemID) {
 enum {MDcalculate, MDinput};																											// RJS 061312
 int MDWTempGrdWaterDef () {
 	int  optID = MDinput;																												// RJS 061312
-	char *optStr, *optName = MDOptGrdWaterTemp;																					// RJS 061312
-	char *options [] = { MDCalculateStr, MDInputStr,  (char *) NULL };															// RJS 061312
+	const char *optStr, *optName = MDOptGrdWaterTemp;																					// RJS 061312
+	const char *options [] = { MDCalculateStr, MDInputStr,  (char *) NULL };															// RJS 061312
 
 	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);									// RJS 061312
 

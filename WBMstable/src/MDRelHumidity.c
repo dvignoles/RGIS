@@ -44,8 +44,8 @@ enum { MDinput, MDcalc };
 
 int MDRelHumidityDef () {
 	int optID = MFUnset;
-	char *optStr, *optName = MDVarRelHumidity;
-	char *options [] = { MDInputStr, MDCalculateStr, (char *) NULL };
+	const char *optStr, *optName = MDVarRelHumidity;
+	const char *options [] = { MDInputStr, MDCalculateStr, (char *) NULL };
 	
 	if (_MDOutRelHumidityID != MFUnset) return (_MDOutRelHumidityID);
 

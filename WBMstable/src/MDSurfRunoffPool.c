@@ -73,8 +73,8 @@ int MDSurfRunoffPoolDef () {
  
 	float par;
 	int  optID = MFUnset;
-	char *optStr, *optName = MDOptSurfRunoffPool;
-	char *options [] = { MDNoneStr, MDCalculateStr,  (char *) NULL };
+	const char *optStr, *optName = MDOptSurfRunoffPool;
+	const char *options [] = { MDNoneStr, MDCalculateStr,  (char *) NULL };
 if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);
 if (((optStr = MFOptionGet (MDParSurfWaterBETA2))   != (char *) NULL) && (sscanf (optStr,"%f",&par) == 1)) _MDSurfRunoffPoolBETA = par;
 

@@ -391,7 +391,7 @@ int MDDINDef () {
 	float par6;		//RJS 033009
 	float par7;		//RJS 033009
 
-	char *optStr1, *optStr2, *optStr3, *optStr4, *optStr5, *optStr6, *optStr7;		//RJS 032509
+	const char *optStr1, *optStr2, *optStr3, *optStr4, *optStr5, *optStr6, *optStr7;		//RJS 032509
 
 	if (((optStr1 = MFOptionGet (MDParAlphaSTS))  != (char *) NULL) && (sscanf (optStr1,"%f",&par1) == 1)) _MDAlphaSTS = par1;  // RJS 032509
 	if (((optStr2 = MFOptionGet (MDParAlphaHTS))  != (char *) NULL) && (sscanf (optStr2,"%f",&par2) == 1)) _MDAlphaHTS = par2;  // RJS 032509

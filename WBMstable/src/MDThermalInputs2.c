@@ -701,8 +701,8 @@ enum { MDnone, MDinput };
 
 int MDThermalInputs2Def () {
 	int optID = MFUnset;
-	char *optStr, *optName = MDOptThermalInputs2;
-	char *options [] = { MDNoneStr, MDInputStr, (char *) NULL };
+	const char *optStr, *optName = MDOptThermalInputs2;
+	const char *options [] = { MDNoneStr, MDInputStr, (char *) NULL };
 
 	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);
 
