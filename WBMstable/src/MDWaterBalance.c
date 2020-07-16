@@ -36,8 +36,6 @@ static int _MDInSmallResReleaseID    = MFUnset;
 static int _MDInSmallResStorageChgID = MFUnset;
 static int _MDInSmallResEvapoID      = MFUnset;
 
-static int _MDInRunoffPoolChgID		 = MFUnset;
-
 // Output
 static int _MDOutWaterBalanceID      = MFUnset;
 static int _MDOutIrrUptakeBalanceID  = MFUnset;
@@ -51,7 +49,6 @@ static void _MDWaterBalance(int itemID) {
 	float soilMoistChg  	 = MFVarGetFloat(_MDInSoilMoistChgID,   itemID, 0.0);
 	float grdWaterChg   	 = MFVarGetFloat(_MDInGrdWatChgID,      itemID, 0.0);
 	float runoff        	 = MFVarGetFloat(_MDInRunoffID,         itemID, 0.0);
-	float runoffPoolChg 	 = MFVarGetFloat(_MDInRunoffPoolChgID,  itemID, 0.0);
 	float irrAreaFrac        = 0.0;
 	float irrGrossDemand     = 0.0;
 	float irrReturnFlow      = 0.0;
@@ -90,7 +87,7 @@ static void _MDWaterBalance(int itemID) {
 		MFVarSetFloat (_MDOutIrrUptakeBalanceID, itemID, balance);
 	}
 	balance  = precip + irrUptakeRiver + irrUptakeExcess - (etp + runoff + grdWaterChg + snowPackChg + soilMoistChg + smallResStorageChg);
-	balance2 = precip + irrUptakeRiver + irrUptakeExcess - (etp + runoff + grdWaterChg + snowPackChg + soilMoistChg + smallResStorageChg + runoffPoolChg);
+	balance2 = precip + irrUptakeRiver + irrUptakeExcess - (etp + runoff + grdWaterChg + snowPackChg + soilMoistChg + smallResStorageChg);
 //	printf("d = %d, m = %d, y = %d, waterbalance = %f\n", MFDateGetCurrentDay(), MFDateGetCurrentMonth(), MFDateGetCurrentYear(), balance2);
 	if (fabs (balance2) > 0.001 )
 //		printf ("TIEM %i WaterBalance! %f precip %f etp = %f runoff = %f grdWaterChg = %f snowPackChg = %f soilMoistChg = %f runoffPoolChg %f\n", itemID ,balance2,precip,etp,runoff,grdWaterChg,snowPackChg,soilMoistChg,runoffPoolChg);
@@ -111,7 +108,6 @@ int MDWaterBalanceDef() {
 	    ((_MDInRunoffID                  = MDRunoffDef           ()) == CMfailed) ||
 	    ((_MDInEvaptrsID                 = MFVarGetID (MDVarEvapotranspiration,      "mm",   MFInput,  MFFlux,  MFBoundary)) == CMfailed) ||
 	    ((_MDInGrdWatChgID               = MFVarGetID (MDVarGroundWaterChange,       "mm",   MFInput,  MFFlux,  MFBoundary)) == CMfailed) ||
-	    ((_MDInRunoffPoolChgID           = MFVarGetID (MDVarRunoffPoolChg,           "mm",   MFInput,  MFFlux,  MFBoundary)) == CMfailed) ||
 	    ((_MDOutWaterBalanceID           = MFVarGetID (MDVarWaterBalance,            "mm",   MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
 	    (MFModelAddFunction(_MDWaterBalance) == CMfailed))
 	    return (CMfailed);
