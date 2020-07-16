@@ -184,9 +184,6 @@ int MDRainSMoistChgDef () {
 	    ((_MDInInterceptID         = MDRainInterceptDef     ()) == CMfailed) ||
 	    ((_MDInSoilAvailWaterCapID = MDSoilAvailWaterCapDef ()) == CMfailed) ||
 	    ((_MDInAirTMeanID          = MFVarGetID (MDVarAirTemperature,             "degC", MFInput,  MFState, MFBoundary)) == CMfailed) ||
-//	    ((_MDInRunoffToPervID      = MDStormRunoffDef ())  == CMfailed) ||  								// RJS 082812
- //	    ((_MDInH2OFractionID       = MFVarGetID (MDVarH2OFracSpatial,             "mm",   MFInput,  MFState, MFBoundary)) == CMfailed) ||   // RJS 082812
- //     ((_MDInStormRunoffTotalID  = MFVarGetID (MDVarStormRunoffTotal,           "mm",   MFInput,  MFFlux,  MFBoundary)) == CMfailed) ||	// RJS 082812
 	    ((_MDInImpFractionID       = MFVarGetID (MDVarImpFracSpatial,             "mm",   MFInput,  MFState, MFBoundary)) == CMfailed) ||   // RJS 082812
  	    ((_MDOutEvaptrsID          = MFVarGetID (MDVarRainEvapotranspiration,     "mm",   MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
  	    ((_MDOutEvaptrsNotScaledID = MFVarGetID (MDVarRainETnotScaled,            "mm",   MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||	// RJS 082812
