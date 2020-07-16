@@ -25,9 +25,7 @@ static int _MDInSPackChgID            = MFUnset;
 static int _MDInSoilAvailWaterCapID   = MFUnset;
 static int _MDInIrrAreaFracID         = MFUnset;
 static int _MDInRelativeIceContent    = MFUnset;
-static int _MDInRunoffToPervID        = MFUnset;  // RJS 082812
 static int _MDInImpFractionID         = MFUnset;  // RJS 082812
-static int _MDInStormRunoffTotalID    = MFUnset;  // RJS 082812
 
 // Output
 static int _MDOutEvaptrsID            = MFUnset;
@@ -47,8 +45,6 @@ static void _MDRainSMoistChg (int itemID) {
 	float sPackChg;          	  // Snow pack change [mm/dt]
 	float irrAreaFrac      = 0.0; // Irrigated area fraction
 	float impAreaFrac      = 0.0; // Impervious area fraction // RJS 082812
-	float runoffToPerv     = 0.0; // runoff from impervious to pervious [mm/dt]  RJS 082812
-	float stormRunoffTotal = 0.0; // RJS 082812
 	float excess	       = 0.0; // RJS 082812
 	float sMoist           = 0.0; // Soil moisture [mm/dt]
 // Output
@@ -66,8 +62,6 @@ static void _MDRainSMoistChg (int itemID) {
 	pet              = MFVarGetFloat (_MDInPotETID,             itemID, 0.0);
 	awCap            = MFVarGetFloat (_MDInSoilAvailWaterCapID, itemID, 0.0);
 	impAreaFrac      = MFVarGetFloat (_MDInImpFractionID,  	    itemID, 0.0);	// RJS 082812
-	runoffToPerv     = MFVarGetFloat (_MDInRunoffToPervID,      itemID, 0.0);	// RJS 082812
-	stormRunoffTotal = MFVarGetFloat (_MDInStormRunoffTotalID,  itemID, 0.0);	// RJS 082812
 	sMoist       	 = MFVarGetFloat (_MDOutSoilMoistCellID,    itemID, 0.0);
 	iceContent   	 = _MDInRelativeIceContent != MFUnset ? MFVarGetFloat (_MDInRelativeIceContent,  itemID, 0.0) : 0.0;
 	intercept   	 = _MDInInterceptID        != MFUnset ? MFVarGetFloat (_MDInInterceptID,         itemID, 0.0) : 0.0;
@@ -79,7 +73,7 @@ static void _MDRainSMoistChg (int itemID) {
 	//reduce available water capacity by ice content
 //	awCap= awCap - (awCap * iceContent);
 	
-	waterIn = precip - intercept - sPackChg + runoffToPerv;	// RJS 082812
+	waterIn = precip - intercept - sPackChg;	// RJS 082812
 
 //*	if (airT > 0.0) {											// this was commented out prior to 082812, uncommented 082812
 
@@ -91,7 +85,7 @@ static void _MDRainSMoistChg (int itemID) {
 		if (awCap > 0.0) {
 			if (waterIn > pet) {
 				sMoistChg = waterIn - pet < awCap - sMoist ? waterIn - pet : awCap - sMoist;
-				excess	  = precip - intercept - sPackChg + runoffToPerv - pet - sMoistChg;	// RJS 082812
+				excess	  = precip - intercept - sPackChg - pet - sMoistChg;	// RJS 082812
 			}
 			else {
 				gm = (1.0 - exp (- _MDSoilMoistALPHA * sMoist / awCap)) / (1.0 - exp (- _MDSoilMoistALPHA));
@@ -99,7 +93,7 @@ static void _MDRainSMoistChg (int itemID) {
 			}
 			if (sMoist + sMoistChg > awCap) {
 				sMoistChg = awCap - sMoist;
-				excess	  = precip - intercept - sPackChg + runoffToPerv - pet - sMoistChg;    // RJS 082812
+				excess	  = precip - intercept - sPackChg - pet - sMoistChg;    // RJS 082812
 			}
 			if (sMoist + sMoistChg <   0.0) sMoistChg =       - sMoist;
 			sMoist = sMoist + sMoistChg;
@@ -107,7 +101,7 @@ static void _MDRainSMoistChg (int itemID) {
 		}
 		else {														// RJS 082812 added brackets
 			sMoist = sMoistChg = 0.0;								// RJS 082812 moved into brackets
-			if (waterIn - sMoistChg > pet + intercept) excess = precip - intercept - sPackChg + runoffToPerv - pet - sMoistChg;	// RJS 082812
+			if (waterIn - sMoistChg > pet + intercept) excess = precip - intercept - sPackChg - pet - sMoistChg;	// RJS 082812
 			else excess = 0.0;	// RJS 082812
 		}
 
@@ -190,9 +184,9 @@ int MDRainSMoistChgDef () {
 	    ((_MDInInterceptID         = MDRainInterceptDef     ()) == CMfailed) ||
 	    ((_MDInSoilAvailWaterCapID = MDSoilAvailWaterCapDef ()) == CMfailed) ||
 	    ((_MDInAirTMeanID          = MFVarGetID (MDVarAirTemperature,             "degC", MFInput,  MFState, MFBoundary)) == CMfailed) ||
-	    ((_MDInRunoffToPervID      = MDStormRunoffDef ())  == CMfailed) ||  								// RJS 082812
+//	    ((_MDInRunoffToPervID      = MDStormRunoffDef ())  == CMfailed) ||  								// RJS 082812
  //	    ((_MDInH2OFractionID       = MFVarGetID (MDVarH2OFracSpatial,             "mm",   MFInput,  MFState, MFBoundary)) == CMfailed) ||   // RJS 082812
-        ((_MDInStormRunoffTotalID  = MFVarGetID (MDVarStormRunoffTotal,           "mm",   MFInput,  MFFlux,  MFBoundary)) == CMfailed) ||	// RJS 082812
+ //     ((_MDInStormRunoffTotalID  = MFVarGetID (MDVarStormRunoffTotal,           "mm",   MFInput,  MFFlux,  MFBoundary)) == CMfailed) ||	// RJS 082812
 	    ((_MDInImpFractionID       = MFVarGetID (MDVarImpFracSpatial,             "mm",   MFInput,  MFState, MFBoundary)) == CMfailed) ||   // RJS 082812
  	    ((_MDOutEvaptrsID          = MFVarGetID (MDVarRainEvapotranspiration,     "mm",   MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
  	    ((_MDOutEvaptrsNotScaledID = MFVarGetID (MDVarRainETnotScaled,            "mm",   MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||	// RJS 082812
