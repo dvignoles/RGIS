@@ -43,12 +43,12 @@ static int _MDOutIrrWaterBalanceID   = MFUnset;
 
 static void _MDWaterBalance(int itemID) {
 // Input
-	float precip        	 = MFVarGetFloat(_MDInPrecipID,         itemID, 0.0);
-	float etp           	 = MFVarGetFloat(_MDInEvaptrsID,        itemID, 0.0);
-	float snowPackChg   	 = MFVarGetFloat(_MDInSnowPackChgID,    itemID, 0.0);
-	float soilMoistChg  	 = MFVarGetFloat(_MDInSoilMoistChgID,   itemID, 0.0);
-	float grdWaterChg   	 = MFVarGetFloat(_MDInGrdWatChgID,      itemID, 0.0);
-	float runoff        	 = MFVarGetFloat(_MDInRunoffID,         itemID, 0.0);
+	float precip       = MFVarGetFloat(_MDInPrecipID,         itemID, 0.0);
+	float etp          = MFVarGetFloat(_MDInEvaptrsID,        itemID, 0.0);	
+	float snowPackChg  = MFVarGetFloat(_MDInSnowPackChgID,    itemID, 0.0);	
+	float soilMoistChg = MFVarGetFloat(_MDInSoilMoistChgID,   itemID, 0.0);
+	float grdWaterChg  = MFVarGetFloat(_MDInGrdWatChgID,      itemID, 0.0);
+	float runoff       = MFVarGetFloat(_MDInRunoffID,         itemID, 0.0);
 	float irrAreaFrac        = 0.0;
 	float irrGrossDemand     = 0.0;
 	float irrReturnFlow      = 0.0;
@@ -62,7 +62,6 @@ static void _MDWaterBalance(int itemID) {
 	float smallResEvapo      = 0.0;
 // Output
 	float balance;
-	float balance2;
 
 	if (_MDInIrrGrossDemandID != MFUnset) { 
 		irrAreaFrac       = MFVarGetFloat (_MDInIrrAreaFracID,            itemID, 0.0);
@@ -86,11 +85,9 @@ static void _MDWaterBalance(int itemID) {
 		balance = irrGrossDemand - (irrUptakeGrdWater + irrUptakeRiver + irrUptakeExcess + smallResRelease);
 		MFVarSetFloat (_MDOutIrrUptakeBalanceID, itemID, balance);
 	}
-	balance  = precip + irrUptakeRiver + irrUptakeExcess - (etp + runoff + grdWaterChg + snowPackChg + soilMoistChg + smallResStorageChg);
-	balance2 = precip + irrUptakeRiver + irrUptakeExcess - (etp + runoff + grdWaterChg + snowPackChg + soilMoistChg + smallResStorageChg);
-//	printf("d = %d, m = %d, y = %d, waterbalance = %f\n", MFDateGetCurrentDay(), MFDateGetCurrentMonth(), MFDateGetCurrentYear(), balance2);
-	if (fabs (balance2) > 0.001 )
-//		printf ("TIEM %i WaterBalance! %f precip %f etp = %f runoff = %f grdWaterChg = %f snowPackChg = %f soilMoistChg = %f runoffPoolChg %f\n", itemID ,balance2,precip,etp,runoff,grdWaterChg,snowPackChg,soilMoistChg,runoffPoolChg);
+	balance = precip + irrUptakeRiver + irrUptakeExcess - (etp + runoff + grdWaterChg + snowPackChg + soilMoistChg + smallResStorageChg);
+	if (fabs (balance) > 0.01 )
+	//	printf ("TIEM %i WaterBalance! %f precip %f Demand %f\n", itemID ,balance,precip,irrGrossDemand);
 		
 
 	MFVarSetFloat (_MDOutWaterBalanceID, itemID , balance);
