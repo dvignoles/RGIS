@@ -881,6 +881,7 @@ DBInt RGlibGridZoneStatistics(DBObjData *zGrdData, DBObjData *wGrdData, DBObjDat
     DBPosition pos;
     DBCoordinate coord;
     DBObjTableField *outZoneIDFLD;
+    DBObjTableField *outZoneValueFLD;
     DBObjTableField *outZoneNameFLD;
     DBObjTableField *outZLayerIDFLD;
     DBObjTableField *outZLayerNameFLD;
@@ -901,44 +902,33 @@ DBInt RGlibGridZoneStatistics(DBObjData *zGrdData, DBObjData *wGrdData, DBObjDat
     DBGridIF *wGrdIF = new DBGridIF(wGrdData);
     DBObjTable *outTable = tblData->Table(DBrNItems);
     DBObjTable *zoneTable = new DBObjTable(*zGrdData->Table(DBrNItems));
+    DBObjTableField *zoneValueFLD = zoneTable->Field(DBrNGridValue);
     DBObjRecord *zLayerRec, *wLayerRec, *zoneRec, *outRec;
     DBObjectLIST<DBObjTableField> *fields;
 
-    for (zoneID = 0; zoneID < zoneTable->ItemNum(); ++zoneID) {
+     for (zoneID = 0; zoneID < zoneTable->ItemNum(); ++zoneID) {
         zoneRec = zoneTable->Item(zoneID);
         nameLen = strlen(zoneRec->Name());
         zoneNameLen = zoneNameLen > nameLen + 1 ? zoneNameLen : nameLen + 1;
     }
-    outTable->AddField(outZLayerIDFLD = new DBObjTableField("ZoneLayerID", DBTableFieldInt, "%4d", sizeof(DBShort)));
-    outTable->AddField(
-            outZLayerNameFLD = new DBObjTableField("ZoneLayerName", DBTableFieldString, "%s", DBStringLength));
-    outTable->AddField(outZoneIDFLD = new DBObjTableField("ZoneGridID", DBTableFieldInt, "%8d", sizeof(DBInt)));
-    outTable->AddField(outZoneNameFLD = new DBObjTableField("ZoneGridName", DBTableFieldString, "%s", zoneNameLen));
-    outTable->AddField(outWLayerIDFLD = new DBObjTableField("WeightLayerID", DBTableFieldInt, "%4d", sizeof(DBShort)));
-    outTable->AddField(
-            outWLayerNameFLD = new DBObjTableField("WeightLayerName", DBTableFieldString, "%s", DBStringLength));
-    outTable->AddField(
-            outZoneAreaFLD = new DBObjTableField(RGlibZoneArea, DBTableFieldFloat, "%10.1f", sizeof(DBFloat4)));
-    outTable->AddField(outAverageFLD = new DBObjTableField(RGlibZonalMean, DBTableFieldFloat, wGrdIF->ValueFormat(),
-                                                           sizeof(DBFloat4)));
-    outTable->AddField(outMinimumFLD = new DBObjTableField(RGlibZonalMin, DBTableFieldFloat, wGrdIF->ValueFormat(),
-                                                           sizeof(DBFloat4)));
-    outTable->AddField(outMaximumFLD = new DBObjTableField(RGlibZonalMax, DBTableFieldFloat, wGrdIF->ValueFormat(),
-                                                           sizeof(DBFloat4)));
-    outTable->AddField(outStdDevFLD = new DBObjTableField(RGlibZonalStdDev, DBTableFieldFloat, wGrdIF->ValueFormat(),
-                                                          sizeof(DBFloat4)));
-    zoneTable->AddField(tmpSumWeightFLD = new DBObjTableField("TMPSumWeight", DBTableFieldFloat, wGrdIF->ValueFormat(),
-                                                              sizeof(DBFloat4)));
-    zoneTable->AddField(tmpPSumValFLD = new DBObjTableField("TMPPSumVal", DBTableFieldFloat, wGrdIF->ValueFormat(),
-                                                            sizeof(DBFloat4)));
-    zoneTable->AddField(tmpWSumValFLD = new DBObjTableField("TMPWSumVal", DBTableFieldFloat, wGrdIF->ValueFormat(),
-                                                            sizeof(DBFloat4)));
-    zoneTable->AddField(tmpSumValSqrFLD = new DBObjTableField("TMPSumValSqr", DBTableFieldFloat, wGrdIF->ValueFormat(),
-                                                              sizeof(DBFloat4)));
-    zoneTable->AddField(
-            tmpMinimumFLD = new DBObjTableField("TMPMin", DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
-    zoneTable->AddField(
-            tmpMaximumFLD = new DBObjTableField("TMPMax", DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
+    outTable->AddField(outZoneIDFLD     = new DBObjTableField("ZoneGridID",      DBTableFieldInt,   "%8d",    sizeof(DBInt)));
+    outTable->AddField(outZoneValueFLD  = new DBObjTableField("ZoneGridValue",   DBTableFieldInt,   "%8d",    sizeof(DBInt)));
+    outTable->AddField(outZoneNameFLD   = new DBObjTableField("ZoneGridName",    DBTableFieldString,"%s",     zoneNameLen));
+    outTable->AddField(outZoneAreaFLD   = new DBObjTableField(RGlibZoneArea,           DBTableFieldFloat, "%10.1f", sizeof(DBFloat4)));
+    outTable->AddField(outZLayerIDFLD   = new DBObjTableField("ZoneLayerID",     DBTableFieldInt,   "%4d",    sizeof(DBShort)));
+    outTable->AddField(outZLayerNameFLD = new DBObjTableField("ZoneLayerName",   DBTableFieldString,"%s",     DBStringLength));
+    outTable->AddField(outWLayerIDFLD   = new DBObjTableField("WeightLayerID",   DBTableFieldInt,   "%4d",    sizeof(DBShort)));
+    outTable->AddField(outWLayerNameFLD = new DBObjTableField("WeightLayerName", DBTableFieldString,"%s",     DBStringLength));
+    outTable->AddField(outAverageFLD    = new DBObjTableField(RGlibZonalMean,   DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
+    outTable->AddField(outMinimumFLD    = new DBObjTableField(RGlibZonalMin,    DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
+    outTable->AddField(outMaximumFLD    = new DBObjTableField(RGlibZonalMax,    DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
+    outTable->AddField(outStdDevFLD     = new DBObjTableField(RGlibZonalStdDev, DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
+    zoneTable->AddField(tmpSumWeightFLD = new DBObjTableField("TMPSumWeight", DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
+    zoneTable->AddField(tmpPSumValFLD   = new DBObjTableField("TMPPSumVal",   DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
+    zoneTable->AddField(tmpWSumValFLD   = new DBObjTableField("TMPWSumVal",   DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
+    zoneTable->AddField(tmpSumValSqrFLD = new DBObjTableField("TMPSumValSqr", DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
+    zoneTable->AddField(tmpMinimumFLD   = new DBObjTableField("TMPMin",       DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
+    zoneTable->AddField(tmpMaximumFLD   = new DBObjTableField("TMPMax",       DBTableFieldFloat, wGrdIF->ValueFormat(), sizeof(DBFloat4)));
 
     maxProgress = zGrdIF->LayerNum() * wGrdIF->LayerNum() * zGrdIF->RowNum();
     for (zLayerID = 0; zLayerID < zGrdIF->LayerNum(); ++zLayerID) {
@@ -980,11 +970,12 @@ DBInt RGlibGridZoneStatistics(DBObjData *zGrdData, DBObjData *wGrdData, DBObjDat
                     tmpWSumValFLD->Float(zoneRec, tmpWSumValFLD->Float(zoneRec) / tmpSumWeightFLD->Float(zoneRec));
                     tmpSumValSqrFLD->Float(zoneRec, tmpSumValSqrFLD->Float(zoneRec) / tmpSumWeightFLD->Float(zoneRec));
                     outRec = outTable->Add(zoneRec->Name());
+                    outZoneIDFLD->Int(outRec, zoneRec->RowID() + 1);
+                    outZoneValueFLD->Int(outRec,zoneValueFLD->Int(zoneRec));
+                    outZoneNameFLD->String(outRec, zoneRec->Name());
+                    outZoneAreaFLD->Float(outRec, tmpSumWeightFLD->Float(zoneRec));
                     outZLayerIDFLD->Int(outRec, zLayerRec->RowID() + 1);
                     outZLayerNameFLD->String(outRec, zLayerRec->Name());
-                    outZoneAreaFLD->Float(outRec, tmpSumWeightFLD->Float(zoneRec));
-                    outZoneIDFLD->Int(outRec, zoneRec->RowID() + 1);
-                    outZoneNameFLD->String(outRec, zoneRec->Name());
                     outWLayerIDFLD->Int(outRec, wLayerRec->RowID() + 1);
                     outWLayerNameFLD->String(outRec, wLayerRec->Name());
                     outAverageFLD->Float(outRec, tmpWSumValFLD->Float(zoneRec));
