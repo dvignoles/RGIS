@@ -269,7 +269,7 @@ static VDBmasterTable_t _VDBmasterTable3 [] = {
         {"topography",    "topography_bathymetry-max",                         "Topography-Bathymetry-Max",                  "Maximum Depth",                      "continuous", "blue",        "avg"},
         {"topography",    "topography_elevation",                              "Topography-Elevation",                       "Elevation",                          "continuous", "elevation",   "avg"},
         {"topography",    "topography_elevation-min",                          "Topography-Elevation-Min",                   "Minimum Elevation",                  "continuous", "elevation",   "avg"},
-        {"topography",    "topograpgy-elevation-max",                          "Topography-Elevation-Max",                   "Maximum Elevation",                  "continuous", "elevation",   "avg"},
+        {"topography",    "topography-elevation-max",                          "Topography-Elevation-Max",                   "Maximum Elevation",                  "continuous", "elevation",   "avg"},
         {"weather",       "weather_air_temperature",                           "Weather-AirTemperature",                     "Air Temperature",                    "continuous", "blue-to-red", "avg"},
         {"weather",       "weather_air_temperature-min",                       "Weather-AirTemperature-Min",                 "Minimum Air Temperature",            "continuous", "blue-to-red", "avg"},
         {"weather",       "weather_air_temperature-max",                       "Weather-AirTemperature-Max",                 "Maximum Air Temperature",            "continuous", "blue-to-red", "avg"},
