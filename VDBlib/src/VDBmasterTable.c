@@ -355,7 +355,7 @@ const char *VDBdataType (VDBversion version, const char *cfName) {
             break;
         case VDBversion3:
             for (i = 0; i < VDBrecordNum2; ++i) {
-                if (strcmp (cfName, _VDBmasterTable2[i].CFname) == 0) return (_VDBmasterTable2[i].DataType);
+                if (strcmp (cfName, _VDBmasterTable3[i].CFname) == 0) return (_VDBmasterTable2[i].DataType);
             }
             break;
     }
