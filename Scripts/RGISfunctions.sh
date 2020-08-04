@@ -459,7 +459,7 @@ function RGISdirectory () {
 function RGISfileExtension () {
 	local variable="${1}"; shift
 
-    local dataType="$(vdbLookup -t "${variable}")"
+    local dataType="$(vdbLookup -t "${variable}" -v "${__RGISarchiveVDBversion}")"
     if [[ "${dataType}" == "" ]]
     then
         local dataType="continuous"
