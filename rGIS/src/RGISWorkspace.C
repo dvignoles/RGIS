@@ -199,207 +199,207 @@ void RGISWorkspace::Initialize (Widget mainForm)
 	strcpy (SubjectSTR,"");
 	strcpy (DomainSTR,"");
 	selectionForm = XtVaCreateManagedWidget ("RGISSeletionForm",xmFormWidgetClass,mainForm,
-											XmNtopAttachment,			XmATTACH_FORM,
-											XmNtopOffset,				5,
-											XmNleftAttachment,		XmATTACH_FORM,
-											XmNleftOffset,				5,
-											XmNrightAttachment,		XmATTACH_FORM,
-											XmNrightOffset,			5,
-											XmNshadowThickness,		1,
+											XmNtopAttachment,    XmATTACH_FORM,
+											XmNtopOffset,        5,
+											XmNleftAttachment,   XmATTACH_FORM,
+											XmNleftOffset,	     5,
+											XmNrightAttachment,  XmATTACH_FORM,
+											XmNrightOffset,      5,
+											XmNshadowThickness,  1,
 											NULL);
 	textF = XtVaCreateManagedWidget ("RGISWorkspaceSubjectTextF",xmTextFieldWidgetClass,selectionForm,
-											XmNtopAttachment,			XmATTACH_FORM,
-											XmNtopOffset,				5,
-											XmNleftAttachment,		XmATTACH_POSITION,
-											XmNleftPosition,			12,
-											XmNbottomAttachment,		XmATTACH_FORM,
-											XmNbottomOffset,			5,
-											XmNmaxLength,				DBStringLength - 1,
-											XmNcolumns,					DBStringLength * 2 / 3,
-											XmNuserData,				SubjectSTR,
+											XmNtopAttachment,    XmATTACH_FORM,
+											XmNtopOffset,        5,
+											XmNleftAttachment,   XmATTACH_POSITION,
+											XmNleftPosition,     12,
+											XmNbottomAttachment, XmATTACH_FORM,
+											XmNbottomOffset,     5,
+											XmNmaxLength,        DBStringLength - 1,
+											XmNcolumns,          DBStringLength * 2 / 3,
+											XmNuserData,         SubjectSTR,
 											NULL);
 	XtAddCallback (textF,XmNvalueChangedCallback,(XtCallbackProc) _RGISTextFieldValueChangedCBK,(XtPointer) SubjectSTR);
 
 	string = XmStringCreate ((char *) "Subject:",UICharSetBold);
 	label = XtVaCreateManagedWidget ("RGISWorkspaceSubjectLabel",xmLabelWidgetClass,selectionForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				textF,
-											XmNrightAttachment,		XmATTACH_WIDGET,
-											XmNrightWidget,			textF,
-											XmNrightOffset,			5,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			textF,
-											XmNlabelString,			string,
+											XmNtopAttachment,    XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,        textF,
+											XmNrightAttachment,  XmATTACH_WIDGET,
+											XmNrightWidget,	     textF,
+											XmNrightOffset,	     5,
+											XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,     textF,
+											XmNlabelString,      string,
 											NULL);
 	string = XmStringCreate ((char *) "Select",UICharSetBold);
 	button = XtVaCreateManagedWidget ("RGISWorkspaceSubjectSelectB",xmPushButtonGadgetClass,selectionForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				textF,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				textF,
-											XmNleftOffset,				5,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			textF,
-											XmNlabelString,			string,
-											XmNuserData,				(XtArgVal) UIDatasetSubject,
+											XmNtopAttachment,     XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,         textF,
+											XmNleftAttachment,    XmATTACH_WIDGET,
+											XmNleftWidget,        textF,
+											XmNleftOffset,        5,
+											XmNbottomAttachment,  XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,      textF,
+											XmNlabelString,       string,
+											XmNuserData,          (XtArgVal) UIDatasetSubject,
 											NULL);
 	XtAddCallback (button,XmNactivateCallback,(XtCallbackProc) _RGISSelectButtonCBK,textF);
 
 	string = XmStringCreate ((char *) "Domain:",UICharSetBold);
 	label = XtVaCreateManagedWidget ("RGISWorkspaceDomainLabel",xmLabelWidgetClass,selectionForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				textF,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				button,
-											XmNleftOffset,				15,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			textF,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,         textF,
+											XmNleftAttachment,    XmATTACH_WIDGET,
+											XmNleftWidget,        button,
+											XmNleftOffset,        15,
+											XmNbottomAttachment,  XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,      textF,
+											XmNlabelString,       string,
 											NULL);
 
 	textF = XtVaCreateManagedWidget ("RGISWorkspaceDomainTextF",xmTextFieldWidgetClass,selectionForm,
-											XmNtopAttachment,			XmATTACH_FORM,
-											XmNtopOffset,				5,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				label,
-											XmNbottomAttachment,		XmATTACH_FORM,
-											XmNbottomOffset,			5,
-											XmNmaxLength,				DBStringLength - 1,
-											XmNcolumns,					DBStringLength * 2 / 3,
-											XmNuserData,				DomainSTR,
+											XmNtopAttachment,    XmATTACH_FORM,
+											XmNtopOffset,        5,
+											XmNleftAttachment,   XmATTACH_WIDGET,
+											XmNleftWidget,       label,
+											XmNbottomAttachment, XmATTACH_FORM,
+											XmNbottomOffset,     5,
+											XmNmaxLength,        DBStringLength - 1,
+											XmNcolumns,          DBStringLength * 2 / 3,
+											XmNuserData,         DomainSTR,
 											NULL);
 	XtAddCallback (textF,XmNvalueChangedCallback,(XtCallbackProc) _RGISTextFieldValueChangedCBK,(XtPointer) DomainSTR);
 
 	string = XmStringCreate ((char *) "Select",UICharSetBold);
 	button = XtVaCreateManagedWidget ("RGISWorkspaceDomainSelectB",xmPushButtonGadgetClass,selectionForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				textF,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				textF,
-											XmNleftOffset,				5,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			textF,
-											XmNlabelString,			string,
-											XmNuserData,				(XtArgVal) UIDatasetGeoDomain,
+											XmNtopAttachment,     XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,         textF,
+											XmNleftAttachment,    XmATTACH_WIDGET,
+											XmNleftWidget,        textF,
+											XmNleftOffset,        5,
+											XmNbottomAttachment,  XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,      textF,
+											XmNlabelString,       string,
+											XmNuserData,          (XtArgVal) UIDatasetGeoDomain,
 											NULL);
 	XtAddCallback (button,XmNactivateCallback,(XtCallbackProc) _RGISSelectButtonCBK,textF);
 
 	currentDataForm = XtVaCreateManagedWidget ("RGISCurrentDataForm",xmFormWidgetClass,mainForm,
-											XmNtopAttachment,			XmATTACH_WIDGET,
-											XmNtopWidget,				selectionForm,
-											XmNtopOffset,				5,
-											XmNleftAttachment,		XmATTACH_FORM,
-											XmNleftOffset,				5,
-											XmNrightAttachment,		XmATTACH_FORM,
-											XmNrightOffset,			5,
-											XmNshadowThickness,		1,
+											XmNtopAttachment,     XmATTACH_WIDGET,
+											XmNtopWidget,         selectionForm,
+											XmNtopOffset,         5,
+											XmNleftAttachment,    XmATTACH_FORM,
+											XmNleftOffset,        5,
+											XmNrightAttachment,   XmATTACH_FORM,
+											XmNrightOffset,       5,
+											XmNshadowThickness,   1,
 											NULL);
 
 	string = XmStringCreate ((char *) "Current Data:",UICharSetBold);
 	dataLabel = XtVaCreateManagedWidget ("RGISWorkspaceCurrentDataLabel",xmLabelWidgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_FORM,
-											XmNtopOffset,				5,
-											XmNleftAttachment,		XmATTACH_FORM,
-											XmNleftOffset,				5,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_FORM,
+											XmNtopOffset,         5,
+											XmNleftAttachment,    XmATTACH_FORM,
+											XmNleftOffset,        5,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 
 	string = XmStringCreate ((char *) " ",UICharSetNormal);
 	CurrentDataLabel = XtVaCreateManagedWidget ("RGISWorkspaceCurrentDataLabelField",xmLabelGadgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_FORM,
-											XmNtopOffset,				5,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				dataLabel,
-											XmNleftOffset,				5,
-											XmNrightAttachment,		XmATTACH_POSITION,
-											XmNrightPosition,			75,
-											XmNrightOffset,			5,
-											XmNalignment,				XmALIGNMENT_BEGINNING,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_FORM,
+											XmNtopOffset,         5,
+											XmNleftAttachment,    XmATTACH_WIDGET,
+											XmNleftWidget,        dataLabel,
+											XmNleftOffset,        5,
+											XmNrightAttachment,   XmATTACH_POSITION,
+											XmNrightPosition,     75,
+											XmNrightOffset,       5,
+											XmNalignment,         XmALIGNMENT_BEGINNING,
+											XmNlabelString,       string,
 											NULL);
 
 	XmStringFree (string);
 	string = XmStringCreate ((char *) "Type:",UICharSetBold);
 	label = XtVaCreateManagedWidget ("RGISWorkspaceDataTypeLabel",xmLabelWidgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_FORM,
-											XmNtopOffset,				5,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				CurrentDataLabel,
-											XmNleftOffset,				5,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_FORM,
+											XmNtopOffset,         5,
+											XmNleftAttachment,    XmATTACH_WIDGET,
+											XmNleftWidget,        CurrentDataLabel,
+											XmNleftOffset,        5,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 	string = XmStringCreate ((char *) " ",UICharSetNormal);
 	DataTypeLabel = XtVaCreateManagedWidget ("RGISWorkspaceDataTypeLabelField",xmLabelGadgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_FORM,
-											XmNtopOffset,				5,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				label,
-											XmNleftOffset,				5,
-											XmNrightAttachment,		XmATTACH_FORM,
-											XmNrightOffset,			5,
-											XmNalignment,				XmALIGNMENT_BEGINNING,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_FORM,
+											XmNtopOffset,         5,
+											XmNleftAttachment,    XmATTACH_WIDGET,
+											XmNleftWidget,        label,
+											XmNleftOffset,        5,
+											XmNrightAttachment,   XmATTACH_FORM,
+											XmNrightOffset,       5,
+											XmNalignment,         XmALIGNMENT_BEGINNING,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 
 	string = XmStringCreate ((char *) "Domain:",UICharSetBold);
 	label = XtVaCreateManagedWidget ("RGISWorkspaceDomainLabel",xmLabelWidgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_WIDGET,
-											XmNtopWidget,				CurrentDataLabel,
-											XmNleftAttachment,		XmATTACH_FORM,
-											XmNleftOffset,				5,
-											XmNrightAttachment,		XmATTACH_WIDGET,
-											XmNrightWidget,			CurrentDataLabel,
-											XmNrightOffset,			5,
-											XmNalignment,				XmALIGNMENT_END,
-											XmNmarginHeight,			8,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_WIDGET,
+											XmNtopWidget,         CurrentDataLabel,
+											XmNleftAttachment,    XmATTACH_FORM,
+											XmNleftOffset,        5,
+											XmNrightAttachment,   XmATTACH_WIDGET,
+											XmNrightWidget,       CurrentDataLabel,
+											XmNrightOffset,       5,
+											XmNalignment,         XmALIGNMENT_END,
+											XmNmarginHeight,      8,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 	string = XmStringCreate ((char *) " ",UICharSetNormal);
 	GeoDomainLabel = XtVaCreateManagedWidget ("RGISWorkspaceDomainLabelField",xmLabelGadgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				label,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				label,
-											XmNleftOffset,				5,
-											XmNrightAttachment,		XmATTACH_POSITION,
-											XmNrightPosition,			35,
-											XmNrightOffset,			5,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			label,
-											XmNalignment,				XmALIGNMENT_BEGINNING,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,         label,
+											XmNleftAttachment,    XmATTACH_WIDGET,
+											XmNleftWidget,        label,
+											XmNleftOffset,        5,
+											XmNrightAttachment,   XmATTACH_POSITION,
+											XmNrightPosition,     35,
+											XmNrightOffset,       5,
+											XmNbottomAttachment,  XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,      label,
+											XmNalignment,         XmALIGNMENT_BEGINNING,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 
 	string = XmStringCreate ((char *) "Version:",UICharSetBold);
 	label = XtVaCreateManagedWidget ("RGISWorkspaceSubjectLabel",xmLabelWidgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				GeoDomainLabel,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				GeoDomainLabel,
-											XmNleftOffset,				10,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			GeoDomainLabel,
-											XmNalignment,				XmALIGNMENT_END,
-											XmNrecomputeSize,			False,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,         GeoDomainLabel,
+											XmNleftAttachment,    XmATTACH_WIDGET,
+											XmNleftWidget,        GeoDomainLabel,
+											XmNleftOffset,        10,
+											XmNbottomAttachment,  XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,      GeoDomainLabel,
+											XmNalignment,         XmALIGNMENT_END,
+											XmNrecomputeSize,     False,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 	string = XmStringCreate ((char *) " ",UICharSetNormal);
 	VersionLabel = XtVaCreateManagedWidget ("RGISWorkspaceSubjectLabelField",xmLabelGadgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				label,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				label,
-											XmNleftOffset,				5,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			label,
-											XmNalignment,				XmALIGNMENT_BEGINNING,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,         label,
+											XmNleftAttachment,    XmATTACH_WIDGET,
+											XmNleftWidget,        label,
+											XmNleftOffset,        5,
+											XmNbottomAttachment,  XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,      label,
+											XmNalignment,         XmALIGNMENT_BEGINNING,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 
@@ -412,61 +412,60 @@ void RGISWorkspace::Initialize (Widget mainForm)
 	XtVaGetValues (UserModeMenu,XmNchildren,	&buttons, NULL);
 	string = XmStringCreate ((char *) "User Mode:",UICharSetBold);
 	UserModeMenu = XtVaCreateManagedWidget ("RGISUserModeMenu",xmRowColumnWidgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				VersionLabel,
-											XmNrightAttachment,		XmATTACH_FORM,
-											XmNrightOffset,			10,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			VersionLabel,
-											XmNsubMenuId,				UserModeMenu,
-											XmNlabelString,			string,
-											XmNrowColumnType,			XmMENU_OPTION,
-											XmNtraversalOn,			False,
+											XmNtopAttachment,     XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,         VersionLabel,
+											XmNrightAttachment,   XmATTACH_FORM,
+											XmNrightOffset,       10,
+											XmNbottomAttachment,  XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,      VersionLabel,
+											XmNsubMenuId,         UserModeMenu,
+											XmNlabelString,       string,
+											XmNrowColumnType,     XmMENU_OPTION,
+											XmNtraversalOn,       False,
 											NULL);
 	XmStringFree (string);
 
 	string = XmStringCreate ((char *) "Subject:",UICharSetBold);
 	label = XtVaCreateManagedWidget ("RGISWorkspaceDomainLabel",xmLabelWidgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_WIDGET,
-											XmNtopWidget,				GeoDomainLabel,
-											XmNleftAttachment,		XmATTACH_FORM,
-											XmNleftOffset,				5,
-											XmNrightAttachment,		XmATTACH_WIDGET,
-											XmNrightWidget,			CurrentDataLabel,
-											XmNrightOffset,			5,
-											XmNalignment,				XmALIGNMENT_END,
-											XmNmarginHeight,			8,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_WIDGET,
+											XmNtopWidget,         GeoDomainLabel,
+											XmNleftAttachment,    XmATTACH_FORM,
+											XmNleftOffset,        5,
+											XmNrightAttachment,   XmATTACH_WIDGET,
+											XmNrightWidget,       CurrentDataLabel,
+											XmNrightOffset,       5,
+											XmNalignment,         XmALIGNMENT_END,
+											XmNmarginHeight,      8,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 	string = XmStringCreate ((char *) " ",UICharSetNormal);
 	SubjectLabel = XtVaCreateManagedWidget ("RGISWorkspaceSubjectLabelField",xmLabelGadgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				label,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				label,
-											XmNleftOffset,				5,
-											XmNrightAttachment,		XmATTACH_POSITION,
-											XmNrightPosition,			35,
-											XmNrightOffset,			5,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			label,
-											XmNalignment,				XmALIGNMENT_BEGINNING,
-											XmNlabelString,			string,
+											XmNtopAttachment,    XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,        label,
+											XmNleftAttachment,   XmATTACH_WIDGET,
+											XmNleftWidget,       label,
+											XmNleftOffset,       5,
+											XmNrightWidget,      VersionLabel,
+											XmNrightOffset,      5,
+											XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,     label,
+											XmNalignment,        XmALIGNMENT_BEGINNING,
+											XmNlabelString,      string,
 											NULL);
 	XmStringFree (string);
 
 
 	string = XmStringCreate ((char *) "Display",UICharSetBold);
 	DisplayToggle = XtVaCreateManagedWidget ("RGISWorkspaceDisplayToggle",xmToggleButtonGadgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				SubjectLabel,
-											XmNleftAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNleftWidget,				VersionLabel,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			SubjectLabel,
-											XmNlabelString,			string,
-											XmNshadowThickness,		0,
+											XmNtopAttachment,    XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,        SubjectLabel,
+											XmNleftAttachment,   XmATTACH_OPPOSITE_WIDGET,
+											XmNleftWidget,       VersionLabel,
+											XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,     SubjectLabel,
+											XmNlabelString,      string,
+											XmNshadowThickness,  0,
 											NULL);
 	XtAddCallback (DisplayToggle,XmNvalueChangedCallback,(XtCallbackProc) _RGISDisplayModeCBK,(void *) NULL);
 	XmStringFree (string);
@@ -483,125 +482,125 @@ void RGISWorkspace::Initialize (Widget mainForm)
 
 	string = XmStringCreate ((char *) "Select Mode:",UICharSetBold);
 	SelectModeMenu = XtVaCreateManagedWidget ("RGISelectModeMenu",xmRowColumnWidgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				SubjectLabel,
-											XmNrightAttachment,		XmATTACH_FORM,
-											XmNrightOffset,			10,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			SubjectLabel,
-											XmNsubMenuId,				SelectModeMenu,
-											XmNlabelString,			string,
-											XmNrowColumnType,			XmMENU_OPTION,
-											XmNtraversalOn,			False,
+											XmNtopAttachment,      XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,          SubjectLabel,
+											XmNrightAttachment,    XmATTACH_FORM,
+											XmNrightOffset,        10,
+											XmNbottomAttachment,   XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,       SubjectLabel,
+											XmNsubMenuId,          SelectModeMenu,
+											XmNlabelString,        string,
+											XmNrowColumnType,      XmMENU_OPTION,
+											XmNtraversalOn,        False,
 											NULL);
 	XmStringFree (string);
 
 	string = XmStringCreate ((char *) "Linked Data:",UICharSetBold);
 	label = XtVaCreateManagedWidget ("RGISWorkspaceSubjectLabel",xmLabelWidgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_WIDGET,
-											XmNtopWidget,				SubjectLabel,
-											XmNtopOffset,				5,
-											XmNleftAttachment,		XmATTACH_FORM,
-											XmNleftOffset,				5,
-											XmNrightAttachment,		XmATTACH_WIDGET,
-											XmNrightWidget,			CurrentDataLabel,
-											XmNrightOffset,			5,
-											XmNbottomAttachment,		XmATTACH_FORM,
-											XmNbottomOffset,			5,
-											XmNalignment,				XmALIGNMENT_END,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_WIDGET,
+											XmNtopWidget,         SubjectLabel,
+											XmNtopOffset,         5,
+											XmNleftAttachment,    XmATTACH_FORM,
+											XmNleftOffset,        5,
+											XmNrightAttachment,   XmATTACH_WIDGET,
+											XmNrightWidget,       CurrentDataLabel,
+											XmNrightOffset,       5,
+											XmNbottomAttachment,  XmATTACH_FORM,
+											XmNbottomOffset,      5,
+											XmNalignment,         XmALIGNMENT_END,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 
 	string = XmStringCreate ((char *) " ",UICharSetNormal);
 	LinkedDataLabel = XtVaCreateManagedWidget ("RGISWorkspaceSubjectLabelField",xmLabelGadgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_WIDGET,
-											XmNtopWidget,				SubjectLabel,
-											XmNtopOffset,				5,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				label,
-											XmNleftOffset,				5,
-											XmNrightAttachment,		XmATTACH_POSITION,
-											XmNrightPosition,			80,
-											XmNrightOffset,			5,
-											XmNbottomAttachment,		XmATTACH_FORM,
-											XmNbottomOffset,			5,
-											XmNalignment,				XmALIGNMENT_BEGINNING,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_WIDGET,
+											XmNtopWidget,         SubjectLabel,
+											XmNtopOffset,         5,
+											XmNleftAttachment,    XmATTACH_WIDGET,
+											XmNleftWidget,        label,
+											XmNleftOffset,        5,
+											XmNrightAttachment,   XmATTACH_POSITION,
+											XmNrightPosition,     80,
+											XmNrightOffset,       5,
+											XmNbottomAttachment,  XmATTACH_FORM,
+											XmNbottomOffset,      5,
+											XmNalignment,         XmALIGNMENT_BEGINNING,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 
 	string = XmStringCreate ((char *) "Type:",UICharSetBold);
 	label = XtVaCreateManagedWidget ("RGISWorkspaceSubjectLabel",xmLabelWidgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_WIDGET,
-											XmNtopWidget,				SubjectLabel,
-											XmNtopOffset,				5,
-											XmNrightAttachment,		XmATTACH_WIDGET,
-											XmNrightWidget,			DataTypeLabel,
-											XmNrightOffset,			5,
-											XmNbottomAttachment,		XmATTACH_FORM,
-											XmNbottomOffset,			5,
-											XmNalignment,				XmALIGNMENT_END,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_WIDGET,
+											XmNtopWidget,         SubjectLabel,
+											XmNtopOffset,         5,
+											XmNrightAttachment,   XmATTACH_WIDGET,
+											XmNrightWidget,       DataTypeLabel,
+											XmNrightOffset,       5,
+											XmNbottomAttachment,  XmATTACH_FORM,
+											XmNbottomOffset,      5,
+											XmNalignment,         XmALIGNMENT_END,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 	string = XmStringCreate ((char *) " ",UICharSetNormal);
 	LinkedTypeLabel = XtVaCreateManagedWidget ("RGISWorkspaceSubjectLabelField",xmLabelGadgetClass,currentDataForm,
-											XmNtopAttachment,			XmATTACH_WIDGET,
-											XmNtopWidget,				SubjectLabel,
-											XmNtopOffset,				5,
-											XmNleftAttachment,		XmATTACH_WIDGET,
-											XmNleftWidget,				label,
-											XmNleftOffset,				5,
-											XmNrightAttachment,		XmATTACH_FORM,
-											XmNrightOffset,			5,
-											XmNbottomAttachment,		XmATTACH_FORM,
-											XmNbottomOffset,			5,
-											XmNalignment,				XmALIGNMENT_BEGINNING,
-											XmNlabelString,			string,
+											XmNtopAttachment,     XmATTACH_WIDGET,
+											XmNtopWidget,         SubjectLabel,
+											XmNtopOffset,         5,
+											XmNleftAttachment,    XmATTACH_WIDGET,
+											XmNleftWidget,        label,
+											XmNleftOffset,        5,
+											XmNrightAttachment,   XmATTACH_FORM,
+											XmNrightOffset,       5,
+											XmNbottomAttachment,  XmATTACH_FORM,
+											XmNbottomOffset,      5,
+											XmNalignment,         XmALIGNMENT_BEGINNING,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 
 	string = XmStringCreate ((char *) "Active Data:",UICharSetBold);
 	label = XtVaCreateManagedWidget ("RGISPointInfoItemNumLabel",xmLabelWidgetClass, mainForm,
-											XmNtopAttachment,				XmATTACH_WIDGET,
-											XmNtopWidget,					currentDataForm,
-											XmNtopOffset,					5,
-											XmNleftAttachment,			XmATTACH_FORM,
-											XmNleftOffset,					5,
-											XmNlabelString,				string,
+											XmNtopAttachment,     XmATTACH_WIDGET,
+											XmNtopWidget,         currentDataForm,
+											XmNtopOffset,         5,
+											XmNleftAttachment,    XmATTACH_FORM,
+											XmNleftOffset,        5,
+											XmNlabelString,       string,
 											NULL);
 	XmStringFree (string);
 
 	string = XmStringCreate ((char *) "Smart Sort",UICharSetBold);
 	SmartSortToggle = XtVaCreateManagedWidget ("RGISWorkspaceDisplayToggle",xmToggleButtonGadgetClass,mainForm,
-											XmNtopAttachment,			XmATTACH_WIDGET,
-											XmNtopWidget,				currentDataForm,
-											XmNtopOffset,				5,
-											XmNrightAttachment,		XmATTACH_POSITION,
-											XmNrightPosition,			60,
-											XmNlabelString,			string,
-											XmNshadowThickness,		0,
-											XmNset,						((dataset->DataList ())->Flags () & DBDataLISTFlagSmartSort) == DBDataLISTFlagSmartSort,
+											XmNtopAttachment,     XmATTACH_WIDGET,
+											XmNtopWidget,         currentDataForm,
+											XmNtopOffset,         5,
+											XmNrightAttachment,   XmATTACH_POSITION,
+											XmNrightPosition,     60,
+											XmNlabelString,       string,
+											XmNshadowThickness,   0,
+											XmNset,               ((dataset->DataList ())->Flags () & DBDataLISTFlagSmartSort) == DBDataLISTFlagSmartSort,
 											NULL);
 	XtAddCallback (SmartSortToggle,XmNvalueChangedCallback,(XtCallbackProc) _RGISSmartSortCBK,(void *) (dataset->DataList ()));
 	XmStringFree (string);
 
 	argNum = 0;
-	XtSetArg (wargs [argNum],	XmNtopAttachment,				XmATTACH_WIDGET);	++argNum;
-	XtSetArg (wargs [argNum],	XmNtopWidget,					label);				++argNum;
-	XtSetArg (wargs [argNum],	XmNtopOffset,					5);					++argNum;
-	XtSetArg (wargs [argNum],	XmNleftAttachment,			XmATTACH_FORM);	++argNum;
-	XtSetArg (wargs [argNum],	XmNleftOffset,					5); 					++argNum;
-	XtSetArg (wargs [argNum],	XmNrightAttachment,			XmATTACH_POSITION);	++argNum;
-	XtSetArg (wargs [argNum],	XmNrightPosition,				60);					++argNum;
-	XtSetArg (wargs [argNum],	XmNbottomAttachment,			XmATTACH_FORM);	++argNum;
-	XtSetArg (wargs [argNum],	XmNbottomOffset,				5);					++argNum;
-	XtSetArg (wargs [argNum],	XmNscrollingPolicy,			XmAUTOMATIC);		++argNum;
-	XtSetArg (wargs [argNum],	XmNscrollBarDisplayPolicy,	XmAS_NEEDED);		++argNum;
-	XtSetArg (wargs [argNum],	XmNvisualPolicy,				XmVARIABLE);		++argNum;
-	XtSetArg (wargs [argNum],	XmNshadowThickness,			2);					++argNum;
-	XtSetArg (wargs [argNum],	XmNselectionPolicy,			XmSINGLE_SELECT);	++argNum;
+	XtSetArg (wargs [argNum],	XmNtopAttachment,          XmATTACH_WIDGET);   ++argNum;
+	XtSetArg (wargs [argNum],	XmNtopWidget,              label);             ++argNum;
+	XtSetArg (wargs [argNum],	XmNtopOffset,              5);                 ++argNum;
+	XtSetArg (wargs [argNum],	XmNleftAttachment,         XmATTACH_FORM);     ++argNum;
+	XtSetArg (wargs [argNum],	XmNleftOffset,             5);                 ++argNum;
+	XtSetArg (wargs [argNum],	XmNrightAttachment,        XmATTACH_POSITION); ++argNum;
+	XtSetArg (wargs [argNum],	XmNrightPosition,          60);                ++argNum;
+	XtSetArg (wargs [argNum],	XmNbottomAttachment,       XmATTACH_FORM);     ++argNum;
+	XtSetArg (wargs [argNum],	XmNbottomOffset,           5);                 ++argNum;
+	XtSetArg (wargs [argNum],	XmNscrollingPolicy,        XmAUTOMATIC);       ++argNum;
+	XtSetArg (wargs [argNum],	XmNscrollBarDisplayPolicy, XmAS_NEEDED);       ++argNum;
+	XtSetArg (wargs [argNum],	XmNvisualPolicy,           XmVARIABLE);        ++argNum;
+	XtSetArg (wargs [argNum],	XmNshadowThickness,        2);                 ++argNum;
+	XtSetArg (wargs [argNum],	XmNselectionPolicy,        XmSINGLE_SELECT);   ++argNum;
 	DataList = XmCreateScrolledList (mainForm,(char *) "RGISCurrentDataList",wargs,argNum);
 	XtAddCallback (DataList,XmNsingleSelectionCallback,	(XtCallbackProc) _RGISWorkspaceSetCurrentDataCBK,this);
 	XtManageChild (DataList);
@@ -613,40 +612,40 @@ void RGISWorkspace::Initialize (Widget mainForm)
 	GrpPNL = new RGISGrpPanel (mainForm,DataList);
 
 	controlRowCol = XtVaCreateManagedWidget ("RGISGroupMenuRowColumn",xmRowColumnWidgetClass,mainForm,
-											XmNtopAttachment,			XmATTACH_OPPOSITE_WIDGET,
-											XmNtopWidget,				SmartSortToggle,
-											XmNrightAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNrightWidget,			currentDataForm,
-											XmNbottomAttachment,		XmATTACH_OPPOSITE_WIDGET,
-											XmNbottomWidget,			SmartSortToggle,
-											XmNorientation,			XmHORIZONTAL,
-											XmNpacking,					XmPACK_COLUMN,
-											XmNspacing,					0,
-											XmNmarginWidth,			0,
-											XmNmarginHeight,			0,
-											XmNnumColumns,				1,
-											XmNradioBehavior,			True,
-											XmNradioAlwaysOne,		True,
+											XmNtopAttachment,      XmATTACH_OPPOSITE_WIDGET,
+											XmNtopWidget,          SmartSortToggle,
+											XmNrightAttachment,    XmATTACH_OPPOSITE_WIDGET,
+											XmNrightWidget,        currentDataForm,
+											XmNbottomAttachment,   XmATTACH_OPPOSITE_WIDGET,
+											XmNbottomWidget,       SmartSortToggle,
+											XmNorientation,        XmHORIZONTAL,
+											XmNpacking,            XmPACK_COLUMN,
+											XmNspacing,            0,
+											XmNmarginWidth,        0,
+											XmNmarginHeight,       0,
+											XmNnumColumns,         1,
+											XmNradioBehavior,      True,
+											XmNradioAlwaysOne,     True,
 											NULL);
 	string = XmStringCreate ((char *) "Display Modes",UICharSetBold);
 	toggle = XtVaCreateManagedWidget ("RGISWorkspaceDisplayControlToggleWGT",xmToggleButtonGadgetClass,controlRowCol,
-											XmNuserData,				this,
-											XmNlabelString,			string,
+											XmNuserData,           this,
+											XmNlabelString,        string,
 											XmNhighlightThickness,	0,
 											XmNshadowThickness,		0,
 											XmNmarginWidth,			5,
-											XmNset,						True,
+											XmNset,                 True,
 											NULL);
 	XmStringFree (string);
 	XtAddCallback (toggle,XmNvalueChangedCallback,(XtCallbackProc) _RGISControlPageCBK,(XtPointer) 0);
 	string = XmStringCreate ((char *) "Groups",UICharSetBold);
 	toggle = XtVaCreateManagedWidget ("RGISWorkspaceGroupControlToggleWGT",xmToggleButtonGadgetClass,controlRowCol,
-											XmNuserData,				this,
-											XmNlabelString,			string,
-											XmNhighlightThickness,	0,
-											XmNshadowThickness,		0,
-											XmNmarginWidth,			5,
-											XmNset,						False,
+											XmNuserData,           this,
+											XmNlabelString,        string,
+											XmNhighlightThickness, 0,
+											XmNshadowThickness,    0,
+											XmNmarginWidth,        5,
+											XmNset,                False,
 											NULL);
 	XmStringFree (string);
 	XtAddCallback (toggle,XmNvalueChangedCallback,(XtCallbackProc) _RGISControlPageCBK,(XtPointer) 1);
