@@ -166,8 +166,8 @@ DBObjData *DBGridCreate(char *title, DBRegion extent, DBCoordinate cellSize, DBI
         return ((DBObjData *) NULL);
     }
 
-    colNum = (DBInt) ceil((extent.UpperRight.X - extent.LowerLeft.X) / cellSize.X);
-    rowNum = (DBInt) ceil((extent.UpperRight.Y - extent.LowerLeft.Y) / cellSize.Y);
+    colNum = (DBInt) round((extent.UpperRight.X - extent.LowerLeft.X) / cellSize.X);
+    rowNum = (DBInt) round((extent.UpperRight.Y - extent.LowerLeft.Y) / cellSize.Y);
     extent.UpperRight.X = extent.LowerLeft.X + (DBFloat) colNum * cellSize.X;
     extent.UpperRight.Y = extent.LowerLeft.Y + (DBFloat) rowNum * cellSize.Y;
 
