@@ -642,7 +642,7 @@ function RGIStitle () {
 	local  timeRange="${1}"; shift
 	local    version="${1}"; shift
 
-	USAGE="Usage: RGIStitle <archive> <domain> <variable> <product> <resolution> <tstep type> <tstep> <time range> <version>"
+	USAGE="Usage: RGIStitle <domain> <variable> <product> <resolution> <tstep type> <tstep> <time range> <version>"
     if [[ "${tStepType}" == "" ]]; then echo "${USAGE}"; return 1; fi
 
 	local variableFullName=$(RGISlookupFullName "${variable}")
