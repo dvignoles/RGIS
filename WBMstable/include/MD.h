@@ -202,7 +202,7 @@ extern "C" {
 #define MDVarGroundWaterUptake               "GroundWaterUptake"
 #define MDVarLeafAreaIndex                   "LeafAreaIndex"
 
-#define MDVarIceCover			"IceCover"
+#define MDVarIceCover		              	"IceCover"
 
 #define MDVarIrrAreaFraction                 "IrrigatedAreaFraction"
 
