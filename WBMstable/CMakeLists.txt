@@ -13,7 +13,7 @@ else(${GHAASDIR})
 endif(${GHAASDIR})
 
 FILE(GLOB sources src/*.c)
-add_executable(WBM20 ${sources})
+add_executable(WBMstable ${sources})
 
 if(${CMAKE_HOST_APPLE})
     target_link_libraries(WBM20 MF30 CM30 m)
