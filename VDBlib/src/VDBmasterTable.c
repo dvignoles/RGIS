@@ -286,7 +286,7 @@ static VDBmasterTable_t _VDBmasterTable3 [] = {
         {"weather",       "weather_humidity_relative",                         "Weather-Humidity-Relative",                    "Relative Humidity",                  "continuous", "blue",        "avg"},
         {"weather",       "weather_humidity_specific",                         "Weather-Humidity-Specific",                    "Specific Humidity",                  "continuous", "blue",        "avg"},
         {"weather",       "weather_humidity_vapor_pressure",                   "Weather-Humidity-VaporPressure",               "Vapor Pressure",                     "continuous", "blue",        "avg"},
-        {"weather",       "weather_humidity_vapor_pressure_deficit",           "Weather-Humidity-VaporPressure-Deficit",       "Vapor Pressure Deficit",             "continuous", "bllue-to-red","avg"},
+        {"weather",       "weather_humidity_vapor_pressure_deficit",           "Weather-Humidity-VaporPressure-Deficit",       "Vapor Pressure Deficit",             "continuous", "blue-to-red", "avg"},
         {"weather",       "weather_wind_speed",                                "Weather-WindSpeed",                            "Wind Speed",                         "continuous", "grey",        "avg"},
         {"weather",       "weather_wind_speed_u10m",                           "Weather-WindSpeed-U10m",                       "Wind Speed U-direction at 10m",      "continuous", "grey",        "avg"},
         {"weather",       "weather_wind_speed_v10m",                           "Weather-WindSpeed-V10m",                       "Wind Speed V-direction at 10m",      "continuous", "grey",        "avg"}};
