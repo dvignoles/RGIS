@@ -381,12 +381,18 @@ int MDAux_AccumRunoffDef ();
 int MDAux_AccumSMoistChgDef ();
 int MDAux_AvgNStepsDef ();
 int MDAux_MeanDiscargehDef ();
+int MDAux_MeanRunoffDef ();
 
 int MDCommon_CloudCoverDef ();
 int MDCommon_GrossRadDef ();
 int MDCommon_HumidityRelativeDef ();
 int MDCommon_HumiditySpecificDef ();
+int MDCommon_PrecipitationDef ();
+int MDCommon_SolarRadDef ();
+int MDCommon_SolarRadDayLengthDef ();
+int MDCommon_SolarRadI0HDayDef ();
 int MDCommon_WetBulbTempDef ();
+int MDCommon_WetDaysDef ();
 
 int MDCore_BaseFlowDef ();
 int MDCore_EvapotranspirationDef ();
@@ -405,6 +411,14 @@ int MDCore_RainPotETTurcDef ();
 int MDCore_RainSMoistChgDef ();
 int MDCore_RainSurfRunoffDef ();
 int MDCore_RainWaterSurplusDef ();
+int MDCore_RunoffDef ();
+int MDCore_RunoffVolumeDef ();
+int MDCore_SnowPackChgDef ();
+int MDCore_SnowPackMeltDef ();
+int MDCore_SoilAvailWaterCapDef ();
+int MDCore_SoilMoistChgDef ();
+int MDCore_SurfRunoffDef ();
+int MDCore_WaterBalanceDef ();
 
 int MDIrrigation_IrrAreaDef ();
 int MDIrrigation_GrossDemandDef ();
@@ -429,19 +443,22 @@ int MDParam_LCLPMaxDef ();
 int MDParam_LCZ0gDef ();
 int MDParam_LandCoverMappingDef ();
 int MDParam_LeafAreaIndexDef ();
+int MDParam_LCStemAreaIndexDef ();
 
 int MDRouting_DischargeDef ();
-int MDRouting_DischLevel1Def ();
+int MDRouting_DischargeInChannelDef ();
+int MDRouting_DischargeInChannelAccumulateDef ();
+int MDRouting_DischargeInChannelCascadeDef ();
+int MDRouting_DischargeInChannelMuskingumDef ();
+int MDRouting_DischargeInChannelMuskingumCoeffDef ();
+int MDRouting_DischargeReleaseDef ();
 int MDRouting_DischargeUptake ();
-int MDRouting_DischLevel3Def ();
-int MDRouting_DischLevel3AccumulateDef ();
-int MDRouting_DischLevel3CascadeDef ();
-int MDRouting_DischLevel3MuskingumDef ();
-int MDRouting_DischLevel3MuskingumCoeffDef ();
-
-int MDReservoir_OperationDef ();
 int MDRouting_RiverbedShapeExponentDef ();
 int MDRouting_RiverWidthDef ();
+
+int MDReservoir_OperationDef ();
+int MDReservoir_FarmPondReleaseDef ();
+int MDReservoir_FarmPondCapacityDef ();
 
 int MDSediment_BQARTpreprocessDef (); //NEW !!!!!  (S.C)
 int MDSediment_BankfullQcalcDef ();//NEW !!!!!  (S.C)
@@ -449,23 +466,6 @@ int MDSediment_BedloadFluxDef ();//NEW !!!!!  (S.C)
 int MDSediment_FluxDef (); //NEW !!!!!  (S.C)
 int MDSediment_DischargeBFDef ();
 
-int MDCore_RunoffDef ();
-int MDAux_MeanRunoffDef ();
-int MDCore_RunoffVolumeDef ();
-int MDCore_SnowPackChgDef ();
-int MDCore_SnowPackMeltDef ();
-int MDReservoir_FarmPondReleaseDef ();
-int MDReservoir_FarmPondCapacityDef ();
-int MDCommon_SolarRadDef ();
-int MDCommon_SolarRadDayLengthDef ();
-int MDCommon_SolarRadI0HDayDef ();
-int MDCore_SoilAvailWaterCapDef ();
-int MDCore_SoilMoistChgDef ();
-int MDCore_SurfRunoffDef ();
-int MDParam_LCStemAreaIndexDef ();
-int MDCore_WaterBalanceDef ();
-int MDCommon_PrecipitationDef ();
-int MDCommon_WetDaysDef ();
 int MDTP2M_WTempGrdWaterDef ();
 int MDTP2M_WTempRiverDef ();
 int MDTP2M_WTempRiverRouteDef ();
