@@ -144,7 +144,7 @@ extern "C" {
 #define MDVarIrrigation_RefEvapotrans           "IrrReferenceETP"
 #define MDVarIrrigation_ReturnFlow              "IrrReturnFlow"
 #define MDVarIrrigation_SoilMoisture            "IrrSoilMoisture"
-#define MDVarIrrigation_SoilMoistChange         "IrrSoilMoistChange"
+#define MDVarIrrigation_SoilMoistChange         "IrrSoilMoistureChg"
 #define MDVarIrrigation_UptakeBalance           "IrrUptakeBalance"
 #define MDVarIrrigation_UptakeExternal          "IrrUptakeExternal"
 #define MDVarIrrigation_UptakeExcess            "IrrUptakeExcess"
