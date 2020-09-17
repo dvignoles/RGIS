@@ -142,6 +142,7 @@ extern "C" {
 #define MDVarIrrigation_NetDemand               "IrrNetWaterDemand"
 #define MDVarIrrigation_Precipitation           "IrrPrecipitation"
 #define MDVarIrrigation_RefEvapotrans           "IrrReferenceETP"
+#define MDVarIrrigation_Runoff                  "IrrRunoff"
 #define MDVarIrrigation_ReturnFlow              "IrrReturnFlow"
 #define MDVarIrrigation_SoilMoisture            "IrrSoilMoisture"
 #define MDVarIrrigation_SoilMoistChange         "IrrSoilMoistureChange"
@@ -425,6 +426,7 @@ int MDIrrigation_GrossDemandDef ();
 int MDIrrigation_ReferenceETDef ();
 int MDIrrigation_ReferenceETFAODef ();
 int MDIrrigation_Reference_ETHamonDef ();
+int MDIrrigation_RunoffDef ();
 int MDIrrigation_ReturnFlowDef ();
 int MDIrrigation_SoilMoistDef ();
 int MDIrrigation_SoilMoistChgDef ();
