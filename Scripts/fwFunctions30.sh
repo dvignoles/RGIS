@@ -515,7 +515,7 @@ function _fwPostprocess () {
 
 		# [ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP1" "${fwGDSFileNAME}.TMP2"
 
-		if [ "${_fwDAILYOUTPUT}" == "on" ]:1
+		if [ "${_fwDAILYOUTPUT}" == "on" ]
 		then
 			# [ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP3"
 			(cat "${fwGDSFileNAME}"       |\
