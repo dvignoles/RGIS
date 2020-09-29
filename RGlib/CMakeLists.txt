@@ -1,3 +1,4 @@
+project(RGlib)
 FILE(GLOB sources src/*.C)
 add_library(RG30 ${sources})
 target_include_directories(RG30 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include

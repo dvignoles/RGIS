@@ -1,3 +1,4 @@
+project(VDBlib)
 FILE(GLOB sources src/*.c)
 add_library(VDB30 ${sources})
 target_include_directories(VDB30 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

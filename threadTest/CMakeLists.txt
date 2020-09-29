@@ -1,3 +1,4 @@
+project(threadTest)
 FILE(GLOB sources src/*.c)
 add_executable(threadTest ${sources})
 if(${CMAKE_HOST_APPLE})
