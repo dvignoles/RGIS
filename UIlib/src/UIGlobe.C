@@ -209,7 +209,7 @@ static void _UIGlobeDrawImage(XImage *image, int longitude, Pixel background) {
     bathColorNum = UIColorNum(UIColorBlueScale);
     elevColorNum = UIColorNum(UIColorElevation);
 
-    rad = image->height < image->height ? image->height >> 0x1 : image->height >> 0x01;
+    rad = image->width < image->height ? image->width >> 0x1 : image->height >> 0x01;
     for (j = -(image->height >> 0x01); j < (image->height >> 0x01); ++j)
         for (i = -(image->width >> 0x01); i < (image->width >> 0x01); ++i) {
             if ((i * i) + (j * j) >= rad * rad) {

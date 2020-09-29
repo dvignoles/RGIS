@@ -1,4 +1,4 @@
-FROM ubuntu:19.10 AS base
+FROM ubuntu:20.04 AS base
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
     apt-get install -y tzdata gnupg gnupg-utils lsb-release wget ca-certificates apt-transport-https
 ENTRYPOINT ["/bin/bash"]
@@ -6,7 +6,7 @@ ENTRYPOINT ["/bin/bash"]
 # Auxiliary container to build RGIS
 FROM base AS rgis
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y --no-install-recommends git cmake clang curl libnetcdf-dev libudunits2-dev \
+    apt-get install -y --no-install-recommends git cmake clang curl make libnetcdf-dev libudunits2-dev \
             libgdal-dev libexpat1-dev libxext-dev libmotif-dev
 RUN git clone https://github.com/bmfekete/RGIS /tmp/RGIS && /tmp/RGIS/install.sh /usr/local/share && rm -rf /tmp/RGIS
 ENV PATH="${PATH}:/usr/local/share/ghaas/bin:/usr/local/share/ghaas/f"
