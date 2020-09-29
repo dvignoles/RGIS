@@ -513,11 +513,11 @@ function _fwPostprocess () {
 		local fwGDSFileNAME="$(FwGDSFilename "${fwVARIABLE}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
 		[ -e "${fwGDSFileNAME}" ] || ( echo "Skipping missing variable [${fwVARIABLE}]"; echo ${fwGDSFileNAME}; continue; )
 
-		[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP1" "${fwGDSFileNAME}.TMP2"
+		# [ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP1" "${fwGDSFileNAME}.TMP2"
 
 		if [ "${_fwDAILYOUTPUT}" == "on" ]:1
 		then
-			[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP3"
+			# [ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP3"
 			(cat "${fwGDSFileNAME}"       |\
 			 tee "${fwGDSFileNAME}.TMP1" |\
 			 tee "${fwGDSFileNAME}.TMP2" > "${fwGDSFileNAME}.TMP3"
