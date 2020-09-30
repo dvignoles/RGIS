@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
             date[step] = '\0';
         }
         itemNum = 0;
-        while ((itemRet = fread(items + itemNum, itemSize, header.ItemNum, inFile)) > 0) {
+        while ((itemRet = fread(((char *) items) + itemNum * itemSize, itemSize, header.ItemNum, inFile)) > 0) {
             itemNum += itemRet;
             if (itemNum == header.ItemNum) break;
         }
