@@ -160,10 +160,9 @@ int main(int argc, char *argv[]) {
             date[step] = '\0';
         }
         itemNum = 0;
-        while ((itemRet = fread(((char *) items) + itemNum * itemSize, itemSize, header.ItemNum, inFile)) > 0) {
-            itemNum += itemRet;
-            if (itemNum == header.ItemNum) break;
-        }
+        do itemNum += fread(((char *) items) + itemNum * itemSize, itemSize, header.ItemNum, inFile);
+        while ((feof(inFile) == 0) && (itemNum != header.ItemNum));
+    
         if (itemNum != header.ItemNum) {
             CMmsgPrint(CMmsgSysError, "Input reading error in: %s:%d", __FILE__, __LINE__);
             goto Stop;
