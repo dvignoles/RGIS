@@ -513,14 +513,12 @@ function _fwPostprocess () {
 		local fwGDSFileNAME="$(FwGDSFilename "${fwVARIABLE}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
 		[ -e "${fwGDSFileNAME}" ] || ( echo "Skipping missing variable [${fwVARIABLE}]"; echo ${fwGDSFileNAME}; continue; )
 
-		[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP1" "${fwGDSFileNAME}.TMP2"
+		# [ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP1" "${fwGDSFileNAME}.TMP2"
 
 		if [ "${_fwDAILYOUTPUT}" == "on" ]
 		then
-			[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP3"
-			(cat "${fwGDSFileNAME}"      |\
-			 tee "${fwGDSFileNAME}.TMP1" |\
-			 tee "${fwGDSFileNAME}.TMP2" > "${fwGDSFileNAME}.TMP3") &
+			# [ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP3"
+			(cat "${fwGDSFileNAME}" | tee "${fwGDSFileNAME}.TMP1" | tee "${fwGDSFileNAME}.TMP2" > "${fwGDSFileNAME}.TMP3") &
 			(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "d" "${fwYEAR}")"
 			 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
 			 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Daily${fwSUFFIX})"  \
@@ -528,21 +526,20 @@ function _fwPostprocess () {
 			                      "${fwGDSFileNAME}.TMP3" "${fwRGISFileNAME}"
 			 rm "${fwGDSFileNAME}.TMP3") &
 		else
-			(cat "${fwGDSFileNAME}"       |\
-			 tee "${fwGDSFileNAME}.TMP1" > "${fwGDSFileNAME}.TMP2") &
+			(cat "${fwGDSFileNAME}" | tee "${fwGDSFileNAME}.TMP1" > "${fwGDSFileNAME}.TMP2") &
 		fi
 		(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "a" "${fwYEAR}")"
 		 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
 		 dsAggregate -e year -a ${fwAMODE} "${fwGDSFileNAME}.TMP2" - |\
 		 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Yearly${fwSUFFIX})" \
 		         -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}"  -s blue - ${fwRGISFileNAME}
-		 rm "${fwGDSFileNAME}.TMP2") &
+		 rm "${fwGDSFileNAME}.TMP2" "${fwGDSFileNAME}") &
 		(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "m" "${fwYEAR}")"
 		 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
 		 dsAggregate -e month -a ${fwAMODE} "${fwGDSFileNAME}.TMP1" - |\
 		 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Monthly${fwSUFFIX})" \
 		         -m ${_fwRGISDomainFILE}  -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue - ${fwRGISFileNAME}
-		 rm "${fwGDSFileNAME}.TMP1" "${fwGDSFileNAME}") &
+		 rm "${fwGDSFileNAME}.TMP1") &
 	done
 	wait
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"; }
