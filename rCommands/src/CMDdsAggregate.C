@@ -26,7 +26,7 @@ enum { DAY = 10, MONTH = 7, YEAR = 4 };
 enum { AVG = 1, SUM = 2 };
 
 int main(int argc, char *argv[]) {
-    int argPos = 0, argNum = argc, ret = CMfailed, itemSize, i, recordNum = 0, step = CMfailed, mode = CMfailed;
+    int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemNum, itemRet, i, recordNum = 0, step = CMfailed, mode = CMfailed;
     FILE *inFile = stdin, *outFile = stdout;
     char date[MFDateStringLength];
     MFdsHeader_t header, outHeader;
@@ -159,7 +159,12 @@ int main(int argc, char *argv[]) {
             strncpy(date, header.Date, step);
             date[step] = '\0';
         }
-        if ((int) fread(items, itemSize, header.ItemNum, inFile) != header.ItemNum) {
+        itemNum = 0;
+        while ((itemRet = fread(items + itemNum, itemSize, header.ItemNum, inFile)) > 0) {
+            itemNum += itemRet;
+            if (itemNum == header.ItemNum) break;
+        }
+        if (itemNum != header.ItemNum) {
             CMmsgPrint(CMmsgSysError, "Input reading error in: %s:%d", __FILE__, __LINE__);
             goto Stop;
         }
