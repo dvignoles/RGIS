@@ -504,6 +504,7 @@ function _fwPostprocess () {
 	if [ "${fwYEAR}" == "" ]; then local fwSUFFIX="LT"; else local fwSUFFIX="TS${fwYEAR}"; fi
 	[ "${_fwOPTIONSPIPED}" == "off" ] && [ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"; }
 
+	local procNum=0
 	local files=""
 	for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
 	do
@@ -513,8 +514,11 @@ function _fwPostprocess () {
 		local fwGDSFileNAME="$(FwGDSFilename "${fwVARIABLE}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
 		[ -e "${fwGDSFileNAME}" ] || ( echo "Skipping missing variable [${fwVARIABLE}]"; echo ${fwGDSFileNAME}; continue; )
 
+		[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP1" "${fwGDSFileNAME}.TMP2"
+
 		if [ "${_fwDAILYOUTPUT}" == "on" ]
 		then
+			[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP3"
 			(cat "${fwGDSFileNAME}" | tee "${fwGDSFileNAME}.TMP1" | tee "${fwGDSFileNAME}.TMP2" > "${fwGDSFileNAME}.TMP3") &
 			(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "d" "${fwYEAR}")"
 			 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
@@ -537,6 +541,13 @@ function _fwPostprocess () {
 		 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Monthly${fwSUFFIX})" \
 		         -m ${_fwRGISDomainFILE}  -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue - ${fwRGISFileNAME}
 		 rm "${fwGDSFileNAME}.TMP1") &
+		
+		local procNum=$((${procNum} + 1))
+	    if (( ${procNum} == $((${GHAASprocessorNum} / 4)) ))
+    	then
+        	 wait
+         	local procNum=0
+      	fi
 	done
 	wait
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"; }
