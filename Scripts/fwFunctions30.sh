@@ -497,6 +497,15 @@ function _fwPreprocess () {
 	return 0
 }
 
+function _fwVariableIsState () {
+	local fileName="${1}"; shift;
+
+	for (( _isStatefwI = 0; _isStatefwI < ${#_fwStateARRAY[@]} ; ++_isStatefwI))
+	do
+		[ "${fileName}" == "${_fwStateARRAY[${_isStatefwI}]}" ] && echo "Matched"
+	done
+}
+
 function _fwPostprocess () {
     local fwVERSION="${1}"; shift
 	local    fwYEAR="${1}"; shift
@@ -534,7 +543,8 @@ function _fwPostprocess () {
 		 dsAggregate -e year -a ${fwAMODE} "${fwGDSFileNAME}.TMP2" - |\
 		 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Yearly${fwSUFFIX})" \
 		         -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}"  -s blue - ${fwRGISFileNAME}
-		 rm "${fwGDSFileNAME}.TMP2" "${fwGDSFileNAME}") &
+		 rm "${fwGDSFileNAME}.TMP2" 
+		 [ $(_fwVariableIsState "${fwVARIABLE}") == "Matched" ] || rm "${fwGDSFileNAME}") &
 		(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "m" "${fwYEAR}")"
 		 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
 		 dsAggregate -e month -a ${fwAMODE} "${fwGDSFileNAME}.TMP1" - |\
