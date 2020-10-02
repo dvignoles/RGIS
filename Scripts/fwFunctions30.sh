@@ -470,7 +470,7 @@ function _fwPreprocess () {
         		fi
         	fi
 	done
-
+	wait
 	[ "${FwVERBOSE}" == "on"  ] && echo "      Preprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"
 	return 0
 }
