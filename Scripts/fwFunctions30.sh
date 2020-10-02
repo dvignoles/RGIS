@@ -469,6 +469,11 @@ function _fwPreprocess () {
             		echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
         		fi
         	fi
+	    if (( ${procNum} == ${GHAASprocessorNum} ))
+    	then
+        	wait
+         	local procNum=0
+      	fi
 	done
 	wait
 	[ "${FwVERBOSE}" == "on"  ] && echo "      Preprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"
