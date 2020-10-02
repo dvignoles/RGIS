@@ -74,7 +74,6 @@ function FwArguments () {
 		   _fwOUTFORMAT="gdbc"
 	     _fwDAILYOUTPUT="off"
 	          FwVERBOSE="off"
-	    _fwOPTIONSPIPED="off"
 
 	while [ "${1}" != "" ]
 	do
@@ -140,17 +139,6 @@ function FwArguments () {
 					;;
 					(*)
 						echo "Invalid --warnings argument [${1}]"
-					;;
-				esac
-			;;
-			(-p|--piped)
-				shift
-				case ${1} in
-					(on|off)
-					    _fwOPTIONSPIPED="${1}"
-					;;
-					(*)
-						echo "Invalid --piped argument [${1}]"
 					;;
 				esac
 			;;
@@ -436,12 +424,6 @@ function FwRGISFilename () {
 function _fwPreprocess () {
 	local    fwYEAR="${1}"; shift
 
-	if [ "${fwYEAR}" == "" ]
-	then
-		local fwPiped="off"
-	else
-		local fwPiped="${_fwOPTIONSPIPED}"
-	fi
 	[ -e "${_fwRGISDomainFILE}" ] || ( echo "Missing domain file: ${_fwRGISDomainFILE}"; return 1; )
 
 	[ "${FwVERBOSE}" == "on" ] && echo "      Preprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"
@@ -502,7 +484,7 @@ function _fwPostprocess () {
 	local    fwYEAR="${1}"; shift
 
 	if [ "${fwYEAR}" == "" ]; then local fwSUFFIX="LT"; else local fwSUFFIX="TS${fwYEAR}"; fi
-	[ "${_fwOPTIONSPIPED}" == "off" ] && [ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"; }
+	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"; }
 
 	local procNum=0
 	local files=""
@@ -514,11 +496,8 @@ function _fwPostprocess () {
 		local fwGDSFileNAME="$(FwGDSFilename "${fwVARIABLE}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
 		[ -e "${fwGDSFileNAME}" ] || ( echo "Skipping missing variable [${fwVARIABLE}]"; echo ${fwGDSFileNAME}; continue; )
 
-		[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP1" "${fwGDSFileNAME}.TMP2"
-
 		if [ "${_fwDAILYOUTPUT}" == "on" ]
 		then
-			[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "${fwGDSFileNAME}.TMP3"
 			(cat "${fwGDSFileNAME}" | tee "${fwGDSFileNAME}.TMP1" | tee "${fwGDSFileNAME}.TMP2" > "${fwGDSFileNAME}.TMP3") &
 			(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "d" "${fwYEAR}")"
 			 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
@@ -646,24 +625,13 @@ function _fwSpinup () {
 			do
 				local fwOutputITEM=(${_fwOutputARRAY[${fwI}]})
 				echo "-o ${fwOutputITEM[0]}=file:$(FwGDSFilename "${fwOutputITEM[0]}" "Output" "${fwVERSION}" "" "d")"
-				[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo $(FwGDSFilename "${fwOutputITEM[0]}" "Output" "${fwVERSION}" "" "d")
 			done
 		fi)
 
 		echo "${fwOptions}" > ${fwOptionsFILE}
 		[ "${FwVERBOSE}" == "on" ] && echo "   Passnum [${fwPASS}] started:  $(date '+%Y-%m-%d %H:%M:%S')"
 
-		if [ "${_fwOPTIONSPIPED}" == "on" ]
-		then
-			if ((fwPASS < _fwPASSNUM))
-			then
-    			echo ${fwOptions} | xargs ${_fwModelBIN}
-    		else
-    		  echo ${fwOptions} | xargs ${_fwModelBIN} &
-			fi
-		else
-          echo ${fwOptions} | xargs ${_fwModelBIN}
-		fi
+        echo ${fwOptions} | xargs ${_fwModelBIN}
 	done
 	_fwPostprocess "${fwVERSION}" ""
 	[ "${FwVERBOSE}"      == "on" ] && echo "Initialization finished: $(date '+%Y-%m-%d %H:%M:%S')"
@@ -754,19 +722,13 @@ function _fwRun () {
  		do
 			local fwOutputITEM=${_fwOutputARRAY[${fwI}]}
 			echo "-o ${fwOutputITEM}=file:$(FwGDSFilename "${fwOutputITEM[0]}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
-			[ "${_fwOPTIONSPIPED}" == "on" ] && mkfifo "$(FwGDSFilename "${fwOutputITEM[0]}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
  		done)
 
 		echo "${fwOptions}" > ${fwOptionsFILE}
 
 		[ "${FwVERBOSE}" == "on" ] && echo "   Running year [${fwYEAR}] started:  $(date '+%Y-%m-%d %H:%M:%S')"
 		_fwPreprocess "${fwYEAR}"
-		if [ "${_fwOPTIONSPIPED}" == "on" ]
-		then
-			echo ${fwOptions} | xargs ${_fwModelBIN} &
-		else
-            echo ${fwOptions} | xargs ${_fwModelBIN}
-		fi
+        echo ${fwOptions} | xargs ${_fwModelBIN}
 		_fwPostprocess "${fwVERSION}" "${fwYEAR}"
 		local fwInputList=$(echo "${fwOptions}" | grep -e "-i" | grep -e "file:"| grep -e "Input" | sed "s:.*file\:\(.*\):\1:")
 		[ "${fwInputList}" == "" ] || rm -f ${fwInputList}
