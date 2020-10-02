@@ -549,7 +549,13 @@ function _fwPostprocess () {
 		 dsAggregate -e month -a ${fwAMODE} "${fwGDSFileNAME}.TMP1" - |\
 		 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Monthly${fwSUFFIX})" \
 		         -m ${_fwRGISDomainFILE}  -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue - ${fwRGISFileNAME}
-		 rm "${fwGDSFileNAME}.TMP1") &		
+		 rm "${fwGDSFileNAME}.TMP1") &
+		 		local procNum=$((${procNum} + 1))
+	    if (( ${procNum} == $((${GHAASprocessorNum} / 4)) ))
+    	then
+        	 wait
+         	local procNum=0
+      	fi
 	done
 	wait
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"; }
