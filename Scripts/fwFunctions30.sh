@@ -458,24 +458,20 @@ function _fwPreprocess () {
 		elif [ "${fwSOURCE[3]}" == "file" ]
 		then
 			[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} File input"
-
-            		if [ -e "${fwSOURCE[4]}" ]
-            		then
+            if [ -e "${fwSOURCE[4]}" ]
+            then
 				[ -e "${_fwGDSDomainDIR}/${fwSOURCE[2]}" ] || mkdir -p "${_fwGDSDomainDIR}/${fwSOURCE[2]}"
 				local fwFILENAME="$(FwGDSFilename "${fwInputITEM}" "Input" "${fwSOURCE[2]}" "${fwInYEAR}" "d")"
 				rm -f "${fwFILENAME}"
-				[ "${fwPiped}" == "on" ] && mkfifo "${fwFILENAME}"
-            			rgis2ds -m "${_fwRGISDomainFILE}" "${fwSOURCE[4]}" "${fwFILENAME}" &
+				
+            	rgis2ds -m "${_fwRGISDomainFILE}" "${fwSOURCE[4]}" "${fwFILENAME}" &
 			else
-            			echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
+            		echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
         		fi
         	fi
 	done
-	if [ "${fwPiped}"   == "off" ]
-	then
-		wait
-		[ "${FwVERBOSE}" == "on"  ] && echo "      Preprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"
-	fi
+
+	[ "${FwVERBOSE}" == "on"  ] && echo "      Preprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"
 	return 0
 }
 
