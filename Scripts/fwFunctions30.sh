@@ -497,15 +497,6 @@ function _fwPreprocess () {
 	return 0
 }
 
-function _fwVariableIsState () {
-	local fileName="${1}"; shift;
-
-	for (( isStatefwI = 0; isStatefwI < ${#_fwStateARRAY[@]} ; ++isStatefwI))
-	do
-		[ "${fileName}" == "${_fwStateARRAY[${isStatefwI}]}" ] && echo "Matched"
-	done
-}
-
 function _fwPostprocess () {
     local fwVERSION="${1}"; shift
 	local    fwYEAR="${1}"; shift
