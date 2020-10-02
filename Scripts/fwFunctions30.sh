@@ -500,9 +500,9 @@ function _fwPreprocess () {
 function _fwVariableIsState () {
 	local fileName="${1}"; shift;
 
-	for (( _isStatefwI = 0; _isStatefwI < ${#_fwStateARRAY[@]} ; ++_isStatefwI))
+	for (( isStatefwI = 0; isStatefwI < ${#_fwStateARRAY[@]} ; ++isStatefwI))
 	do
-		[ "${fileName}" == "${_fwStateARRAY[${_isStatefwI}]}" ] && echo "Matched"
+		[ "${fileName}" == "${_fwStateARRAY[${isStatefwI}]}" ] && echo "Matched"
 	done
 }
 
@@ -543,21 +543,13 @@ function _fwPostprocess () {
 		 dsAggregate -e year -a ${fwAMODE} "${fwGDSFileNAME}.TMP2" - |\
 		 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Yearly${fwSUFFIX})" \
 		         -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}"  -s blue - ${fwRGISFileNAME}
-		 rm "${fwGDSFileNAME}.TMP2" 
-		 [ "$(_fwVariableIsState "${fwVARIABLE}")" == "Matched" ] || rm "${fwGDSFileNAME}") &
+		 rm "${fwGDSFileNAME}.TMP2") &
 		(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "m" "${fwYEAR}")"
 		 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
 		 dsAggregate -e month -a ${fwAMODE} "${fwGDSFileNAME}.TMP1" - |\
 		 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Monthly${fwSUFFIX})" \
 		         -m ${_fwRGISDomainFILE}  -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue - ${fwRGISFileNAME}
-		 rm "${fwGDSFileNAME}.TMP1") &
-		
-		local procNum=$((${procNum} + 1))
-	    if (( ${procNum} == $((${GHAASprocessorNum} / 4)) ))
-    	then
-        	 wait
-         	local procNum=0
-      	fi
+		 rm "${fwGDSFileNAME}.TMP1") &		
 	done
 	wait
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"; }
