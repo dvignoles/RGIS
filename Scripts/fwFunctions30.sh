@@ -553,11 +553,17 @@ function _fwPostprocess () {
 		 		local procNum=$((${procNum} + 1))
 	    if (( ${procNum} == $((${GHAASprocessorNum} / 4)) ))
     	then
-        	 wait
+        	wait
          	local procNum=0
       	fi
 	done
 	wait
+	for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
+	do
+		local fwVARIABLE="${_fwOutputARRAY[${fwI}]}"
+		local fwGDSFileNAME="$(FwGDSFilename "${fwVARIABLE}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
+		[ -e "${fwGDSFileNAME}" ] && [ "$(_fwVariableIsState "${fwVARIABLE}")" == "" ] && rm "${fwGDSFileNAME}"
+	done
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"; }
 	return 0
 }
