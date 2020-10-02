@@ -470,12 +470,6 @@ function _fwPreprocess () {
             		echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
         		fi
         	fi
-		local procNum=$((${procNum} + 1))
-	    if (( ${procNum} == ${GHAASprocessorNum} ))
-     	then
-        	wait
-         	local procNum=0
-      	fi
 	done
 	wait
 	[ "${FwVERBOSE}" == "on"  ] && echo "      Preprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"
@@ -524,7 +518,7 @@ function _fwPostprocess () {
 		         -m ${_fwRGISDomainFILE}  -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue - ${fwRGISFileNAME}
 		 rm "${fwGDSFileNAME}.TMP1") &
 		 		local procNum=$((${procNum} + 1))
-	    if (( ${procNum} == $((${GHAASprocessorNum} / 4)) ))
+	    if (( ${procNum} == 6 ))
     	then
         	wait
          	local procNum=0
