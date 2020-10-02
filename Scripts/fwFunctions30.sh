@@ -518,7 +518,7 @@ function _fwPostprocess () {
 	do
 		local fwVARIABLE="${_fwOutputARRAY[${fwI}]}"
 		local fwGDSFileNAME="$(FwGDSFilename "${fwVARIABLE}" "Output" "${fwVERSION}" "${fwYEAR}" "d")"
-		[ -p "${fwGDSFileNAME}" ] && rm "${fwGDSFileNAME}"
+		[ -e "${fwGDSFileNAME}" ] && rm "${fwGDSFileNAME}"
 	done
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"; }
 	return 0
