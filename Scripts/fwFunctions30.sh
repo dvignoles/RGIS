@@ -517,8 +517,8 @@ function _fwPostprocess () {
 		 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Monthly${fwSUFFIX})" \
 		         -m ${_fwRGISDomainFILE}  -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue - ${fwRGISFileNAME}
 		 rm "${fwGDSFileNAME}.TMP1") &
-		 		local procNum=$((${procNum} + 1))
-	    if (( ${procNum} == 6 ))
+		local procNum=$((${procNum} + 1))
+	    if (( ${procNum} == 4 ))
     	then
         	wait
          	local procNum=0
