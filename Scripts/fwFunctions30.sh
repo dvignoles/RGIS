@@ -429,7 +429,8 @@ function _fwPreprocess () {
 	[ "${FwVERBOSE}" == "on" ] && echo "      Preprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"
 	[ -e "${_fwGDSDomainDIR}"  ] || mkdir -p "${_fwGDSDomainDIR}"
 	[ -e "${_fwGDSDomainFILE}" ] || rgis2domain ${_fwLENGTHCORRECTION} "${_fwRGISDomainFILE}" "${_fwGDSDomainFILE}"
-
+    
+	local procNum=0
 	for (( fwI = 0; fwI < ${#_fwInputARRAY[@]} ; ++fwI ))
 	do
 		local fwInputITEM=${_fwInputARRAY[${fwI}]}
@@ -469,7 +470,8 @@ function _fwPreprocess () {
             		echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
         		fi
         	fi
-	    if (( ${procNum} == $((${GHAASprocessorNum} / 2)) ))
+		local procNum=$((${procNum} + 1))
+	    if (( ${procNum} == ${GHAASprocessorNum} ))
      	then
         	wait
          	local procNum=0
