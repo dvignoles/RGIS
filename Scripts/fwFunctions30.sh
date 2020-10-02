@@ -469,8 +469,8 @@ function _fwPreprocess () {
             		echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
         		fi
         	fi
-	    if (( ${procNum} == ${GHAASprocessorNum} ))
-    	then
+	    if (( ${procNum} == $((${GHAASprocessorNum} / 2)) ))
+     	then
         	wait
          	local procNum=0
       	fi
