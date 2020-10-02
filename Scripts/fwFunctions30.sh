@@ -544,7 +544,7 @@ function _fwPostprocess () {
 		 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Yearly${fwSUFFIX})" \
 		         -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}"  -s blue - ${fwRGISFileNAME}
 		 rm "${fwGDSFileNAME}.TMP2" 
-		 [ $(_fwVariableIsState "${fwVARIABLE}") == "Matched" ] || rm "${fwGDSFileNAME}") &
+		 [ "$(_fwVariableIsState "${fwVARIABLE}")" == "Matched" ] || rm "${fwGDSFileNAME}") &
 		(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "m" "${fwYEAR}")"
 		 [ -e "${fwRGISFileNAME%/*}" ] || mkdir -p "${fwRGISFileNAME%/*}"
 		 dsAggregate -e month -a ${fwAMODE} "${fwGDSFileNAME}.TMP1" - |\
