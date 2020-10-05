@@ -512,6 +512,11 @@ function _fwPostprocess () {
 			                      -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue \
 			                      "${fwGDSFileNAME}" "${fwRGISFileNAME}") &
 		fi
+	    if (( ${procNum} == ${GHAASprocessorNum} ))
+    	then
+        	wait
+         	local procNum=0
+      	fi
 	done
 	wait
 	for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
