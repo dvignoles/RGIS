@@ -511,12 +511,12 @@ function _fwPostprocess () {
 			 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Daily${fwSUFFIX})"  \
 			                      -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue \
 			                      "${fwGDSFileNAME}" "${fwRGISFileNAME}") &
+		    if (( ${procNum} == ${GHAASprocessorNum} ))
+    		then
+        		wait
+    	     	local procNum=0
+	      	fi
 		fi
-	    if (( ${procNum} == ${GHAASprocessorNum} ))
-    	then
-        	wait
-         	local procNum=0
-      	fi
 	done
 	wait
 	for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
