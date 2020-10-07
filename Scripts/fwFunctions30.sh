@@ -503,7 +503,6 @@ function _fwPostprocess () {
 		 dsAggregate -e month -a ${fwAMODE} "${fwGDSFileNAME}" - |\
 		 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Monthly${fwSUFFIX})" \
 		         -m ${_fwRGISDomainFILE}  -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue - ${fwRGISFileNAME}) &
-		local procNum=$((${procNum} + 1))
 		if [ "${_fwDAILYOUTPUT}" == "on" ]
 		then
 			(local fwRGISFileNAME="$(FwRGISFilename "${fwVARIABLE}" "${fwVERSION}" "d" "${fwYEAR}")"
@@ -511,10 +510,11 @@ function _fwPostprocess () {
 			 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Daily${fwSUFFIX})"  \
 			                      -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue \
 			                      "${fwGDSFileNAME}" "${fwRGISFileNAME}") &
-		    if (( ${procNum} == ${GHAASprocessorNum} ))
+			local procNum=$((${procNum} + 1))
+		    if (( ${procNum} == $((${GHAASprocessorNum} / 2)) ))
     		then
-        		wait
     	     	local procNum=0
+				wait
 	      	fi
 		fi
 	done
