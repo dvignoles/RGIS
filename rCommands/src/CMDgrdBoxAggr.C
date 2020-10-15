@@ -255,7 +255,6 @@ int main(int argc, char *argv[]) {
                 if (inGridIF->Value(inLayerRec, inPos, &var)) {
                     switch (method) {
                         case CMDboxSum:
-                                boxWeight = CMDboxWeightCellNum;
                         case CMDboxAverage:
                             if (boxWeight == CMDboxWeightArea) {
                                 array[outPos.Row * outGridIF->ColNum() + outPos.Col] += var * cellArea;
@@ -291,14 +290,14 @@ int main(int argc, char *argv[]) {
             for (outPos.Col = 0; outPos.Col < outGridIF->ColNum(); ++outPos.Col) {
                 if (sumWeights[outPos.Row * outGridIF->ColNum() + outPos.Col] > 0.0) {
                     var = array[outPos.Row * outGridIF->ColNum() + outPos.Col];
-                    if (method == CMDboxAverage)
-                        var = var / ((DBFloat) sumWeights[outPos.Row * outGridIF->ColNum() + outPos.Col] +
-                                    (boxWeight == CMDboxWeightCellNum ? misWeights[outPos.Row * outGridIF->ColNum() + outPos.Col] : 0.0));
-                    else if (method == CMDboxSum) {
-                        if (boxWeight == CMDboxWeightArea)
-                            var = var * (misWeights[outPos.Row * outGridIF->ColNum() + outPos.Col] +
-                                         sumWeights[outPos.Row * outGridIF->ColNum() + outPos.Col])
+                    switch (method) {
+                        case CMDboxAverage: var = var / ((DBFloat) sumWeights[outPos.Row * outGridIF->ColNum() + outPos.Col]); break;
+                        case CMDboxSum:
+                            var = var * (sumWeights[outPos.Row * outGridIF->ColNum() + outPos.Col] +
+                                        misWeights[outPos.Row * outGridIF->ColNum() + outPos.Col])
                                       / (DBFloat) sumWeights[outPos.Row * outGridIF->ColNum() + outPos.Col];
+                            break;
+                        default: break;
                     }
                     outGridIF->Value(outLayerRec, outPos, var);
                 }
