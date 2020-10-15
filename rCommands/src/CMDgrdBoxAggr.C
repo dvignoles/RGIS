@@ -17,7 +17,7 @@ bfekete@gc.cuny.edu
 #include <RG.H>
 
 typedef enum {CMDboxAverage, CMDboxMinimum, CMDboxMaximum, CMDboxSum} CMDboxMethod;
-typedef enum { CMDboxWeightArea, CMDboxWeightCellNum} CMDboxWeight;
+typedef enum {CMDboxWeightArea, CMDboxWeightCellNum} CMDboxWeight;
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
@@ -255,6 +255,7 @@ int main(int argc, char *argv[]) {
                 if (inGridIF->Value(inLayerRec, inPos, &var)) {
                     switch (method) {
                         case CMDboxSum:
+                                boxWeight = CMDboxWeightCellNum;
                         case CMDboxAverage:
                             if (boxWeight == CMDboxWeightArea) {
                                 array[outPos.Row * outGridIF->ColNum() + outPos.Col] += var * cellArea;
