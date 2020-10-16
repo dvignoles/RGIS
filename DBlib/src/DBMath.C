@@ -35,8 +35,10 @@ char *DBMathFloatAutoFormat(DBFloat maxVal) {
 
     i = (DBInt) (ceil(log10(fabs(maxVal))));
 
-    decimals = i > 0 ? (i > 5 ? 1 : 5 - i) : 0 - i - 2;
-    length = i > 0 ? i + decimals + 2 : decimals + 2;
+    if      (i <= 0) { decimals = 0 - i + 3, length = decimals + 1; }
+    else if (i <= 3) { decimals = 3 - i;     length = 3; }
+    else             { decimals = 0;         length = i; }
+    length += (decimals > 0 ? 2 : 1);
     format[0] = '%';
     sprintf(format + 1, "%d.%df", length, decimals);
     return (format);
