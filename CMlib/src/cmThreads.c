@@ -275,8 +275,8 @@ CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum, si
     struct timeval  tp;
     struct timezone tzp;
 
-    if ((taskNum >> 0x0100L) <= 1) threadNum = 1;
-    else threadNum = (taskNum >> 0x0100L) < threadNum ? (taskNum >> 0x0100L) : threadNum;
+    if ((taskNum >> 0x000CL) <= 1) threadNum = 1;
+    else threadNum = (taskNum >> 0x000CL) < threadNum ? (taskNum >> 0x000CL) : threadNum;
 
     gettimeofday(&tp, &tzp);
     team->TotTime = tp.tv_sec * 1000000 + tp.tv_usec;
