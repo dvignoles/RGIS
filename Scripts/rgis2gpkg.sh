@@ -106,8 +106,7 @@ if [ "${TBLNAME}" == "" ]; then TBLNAME="${FILENAME}"; fi
        ID=$(caseFunc "${CASE}" "ID")
 GRIDVALUE=$(caseFunc "${CASE}" "GridValue")
 
-#TEMPFILE="$(tempfile -p "rgis2geopackage" -s $(caseFunc "${CASE}" ${FILENAME}))"
-TEMPFILE="TEMP_${FILENAME}"
+TEMPFILE="$(mktemp -u -t rgis2gpkgXXXX)"
 
 [ -e "${GEOPACKAGE}" ] && UPDATEFLAG="-update -overwrite" || UPDATEFLAG=""
  
@@ -121,7 +120,7 @@ case "${EXTENSION}" in
 		ogr2ogr -a_srs EPSG:4326 -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
 		ogr2ogr ${UPDATEFLAG} -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" "${GEOPACKAGE}" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite  -silent "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | tee test.sql | spatialite -silent "${GEOPACKAGE}"
+		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | spatialite -silent "${GEOPACKAGE}"
 		rm "${TEMPFILE}".*
  	;;
 	(gdbd|gdbd.gz)
@@ -130,7 +129,7 @@ case "${EXTENSION}" in
 		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
 		ogr2ogr ${UPDATEFLAG} -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${ID}" "DN" | tee test.sql | spatialite -silent "${GEOPACKAGE}"
+		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${ID}" "DN" | spatialite -silent "${GEOPACKAGE}"
         rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
