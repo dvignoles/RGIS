@@ -40,11 +40,10 @@ function _GPKGattribTable () {
 	local     joinID="${1}"; shift
 
 	echo "INSERT INTO \"gpkg_contents\""
-	echo "SELECT \"${schemaName}_${tableName}\", data_type, \"${schemaName}_${tableName}\", description, last_change, min_x, min_y, max_x, max_y, srs_id"
+	echo "SELECT \"${schemaName}_${tableName}\", \"data_type\", \"${schemaName}_${tableName}\", \"description\", \"last_change\", \"min_x\", \"min_y\", \"max_x\", \"max_y\", \"srs_id\""
 	echo "FROM "gpkg_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
 	echo "INSERT INTO \"gpkg_ogr_contents\""
-	echo "SELECT \"${schemaName}_${tableName}\", feature_count"
-	echo "FROM "gpkg_ogr_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
+	echo "SELECT \"${schemaName}_${tableName}\", \"feature_count\" FROM "gpkg_ogr_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
 	echo "SELECT gpkgAddGeometryColumn(\"${schemaName}_${tableName}\", \"geom\", '${dataType}', 0, 0, 4326);"
 	echo "UPDATE \"${schemaName}_${tableName}\""
     echo "SET \"geom\" = \"${schemaName}_${tableName}_geom\".\"geom\""
@@ -122,7 +121,7 @@ case "${EXTENSION}" in
 		ogr2ogr -a_srs EPSG:4326 -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
 		ogr2ogr ${UPDATEFLAG} -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" "${GEOPACKAGE}" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite  -silent "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | spatialite -silent "${GEOPACKAGE}"
+		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | tee test.sql | spatialite -silent "${GEOPACKAGE}"
 		rm "${TEMPFILE}".*
  	;;
 	(gdbd|gdbd.gz)
@@ -131,7 +130,7 @@ case "${EXTENSION}" in
 		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
 		ogr2ogr ${UPDATEFLAG} -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${ID}" "DN" | spatialite -silent "${GEOPACKAGE}"
+		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${ID}" "DN" | tee test.sql | spatialite -silent "${GEOPACKAGE}"
         rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
