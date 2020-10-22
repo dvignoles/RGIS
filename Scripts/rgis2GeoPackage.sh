@@ -1,17 +1,5 @@
 #!/usr/bin/env bash
 
-case "$(uname)" in
-(Linux)
-	SQLITE=sqlite3
-	LOADEXT="SELECT load_extension('/usr/lib/x86_64-linux-gnu/mod_spatialite.so')"
-;;
-(Darwin)
-	SQLITE="sqlite3.brew"
-	LOADEXT="SELECT load_extension('mod_spatialite')"
-;;
-esac
-#SQLITE=spatialite
-
 function PrintUsage () {
 	echo "Usage ${0##*/} [options] <rgisfile>"
 	echo "      -c, --case [sensitive|lower|upper]"
