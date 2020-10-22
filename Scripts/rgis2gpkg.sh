@@ -130,7 +130,7 @@ case "${EXTENSION}" in
 		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
 		ogr2ogr ${UPDATEFLAG} -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${ID}" "DN" | tee test.sql | spatialite -silent "${GEOPACKAGE}"
+		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${ID}" "DN" | spatialite -silent "${GEOPACKAGE}"
         rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
