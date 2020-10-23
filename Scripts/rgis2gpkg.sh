@@ -113,15 +113,15 @@ TEMPFILE="$(mktemp -u -t rgis2gpkgXXXX)"
  
 case "${EXTENSION}" in
 	(gdbt)
-		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -batch  "${GEOPACKAGE}"
+		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
 	;;
 	(gdbp|gdbp.gz|gdbl|gdbl.gz)
 		[ "${EXTENSION%.gz}" == gdbp ] && DATATYPE="POINT" || DATATYPE="LINESTRING"
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.asc"
 		ogr2ogr -a_srs EPSG:4326 -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
 		ogr2ogr ${UPDATEFLAG} -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" "${GEOPACKAGE}" "${TEMPFILE}.shp"
-		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -batch  "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | spatialite -batch  "${GEOPACKAGE}"
+		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
+		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | spatialite -silent -batch  "${GEOPACKAGE}"
 		rm "${TEMPFILE}".*
  	;;
 	(gdbd|gdbd.gz)
@@ -129,8 +129,8 @@ case "${EXTENSION}" in
 		gdal_translate -a_srs EPSG:4326 "${TEMPFILE}.grd" "${TEMPFILE}.tif"
 		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
 		ogr2ogr ${UPDATEFLAG} -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}.shp"
-		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -batch  "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${ID}" "DN" | spatialite -batch  "${GEOPACKAGE}"
+		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
+		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${ID}" "DN" | spatialite -silent -batch  "${GEOPACKAGE}"
         rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
