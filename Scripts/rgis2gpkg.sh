@@ -39,21 +39,21 @@ function _GPKGattribTable () {
 	local   relateID="${1}"; shift
 	local     joinID="${1}"; shift
 
-	echo "INSERT INTO \"gpkg_contents\""
-	echo "SELECT \"${schemaName}_${tableName}\", \"data_type\", \"${schemaName}_${tableName}\", \"description\", \"last_change\", \"min_x\", \"min_y\", \"max_x\", \"max_y\", \"srs_id\""
-	echo "FROM "gpkg_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
-	echo "INSERT INTO \"gpkg_ogr_contents\""
-	echo "SELECT \"${schemaName}_${tableName}\", \"feature_count\" FROM "gpkg_ogr_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
-	echo "SELECT gpkgAddGeometryColumn(\"${schemaName}_${tableName}\", \"geom\", '${dataType}', 0, 0, 4326);"
-	echo "UPDATE \"${schemaName}_${tableName}\""
-	echo "SET \"geom\" = (SELECT \"${schemaName}_${tableName}_geom\".\"geom\""
- 	echo "                FROM \"${schemaName}_${tableName}_geom\""
-	echo "                WHERE \"${schemaName}_${tableName}\".\"${relateID}\" = \"${schemaName}_${tableName}_geom\".\"${joinID}\");"
-	echo "DROP TABLE \"${schemaName}_${TBLNAME}_geom\";"
-	echo "DELETE FROM \"gpkg_metadata_reference\" WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
-	echo "DELETE FROM \"gpkg_geometry_columns\"   WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
-	echo "DELETE FROM \"gpkg_contents\"           WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
-	echo "DELETE FROM \"gpkg_ogr_contents\"       WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
+	echo -n " INSERT INTO \"gpkg_contents\""
+	echo -n " SELECT \"${schemaName}_${tableName}\", \"data_type\", \"${schemaName}_${tableName}\", \"description\", \"last_change\", \"min_x\", \"min_y\", \"max_x\", \"max_y\", \"srs_id\""
+	echo -n " FROM "gpkg_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
+	echo -n " INSERT INTO \"gpkg_ogr_contents\""
+	echo -n " SELECT \"${schemaName}_${tableName}\", \"feature_count\" FROM "gpkg_ogr_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
+	echo -n " SELECT gpkgAddGeometryColumn(\"${schemaName}_${tableName}\", \"geom\", '${dataType}', 0, 0, 4326);"
+	echo -n " UPDATE \"${schemaName}_${tableName}\""
+	echo -n " SET \"geom\" = (SELECT \"${schemaName}_${tableName}_geom\".\"geom\""
+ 	echo -n " FROM \"${schemaName}_${tableName}_geom\""
+	echo -n " WHERE \"${schemaName}_${tableName}\".\"${relateID}\" = \"${schemaName}_${tableName}_geom\".\"${joinID}\");"
+	echo -n " DROP TABLE \"${schemaName}_${TBLNAME}_geom\";"
+	echo -n " DELETE FROM \"gpkg_metadata_reference\" WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
+	echo -n " DELETE FROM \"gpkg_geometry_columns\"   WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
+	echo -n " DELETE FROM \"gpkg_contents\"           WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
+	echo -n " DELETE FROM \"gpkg_ogr_contents\"       WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
 }
 
 while [ "${1}" != "" ]
