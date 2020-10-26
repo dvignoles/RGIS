@@ -317,6 +317,7 @@ static VDBmasterTable_t _VDBmasterTable3 [] = {
         {"reservoir",     "reservoir_capacity",                           "Reservoir-Capacity",                           "Reservoir Capacity",                  VDBcontinuous, VDBgrey,          VDBsum},
         {"reservoir",     "reservoir_dam",                                "Reservoir-Dam",                                "Reservoir Dam",                       VDBpoint,      VDBnotApplicable, VDBnotApplicable},
         {"reservoir",     "reservoir_height",                             "Reservoir-Height",                             "Reservoir Height",                    VDBcontinuous, VDBgrey,          VDBavg},
+        {"reservoir",     "reservoir_subbasin",                           "Reservoir-Subbasin",                           "Reservoir Subbasin",                  VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"reservoir",     "reservoir_volume",                             "Reservoir-Volume",                             "Reservoir Volume",                    VDBcontinuous, VDBgrey,          VDBsum},
         {"reservoir",     "reservoir_small_coefficient",                  "Reservoir-Small-Coefficient",                  "Small-reservoir Coefficient",         VDBcontinuous, VDBgrey,          VDBavg},
         {"river",         "river_basin",                                  "River-Basin",                                  "River Basin",                         VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
