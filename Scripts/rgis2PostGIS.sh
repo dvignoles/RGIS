@@ -83,15 +83,15 @@ do
 		TBLNAME="${1}"
 		shift
 	;;
-	(-*)
-		shift
-		PrintUsage
-	;;
 	(-)
 		RGISFILE="${1}"
 		FILENAME="Default"
 		EXTENSION="gdbt"
 		shift
+	;;
+	(-*)
+		shift
+		PrintUsage
 	;;
 	(*)
 		RGISFILE="${1}"
