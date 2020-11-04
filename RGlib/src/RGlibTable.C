@@ -108,7 +108,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
     DBInt bufferLen [2] = {0,0}, recordID, nameLength = 1;
     char *bufferPtr [2] = {(char *) NULL, (char *) NULL}, *notExists, *separator, *encap_begin, *encap_end;
 
-    fprint (outFile,"SELECT EnableGpkgMode();")
+    fprintf (outFile,"SELECT EnableGpkgMode();")
     if ((RGlibTableCopy == mode) || (RGlibTableBlank == mode) || (RGlibTableReplace == mode)) {
         notExists = RGlibTableCopy == mode ? (char *) " IF NOT EXISTS " : (char *) " ";
         if (dbSchemaName == (char *) NULL) {
