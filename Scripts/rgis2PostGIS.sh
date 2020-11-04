@@ -38,7 +38,8 @@ while [ "${1}" != "" ]
 do
 	case "${1}" in
 	(-c|--case)
-	    shift; if [ "${1}" == "" ]; then PrintUsage; fi
+	    shift
+		if [ "${1}" == "" ]; then PrintUsage; fi
 	    case "${1}" in
 	    (sensitive|lower)
 	        CASE="${1}"
@@ -48,10 +49,11 @@ do
 	        PrintUsage
 	        ;;
 	    esac
-	    shift;
+	    shift
 	    ;;
 	(-m|--mode)
-	    shift; if [ "${1}" == "" ]; then PrintUsage; fi
+	    shift
+		if [ "${1}" == "" ]; then PrintUsage; fi
 	    case "${1}" in
 	    (append|replace)
 	        MODE="${1}"
@@ -61,36 +63,49 @@ do
 	        PrintUsage
 	        ;;
 	    esac
-	    shift;
+	    shift
 	    ;;
 	(-d|--dbname)
-		shift; if [ "${1}" == "" ]; then PrintUsage; fi
+		shift
+		if [ "${1}" == "" ]; then PrintUsage; fi
 		DBNAME="${1}"
 		shift
 	;;
 	(-s|--schema)
-		shift; if [ "${1}" == "" ]; then PrintUsage; fi
-		SCHEMA="${1}"; shift
+		shift
+		if [ "${1}" == "" ]; then PrintUsage; fi
+		SCHEMA="${1}"
+		shift
 	;;
 	(-t|--tblname)
-		shift; if [ "${1}" == "" ]; then PrintUsage; fi
-		TBLNAME="${1}"; shift
+		shift
+		if [ "${1}" == "" ]; then PrintUsage; fi
+		TBLNAME="${1}"
+		shift
 	;;
 	(-*)
+		shift
 		PrintUsage
 	;;
+	(-gdbt|-gdbp|-gdbl|-gdbd|-gdbc|*)
+		shift
+		RGISFILE="-"
+		FILENAME="Default"
+		EXTENSION="${RGISFILE#-}"
+	;;
 	(*)
-		RGISFILE="${1}"; shift
+		RGISFILE="${1}"
+		FILENAME="${RGISFILE##*/}"
+		FILENAME="${FILENAME%%.*}"
+		EXTENSION="${RGISFILE#*.}"
+		shift
+	;;
 	esac
 done
 
 if [ "${RGISFILE}" == "" ]; then PrintUsage; fi
- FILENAME="${RGISFILE##*/}"
- FILENAME="${FILENAME%%.*}"
-EXTENSION="${RGISFILE#*.}"
-
-if [ "${SCHEMA}"  == "" ]; then  SCHEMA="public"; fi
-if [ "${TBLNAME}" == "" ]; then TBLNAME="${FILENAME}"; fi
+if [ "${SCHEMA}"   == "" ]; then SCHEMA="public"; fi
+if [ "${TBLNAME}"  == "" ]; then TBLNAME="${FILENAME}"; fi
 
    DBNAME="${DBNAME}"
    SCHEMA=$(caseFunc "${CASE}" "${SCHEMA}")
