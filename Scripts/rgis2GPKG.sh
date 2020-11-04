@@ -110,11 +110,11 @@ do
 		shift
 		PrintUsage
 	;;
-	(-gdbt|-gdbp|-gdbl|-gdbd|-gdbc|*)
-		shift
-		RGISFILE="-"
+	(-)
+		RGISFILE="${1}"
 		FILENAME="Default"
-		EXTENSION="${RGISFILE#-}"
+		EXTENSION="gdbt"
+		shift
 	;;
 	(*)
 		RGISFILE="${1}"
