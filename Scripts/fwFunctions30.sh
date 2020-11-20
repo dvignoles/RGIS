@@ -6,21 +6,10 @@
 #
 ##########################################################################################################
 
-if [ "${GHAASDIR}" == "" ]; then GHAASDIR="/usr/local/share/ghaas"; fi
+[[ "${GHAASDIR}" == "" ]] && export GHAASDIR="/usr/local/share/ghaas"
 source "${GHAASDIR}/Scripts/RGISfunctions.sh"
 
-if (( "${GHAASprocessorNum}" <= 1))
-then
-    _fwMAXPROC=1
-    export GHAASprocessorNum=${_fwMAXPROC}
-elif (( "${GHAASprocessorNum}" <= 16 ))
-then
-     _fwMAXPROC="${GHAASprocessorNum}"
-else
-    _fwMAXPROC=16
-    export GHAASprocessorNum=${_fwMAXPROC}
-fi
-
+_fwMAXPROC="${GHAASprocessorNum}"
 _fwPASSNUM=5
 _fwRESTART=""
 
@@ -147,17 +136,13 @@ function FwArguments () {
 			;;
 			(-P|--processors)
 				shift
-				if   (( "${1}"  <  0 ))
+				if   (( ${1} <= 0 ))
 				then
 					echo "Invalid --process number [${1}]"
 					_fwMAXPROC=1
 					export GHAASprocessorNum=${_fwMAXPROC}
-				elif (( "${1}" <= 16 ))
-				then
-					_fwMAXPROC="${1}"
-					export GHAASprocessorNum=${_fwMAXPROC}
 				else
-					_fwMAXPROC=16
+					_fwMAXPROC="${1}"
 					export GHAASprocessorNum=${_fwMAXPROC}
 				fi
 			;;

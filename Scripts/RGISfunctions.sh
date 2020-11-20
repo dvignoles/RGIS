@@ -11,6 +11,7 @@ case "$(uname)" in
         export GHAASprocessorNum=1
     ;;
 esac
+(( ${GHAASprocessorNum} <=32 )) || export GHAASprocessorNum=32
 
 function GHAASprojectDir () {
     local arg="${1}"; shift;
