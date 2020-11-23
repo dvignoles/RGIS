@@ -131,8 +131,8 @@ if [ "${SCHEMA}"   == "" ]; then SCHEMA="public"; fi
 if [ "${TBLNAME}"  == "" ]; then TBLNAME="${FILENAME}"; fi
 
    GEOPACKAGE="${GEOPACKAGE}"
-   SCHEMA=$(caseFunc "${CASE}" "${SCHEMA}")
-  TBLNAME=$(caseFunc "${CASE}" "${TBLNAME}")
+   SCHEMA=$(caseFunc "${CASE}" \"${SCHEMA}\")
+  TBLNAME=$(caseFunc "${CASE}" \"${TBLNAME}\")
        ID=$(caseFunc "${CASE}" "ID")
 GRIDVALUE=$(caseFunc "${CASE}" "GridValue")
 
