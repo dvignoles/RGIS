@@ -108,8 +108,8 @@ if [ "${SCHEMA}"   == "" ]; then SCHEMA="public"; fi
 if [ "${TBLNAME}"  == "" ]; then TBLNAME="${FILENAME}"; fi
 
    DBNAME="${DBNAME}"
-   SCHEMA=$(caseFunc "${CASE}" "${SCHEMA}")
-  TBLNAME=$(caseFunc "${CASE}" "${TBLNAME}")
+   SCHEMA=$(echo $(caseFunc "${CASE}" "${SCHEMA}")  | sed "s:-::g" | sed "s:+::g")
+  TBLNAME=$(echo $(caseFunc "${CASE}" "${TBLNAME}") | sed "s:-::g" | sed "s:+::g")
        ID=$(caseFunc "${CASE}" "ID")
 GRIDVALUE=$(caseFunc "${CASE}" "GridValue")
 
