@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.10)
 project(RGlib)
 FILE(GLOB sources src/*.C)
 add_library(RG30 ${sources})
