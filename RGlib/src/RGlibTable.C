@@ -108,35 +108,31 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
     DBInt i;
     DBInt bufferLen [2] = {0,0}, recordID, nameLength = 1;
     char *bufferPtr [2] = {(char *) NULL, (char *) NULL}, *notExists, *separator, *encap_begin, *encap_end;
-    char schemaName [DBDataFileNameLen], tableName [DBDataFileNameLen];
 
     notExists = RGlibTableCopy == mode ? (char *) " IF NOT EXISTS " : (char *) " ";
-    for (i = strlen (dbTableName) - 1; i >= 0; --i) tableName [i] = ((dbTableName [i] == '-') || (dbTableName [i] == '+')) ? '_' : dbTableName [i];
     if (dbSchemaName == (char *) NULL) {
-        fprintf (outFile, "-- Table: \"%s\"\n",             _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr, bufferLen));
+        fprintf (outFile, "-- Table: \"%s\"\n",             _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
         if (RGlibTableCopy != mode) {
-            fprintf (outFile, "DROP TABLE IF EXISTS \"%s\";\n", _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr, bufferLen));
+            fprintf (outFile, "DROP TABLE IF EXISTS \"%s\";\n", _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
         }
-        fprintf (outFile, "CREATE TABLE%s\"%s\"\n",         notExists, _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr, bufferLen));
+        fprintf (outFile, "CREATE TABLE%s\"%s\"\n",         notExists, _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
     }
     else {
-        for (i = strlen (dbSchemaName) - 1; i >= 0; --i) schemaName [i] = ((dbSchemaName [i] == '-') || (dbSchemaName [i] == '+')) ? '_' : dbSchemaName [i];
-        switch (dialect)
-        {
+        switch (dialect) {
             case RGlibSQLpostgres:
-                fprintf (outFile, "-- Table: \"%s\".\"%s\"\n",                  _RGlibSQLCaseChange (sqlCase, schemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr + 1, bufferLen + 1));
+                fprintf (outFile, "-- Table: \"%s\".\"%s\"\n",                  _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                 if (RGlibTableCopy != mode) {
-                    fprintf (outFile, "DROP TABLE IF EXISTS \"%s\".\"%s\";\n",  _RGlibSQLCaseChange (sqlCase, schemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr + 1, bufferLen + 1));
+                    fprintf (outFile, "DROP TABLE IF EXISTS \"%s\".\"%s\";\n",  _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                 }
-                fprintf (outFile, "CREATE TABLE%s\"%s\".\"%s\" (\n", notExists, _RGlibSQLCaseChange (sqlCase, schemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr + 1, bufferLen + 1));
+                fprintf (outFile, "CREATE TABLE%s\"%s\".\"%s\" (\n", notExists, _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                 encap_begin = encap_end = (char *) "$$";
                 break;
             case RGlibSQLite:
-                fprintf (outFile, "-- Table: \"%s_%s\"\n",                  _RGlibSQLCaseChange (sqlCase, schemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr + 1, bufferLen + 1));
+                fprintf (outFile, "-- Table: \"%s_%s\"\n",                  _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                 if (RGlibTableCopy != mode) {
-                    fprintf (outFile, "DROP TABLE IF EXISTS \"%s_%s\";\n",  _RGlibSQLCaseChange (sqlCase, schemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr + 1, bufferLen + 1));
+                    fprintf (outFile, "DROP TABLE IF EXISTS \"%s_%s\";\n",  _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                 }
-                fprintf (outFile, "CREATE TABLE%s\"%s_%s\" (\n", notExists, _RGlibSQLCaseChange (sqlCase, schemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr + 1, bufferLen + 1));
+                fprintf (outFile, "CREATE TABLE%s\"%s_%s\" (\n", notExists, _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                 encap_begin = (char *) "\"";
                 encap_end   = (char *) "\"";
                 break;
@@ -147,8 +143,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
         nameLength = nameLength > strlen (record->Name ()) ? nameLength : strlen (record->Name ());
     }
 
-    switch (dialect)
-    {
+    switch (dialect) {
         case RGlibSQLpostgres:
             fprintf (outFile,"\"%s\" SERIAL",_RGlibSQLCaseChange (sqlCase, "ID", bufferPtr, bufferLen));
             if (recordName) fprintf (outFile,",\n\"%s\" CHARACTER VARYING(%d) COLLATE pg_catalog.\"default\"",_RGlibSQLCaseChange (sqlCase, "RecordName", bufferPtr, bufferLen),nameLength + 1);
@@ -171,7 +166,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
                             break;
                     }
             }
-            fprintf (outFile,",\nCONSTRAINT \"%s:pkey\" PRMARY KEY (\"%s\")", _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr, bufferLen),_RGlibSQLCaseChange (sqlCase, "ID", bufferPtr + 1, bufferLen + 1));
+            fprintf (outFile,",\nCONSTRAINT \"%s:pkey\" PRMARY KEY (\"%s\")", _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen),_RGlibSQLCaseChange (sqlCase, "ID", bufferPtr + 1, bufferLen + 1));
             fprintf (outFile,") WITH ( OIDS = FALSE ) TABLESPACE pg_default;\n");
             break;
         case RGlibSQLite:
@@ -203,23 +198,24 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
         if (mode == RGlibTableCopy) {
             switch (dialect) {
                 case RGlibSQLpostgres:
-                    if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nTRUNCATE TABLE \"%s\"          RESTART IDENTITY CASCADE;", _RGlibSQLCaseChange (sqlCase, tableName,  bufferPtr, bufferLen));
-                    else                               fprintf (outFile,"\nTRUNCATE TABLE \"%s\".\"%s\"   RESTART IDENTITY CASCADE;", _RGlibSQLCaseChange (sqlCase, schemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr + 1, bufferLen + 1));
+                    if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nTRUNCATE TABLE \"%s\"          RESTART IDENTITY CASCADE;", _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
+                    else                               fprintf (outFile,"\nTRUNCATE TABLE \"%s\".\"%s\"   RESTART IDENTITY CASCADE;", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                     break;
                 case RGlibSQLite:
-                    if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nDELETE FROM \"%s\";",    _RGlibSQLCaseChange (sqlCase, tableName,  bufferPtr, bufferLen));
-                    else                               fprintf (outFile,"\nDELETE FROM \"%s_%s\";", _RGlibSQLCaseChange (sqlCase, schemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr + 1, bufferLen + 1));
+                    if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nDELETE FROM \"%s\";",    _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
+                    else                               fprintf (outFile,"\nDELETE FROM \"%s_%s\";", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                     break;
             }
         }
-        if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nINSERT INTO  \"%s\" (",  _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr, bufferLen));
+        if (dbSchemaName == (char *) NULL) fprintf (outFile,"\nINSERT INTO  \"%s\" (",  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
         else
-            switch (dialect) {
+            switch (dialect)
+            {
                 case RGlibSQLpostgres:
-                    fprintf (outFile,"\nINSERT INTO  \"%s\".\"%s\" (", _RGlibSQLCaseChange (sqlCase, schemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr + 1, bufferLen + 1));
+                    fprintf (outFile,"\nINSERT INTO  \"%s\".\"%s\" (", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                     break;
                 case RGlibSQLite:
-                    fprintf (outFile,"\nINSERT INTO  \"%s_%s\" (",     _RGlibSQLCaseChange (sqlCase, schemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, tableName, bufferPtr + 1, bufferLen + 1));
+                    fprintf (outFile,"\nINSERT INTO  \"%s_%s\" (", _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen),  _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                     break;
             }
         if (recordName) {
