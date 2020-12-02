@@ -172,7 +172,6 @@ function FwArguments () {
 				echo "           -l, --lengthcorrection [value]"
 				echo "           -n, --passnum      [num]"
 				echo "           -m, --outputformat [rgis|netcdf]"
-				echo "           -p, --piped        on|off"
 				echo "           -P, --processors   [# of processors]"
 				echo "           -W, --warnings     on|off"
 				echo "           -T, --testonly"
@@ -334,9 +333,6 @@ function _fwPrintTest () {
 		elif [ "${fwSOURCE[3]}" == "const" ]
 		then
 			echo "  ${fwInputITEM[0]} Constant [${fwSOURCE[4]}] input"
-		elif [ "${fwSOURCE[3]}" == "pipe"  ]
-		then
-			echo "  ${fwInputITEM[0]} Piped input"
 		elif [ "${fwSOURCE[3]}" == "file"  ]
 		then
 			if [ -e "${fwSOURCE[4]}" ]
