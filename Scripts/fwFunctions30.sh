@@ -492,7 +492,7 @@ function _fwPostprocess () {
 			                      -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue \
 			                      "${fwGDSFileNAME}" "${fwRGISFileNAME}") &
 			local procNum=$((${procNum} + 1))
-		    if (( ${procNum} == $((${GHAASprocessorNum} / 2)) ))
+		    if (( ${procNum} == 16 ))
     		then
     	     	local procNum=0
 				wait
