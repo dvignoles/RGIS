@@ -492,7 +492,7 @@ function _fwPostprocess () {
 			                      -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue \
 			                      "${fwGDSFileNAME}" "${fwRGISFileNAME}") &
 			local procNum=$((${procNum} + 1))
-		    if (( ${procNum} == 16 ))
+		    if (( ${procNum} == 8 ))
     		then
     	     	local procNum=0
 				wait
