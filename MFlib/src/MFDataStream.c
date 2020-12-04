@@ -252,7 +252,6 @@ CMreturn MFdsRecordRead (MFVariable_p var) {
 
 CMreturn MFdsRecordWrite (MFVariable_p var) {
 	MFdsHeader_t header;
-	size_t block, blockSize = 0x400, itemSize = MFVarItemSize (var->Type);
 
 	header.Type    = var->Type;
 	header.ItemNum = var->ItemNum;
@@ -267,10 +266,9 @@ CMreturn MFdsRecordWrite (MFVariable_p var) {
 		default:	break;
 	}
 	if (MFdsHeaderWrite (&(header),var->OutStream->Handle.File) != CMsucceeded) return (CMfailed);
-	for (block = 0; block < var->ItemNum; block += blockSize)
-		if (fwrite (var->Buffer + block * itemSize, itemSize, blockSize < var->ItemNum - block ? blockSize : var->ItemNum - block, var->OutStream->Handle.File) != var->ItemNum) {
-			CMmsgPrint (CMmsgSysError,"Data writing error (%s:%d)!"__FILE__,__LINE__);
-			return (CMfailed);
-		}
+	if (fwrite (var->Buffer, (size_t) MFVarItemSize (var->Type), var->ItemNum, var->OutStream->Handle.File) != var->ItemNum) {
+		CMmsgPrint (CMmsgSysError,"Data writing error (%s:%d)!"__FILE__,__LINE__);
+		return (CMfailed);
+	}
 	return (CMsucceeded);
 }
