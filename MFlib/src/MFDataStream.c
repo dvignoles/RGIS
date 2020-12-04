@@ -267,7 +267,7 @@ CMreturn MFdsRecordWrite (MFVariable_p var) {
 	}
 	if (MFdsHeaderWrite (&(header),var->OutStream->Handle.File) != CMsucceeded) return (CMfailed);
 	if (fwrite (var->Buffer, (size_t) MFVarItemSize (var->Type), var->ItemNum, var->OutStream->Handle.File) != var->ItemNum) {
-		CMmsgPrint (CMmsgSysError,"Data writing error (%s:%d)!"__FILE__,__LINE__);
+		CMmsgPrint (CMmsgSysError,"Data writing error (%s:%d)!",__FILE__,__LINE__);
 		return (CMfailed);
 	}
 	return (CMsucceeded);
