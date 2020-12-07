@@ -134,16 +134,14 @@ function FwArguments () {
 			(-O|--optionsprint)
 				_fwOPTIONSPRINT="on"
 			;;
-			(-P|--processors)
+			(-P|--postprocessors)
 				shift
 				if   (( ${1} <= 0 ))
 				then
 					echo "Invalid --process number [${1}]"
 					_fwMAXPROC=1
-					export GHAASprocessorNum=${_fwMAXPROC}
 				else
 					_fwMAXPROC="${1}"
-					export GHAASprocessorNum=${_fwMAXPROC}
 				fi
 			;;
 			(-T|--testonly)
@@ -492,7 +490,7 @@ function _fwPostprocess () {
 			                      -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue \
 			                      "${fwGDSFileNAME}" "${fwRGISFileNAME}") &
 			local procNum=$((${procNum} + 1))
-		    if (( ${procNum} == 8 ))
+		    if (( ${procNum} == ${_fwMAXPROC} ))
     		then
     	     	local procNum=0
 				wait
