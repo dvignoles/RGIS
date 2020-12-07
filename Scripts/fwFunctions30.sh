@@ -141,7 +141,7 @@ function FwArguments () {
 					echo "Invalid --process number [${1}]"
 					_fwMAXPROC=1
 				else
-					_fwMAXPROC="${1}"
+					_fwMAXPROC=${1}
 				fi
 			;;
 			(-T|--testonly)
