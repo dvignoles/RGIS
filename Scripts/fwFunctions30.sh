@@ -489,13 +489,14 @@ function _fwPostprocess () {
 			 ds2rgis -t "${_fwDomainNAME}, ${fwVARIABLE} ${fwVERSION} (${FwDomainRES}, Daily${fwSUFFIX})"  \
 			                      -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue \
 			                      "${fwGDSFileNAME}" "${fwRGISFileNAME}") &
-			local procNum=$((${procNum} + 1))
-		    if (( ${procNum} == ${_fwMAXPROC} ))
-    		then
-    	     	local procNum=0
-				wait
-	      	fi
 		fi
+		if (( ${procNum} < ${_fwMAXPROC} ))
+    	then
+			local procNum=$((${procNum} + 1))
+		else
+    	    local procNum=0
+			wait
+	    fi
 	done
 	wait
 	for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
