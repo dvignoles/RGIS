@@ -109,10 +109,10 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
     DBInt bufferLen [2] = {0,0}, recordID, nameLength = 1;
     char *bufferPtr [2] = {(char *) NULL, (char *) NULL}, *notExists, *separator, *encap_begin, *encap_end;
 
-    notExists = RGlibTableCopy == mode ? (char *) " IF NOT EXISTS " : (char *) " ";
+    notExists = RGlibTableCopy == mode || RGlibTableAppend == mode ? (char *) " IF NOT EXISTS " : (char *) " ";
     if (dbSchemaName == (char *) NULL) {
         fprintf (outFile, "-- Table: \"%s\"\n",             _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
-        if (RGlibTableCopy != mode) {
+        if (RGlibTableReplace == mode || RGlibTableBlank == mode ) {
             fprintf (outFile, "DROP TABLE IF EXISTS \"%s\";\n", _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
         }
         fprintf (outFile, "CREATE TABLE%s\"%s\"\n",         notExists, _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
