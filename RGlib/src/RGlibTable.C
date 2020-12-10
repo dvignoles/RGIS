@@ -112,7 +112,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
     notExists = RGlibTableCopy == mode || RGlibTableAppend == mode ? (char *) " IF NOT EXISTS " : (char *) " ";
     if (dbSchemaName == (char *) NULL) {
         fprintf (outFile, "-- Table: \"%s\"\n",             _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
-        if (RGlibTableReplace == mode || RGlibTableBlank == mode ) {
+        if (RGlibTableReplace == mode || RGlibTableBlank == mode) {
             fprintf (outFile, "DROP TABLE IF EXISTS \"%s\";\n", _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
         }
         fprintf (outFile, "CREATE TABLE%s\"%s\"\n",         notExists, _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr, bufferLen));
@@ -121,7 +121,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
         switch (dialect) {
             case RGlibSQLpostgres:
                 fprintf (outFile, "-- Table: \"%s\".\"%s\"\n",                  _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
-                if (RGlibTableCopy != mode) {
+                if (RGlibTableReplace == mode || RGlibTableBlank == mode) {
                     fprintf (outFile, "DROP TABLE IF EXISTS \"%s\".\"%s\";\n",  _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                 }
                 fprintf (outFile, "CREATE TABLE%s\"%s\".\"%s\" (\n", notExists, _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
@@ -129,7 +129,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
                 break;
             case RGlibSQLite:
                 fprintf (outFile, "-- Table: \"%s_%s\"\n",                  _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
-                if (RGlibTableCopy != mode) {
+                if (RGlibTableReplace == mode || RGlibTableBlank == mode) {
                     fprintf (outFile, "DROP TABLE IF EXISTS \"%s_%s\";\n",  _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
                 }
                 fprintf (outFile, "CREATE TABLE%s\"%s_%s\" (\n", notExists, _RGlibSQLCaseChange (sqlCase, dbSchemaName, bufferPtr, bufferLen), _RGlibSQLCaseChange (sqlCase, dbTableName, bufferPtr + 1, bufferLen + 1));
