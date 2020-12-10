@@ -1,6 +1,6 @@
 /******************************************************************************
 
-GHAAS Water Balance/Transport Model V2.0
+GHAAS Water Balance/Transport Model
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2020, UNH - ASRC/CUNY
 
@@ -36,8 +36,8 @@ static void _MDSoilAvailWaterCap (int itemID) {
 
 enum { MDinput, MDcalculate};
 int MDCore_SoilAvailWaterCapDef () {
-	int  optID = MFUnset;
-	const char *optStr, *optName = MDOptSoilWaterCapacity;
+	int  optID = MDinput;
+	const char *optStr, *optName = MDVarCore_SoilAvailWaterCap;
 	const char *options [] = { MDInputStr, MDCalculateStr,  (char *) NULL };
 	
 	if (_MDOutSoilAvailWaterCapID != MFUnset) return (_MDOutSoilAvailWaterCapID);

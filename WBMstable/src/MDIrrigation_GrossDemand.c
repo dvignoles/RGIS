@@ -1,6 +1,6 @@
 /******************************************************************************
 
-GHAAS Water Balance/Transport Model V2.0
+GHAAS Water Balance/Transport Model
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2020, UNH - ASRC/CUNY
 
@@ -383,7 +383,7 @@ int MDIrrigation_GrossDemandDef () {
                 ((_MDInWltPntID              = MFVarGetID (MDVarCore_SoilWiltingPoint,              "mm/m",   MFInput,  MFState, MFBoundary)) == CMfailed) ||
                 ((_MDInFldCapaID             = MFVarGetID (MDVarCore_SoilFieldCapacity,             "mm/m",   MFInput,  MFState, MFBoundary)) == CMfailed) ||
                 ((_MDInRicePondingDepthID    = MFVarGetID (MDVarIrrigation_RicePondingDepth,        "mm",     MFInput,  MFState, MFBoundary)) == CMfailed) ||
-                ((_MDInRicePercolationRateID = MFVarGetID (MDVarIrrigation_DailyRicePerolationRate, "mm/day", MFInput,  MFState, MFBoundary)) == CMfailed) ||
+                ((_MDInRicePercolationRateID = MFVarGetID (MDVarIrrigation_DailyRicePerolationRate, "mm/day", MFInput , MFState, MFBoundary)) == CMfailed) ||
                 ((_MDOutIrrEvapotranspID     = MFVarGetID (MDVarIrrigation_Evapotranspiration,      "mm",     MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
                 ((_MDOutIrrNetDemandID       = MFVarGetID (MDVarIrrigation_NetDemand,               "mm",     MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
                 ((_MDOutIrrGrossDemandID     = MFVarGetID (MDVarIrrigation_GrossDemand,             "mm",     MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||

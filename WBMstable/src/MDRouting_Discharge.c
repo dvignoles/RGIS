@@ -1,6 +1,6 @@
 /******************************************************************************
 
-GHAAS Water Balance/Transport Model V2.0
+GHAAS Water Balance/Transport Model
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2020, UNH - ASRC/CUNY
 
@@ -15,6 +15,7 @@ bfekete@gc.cuny.edu
 
 // Input
 static int _MDInRouting_DischargeID       = MFUnset;
+static int _MDInRouting_RiverWidthID      = MFUnset;
 static int _MDInDataAssim_DischObservedID = MFUnset;
 
 // Output
@@ -49,7 +50,8 @@ int MDRouting_DischargeDef() {
 				return (CMfailed);
 		case MDcalculate:
 			if (((_MDOutRouting_DischargeID     = MFVarGetID (MDVarRouting_Discharge, "m3/s", MFRoute, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDInRouting_DischargeID      = MDRouting_DischargeReleaseDef()) == CMfailed) ||
+				((_MDInRouting_DischargeID      = MDRouting_DischargeReleaseDef ()) == CMfailed) ||
+				((_MDInRouting_RiverWidthID     = MDRouting_RiverWidthDef ()) == CMfailed) ||
                 (MFModelAddFunction(_MDRouting_Discharge) == CMfailed)) return (CMfailed);
 			break;
 		default: MFOptionMessage (optName, optStr, options); return (CMfailed);

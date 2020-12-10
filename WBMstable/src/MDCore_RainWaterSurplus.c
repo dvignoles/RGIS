@@ -1,6 +1,6 @@
 /******************************************************************************
 
-GHAAS Water Balance/Transport Model V2.0
+GHAAS Water Balance/Transport Model
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2020, UNH - ASRC/CUNY
 
@@ -14,13 +14,13 @@ bfekete@gc.cuny.edu
 #include <MD.h>
 
 // Input
-static int _MDInSPackChgID            = MFUnset;
-static int _MDInRainSMoistChgID       = MFUnset;
-static int _MDInRainEvapoTransID      = MFUnset;
-static int _MDInCommon_PrecipID       = MFUnset;
-static int _MDInIrrigation_AreaFracID = MFUnset;
+static int _MDInSPackChgID          = MFUnset;
+static int _MDInRainSMoistChgID     = MFUnset;
+static int _MDInRainEvapoTransID    = MFUnset;
+static int _MDInCommon_PrecipID            = MFUnset;
+static int _MDInIrrigation_AreaFracID       = MFUnset;
 // Output
-static int _MDOutRainWaterSurplusID   = MFUnset;
+static int _MDOutRainWaterSurplusID = MFUnset;
 
 static void _MDRainWaterSurplus (int itemID) {
 // Input
@@ -55,7 +55,7 @@ int MDCore_RainWaterSurplusDef () {
         return (CMfailed);
 
     if (((_MDInRainSMoistChgID     = MDCore_RainSMoistChgDef()) == CMfailed) ||
-        ((_MDInCommon_PrecipID     = MDCommon_PrecipitationDef()) == CMfailed) ||
+        ((_MDInCommon_PrecipID            = MDCommon_PrecipitationDef()) == CMfailed) ||
         ((_MDInSPackChgID          = MDCore_SnowPackChgDef()) == CMfailed) ||
         ((_MDInRainEvapoTransID    = MFVarGetID (MDVarCore_RainEvapotranspiration, "mm", MFInput, MFFlux, MFBoundary)) == CMfailed) ||
         ((_MDOutRainWaterSurplusID = MFVarGetID (MDVarCore_RainWaterSurplus, "mm", MFOutput, MFFlux, MFBoundary)) == CMfailed) ||

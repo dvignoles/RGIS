@@ -1,5 +1,5 @@
 /******************************************************************************
- GHAAS Water Balance/Transport Model V2.0
+ GHAAS Water Balance/Transport Model
  Global Hydrologic Archive and Analysis System
  Copyright 1994-2020, UNH - ASRC/CUNY
 
@@ -63,13 +63,13 @@ int MDCommon_HumiditySpecificDef () {
     
     switch (optID) {
         case MDinput:
-            if ((_MDOutCommon_HumiditySpecificID = MFVarGetID (MDVarCommon_HumiditySpecific, "degC", MFInput, MFState, MFBoundary)) == CMfailed) return (CMfailed);
+            if ((_MDOutCommon_HumiditySpecificID = MFVarGetID (MDVarCommon_HumiditySpecific, "%",      MFInput, MFState, MFBoundary)) == CMfailed) return (CMfailed);
             break;
         case MDcalculate:
             if (((_MDInCommon_HumidityRelativeID  = MDCommon_HumidityRelativeDef()) == CMfailed) ||
-                ((_MDInCommon_AirTemperatureID    = MFVarGetID (MDVarCommon_AirTemperature, "degC", MFInput, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDInCommon_AirPressureID       = MFVarGetID (MDVarCommon_AirPressure, "g/kg", MFInput, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDOutCommon_HumiditySpecificID = MFVarGetID (MDVarCommon_HumiditySpecific, "degC", MFOutput, MFState, MFBoundary)) == CMfailed) ||
+                ((_MDInCommon_AirTemperatureID    = MFVarGetID (MDVarCommon_AirTemperature,   "degC", MFInput, MFState, MFBoundary)) == CMfailed) ||
+                ((_MDInCommon_AirPressureID       = MFVarGetID (MDVarCommon_AirPressure,      "kPa",  MFInput, MFState, MFBoundary)) == CMfailed) ||
+                ((_MDOutCommon_HumiditySpecificID = MFVarGetID (MDVarCommon_HumiditySpecific, "%",    MFOutput, MFState, MFBoundary)) == CMfailed) ||
                 ((MFModelAddFunction (_MDSpecificHumidity) == CMfailed))) return (CMfailed);
             break;
         default: MFOptionMessage (optName, optStr, options); return (CMfailed);

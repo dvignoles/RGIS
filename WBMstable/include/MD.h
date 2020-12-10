@@ -1,14 +1,14 @@
 /******************************************************************************
 
- GHAAS Water Balance/Transport Model V3.0
- Global Hydrologic Archive and Analysis System
- Copyright 1994-2020, UNH - ASRC/CUNY
+GHAAS Water Balance/Transport Model
+Global Hydrologic Archive and Analysis System
+Copyright 1994-2020, UNH - ASRC/CUNY
 
- MD.h
+MD.h
 
- bfekete@gc.cuny.edu
+bfekete@gc.cuny.edu
 
- *******************************************************************************/
+*******************************************************************************/
 
 #ifndef MD_H_INCLUDED
 #define MD_H_INCLUDED
@@ -36,7 +36,6 @@ extern "C" {
 // River routing options
 #define MDOptRouting_Muskingum                  "Muskingum"
 #define MDOptRouting_Riverbed                   "Riverbed"
-#define MDOptSoilWaterCapacity		            "SoilWaterCapacity"
 
 // Weather options
 #define MDOptWeather_CloudCover		            "CloudCover"
@@ -113,7 +112,7 @@ extern "C" {
 #define MDVarCore_SolarRadiation                "SolarRadiation"
 #define MDVarCore_SolarRadDayLength             "DayLength"
 #define MDVarCore_SolarRadI0HDay                "I0HDay"
-#define MDVarCore_SoilAvailWaterCap             "AvailableWaterCapacity"
+#define MDVarCore_SoilAvailWaterCap             "SoilWaterCapacity"
 #define MDVarCore_SoilFieldCapacity             "FieldCapacity"
 #define MDVarCore_SoilRootingDepth              "RootingDepth"
 #define MDVarCore_SoilMoisture                  "SoilMoisture"
@@ -192,7 +191,7 @@ extern "C" {
 #define MDVarRouting_RiverDepth                 "RiverDepth"
 #define MDVarRouting_RiverStorage               "RiverStorage"
 #define MDVarRouting_RiverStorageChg            "RiverStorageChange"
-#define MDVarRouting_RiverWidth                 "RiverbedWidth"
+#define MDVarRouting_RiverWidth                 "RiverWidth"
 
 // Sediment variable
 #define MDVarSediment_DischargeAcc	            "DischargeAcc"

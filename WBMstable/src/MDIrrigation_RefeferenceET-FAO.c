@@ -1,6 +1,6 @@
 /******************************************************************************
 
-GHAAS Water Balance/Transport Model V2.0
+GHAAS Water Balance/Transport Model
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2020, UNH - ASRC/CUNY
 
@@ -96,11 +96,11 @@ int MDIrrigation_ReferenceETFAODef () {
 	if (_MDOutIrrRefEvapotransID != MFUnset) return (_MDOutIrrRefEvapotransID);
 
 	MFDefEntering ("Irrigation Reference ETP (FAO)");
-	if (((_MDInDayLengthID         = MDCommon_SolarRadDayLengthDef()) == CMfailed) ||
+	if (((_MDInDayLengthID          = MDCommon_SolarRadDayLengthDef()) == CMfailed) ||
         ((_MDInI0HDayID            = MDCommon_SolarRadI0HDayDef()) == CMfailed) ||
         ((_MDInSolRadID            = MDCommon_SolarRadDef()) == CMfailed) ||
         ((_MDInElevationID         = MFVarGetID (MDVarCommon_MeanElevation, "m", MFInput, MFState, MFBoundary)) == CMfailed) ||
-        ((_MDInCommon_AtMeanID     = MFVarGetID (MDVarCommon_AirTemperature, "degC", MFInput, MFState, MFBoundary)) == CMfailed) ||
+        ((_MDInCommon_AtMeanID            = MFVarGetID (MDVarCommon_AirTemperature, "degC", MFInput, MFState, MFBoundary)) == CMfailed) ||
         ((_MDInAtMinID             = MFVarGetID (MDVarCommon_AirTempMinimum, "degC", MFInput, MFState, MFBoundary)) == CMfailed) ||
         ((_MDInAtMaxID             = MFVarGetID (MDVarCommon_AirTempMaximum, "degC", MFInput, MFState, MFBoundary)) == CMfailed) ||
         ((_MDInVPressID            = MFVarGetID (MDVarCore_VaporPressure, "kPa", MFInput, MFState, MFBoundary)) == CMfailed) ||
