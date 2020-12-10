@@ -186,7 +186,7 @@ DBInt RGlibTableToSQL (DBObjTable *table, const char *dbSchemaName, const char *
                             fprintf(outFile, ",\n\"%s\" FLOAT",   _RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen));
                             break;
                         case DBTableFieldDate:
-                            fprintf(outFile, ",\"%s\n\" TEXT",    _RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen));
+                            fprintf(outFile, ",\n\"%s\" TEXT",    _RGlibSQLCaseChange (sqlCase, field->Name(), bufferPtr, bufferLen));
                             break;
                     }
             }
