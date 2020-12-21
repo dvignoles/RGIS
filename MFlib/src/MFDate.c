@@ -48,6 +48,7 @@ int MFDateGetCurrentMonth () { return (_MFCurrentDate.Month); }
 int MFDateGetCurrentYear  () { return (_MFCurrentDate.Year); }
 int MFDateGetDayOfYear    () { return (_MFCurrentDate.DayOfYear); }
 int MFDateGetMonthLength  () { return (_MFDateMonthLength (_MFCurrentDate.Year,_MFCurrentDate.Month)); }
+int MFDateGetYearLength   () { return (365 + _MFDateLeapYear (_MFCurrentDate.Year)); }
 
 char *MFDateTimeStepString (int tStep) {
 	switch (tStep) {

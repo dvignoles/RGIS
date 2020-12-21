@@ -126,7 +126,7 @@ void   MFVarSetInt(int, int, int);
 int    MFVarGetInt(int, int, int);
 void   MFVarSetFloat(int, int, double);
 double MFVarGetFloat(int, int, double);
-int   MFVarGetTStep(int);
+int    MFVarGetTStep(int);
 bool   MFVarTestMissingVal(int, int);
 void   MFVarSetMissingVal(int, int);
 char  *MFVarTypeString(int);
@@ -136,8 +136,8 @@ void   MFOptionPrintList();
 void   MFOptionMessage(const char *, const char *, const char *[]);
 
 
-int MFModelRun(int, char *[], int, int (*)());
-int MFModelAddFunction(MFFunction);
+int   MFModelRun(int, char *[], int, int (*)());
+int   MFModelAddFunction(MFFunction);
 float MFModelGetXCoord(int);
 float MFModelGetYCoord(int);
 float MFModelGetLongitude(int);
@@ -181,6 +181,7 @@ char *MFDateGetNext ();
 int   MFDateGetDayOfYear ();
 int   MFDateGetDayOfMonth ();
 int   MFDateGetMonthLength ();
+int   MFDateGetYearLength ();
 int   MFDateGetCurrentDay ();
 int   MFDateGetCurrentMonth ();
 int   MFDateGetCurrentYear ();
