@@ -211,7 +211,7 @@ function _RGISvariableDir () {
 			then
 				_RGISvariableDir "${archive}" "$(cat ${archive}/${domain%+}/parent)+" "${variable}" || return 1
 			else
-				echo "Missing ${parent}" > /dev/stderr
+				echo "Missing ${archive}/${domain%+}/${varDir}" > /dev/stderr
 				echo ""
 				return 1
 			fi
