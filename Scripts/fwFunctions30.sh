@@ -12,6 +12,7 @@ source "${GHAASDIR}/Scripts/RGISfunctions.sh"
 _fwMAXPROC="${GHAASprocessorNum}"
 _fwPASSNUM=5
 _fwRESTART=""
+_fwSTART="TRUE"
 
 function _fwDataSource () {
 	for (( fwI = 0; fwI < ${#_fwDSourceARRAY[@]} ; ++fwI ))
@@ -409,36 +410,33 @@ function _fwPreprocess () {
 	[ -e "${_fwGDSDomainDIR}"  ] || mkdir -p "${_fwGDSDomainDIR}"
 	[ -e "${_fwGDSDomainFILE}" ] || rgis2domain ${_fwLENGTHCORRECTION} "${_fwRGISDomainFILE}" "${_fwGDSDomainFILE}"
     
+	if [ _fwSTART == "TRUE" ]
+	then
+		for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
+		do
+			local fwInputITEM=${_fwStateARRAY[${fwI}]}
+			local    fwSOURCE=($(_fwDataSource "${fwInputITEM}" "static"))
+			[ "${fwSOURCE[0]}" == "" ] && continue;
 
-	for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
-	do
-		local fwInputITEM=${_fwStateARRAY[${fwI}]}
-		local    fwSOURCE=($(_fwDataSource "${fwInputITEM}" "static"))
-		[ "${fwSOURCE[0]}" == "" ] && { echo "  ${fwInputITEM} is missing from data sources!";         return 1; }
-		[ "${fwSOURCE[1]}" == "" ] && { echo "  ${fwInputITEM} data type is missing!";                 return 1; }
-		[ "${fwSOURCE[2]}" == "" ] && { echo "  ${fwInputITEM} version is missing!";                   return 1; }
-		[ "${fwSOURCE[3]}" == "" ] && { echo "  ${fwInputITEM} data source type is missing!";          return 1; }
-		[ "${fwSOURCE[4]}" == "" ] && { echo "  ${fwInputITEM} data source specification is missing!"; return 1; }
-
-		if [ "${fwSOURCE[3]}" == "const" ]
-		then
-			[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} Constant input"
-		elif [ "${fwSOURCE[3]}" == "file" ]
-		then
-			[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} File input"
-            if [ -e "${fwSOURCE[4]}" ]
-            then
-				[ -e "${_fwGDSDomainDIR}/${fwSOURCE[2]}" ] || mkdir -p "${_fwGDSDomainDIR}/${fwSOURCE[2]}"
-				local fwFILENAME="$(FwGDSFilename "${fwInputITEM}" "State" "${fwSOURCE[2]}" "${fwInYEAR}" "d")"
-				rm -f "${fwFILENAME}"
-				
-            	rgis2ds -m "${_fwRGISDomainFILE}" "${fwSOURCE[4]}" "${fwFILENAME}" &
-			else
-            		echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
-        	fi
-        fi
-	done
-	wait
+			if [ "${fwSOURCE[3]}" == "const" ]
+			then
+				[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} Constant input"
+			elif [ "${fwSOURCE[3]}" == "file" ]
+			then
+				[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} File input"
+            	if [ -e "${fwSOURCE[4]}" ]
+            	then
+					[ -e "${_fwGDSDomainDIR}/${fwSOURCE[2]}" ] || mkdir -p "${_fwGDSDomainDIR}/${fwSOURCE[2]}"
+					local fwFILENAME="$(FwGDSFilename "${fwInputITEM}" "State" "${fwSOURCE[2]}" "${fwInYEAR}" "d")"
+	            	rgis2ds -m "${_fwRGISDomainFILE}" "${fwSOURCE[4]}" "${fwFILENAME}" &
+				else
+            			echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
+        		fi
+	        fi
+		done
+		wait
+		_fwSTART="FALSE"
+	fi
 
 	for (( fwI = 0; fwI < ${#_fwInputARRAY[@]} ; ++fwI ))
 	do
@@ -472,11 +470,9 @@ function _fwPreprocess () {
             then
 				[ -e "${_fwGDSDomainDIR}/${fwSOURCE[2]}" ] || mkdir -p "${_fwGDSDomainDIR}/${fwSOURCE[2]}"
 				local fwFILENAME="$(FwGDSFilename "${fwInputITEM}" "Input" "${fwSOURCE[2]}" "${fwInYEAR}" "d")"
-				rm -f "${fwFILENAME}"
-				
             	rgis2ds -m "${_fwRGISDomainFILE}" "${fwSOURCE[4]}" "${fwFILENAME}" &
 			else
-            		echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
+            	echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
         	fi
         fi
 	done
