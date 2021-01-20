@@ -434,7 +434,6 @@ function _fwPreprocess () {
         		fi
 	        fi
 		done
-		wait
 		_fwSTART="FALSE"
 	fi
 
