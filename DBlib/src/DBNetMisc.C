@@ -132,10 +132,10 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos) const {
     return (CellTable->Item(cellID));
 }
 
-DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat area) const {
+DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat matchVal) const {
     DBInt i, j;
     DBInt cellID;
-    DBFloat bestDelta, delta;
+    DBFloat bestDelta, delta, val;
     DBObjRecord *cellRec, *bestCellRec = (DBObjRecord *) NULL;
     DBPosition cellPos;
 
@@ -153,12 +153,16 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat a
 
         if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) == DBFault) continue;
         cellRec = CellTable->Item(cellID);
-        delta = fabs(area - field->Float(cellRec));
+        val     = field->Float(cellRec);
+        if (CMmathEqualValues(val, field->FloatNoData())) continue;
+        delta = fabs(matchVal - val);
         if (delta < bestDelta) {
             bestDelta   = delta;
             bestCellRec = cellRec;
         }
     }
+    if ((bestCellRec == (DBObjRecord *) NULL) && ((cellID = ((DBInt *) DataRec->Data())[(size_t) pos.Row * (size_t) ColNum() + (size_t) pos.Col]) != DBFault))
+        bestCellRec = CellTable->Item(cellID);
     return (bestCellRec);
 }
 
