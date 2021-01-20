@@ -339,7 +339,11 @@ static int _MFModelParse (int argc, char *argv [],int argNum, int (*mainDefFunc)
 	_MFModelVarEntriesFree(outputVars, outputVarNum);
 	_MFModelVarEntriesFree(stateVars,  stateVarNum);
 
-	if ((argNum) > 2) { CMmsgPrint (CMmsgUsrError,"Extra arguments!");           return (CMfailed); }
+	if ((argNum) > 2) {
+		for (i = 1; i < argNum; ++i) CMmsgPrint (CMmsgUsrError,"Argument: %s",argv[i]);
+		CMmsgPrint (CMmsgUsrError,"Extra arguments!");
+		return (CMfailed);
+	}
 	if ((argNum) < 2) { CMmsgPrint (CMmsgUsrError,"Missing Template Coverage!"); return (CMfailed); }
 	*domainFile = argv [1];
 
@@ -354,11 +358,11 @@ static void _MFUserFunc (size_t threadId, size_t objectId, void *commonPtr) {
 
 	for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID))
 		if (var->Route) {
-// I -think- all WBM routed variables are considered to be extensive. Intensive variables are
-// computed within modules I THINK!. Weighing code here assumes this.
+			// I -think- all WBM routed variables are considered to be extensive. Intensive variables are
+			// computed within modules I THINK!. Weighing code here assumes this.
 			value = 0.0;
-			for (link = 0; link < _MFDomain->Objects [objectId].ULinkNum; ++link) {
-				uLink = _MFDomain->Objects [objectId].ULinks [link];
+			for (link  = 0; link < _MFDomain->Objects [objectId].ULinkNum; ++link) {
+				uLink  = _MFDomain->Objects [objectId].ULinks [link];
                 weight = _MFDomain->Objects [objectId].UWeights [link];
 				value += MFVarGetFloat (varID,uLink,0.0) * weight;
 			}
