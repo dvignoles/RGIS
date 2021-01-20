@@ -597,9 +597,9 @@ function _fwSpinup () {
 				then
 					if [[ "${fwSOURCE[3]}" == "const" ]]
 					then
-						echo "-t ${fwSOURCE[0]}=const:${fwSOURCE[4]}"
+						echo "-i ${fwSOURCE[0]}=const:${fwSOURCE[4]}"
 					else
-						echo "-t ${fwSOURCE[0]}=file:$(FwGDSFilename "${fwSOURCE[0]}" "State" "${fwSOURCE[2]}" "" "d")"
+						echo "-i ${fwSOURCE[0]}=file:$(FwGDSFilename "${fwSOURCE[0]}" "State" "${fwSOURCE[2]}" "" "d")"
 					fi
 				fi
 			done
@@ -607,7 +607,7 @@ function _fwSpinup () {
 			for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
 			do
 				local fwOutputITEM=(${_fwStateARRAY[${fwI}]})
-				echo "-t ${fwOutputITEM}=file:$(FwGDSFilename "${fwOutputITEM[0]}" "State" "${fwVERSION}" "" "d")"
+				echo "-i ${fwOutputITEM}=file:$(FwGDSFilename "${fwOutputITEM[0]}" "State" "${fwVERSION}" "" "d")"
 			done
 		fi
 		for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
