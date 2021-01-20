@@ -747,17 +747,21 @@ public:
 
     DBObjRecord *Cell(DBPosition) const;
 
-    DBObjRecord *Cell(DBPosition, DBFloat) const;
+    DBObjRecord *Cell(DBPosition, DBObjTableField *, DBFloat) const;
+
+    DBObjRecord *Cell(DBPosition pos, DBFloat area) const { return (Cell (pos,this->SubbasinAreaFLD,area)); }
 
     DBObjRecord *Cell(DBCoordinate coord) const {
         DBPosition pos;
         if (Coord2Pos(coord, pos) == DBSuccess) return (Cell(pos)); else return ((DBObjRecord *) NULL);
     }
 
-    DBObjRecord *Cell(DBCoordinate coord, DBFloat area) const {
+    DBObjRecord *Cell(DBCoordinate coord, DBObjTableField *cField, DBFloat area) const {
         DBPosition pos;
-        if (Coord2Pos(coord, pos) == DBSuccess) return (Cell(pos, area)); else return ((DBObjRecord *) NULL);
+        if (Coord2Pos(coord, pos) == DBSuccess) return (Cell(pos, cField, area)); else return ((DBObjRecord *) NULL);
     }
+ 
+    DBObjRecord *Cell(DBCoordinate coord, DBFloat area) const { return (Cell (coord,this->SubbasinAreaFLD, area)); }
 
     DBObjRecord *ToCell(const DBObjRecord *) const;
 

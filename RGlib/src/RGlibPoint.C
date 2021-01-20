@@ -15,15 +15,15 @@ bfekete@gc.cuny.edu
 #include <RG.H>
 
 
-DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *field) {
+DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat limit) {
     DBInt pointID, ret = DBFault;
-    DBFloat areaDiff;
+    DBFloat relDiff;
     DBCoordinate coord;
     DBPosition pos;
     DBObjData *linkedData = dbData->LinkedData();
     DBVPointIF *pntIF;
     DBNetworkIF *netIF;
-    DBObjRecord *pntRec, *cellRec, *bestCellRec;
+    DBObjRecord *pntRec, *cellRec, *bestCellRec, *adjCellRec;
 
     if ((linkedData == (DBObjData *) NULL) && (linkedData->Type() != DBTypeNetwork)) return (DBFault);
     pntIF = new DBVPointIF(dbData);
@@ -36,12 +36,13 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *field) {
         if (netIF->Coord2Pos(coord, pos) == DBFault) continue;
         netIF->Pos2Coord(pos, coord);
         cellRec = netIF->Cell (coord);
-        if ((field != (DBObjTableField *) NULL) && (!CMmathEqualValues(field->Float(pntRec), field->FloatNoData()))) {
-            bestCellRec = netIF->Cell(coord, field->Float(pntRec));
+
+        if ((pField != (DBObjTableField *) NULL) && (!CMmathEqualValues(pField->Float(pntRec), pField->FloatNoData()))) {
+            bestCellRec = netIF->Cell(coord, cField, pField->Float(pntRec));
             if ((cellRec != (DBObjRecord *) NULL) && (bestCellRec != (DBObjRecord *) NULL)) {
-                // The 4 cell area corresponds to the hard coded search radius in netIF->Cell ().
-                areaDiff = fabs(netIF->CellBasinArea(cellRec) - netIF->CellBasinArea(bestCellRec));
-                coord    = areaDiff < 4 * netIF->CellArea(cellRec) ? netIF->Center(cellRec) : netIF->Center(bestCellRec);
+                relDiff = fabs(cField->Float(bestCellRec)) + fabs(cField->Float(cellRec)) <= 0.0 ? 0.0 :
+                          fabs (cField->Float(bestCellRec) - cField->Float(cellRec)) / (fabs(cField->Float(bestCellRec)) + fabs(cField->Float(cellRec)));
+                coord   = relDiff < limit ? netIF->Center(bestCellRec) : netIF->Center(cellRec);
             }
             else if (cellRec     != (DBObjRecord *) NULL) coord = netIF->Center(cellRec);
             else if (bestCellRec != (DBObjRecord *) NULL) coord = netIF->Center(bestCellRec);

@@ -59,7 +59,7 @@ void RGISAnalysePointSTNPointsCBK (Widget widget,RGISWorkspace *workspace,XmAnyC
 	static DBInt cont, diffMethod;
 	DBDataset *dataset;
 	DBObjData *dbData;
-	DBObjTable *table;
+	DBObjTable *pTable, *cTable;
 	DBObjTableField *field = (DBObjTableField *) NULL;
 	static Widget dShell = NULL, mainForm, button;
 	static Widget srcTextF, dstTextF, cmpTextF, errTextF;
@@ -273,22 +273,22 @@ void RGISAnalysePointSTNPointsCBK (Widget widget,RGISWorkspace *workspace,XmAnyC
 
 	dataset = UIDataset ();
 	dbData = dataset->Data ();
-	table = dbData->Table (DBrNItems);
-	XtVaSetValues (srcTextF,XmNuserData,table->Fields (),NULL);
-	XtVaSetValues (dstTextF,XmNuserData,table->Fields (),NULL);
-	XtVaSetValues (cmpTextF,XmNuserData,table->Fields (),NULL);
-	XtVaSetValues (errTextF,XmNuserData,table->Fields (),NULL);
+	pTable = dbData->Table (DBrNItems);
+	XtVaSetValues (srcTextF,XmNuserData,pTable->Fields (),NULL);
+	XtVaSetValues (dstTextF,XmNuserData,pTable->Fields (),NULL);
+	XtVaSetValues (cmpTextF,XmNuserData,pTable->Fields (),NULL);
+	XtVaSetValues (errTextF,XmNuserData,pTable->Fields (),NULL);
 	UIDialogFormPopup (dShell);
 	cont = false;
 	while (UILoop ())
 		{
 		if ((strlen (srcText = XmTextFieldGetString (srcTextF)) > 0) &&
-			 ((field = table->Field (srcText)) != (DBObjTableField *) NULL))
+			 ((field = pTable->Field (srcText)) != (DBObjTableField *) NULL))
 				XtSetSensitive (UIDialogFormGetOkButton (dShell),True);
 		else	XtSetSensitive (UIDialogFormGetOkButton (dShell),False);
 		XtFree (srcText);
 		if ((strlen (srcText = XmTextFieldGetString (cmpTextF)) > 0) &&
-			 ((field = table->Field (srcText)) != (DBObjTableField *) NULL))
+			 ((field = pTable->Field (srcText)) != (DBObjTableField *) NULL))
 			{
 			XtSetSensitive (button,True);
 			XtSetSensitive (errTextF,True);
@@ -320,20 +320,20 @@ void RGISAnalysePointSTNPointsCBK (Widget widget,RGISWorkspace *workspace,XmAnyC
 
 			srcText = XmTextFieldGetString (srcTextF);
 			dbData->LinkedData (netData);
-			table = dbData->Table (DBrNItems);
+			pTable = dbData->Table (DBrNItems);
+			cTable = netData->Table (DBrNCells);
 			groups = dbData->Table (DBrNGroups);
-			for (pointRec = table->First ();pointRec != (DBObjRecord *) NULL;pointRec = table->Next ())
+			for (pointRec = pTable->First ();pointRec != (DBObjRecord *) NULL;pointRec = pTable->Next ())
 				if ((pointRec->Flags () & DBObjectFlagIdle) == DBObjectFlagIdle)
 					{
-					if (groups != (DBObjTable *) NULL)
-						groups->Delete (groups->Item (pointRec->RowID ()));
-					table->Delete (pointRec);
-					pointRec = table->Next (DBBackward);
+					if (groups != (DBObjTable *) NULL) groups->Delete (groups->Item (pointRec->RowID ()));
+					pTable->Delete (pointRec);
+					pointRec = pTable->Next (DBBackward);
 					}
 
-			field = table->Field (srcText);
+			field = pTable->Field (srcText);
 			XtFree (srcText);
-			RGlibPointSTNCoordinates (dbData,field);
+			RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),0.25);
 			UIPauseDialogOpen ((char *) "Moving Points");
 			RGlibPointSTNCharacteristics (dbData);
 			UIPauseDialogClose ();
@@ -341,7 +341,7 @@ void RGISAnalysePointSTNPointsCBK (Widget widget,RGISWorkspace *workspace,XmAnyC
 			if (strlen (dstText = XmTextFieldGetString (dstTextF)) > 0)
 				{
 				srcText = XmTextFieldGetString (srcTextF);
-				RGlibGenFuncTopoSubtract (table,RGlibNextStation,srcText,dstText);
+				RGlibGenFuncTopoSubtract (pTable,RGlibNextStation,srcText,dstText);
 				XtFree (dstText);
 				}
 			if (strlen (dstText = XmTextFieldGetString (errTextF)) > 0)
@@ -349,7 +349,7 @@ void RGISAnalysePointSTNPointsCBK (Widget widget,RGISWorkspace *workspace,XmAnyC
 				char *cmpText;
 				srcText = XmTextFieldGetString (srcTextF);
 				cmpText = XmTextFieldGetString (cmpTextF);
-				RGlibGenFuncFieldCompare (table,srcText,cmpText,dstText,diffMethod);
+				RGlibGenFuncFieldCompare (pTable,srcText,cmpText,dstText,diffMethod);
 				XtFree (dstText);
 				XtFree (cmpText);
 				}

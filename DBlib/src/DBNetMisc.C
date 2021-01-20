@@ -132,7 +132,7 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos) const {
     return (CellTable->Item(cellID));
 }
 
-DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBFloat area) const {
+DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat area) const {
     DBInt i, j;
     DBInt cellID;
     DBFloat bestDelta, delta;
@@ -153,9 +153,9 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBFloat area) const {
 
         if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) == DBFault) continue;
         cellRec = CellTable->Item(cellID);
-        delta = fabs(area - CellBasinArea(cellRec));
+        delta = fabs(area - field->Float(cellRec));
         if (delta < bestDelta) {
-            bestDelta = delta;
+            bestDelta   = delta;
             bestCellRec = cellRec;
         }
     }

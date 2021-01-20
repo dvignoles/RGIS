@@ -78,8 +78,8 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	char *text;
 	static DBInt cont;
 	DBDataset *dataset;
-	DBObjData *dbData;
-	DBObjTable *table;
+	DBObjData *dbData, *netData;
+	DBObjTable *sTable, *cTable;
 	DBObjTableField *field = (DBObjTableField *) NULL;
 	static Widget dShell = NULL, mainForm, button, textF;
 
@@ -92,8 +92,8 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 
 		string = XmStringCreate ((char *) "Select",UICharSetBold);
 		button = XtVaCreateManagedWidget ("RGISEditPointSTNBestCoordsButton",xmPushButtonWidgetClass,mainForm,
-								XmNtopAttachment,			XmATTACH_FORM,
-								XmNtopOffset,				10,
+								XmNtopAttachment,       XmATTACH_FORM,
+								XmNtopOffset,           10,
 								XmNrightAttachment,		XmATTACH_FORM,
 								XmNrightOffset,			10,
 								XmNmarginHeight,			5,
@@ -133,27 +133,25 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 		}
 
 	dataset = UIDataset ();
-	dbData = dataset->Data ();
-	table = dbData->Table (DBrNItems);
-	XtVaSetValues (textF,XmNuserData,table->Fields (),NULL);
+	dbData  = dataset->Data ();
+	netData = dbData->LinkedData();
+	sTable  = dbData->Table (DBrNItems);
+	cTable  = netData->Table (DBrNCells);
+	XtVaSetValues (textF,XmNuserData,sTable->Fields (),NULL);
 	UIDialogFormPopup (dShell);
 	cont = false;
 	while (UILoop ())
 		{
 		if (strlen (text = XmTextFieldGetString (textF)) > 0)
-		field = table->Field (text);
-/*		if ((strlen (text = XmTextFieldGetString (textF)) > 0) &&
-			 ((field = table->Field (text)) != (DBObjTableField *) NULL))
-				XtSetSensitive (UIDialogFormGetOkButton (dShell),True);
-		else	XtSetSensitive (UIDialogFormGetOkButton (dShell),False);
-*/		XtFree (text);
+		field = sTable->Field (text);
+		XtFree (text);
 		}
 
 	UIDialogFormPopdown (dShell);
 	if (cont)
 		{
 		UIPauseDialogOpen ((char *) "Moving Points");
-		RGlibPointSTNCoordinates (dbData,field);
+		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),0.25);
 		UIPauseDialogClose ();
 		UI2DViewRedrawAll ();
 		}
