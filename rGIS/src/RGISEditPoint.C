@@ -79,7 +79,7 @@ static void _RGISEditPointSTNCoordsScaleCBK (Widget widget, void *data, XmScaleC
     Widget label;
 
     XtVaGetValues(widget, XmNuserData, &label, NULL);
-    sprintf(numberString,"%d", value);
+    sprintf(numberString,"%d", callData->value);
     UIAuxSetLabelString(label, numberString);
 }
 
