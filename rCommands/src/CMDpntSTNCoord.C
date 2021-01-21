@@ -20,6 +20,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -f,--field     [source field]");
     CMmsgPrint(CMmsgInfo, "     -c,--cfield    [compare field]");
     CMmsgPrint(CMmsgInfo, "     -l,--limit     [error limit]");
+    CMmsgPrint(CMmsgInfo, "     -p,--pradius   [pixel radius]");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
     CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
@@ -34,6 +35,7 @@ int main(int argc, char *argv[]) {
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *networkName = (char *) NULL;
+    DBInt pRadius = 3;
     DBFloat limit = 1.0;
     DBObjData *data, *netData;
     DBObjTable *pTable, *cTable;
@@ -73,6 +75,18 @@ int main(int argc, char *argv[]) {
             }
             if (sscanf (argv[argPos],"%lf",&limit) != 1) {
                 CMmsgPrint(CMmsgUsrError, "Invalid limit!");
+                return (CMfailed);
+            }
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-p", "--pradius")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing pixel radius!");
+                return (CMfailed);
+            }
+            if (sscanf (argv[argPos],"%d", &pRadius) != 1) {
+                CMmsgPrint(CMmsgUsrError, "Invalid pixel radius!");
                 return (CMfailed);
             }
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
@@ -173,7 +187,7 @@ int main(int argc, char *argv[]) {
     if (version != (char *) NULL) data->Document(DBDocVersion, version);
 
     data->LinkedData(netData);
-    if ((ret = RGlibPointSTNCoordinates (data, pTable->Field(sFieldName),cTable->Field(dFieldName),limit)) == DBSuccess)
+    if ((ret = RGlibPointSTNCoordinates (data, pTable->Field(sFieldName),cTable->Field(dFieldName),limit,pRadius)) == DBSuccess)
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
 
     delete netData;

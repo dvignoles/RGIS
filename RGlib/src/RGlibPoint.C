@@ -15,7 +15,7 @@ bfekete@gc.cuny.edu
 #include <RG.H>
 
 
-DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat limit) {
+DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat limit, DBInt pRadius) {
     DBInt pointID, ret = DBFault;
     DBFloat relDiff;
     DBCoordinate coord;
@@ -38,7 +38,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
 
         if ((pField != (DBObjTableField *) NULL) &&
             (!CMmathEqualValues(pField->Float(pntRec), pField->FloatNoData())) &&
-            ((cellRec = netIF->Cell(coord, cField, pField->Float(pntRec))) != (DBObjRecord *) NULL)) {
+            ((cellRec = netIF->Cell (coord, cField, pField->Float(pntRec), pRadius)) != (DBObjRecord *) NULL)) {
             relDiff = fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)) <= 0.0 ? 0.0 :
                       fabs(cField->Float(cellRec) - pField->Float(pntRec)) / (fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)));
             if (relDiff < limit) coord = netIF->Center(cellRec);
