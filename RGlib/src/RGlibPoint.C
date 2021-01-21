@@ -23,7 +23,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
     DBObjData *linkedData = dbData->LinkedData();
     DBVPointIF *pntIF;
     DBNetworkIF *netIF;
-    DBObjRecord *pntRec, *cellRec, *bestCellRec, *adjCellRec;
+    DBObjRecord *pntRec, *cellRec;
 
     if ((linkedData == (DBObjData *) NULL) && (linkedData->Type() != DBTypeNetwork)) return (DBFault);
     pntIF = new DBVPointIF(dbData);
@@ -35,17 +35,13 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
         coord = pntIF->Coordinate(pntRec);
         if (netIF->Coord2Pos(coord, pos) == DBFault) continue;
         netIF->Pos2Coord(pos, coord);
-        cellRec = netIF->Cell (coord);
 
-        if ((pField != (DBObjTableField *) NULL) && (!CMmathEqualValues(pField->Float(pntRec), pField->FloatNoData()))) {
-            bestCellRec = netIF->Cell(coord, cField, pField->Float(pntRec));
-            if ((cellRec != (DBObjRecord *) NULL) && (bestCellRec != (DBObjRecord *) NULL)) {
-                relDiff = fabs(cField->Float(bestCellRec)) + fabs(cField->Float(cellRec)) <= 0.0 ? 0.0 :
-                          fabs (cField->Float(bestCellRec) - cField->Float(cellRec)) / (fabs(cField->Float(bestCellRec)) + fabs(cField->Float(cellRec)));
-                coord   = relDiff < limit ? netIF->Center(bestCellRec) : netIF->Center(cellRec);
-            }
-            else if (cellRec     != (DBObjRecord *) NULL) coord = netIF->Center(cellRec);
-            else if (bestCellRec != (DBObjRecord *) NULL) coord = netIF->Center(bestCellRec);
+        if ((pField != (DBObjTableField *) NULL) &&
+            (!CMmathEqualValues(pField->Float(pntRec), pField->FloatNoData())) &&
+            ((cellRec = netIF->Cell(coord, cField, pField->Float(pntRec))) != (DBObjRecord *) NULL)) {
+            relDiff = fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)) <= 0.0 ? 0.0 :
+                      fabs(cField->Float(cellRec) - pField->Float(pntRec)) / (fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)));
+            if (relDiff < limit) coord = netIF->Center(cellRec);
         }
         pntIF->Coordinate(pntRec, coord);
     }
