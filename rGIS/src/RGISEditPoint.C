@@ -147,7 +147,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNrightAttachment, XmATTACH_FORM,
                                         XmNrightOffset,     5,
                                         NULL);
-		string = XmStringCreate("FieldNotSet", UICharSetNormal);
+		string = XmStringCreate((char *) "FieldNotSet", UICharSetNormal);
         label = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusDisplayLabel", xmLabelWidgetClass, frame,
                                         XmNmarginWidth,     5,
                                         XmNalignment,       XmALIGNMENT_END,
