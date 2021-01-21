@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *networkName = (char *) NULL;
     DBInt pRadius = 3;
-    DBFloat limit = 1.0;
+    DBFloat limit = 0.10;
     DBObjData *data, *netData;
     DBObjTable *pTable, *cTable;
 
