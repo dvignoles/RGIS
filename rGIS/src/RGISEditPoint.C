@@ -152,7 +152,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNtopAttachment,    XmATTACH_OPPOSITE_WIDGET,
                                         XmNtopWidget,        label,
                                         XmNtopOffset,        2,
-                                        XmNrightAttachment,  XmATTACH_WIDGET,
+                                        XmNrightAttachment,  XmATTACH_OPPOSITE_WIDGET,
                                         XmNrightWidget,      label,
                                         XmNrightOffset,      10,
 /*                                        XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
