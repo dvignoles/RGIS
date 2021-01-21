@@ -130,29 +130,19 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 										XmNlabelString,      string,
 										NULL);
 		XmStringFree (string);
-        string = XmStringCreate((char *) "Pixel Radius:", UICharSetBold);
-        label = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameLabel", xmLabelWidgetClass, mainForm,
-                                        XmNtopAttachment,   XmATTACH_WIDGET,
-                                        XmNtopWidget,       label,
-                                        XmNtopOffset,       5,
-                                        XmNleftAttachment,  XmATTACH_OPPOSITE_WIDGET,
-                                        XmNleftWidget,      label,
-                                        XmNlabelString,     string,
-                                        NULL);
-        XmStringFree(string);
         frame = XtVaCreateManagedWidget("UIDataPropMaxScaleFrame", xmFrameWidgetClass, mainForm,
-                                        XmNtopAttachment, XmATTACH_OPPOSITE_WIDGET,
-                                        XmNtopWidget,     label,
-                                        XmNtopOffset,     2,
+                                        XmNtopAttachment,   XmATTACH_WIDGET,
+                                        XmNtopWidget,       button,
+                                        XmNtopOffset,       5,
                                         XmNrightAttachment, XmATTACH_FORM,
-                                        XmNrightOffset, 5,
+                                        XmNrightOffset,     5,
                                         NULL);
 		string = XmStringCreate((char *) "FieldNotSet", UICharSetNormal);
         label = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusDisplayLabel", xmLabelWidgetClass, frame,
-                                        XmNmarginWidth, 5,
-                                        XmNalignment, XmALIGNMENT_END,
-                                        XmNlabelString, string,
-                                        XmNrecomputeSize, false,
+                                        XmNmarginWidth,     5,
+                                        XmNalignment,       XmALIGNMENT_END,
+                                        XmNlabelString,     string,
+                                        XmNrecomputeSize,   false,
                                         NULL);
         XmStringFree(string);
 
@@ -163,10 +153,10 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNrightAttachment,  XmATTACH_WIDGET,
                                         XmNrightWidget,      frame,
                                         XmNrightOffset,      10,
-/*                                        XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
-                                        XmNbottomWidget,     label,
+                                        XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
+                                        XmNbottomWidget,     frame,
                                         XmNbottomOffset,     2,
-*/                                        XmNorientation,      XmHORIZONTAL,
+                                        XmNorientation,      XmHORIZONTAL,
                                         XmNminimum,          1,
                                         XmNmaximum,          10,
                                         XmNvalue,            3,
@@ -174,6 +164,16 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNtraversalOn,      false,
                                         XmNuserData,         label,
                                     	NULL);
+
+        string = XmStringCreate((char *) "Pixel Radius:", UICharSetBold);
+        XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameLabel", xmLabelWidgetClass, mainForm,
+                                        XmNtopAttachment,   XmATTACH_OPPOSITE_WIDGET,
+                                        XmNtopWidget,       frame,
+                                        XmNtopOffset,       5,
+                                        XmNleftAttachment,  XmATTACH_FROM,
+                                        XmNlabelString,     string,
+                                        NULL);
+        XmStringFree(string);
 
 		XtAddCallback (UIDialogFormGetOkButton (dShell),XmNactivateCallback,(XtCallbackProc) UIAuxSetBooleanTrueCBK,&cont);
 		XtSetSensitive (UIDialogFormGetOkButton (dShell),true);
