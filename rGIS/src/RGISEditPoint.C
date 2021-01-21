@@ -115,7 +115,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 										XmNcolumns,          DBStringLength / 2,
 										NULL);
 		XtAddCallback (button,XmNactivateCallback,(XtCallbackProc) _RGISEditPointSTNCoordsSelectCBK,textF);
-		string = XmStringCreate ((char *) "Area Field",UICharSetBold);
+		string = XmStringCreate ((char *) "Area Field:",UICharSetBold);
 		label = XtVaCreateManagedWidget ("RGISEditSTNCoordAreaFieldNameLabel",xmLabelWidgetClass,mainForm,
 										XmNtopAttachment,    XmATTACH_OPPOSITE_WIDGET,
 										XmNtopWidget,        button,
@@ -129,7 +129,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 										XmNlabelString,      string,
 										NULL);
 		XmStringFree (string);
-        string = XmStringCreate((char *) "Pixel Radius", UICharSetBold);
+        string = XmStringCreate((char *) "Pixel Radius:", UICharSetBold);
         label = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameLabel", xmLabelWidgetClass, mainForm,
                                         XmNtopAttachment,   XmATTACH_WIDGET,
                                         XmNtopOffset,       5,
@@ -139,13 +139,22 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNlabelString,     string,
                                         NULL);
         XmStringFree(string);
+		string = XmStringCreate((char *) "FieldNotSet", UICharSetNormal);
+        label = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusDisplayLabel", xmLabelWidgetClass, mainForm,
+                                        XmNmarginWidth, 5,
+                                        XmNalignment, XmALIGNMENT_END,
+                                        XmNlabelString, string,
+                                        XmNrecomputeSize, false,
+                                        NULL);
+        XmStringFree(string);
+
 		scale = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameScale", xmScaleWidgetClass, mainForm,
                                         XmNtopAttachment,    XmATTACH_OPPOSITE_WIDGET,
                                         XmNtopWidget,        label,
                                         XmNtopOffset,        2,
-                                        XmNleftAttachment,   XmATTACH_WIDGET,
-                                        XmNleftWidget,       label,
-                                        XmNleftOffset,       10,
+                                        XmNrightAttachment,  XmATTACH_WIDGET,
+                                        XmNrightWidget,      label,
+                                        XmNrightOffset,      10,
 /*                                        XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
                                         XmNbottomWidget,     label,
                                         XmNbottomOffset,     2,
@@ -155,7 +164,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNvalue,            3,
                                         XmNscaleWidth,       60,
                                         XmNtraversalOn,      false,
-//                                        XmNuserData,         label,
+                                        XmNuserData,         label,
                                     	NULL);
 
 		XtAddCallback (UIDialogFormGetOkButton (dShell),XmNactivateCallback,(XtCallbackProc) UIAuxSetBooleanTrueCBK,&cont);
