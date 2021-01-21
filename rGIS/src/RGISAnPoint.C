@@ -333,7 +333,7 @@ void RGISAnalysePointSTNPointsCBK (Widget widget,RGISWorkspace *workspace,XmAnyC
 
 			field = pTable->Field (srcText);
 			XtFree (srcText);
-			RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),0.25);
+			RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),0.50);
 			UIPauseDialogOpen ((char *) "Moving Points");
 			RGlibPointSTNCharacteristics (dbData);
 			UIPauseDialogClose ();

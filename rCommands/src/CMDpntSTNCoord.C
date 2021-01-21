@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *networkName = (char *) NULL;
-    DBFloat limit = 0.25;
+    DBFloat limit = 0.50;
     DBObjData *data, *netData;
     DBObjTable *pTable, *cTable;
 

@@ -151,7 +151,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	if (cont)
 		{
 		UIPauseDialogOpen ((char *) "Moving Points");
-		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),0.25);
+		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),0.50);
 		UIPauseDialogClose ();
 		UI2DViewRedrawAll ();
 		}
