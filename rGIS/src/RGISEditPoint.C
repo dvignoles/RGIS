@@ -140,13 +140,13 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         NULL);
         XmStringFree(string);
 		scale = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameScale", xmScaleWidgetClass, mainForm,
-                                        XmNtopAttachment,    XmATTACH_WIDGET,
+                                        XmNtopAttachment,    XmATTACH_OPPOSITE_WIDGET,
                                         XmNtopWidget,        label,
                                         XmNtopOffset,        2,
                                         XmNrightAttachment,  XmATTACH_WIDGET,
                                         XmNrightWidget,      label,
                                         XmNrightOffset,      10,
-                                        XmNbottomAttachment, XmATTACH_WIDGET,
+                                        XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
                                         XmNbottomWidget,     label,
                                         XmNbottomOffset,     2,
                                         XmNorientation,      XmHORIZONTAL,
