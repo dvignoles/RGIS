@@ -74,11 +74,21 @@ static void _RGISEditPointSTNCoordsSelectCBK (Widget widget,Widget text,XmAnyCal
 	else	XmTextFieldSetString (text,(char *) "");
 	}
 
+static void _RGISEditPointSTNCoordsScaleCBK (Widget widget, void *data, XmScaleCallbackStruct *callData) {
+    char numberString[13];
+    Widget label;
+
+    XtVaGetValues(widget, XmNuserData, &label, NULL);
+    sprintf(numberString,"%d", value);
+    UIAuxSetLabelString(label, numberString);
+}
+
+
 void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *callData)
 
 	{
-	char *text;
-	static DBInt cont;
+	char *text, numberString[13];
+	static DBInt cont, pRadius = 3;
 	DBDataset *dataset;
 	DBObjData *dbData, *netData;
 	DBObjTable *sTable, *cTable;
@@ -137,7 +147,8 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNrightAttachment, XmATTACH_FORM,
                                         XmNrightOffset,     5,
                                         NULL);
-		string = XmStringCreate((char *) "FieldNotSet", UICharSetNormal);
+		sprintf(numberString,"%d",pRadius);
+		string = XmStringCreate(numberString, UICharSetNormal);
         label = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusDisplayLabel", xmLabelWidgetClass, frame,
                                         XmNmarginWidth,     5,
                                         XmNalignment,       XmALIGNMENT_END,
@@ -145,7 +156,6 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNrecomputeSize,   false,
                                         NULL);
         XmStringFree(string);
-
 		scale = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameScale", xmScaleWidgetClass, mainForm,
                                         XmNtopAttachment,    XmATTACH_OPPOSITE_WIDGET,
                                         XmNtopWidget,        frame,
@@ -159,11 +169,13 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNorientation,      XmHORIZONTAL,
                                         XmNminimum,          1,
                                         XmNmaximum,          10,
-                                        XmNvalue,            3,
-                                        XmNscaleWidth,       60,
+                                        XmNvalue,            pRadius,
+                                        XmNscaleWidth,       100,
                                         XmNtraversalOn,      false,
                                         XmNuserData,         label,
                                     	NULL);
+        XtAddCallback(scale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
+        XtAddCallback(scale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
 
         string = XmStringCreate((char *) "Pixel Radius:", UICharSetBold);
         XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameLabel", xmLabelWidgetClass, mainForm,
@@ -185,12 +197,17 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	sTable  = dbData->Table (DBrNItems);
 	cTable  = netData->Table (DBrNCells);
 	XtVaSetValues (textF,XmNuserData,sTable->Fields (),NULL);
+	sprintf(numberString,"%d", pRadius);
+    UIAuxSetLabelString(label, numberString);
+	XmScaleSetValue(scale, pRadius);
+
 	UIDialogFormPopup (dShell);
 	cont = false;
 	while (UILoop ())
 		{
 		if (strlen (text = XmTextFieldGetString (textF)) > 0)
 		field = sTable->Field (text);
+		XmScaleGetValue(scale, &pRadius);
 		XtFree (text);
 		}
 
@@ -198,7 +215,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	if (cont)
 		{
 		UIPauseDialogOpen ((char *) "Moving Points");
-		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),1.0,3);
+		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),1.0,pRadius);
 		UIPauseDialogClose ();
 		UI2DViewRedrawAll ();
 		}
