@@ -13,6 +13,7 @@ bfekete@gc.cuny.edu
 #include <Xm/Label.h>
 #include <Xm/TextF.h>
 #include <Xm/PushB.h>
+#include <Xm/Frame.h>
 #include <Xm/Scale.h>
 #include <rgis.H>
 
@@ -82,7 +83,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	DBObjData *dbData, *netData;
 	DBObjTable *sTable, *cTable;
 	DBObjTableField *field = (DBObjTableField *) NULL;
-	static Widget dShell = NULL, mainForm, button, textF, label, scale;
+	static Widget dShell = NULL, mainForm, button, textF, label, frame, scale;
 
 	if (dShell == (Widget) NULL)
 		{
@@ -139,13 +140,15 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNlabelString,     string,
                                         NULL);
         XmStringFree(string);
+        frame = XtVaCreateManagedWidget("UIDataPropMaxScaleFrame", xmFrameWidgetClass, mainForm,
+                                        XmNtopAttachment, XmATTACH_OPPOSITE_WIDGET,
+                                        XmNtopWidget,     label,
+                                        XmNtopOffset,     2,
+                                        XmNrightAttachment, XmATTACH_FORM,
+                                        XmNrightOffset, 5,
+                                        NULL);
 		string = XmStringCreate((char *) "FieldNotSet", UICharSetNormal);
-        label = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusDisplayLabel", xmLabelWidgetClass, mainForm,
-                                        XmNtopAttachment,   XmATTACH_OPPOSITE_WIDGET,
-                                        XmNtopWidget,       label,
-                                        XmNtopOffset,       5,
-                                        XmNrightAttachment,  XmATTACH_FORM,
-                                        XmNrightOffset,      10,
+        label = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusDisplayLabel", xmLabelWidgetClass, frame,
                                         XmNmarginWidth, 5,
                                         XmNalignment, XmALIGNMENT_END,
                                         XmNlabelString, string,
@@ -155,10 +158,10 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 
 		scale = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameScale", xmScaleWidgetClass, mainForm,
                                         XmNtopAttachment,    XmATTACH_OPPOSITE_WIDGET,
-                                        XmNtopWidget,        label,
+                                        XmNtopWidget,        frame,
                                         XmNtopOffset,        2,
-                                        XmNrightAttachment,  XmATTACH_OPPOSITE_WIDGET,
-                                        XmNrightWidget,      label,
+                                        XmNrightAttachment,  XmATTACH_WIDGET,
+                                        XmNrightWidget,      frame,
                                         XmNrightOffset,      10,
 /*                                        XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
                                         XmNbottomWidget,     label,
