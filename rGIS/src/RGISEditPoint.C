@@ -170,7 +170,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNtopAttachment,   XmATTACH_OPPOSITE_WIDGET,
                                         XmNtopWidget,       frame,
                                         XmNtopOffset,       5,
-                                        XmNleftAttachment,  XmATTACH_FROM,
+                                        XmNleftAttachment,  XmATTACH_FORM,
                                         XmNlabelString,     string,
                                         NULL);
         XmStringFree(string);
