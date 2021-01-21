@@ -132,8 +132,8 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
         string = XmStringCreate((char *) "Pixel Radius:", UICharSetBold);
         label = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameLabel", xmLabelWidgetClass, mainForm,
                                         XmNtopAttachment,   XmATTACH_WIDGET,
-                                        XmNtopOffset,       5,
                                         XmNtopWidget,       label,
+                                        XmNtopOffset,       5,
                                         XmNleftAttachment,  XmATTACH_OPPOSITE_WIDGET,
                                         XmNleftWidget,      label,
                                         XmNlabelString,     string,
@@ -141,6 +141,11 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
         XmStringFree(string);
 		string = XmStringCreate((char *) "FieldNotSet", UICharSetNormal);
         label = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusDisplayLabel", xmLabelWidgetClass, mainForm,
+                                        XmNtopAttachment,   XmATTACH_OPPOSITE_WIDGET,
+                                        XmNtopWidget,       label,
+                                        XmNtopOffset,       5,
+                                        XmNrightAttachment,  XmATTACH_FORM,
+                                        XmNrightOffset,      10,
                                         XmNmarginWidth, 5,
                                         XmNalignment, XmALIGNMENT_END,
                                         XmNlabelString, string,
