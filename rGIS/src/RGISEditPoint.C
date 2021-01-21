@@ -167,7 +167,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNbottomOffset,     2,
                                         XmNorientation,      XmHORIZONTAL,
                                         XmNminimum,          1,
-                                        XmNmaximum,          50,
+                                        XmNmaximum,          90,
                                         XmNvalue,            pRadius,
                                         XmNscaleWidth,       120,
                                         XmNtraversalOn,      false,
@@ -176,7 +176,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
         XtAddCallback(toleranceScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
         XtAddCallback(toleranceScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
 
-        string = XmStringCreate((char *) "Tolerance:", UICharSetBold);
+        string = XmStringCreate((char *) "Tolerance [%]:", UICharSetBold);
         XtVaCreateManagedWidget("RGISEditSTNCoordTolleranceNameLabel", xmLabelWidgetClass, mainForm,
                                         XmNtopAttachment,   XmATTACH_OPPOSITE_WIDGET,
                                         XmNtopWidget,       frame,
@@ -221,7 +221,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
         XtAddCallback(pRadiusScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
         XtAddCallback(pRadiusScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
 
-        string = XmStringCreate((char *) "Pixel Radius:", UICharSetBold);
+        string = XmStringCreate((char *) "Radius [pixel]:", UICharSetBold);
         XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameLabel", xmLabelWidgetClass, mainForm,
                                         XmNtopAttachment,   XmATTACH_OPPOSITE_WIDGET,
                                         XmNtopWidget,       frame,
