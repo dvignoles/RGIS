@@ -46,7 +46,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
                           fabs(cField->Float(cellRec) - pField->Float(pntRec)) / (fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)));
                 if (relDiff < limit) { 
                     coord = netIF->Center(cellRec);
-                    cellRec->Flags (DBObjectFlagSelected,DBSet);
+                    pntRec->Flags (DBObjectFlagSelected,DBSet);
                 }
             }
         }
