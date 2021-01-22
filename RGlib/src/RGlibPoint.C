@@ -37,11 +37,9 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
         netIF->Pos2Coord(pos, coord);
         if ((pField != (DBObjTableField *) NULL) && (!CMmathEqualValues(pField->Float(pntRec), pField->FloatNoData()))) {
             if ((cellRec = netIF->Cell(pos)) != (DBObjRecord *) NULL) {
-                if (limit < 0.5) {
-                    relDiff = fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)) <= 0.0 ? 0.0 :
-                              fabs(cField->Float(cellRec) - pField->Float(pntRec)) / (fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)));
-                    if (relDiff < limit) continue; 
-                }
+                relDiff = fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)) <= 0.0 ? 0.0 :
+                            fabs(cField->Float(cellRec) - pField->Float(pntRec)) / (fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)));
+                if (relDiff < limit * (1.0 - limit)) continue; 
             }
             if ((cellRec = netIF->Cell (coord, cField, pField->Float(pntRec), pRadius)) != (DBObjRecord *) NULL) {
                 relDiff = fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)) <= 0.0 ? 0.0 :
