@@ -13,7 +13,7 @@ bfekete@gc.cuny.edu
 #include <DB.H>
 #include <DBif.H>
 #include <RG.H>
-
+#include <math.h>
 
 DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat limit, DBInt pRadius) {
     DBInt pointID, ret = DBFault;

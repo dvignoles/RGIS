@@ -254,8 +254,8 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 		{
 		if (strlen (text = XmTextFieldGetString (textF)) > 0)
 		field = sTable->Field (text);
-		XmScaleGetValue(pRadiusScale,   &pRadius);
 		XmScaleGetValue(toleranceScale, &tolerance);
+		XmScaleGetValue(pRadiusScale,   &pRadius);
 		XtFree (text);
 		}
 
@@ -263,7 +263,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	if (cont)
 		{
 		UIPauseDialogOpen ((char *) "Moving Points");
-		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),(DBFloat) tolerance / 100.0,pRadius);
+		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),(DBFloat) tolerance / 100.0, pRadius);
 		UIPauseDialogClose ();
 		UI2DViewRedrawAll ();
 		}
