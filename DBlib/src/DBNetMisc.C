@@ -161,8 +161,6 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat t
             bestCellRec = cellRec;
         }
     }
-    if ((bestCellRec == (DBObjRecord *) NULL) && ((cellID = ((DBInt *) DataRec->Data())[(size_t) pos.Row * (size_t) ColNum() + (size_t) pos.Col]) != DBFault))
-        bestCellRec = CellTable->Item(cellID);
     return (bestCellRec);
 }
 
