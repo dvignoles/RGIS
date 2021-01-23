@@ -57,6 +57,9 @@ DBInt RGlibGenFuncFieldCompare(DBObjTable *table, char *f0Text, char *f1Text, ch
                     case 2:
                         result->Float(record, (val[0] - val[1]) * 100.0 / (val[0] > val[1] ? val[0] : val[1]));
                         break;
+                    case 3:
+                        result->Float(record, fabs((val[0] - val[1]) * 100.0 / (val[0] > val[1] ? val[0] : val[1])));
+                        break;
                 }
         }
     }
