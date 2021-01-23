@@ -16,8 +16,8 @@ bfekete@gc.cuny.edu
 #include <math.h>
 
 DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat limit, DBInt pRadius) {
-    DBInt pointID, ret = DBFault;
-    DBFloat relDiff;
+    DBInt pointID, ret = DBFault, count = 0;
+    DBFloat relDiff, val, min = HUGE_VAL, max = -HUGE_VAL;
     DBCoordinate coord;
     DBPosition pos;
     DBObjData *linkedData = dbData->LinkedData();
@@ -28,6 +28,18 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
     if ((linkedData == (DBObjData *) NULL) && (linkedData->Type() != DBTypeNetwork)) return (DBFault);
     pntIF = new DBVPointIF(dbData);
     netIF = new DBNetworkIF(linkedData);
+    if (pField != (DBObjTableField *) NULL) {
+    for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
+        pntRec = pntIF->Item(pointID);
+        val = pField->Float(pntRec);
+        if (CMmathEqualValues(val, pField->FloatNoData())) continue;
+        count++;
+        if (min > val) min = val;
+        if (max < val) max = val;
+        }
+    }
+    if ((count == 0) || (max == min)) pField = (DBObjTableField *) NULL;
+    else  pRadius = (int) ceil (sqrt(((max + min) / (max - min))) / pRadius);
     for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
         pntRec = pntIF->Item(pointID);
         if (DBPause(pointID * 100 / pntIF->ItemNum())) goto Stop;
