@@ -50,13 +50,13 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
         if ((pField != (DBObjTableField *) NULL) && (!CMmathEqualValues(tVal = pField->Float(pntRec), pField->FloatNoData()))) {
             if ((cellRec = netIF->Cell(pos)) != (DBObjRecord *) NULL) {
                 cVal = cField->Float(cellRec);
-                relDiff = (cVal - tVal) / (cVal + tVal);
+                relDiff = fabs(cVal - tVal) / (cVal + tVal);
                 if (relDiff < limit * (1.0 - limit)) continue; 
             }
             pRadius = (DBInt) ceil ((float) maxRadius * sqrt(tVal - min) / (max - min));
-            if ((cellRec = netIF->Cell (coord, cField, pField->Float(pntRec), pRadius)) != (DBObjRecord *) NULL) {
+            if ((cellRec = netIF->Cell (coord, cField, tVal, pRadius)) != (DBObjRecord *) NULL) {
                 cVal = cField->Float(cellRec);
-                relDiff = (cVal - tVal) / (cVal + tVal);
+                relDiff = fabs(cVal - tVal) / (cVal + tVal);
                 if (relDiff < limit) { 
                     coord = netIF->Center(cellRec);
                     pntRec->Flags (DBObjectFlagSelected,DBSet);
