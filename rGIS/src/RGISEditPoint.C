@@ -88,7 +88,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 
 	{
 	char *text, numberString[13];
-	static DBInt cont, pRadius = 3, tolerance = 10;
+	static DBInt cont, rMultiplyer = 3, tolerance = 10;
 	DBDataset *dataset;
 	DBObjData *dbData, *netData;
 	DBObjTable *sTable, *cTable;
@@ -168,7 +168,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNorientation,      XmHORIZONTAL,
                                         XmNminimum,          1,
                                         XmNmaximum,          50,
-                                        XmNvalue,            pRadius,
+                                        XmNvalue,            rMultiplyer,
                                         XmNscaleWidth,       120,
                                         XmNtraversalOn,      false,
                                         XmNuserData,         toleranceLabel,
@@ -212,8 +212,8 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNbottomOffset,     2,
                                         XmNorientation,      XmHORIZONTAL,
                                         XmNminimum,          1,
-                                        XmNmaximum,          50,
-                                        XmNvalue,            pRadius,
+                                        XmNmaximum,          10,
+                                        XmNvalue,            rMultiplyer,
                                         XmNscaleWidth,       120,
                                         XmNtraversalOn,      false,
                                         XmNuserData,         pRadiusLabel,
@@ -221,7 +221,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
         XtAddCallback(pRadiusScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
         XtAddCallback(pRadiusScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
 
-        string = XmStringCreate((char *) "Radius [pixel]:", UICharSetBold);
+        string = XmStringCreate((char *) "Radius Multiplyer:", UICharSetBold);
         XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameLabel", xmLabelWidgetClass, mainForm,
                                         XmNtopAttachment,   XmATTACH_OPPOSITE_WIDGET,
                                         XmNtopWidget,       frame,
@@ -244,9 +244,9 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	sprintf(numberString,"%d", tolerance);
     UIAuxSetLabelString(toleranceLabel, numberString);
 	XmScaleSetValue(toleranceScale, tolerance);
-	sprintf(numberString,"%d", pRadius);
+	sprintf(numberString,"%d", rMultiplyer);
     UIAuxSetLabelString(pRadiusLabel, numberString);
-	XmScaleSetValue(pRadiusScale, pRadius);
+	XmScaleSetValue(pRadiusScale, rMultiplyer);
 
 	UIDialogFormPopup (dShell);
 	cont = false;
@@ -255,7 +255,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 		if (strlen (text = XmTextFieldGetString (textF)) > 0)
 		field = sTable->Field (text);
 		XmScaleGetValue(toleranceScale, &tolerance);
-		XmScaleGetValue(pRadiusScale,   &pRadius);
+		XmScaleGetValue(pRadiusScale,   &rMultiplyer);
 		XtFree (text);
 		}
 
@@ -263,7 +263,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	if (cont)
 		{
 		UIPauseDialogOpen ((char *) "Moving Points");
-		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),(DBFloat) tolerance / 100.0, pRadius);
+		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),(DBFloat) tolerance / 100.0, rMultiplyer);
 		UIPauseDialogClose ();
 		UI2DViewRedrawAll ();
 		}
