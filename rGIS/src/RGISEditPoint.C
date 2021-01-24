@@ -169,7 +169,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNminimum,          1,
                                         XmNmaximum,          50,
                                         XmNvalue,            maxRadius,
-                                        XmNscaleWidth,       120,
+                                        XmNscaleWidth,       110,
                                         XmNtraversalOn,      false,
                                         XmNuserData,         toleranceLabel,
                                     	NULL);
@@ -215,7 +215,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNmaximum,          200,
                                         XmNvalue,            maxRadius,
 										XmNscaleMultiple,    5,
-                                        XmNscaleWidth,       120,
+                                        XmNscaleWidth,       110,
                                         XmNtraversalOn,      false,
                                         XmNuserData,         pRadiusLabel,
                                     	NULL);
