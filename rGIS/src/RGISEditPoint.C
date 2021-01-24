@@ -222,7 +222,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
         XtAddCallback(pRadiusScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
         XtAddCallback(pRadiusScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
 
-        string = XmStringCreate((char *) "Maximum Radius:", UICharSetBold);
+        string = XmStringCreate((char *) "Max. Radius [km]:", UICharSetBold);
         XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameLabel", xmLabelWidgetClass, mainForm,
                                         XmNtopAttachment,   XmATTACH_OPPOSITE_WIDGET,
                                         XmNtopWidget,       frame,
