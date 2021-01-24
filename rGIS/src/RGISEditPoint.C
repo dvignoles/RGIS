@@ -88,7 +88,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 
 	{
 	char *text, numberString[13];
-	static DBInt cont, maxRadius = 3, tolerance = 10;
+	static DBInt cont, maxRadius = 5, tolerance = 10;
 	DBDataset *dataset;
 	DBObjData *dbData, *netData;
 	DBObjTable *sTable, *cTable;
@@ -212,8 +212,9 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNbottomOffset,     2,
                                         XmNorientation,      XmHORIZONTAL,
                                         XmNminimum,          1,
-                                        XmNmaximum,          100,
+                                        XmNmaximum,          200,
                                         XmNvalue,            maxRadius,
+										XmNscaleMultiple,    5,
                                         XmNscaleWidth,       120,
                                         XmNtraversalOn,      false,
                                         XmNuserData,         pRadiusLabel,
