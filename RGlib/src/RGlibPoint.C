@@ -17,7 +17,7 @@ bfekete@gc.cuny.edu
 
 DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat limit, DBInt maxRadius) {
     DBInt pointID, ret = DBFault, count = 0, pRadius;
-    DBFloat relDiff, val, min = HUGE_VAL, max = -HUGE_VAL;
+    DBFloat relDiff, cVal, tVal, min = HUGE_VAL, max = -HUGE_VAL;
     DBCoordinate coord;
     DBPosition pos;
     DBObjData *linkedData = dbData->LinkedData();
@@ -31,11 +31,11 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
     if (pField != (DBObjTableField *) NULL) {
         for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
             pntRec = pntIF->Item(pointID);
-            val = pField->Float(pntRec);
-            if (CMmathEqualValues(val, pField->FloatNoData())) continue;
+            tVal = pField->Float(pntRec);
+            if (CMmathEqualValues(tVal, pField->FloatNoData())) continue;
             count++;
-            if (min > val) min = val;
-            if (max < val) max = val;
+            if (min > tVal) min = tVal;
+            if (max < tVal) max = tVal;
         }
         if ((count == 0) || (max == min) || (min <= 0.0)) pField = (DBObjTableField *) NULL;
         else { max = sqrt(max); min = sqrt(min); }
@@ -47,16 +47,16 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
         coord = pntIF->Coordinate(pntRec);
         if (netIF->Coord2Pos(coord, pos) == DBFault) continue;
         netIF->Pos2Coord(pos, coord);
-        if ((pField != (DBObjTableField *) NULL) && (!CMmathEqualValues(val = pField->Float(pntRec), pField->FloatNoData()))) {
+        if ((pField != (DBObjTableField *) NULL) && (!CMmathEqualValues(tVal = pField->Float(pntRec), pField->FloatNoData()))) {
             if ((cellRec = netIF->Cell(pos)) != (DBObjRecord *) NULL) {
-                relDiff = fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)) <= 0.0 ? 0.0 :
-                            fabs(cField->Float(cellRec) - pField->Float(pntRec)) / (fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)));
+                cVal = cField->Float(cellRec);
+                relDiff = (cVal - tVal) / (cVal + tVal);
                 if (relDiff < limit * (1.0 - limit)) continue; 
             }
-            pRadius = (DBInt) ceil ((float) maxRadius * sqrt(val - min) / (max - min));
+            pRadius = (DBInt) ceil ((float) maxRadius * sqrt(tVal - min) / (max - min));
             if ((cellRec = netIF->Cell (coord, cField, pField->Float(pntRec), pRadius)) != (DBObjRecord *) NULL) {
-                relDiff = fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)) <= 0.0 ? 0.0 :
-                          fabs(cField->Float(cellRec) - pField->Float(pntRec)) / (fabs(cField->Float(cellRec)) + fabs(pField->Float(pntRec)));
+                cVal = cField->Float(cellRec);
+                relDiff = (cVal - tVal) / (cVal + tVal);
                 if (relDiff < limit) { 
                     coord = netIF->Center(cellRec);
                     pntRec->Flags (DBObjectFlagSelected,DBSet);
