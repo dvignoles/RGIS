@@ -149,7 +149,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNrightOffset,      10,
                                         XmNorientation,      XmHORIZONTAL,
                                         XmNminimum,          1,
-                                        XmNmaximum,          50,
+                                        XmNmaximum,          75,
                                         XmNvalue,            tolerance,
 										XmNshowValue,        true,
                                         XmNscaleWidth,       160,
