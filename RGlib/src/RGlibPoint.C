@@ -43,7 +43,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
         }
         if ((count == 0) || (max == min) || (min <= 0.0)) pField = (DBObjTableField *) NULL;
         else { max = log(max); min = log(min); }
-        if (cellCount > 0) maxRadius = (DBInt) ceil((DBFloat) maxRadius / cellLength);
+        if (cellCount > 0) { cellLength = cellLength / cellCount; maxRadius = (DBInt) ceil((DBFloat) maxRadius / cellLength); }
     }
     printf ("%f %d\n",limit,maxRadius);
     for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
