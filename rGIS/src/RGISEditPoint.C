@@ -76,10 +76,11 @@ static void _RGISEditPointSTNCoordsSelectCBK (Widget widget,Widget text,XmAnyCal
 
 static void _RGISEditPointSTNCoordsScaleCBK (Widget widget, void *data, XmScaleCallbackStruct *callData) {
     char numberString[13];
+	DBInt scaleMultiplier = *((DBInt *) callData);
     Widget label;
 
     XtVaGetValues(widget, XmNuserData, &label, NULL);
-    sprintf(numberString,"%d", callData->value);
+    sprintf(numberString,"%d", callData->value * scaleMultiplier);
     UIAuxSetLabelString(label, numberString);
 }
 
@@ -88,7 +89,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 
 	{
 	char *text, numberString[13];
-	static DBInt cont, maxRadius = 5, tolerance = 10;
+	static DBInt cont, maxRadius = 1, tolerance = 10, scaleMultiplier;
 	DBDataset *dataset;
 	DBObjData *dbData, *netData;
 	DBObjTable *sTable, *cTable;
@@ -173,8 +174,9 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNtraversalOn,      false,
                                         XmNuserData,         toleranceLabel,
                                     	NULL);
-        XtAddCallback(toleranceScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
-        XtAddCallback(toleranceScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
+		scaleMultiplier = 1;
+        XtAddCallback(toleranceScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &scaleMultiplier);
+        XtAddCallback(toleranceScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &scaleMultiplier);
 
         string = XmStringCreate((char *) "Tolerance [%]:", UICharSetBold);
         XtVaCreateManagedWidget("RGISEditSTNCoordTolleranceNameLabel", xmLabelWidgetClass, mainForm,
@@ -212,15 +214,16 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNbottomOffset,     2,
                                         XmNorientation,      XmHORIZONTAL,
                                         XmNminimum,          1,
-                                        XmNmaximum,          200,
+                                        XmNmaximum,          50,
                                         XmNvalue,            maxRadius,
 										XmNscaleMultiple,    5,
                                         XmNscaleWidth,       110,
                                         XmNtraversalOn,      false,
                                         XmNuserData,         pRadiusLabel,
                                     	NULL);
-        XtAddCallback(pRadiusScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
-        XtAddCallback(pRadiusScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) NULL);
+		scaleMultiplier = 10;
+        XtAddCallback(pRadiusScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &scaleMultiplier);
+        XtAddCallback(pRadiusScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &scaleMultiplier);
 
         string = XmStringCreate((char *) "Max. Radius [km]:", UICharSetBold);
         XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameLabel", xmLabelWidgetClass, mainForm,
@@ -264,7 +267,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	if (cont)
 		{
 		UIPauseDialogOpen ((char *) "Moving Points");
-		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),(DBFloat) tolerance / 100.0, maxRadius, true);
+		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),(DBFloat) tolerance / 100.0, maxRadius * 10, true);
 		UIPauseDialogClose ();
 		UI2DViewRedrawAll ();
 		}
