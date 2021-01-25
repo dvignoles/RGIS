@@ -141,7 +141,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 										XmNlabelString,      string,
 										NULL);
 		XmStringFree (string);
-        frame = XtVaCreateManagedWidget("RGISEditSTNCoordToleranceDisplayScale", xmFrameWidgetClass, mainForm,
+/*        frame = XtVaCreateManagedWidget("RGISEditSTNCoordToleranceDisplayScale", xmFrameWidgetClass, mainForm,
                                         XmNtopAttachment,   XmATTACH_WIDGET,
                                         XmNtopWidget,       button,
                                         XmNtopOffset,       5,
@@ -156,11 +156,11 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNrecomputeSize,   false,
                                         NULL);
         XmStringFree(string);
-		toleranceScale = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameScale", xmScaleWidgetClass, mainForm,
+*/		toleranceScale = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameScale", xmScaleWidgetClass, mainForm,
                                         XmNtopAttachment,    XmATTACH_OPPOSITE_WIDGET,
                                         XmNtopWidget,        frame,
                                         XmNtopOffset,        2,
-                                        XmNrightAttachment,  XmATTACH_WIDGET,
+                                        XmNrightAttachment,  XmATTACH_FORM,
                                         XmNrightWidget,      frame,
                                         XmNrightOffset,      10,
                                         XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
@@ -170,13 +170,15 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNminimum,          1,
                                         XmNmaximum,          50,
                                         XmNvalue,            tolerance,
+										XmNscaleMultiple,    1,
+										XmNshowValue,        true,
                                         XmNscaleWidth,       110,
                                         XmNtraversalOn,      false,
-                                        XmNuserData,         toleranceLabel,
+//                                        XmNuserData,         toleranceLabel,
                                     	NULL);
 		toleranceMultiplier = 1;
-        XtAddCallback(toleranceScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &toleranceMultiplier);
-        XtAddCallback(toleranceScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &toleranceMultiplier);
+//        XtAddCallback(toleranceScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &toleranceMultiplier);
+//        XtAddCallback(toleranceScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &toleranceMultiplier);
 
         string = XmStringCreate((char *) "Tolerance [%]:", UICharSetBold);
         XtVaCreateManagedWidget("RGISEditSTNCoordTolleranceNameLabel", xmLabelWidgetClass, mainForm,
@@ -187,26 +189,19 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNlabelString,     string,
                                         NULL);
         XmStringFree(string);
-        frame = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusDisplayScale", xmFrameWidgetClass, mainForm,
+/*        frame = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusDisplayScale", xmFrameWidgetClass, mainForm,
                                         XmNtopAttachment,   XmATTACH_WIDGET,
                                         XmNtopWidget,       frame,
                                         XmNtopOffset,       5,
                                         XmNrightAttachment, XmATTACH_FORM,
                                         XmNrightOffset,     5,
                                         NULL);
-		string = XmStringCreate((char *) "NotSet", UICharSetNormal);
-        pRadiusLabel = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusDisplayLabel", xmLabelWidgetClass, frame,
-                                        XmNmarginWidth,     5,
-                                        XmNalignment,       XmALIGNMENT_END,
-                                        XmNlabelString,     string,
-                                        XmNrecomputeSize,   false,
-                                        NULL);
-        XmStringFree(string);
+*/
 		pRadiusScale = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameScale", xmScaleWidgetClass, mainForm,
                                         XmNtopAttachment,    XmATTACH_OPPOSITE_WIDGET,
                                         XmNtopWidget,        frame,
                                         XmNtopOffset,        2,
-                                        XmNrightAttachment,  XmATTACH_WIDGET,
+                                        XmNrightAttachment,  XmATTACH_FORM,
                                         XmNrightWidget,      frame,
                                         XmNrightOffset,      10,
                                         XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
@@ -216,13 +211,15 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNminimum,          1,
                                         XmNmaximum,          50,
                                         XmNvalue,            maxRadius,
+										XmNscaleMultiple,    10,
+										XmNshowValue,        true,
                                         XmNscaleWidth,       110,
                                         XmNtraversalOn,      false,
-                                        XmNuserData,         pRadiusLabel,
+//                                        XmNuserData,         pRadiusLabel,
                                     	NULL);
 		radiusMultiplier = 10;
-        XtAddCallback(pRadiusScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &radiusMultiplier);
-        XtAddCallback(pRadiusScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &radiusMultiplier);
+//        XtAddCallback(pRadiusScale, XmNdragCallback,         (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &radiusMultiplier);
+//        XtAddCallback(pRadiusScale, XmNvalueChangedCallback, (XtCallbackProc) _RGISEditPointSTNCoordsScaleCBK, (void *) &radiusMultiplier);
 
         string = XmStringCreate((char *) "Max. Radius [km]:", UICharSetBold);
         XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameLabel", xmLabelWidgetClass, mainForm,
