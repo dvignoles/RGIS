@@ -42,7 +42,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
             if (max < tVal) max = tVal;
         }
         if ((count == 0) || (max == min) || (min <= 0.0)) pField = (DBObjTableField *) NULL;
-        else { max = sqrt(max); min = sqrt(min); }
+        else { max = log(max); min = log(min); }
         if (cellCount > 0) maxRadius = (DBInt) ceil((DBFloat) maxRadius / cellLength);
     }
     for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
@@ -58,7 +58,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
                 relDiff = fabs(cVal - tVal) / (cVal + tVal);
                 if (relDiff < limit * (1.0 - limit)) continue; 
             }
-            pRadius = (DBInt) ceil ((float) maxRadius * sqrt(tVal - min) / (max - min));
+            pRadius = (DBInt) ceil ((float) maxRadius * (log(tVal) - min) / (max - min));
             if ((cellRec = netIF->Cell (coord, cField, tVal, pRadius)) != (DBObjRecord *) NULL) {
                 cVal = cField->Float(cellRec);
                 relDiff = fabs(cVal - tVal) / (cVal + tVal);
