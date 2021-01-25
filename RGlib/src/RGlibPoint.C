@@ -41,7 +41,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
             if (min > tVal) min = tVal;
             if (max < tVal) max = tVal;
         }
-        if ((count == 0) || (max == min) || (min <= 0.0)) pField = (DBObjTableField *) NULL;
+        if ((count == 0) || (max <= min) || (min <= 0.0)) pField = (DBObjTableField *) NULL;
         else { max = log(max); min = log(min); }
         if (cellCount > 0) { cellLength = cellLength / cellCount; maxRadius = (DBInt) ceil((DBFloat) maxRadius / cellLength); }
     }
