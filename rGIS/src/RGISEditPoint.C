@@ -169,7 +169,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNorientation,      XmHORIZONTAL,
                                         XmNminimum,          1,
                                         XmNmaximum,          50,
-                                        XmNvalue,            maxRadius,
+                                        XmNvalue,            tolerance,
                                         XmNscaleWidth,       110,
                                         XmNtraversalOn,      false,
                                         XmNuserData,         toleranceLabel,
@@ -245,12 +245,12 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	sTable  = dbData->Table (DBrNItems);
 	cTable  = netData->Table (DBrNCells);
 	XtVaSetValues (textF,XmNuserData,sTable->Fields (),NULL);
-	sprintf(numberString,"%d", tolerance);
+	sprintf(numberString,"%d", tolerance * toleranceMultiplier);
     UIAuxSetLabelString(toleranceLabel, numberString);
-	XmScaleSetValue(toleranceScale, tolerance);
-	sprintf(numberString,"%d", maxRadius);
+	XmScaleSetValue(toleranceScale, tolerance * toleranceMultiplier);
+	sprintf(numberString,"%d", maxRadius * radiusMultiplier);
     UIAuxSetLabelString(pRadiusLabel, numberString);
-	XmScaleSetValue(pRadiusScale, maxRadius);
+	XmScaleSetValue(pRadiusScale, maxRadius * radiusMultiplier);
 
 	UIDialogFormPopup (dShell);
 	cont = false;
