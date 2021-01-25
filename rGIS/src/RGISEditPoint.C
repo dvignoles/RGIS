@@ -158,11 +158,10 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                     	NULL);
         string = XmStringCreate((char *) "Tolerance [%]:", UICharSetBold);
         XtVaCreateManagedWidget("RGISEditSTNCoordTolleranceNameLabel", xmLabelWidgetClass, mainForm,
-                                        XmNtopAttachment,   XmATTACH_WIDGET,
-                                        XmNtopWidget,       button,
-                                        XmNtopOffset,       2,
-                                        XmNleftAttachment,  XmATTACH_FORM,
-                                        XmNlabelString,     string,
+                                        XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
+                                        XmNbottomWidget,     toleranceScale,
+                                        XmNleftAttachment,   XmATTACH_FORM,
+                                        XmNlabelString,      string,
                                         NULL);
         XmStringFree(string);
 		pRadiusScale = XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameScale", xmScaleWidgetClass, mainForm,
@@ -182,11 +181,10 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                     	NULL);
         string = XmStringCreate((char *) "Max. Radius [km]:", UICharSetBold);
         XtVaCreateManagedWidget("RGISEditSTNCoordPixelRadiusNameLabel", xmLabelWidgetClass, mainForm,
-                                        XmNtopAttachment,   XmATTACH_WIDGET,
-                                        XmNtopWidget,       toleranceScale,
-                                        XmNtopOffset,       2,
-                                        XmNleftAttachment,  XmATTACH_FORM,
-                                        XmNlabelString,     string,
+                                        XmNbottomAttachment, XmATTACH_OPPOSITE_WIDGET,
+                                        XmNbottomWidget,     toleranceScale,
+                                        XmNleftAttachment,   XmATTACH_FORM,
+                                        XmNlabelString,      string,
                                         NULL);
         XmStringFree(string);
 		XtAddCallback (UIDialogFormGetOkButton (dShell),XmNactivateCallback,(XtCallbackProc) UIAuxSetBooleanTrueCBK,&cont);
