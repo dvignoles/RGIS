@@ -89,7 +89,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 
 	{
 	char *text, numberString[13];
-	static DBInt cont, maxRadius = 1, tolerance = 10, toleranceMultiplier = 1, radiusMultiplier = 10;
+	static DBInt cont, maxRadius = 1, tolerance = 10;
 	DBDataset *dataset;
 	DBObjData *dbData, *netData;
 	DBObjTable *sTable, *cTable;
@@ -151,9 +151,8 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNminimum,          1,
                                         XmNmaximum,          50,
                                         XmNvalue,            tolerance,
-										XmNscaleMultiple,    1,
 										XmNshowValue,        true,
-                                        XmNscaleWidth,       110,
+                                        XmNscaleWidth,       160,
                                         XmNtraversalOn,      false,
                                     	NULL);
         string = XmStringCreate((char *) "Tolerance [%]:", UICharSetBold);
@@ -172,11 +171,10 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
                                         XmNrightOffset,      10,
                                         XmNorientation,      XmHORIZONTAL,
                                         XmNminimum,          1,
-                                        XmNmaximum,          50,
+                                        XmNmaximum,          500,
                                         XmNvalue,            maxRadius,
-										XmNscaleMultiple,    10,
 										XmNshowValue,        true,
-                                        XmNscaleWidth,       110,
+                                        XmNscaleWidth,       160,
                                         XmNtraversalOn,      false,
                                     	NULL);
         string = XmStringCreate((char *) "Max. Radius [km]:", UICharSetBold);
@@ -197,8 +195,8 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	sTable  = dbData->Table (DBrNItems);
 	cTable  = netData->Table (DBrNCells);
 	XtVaSetValues (textF,XmNuserData,sTable->Fields (),NULL);
-	XmScaleSetValue(toleranceScale, tolerance * toleranceMultiplier);
-	XmScaleSetValue(pRadiusScale, maxRadius * radiusMultiplier);
+	XmScaleSetValue(toleranceScale, tolerance);
+	XmScaleSetValue(pRadiusScale, maxRadius);
 
 	UIDialogFormPopup (dShell);
 	cont = false;
@@ -215,7 +213,7 @@ void RGISEditPointSTNCoordsCBK (Widget widget,void *data,XmAnyCallbackStruct *ca
 	if (cont)
 		{
 		UIPauseDialogOpen ((char *) "Moving Points");
-		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),(DBFloat) tolerance / 100.0, maxRadius * radiusMultiplier, true);
+		RGlibPointSTNCoordinates (dbData,field,cTable->Field(DBrNSubbasinArea),(DBFloat) tolerance / 100.0, maxRadius, true);
 		UIPauseDialogClose ();
 		UI2DViewRedrawAll ();
 		}
