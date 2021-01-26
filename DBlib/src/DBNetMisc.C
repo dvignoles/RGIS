@@ -132,8 +132,8 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos) const {
     return (CellTable->Item(cellID));
 }
 
-DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat target, DBInt pRadius) const {
-    DBInt i, j, pR2 = pRadius * pRadius;
+DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat target, DBInt pRadius, DBFloat tolerance) const {
+    DBInt i, j, sign, pR2 = pRadius * pRadius;
     DBInt cellID;
     DBFloat bestDelta, delta, val;
     DBObjRecord *cellRec, *bestCellRec = (DBObjRecord *) NULL;
@@ -145,11 +145,11 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat t
     if (pos.Row >= RowNum()) return ((DBObjRecord *) NULL);
 
     bestDelta = HUGE_VAL;
-    for (i = -pRadius; i <= pRadius; ++i) for (j = -pRadius; j <= pRadius; ++j) {
+    for (sign = 0; sign < 2; ++sign) for (i = sign; i < pRadius; ++i) for (j = sign; j < pRadius; ++j) {
         if (i * i + j * j > pR2) continue;
         cellPos = pos;
-        cellPos.Col += i;
-        cellPos.Row += j;
+        cellPos.Col += sign == 0 ? i : -i;
+        cellPos.Row += sign == 0 ? j : -j;
 
         if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) == DBFault) continue;
         cellRec = CellTable->Item(cellID);
@@ -160,6 +160,7 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat t
             bestDelta   = delta;
             bestCellRec = cellRec;
         }
+        if (fabs(bestDelta) / (val + target) < tolerance) break;
     }
     return (bestCellRec);
 }

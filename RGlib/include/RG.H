@@ -40,7 +40,7 @@ DBInt RGlibGenFuncTopoSubtract(DBObjTable *, char *, char *, char *);
 
 DBInt RGlibGenFuncSymbolField(DBObjData *, const char *);
 
-DBInt RGlibPointSTNCoordinates(DBObjData *, DBObjTableField *, DBObjTableField *,DBFloat, DBInt, bool);
+DBInt RGlibPointSTNCoordinates(DBObjData *, DBObjTableField *, DBObjTableField *,DBFloat, DBInt);
 
 DBInt RGlibPointSTNCharacteristics(DBObjData *);
 

@@ -15,7 +15,7 @@ bfekete@gc.cuny.edu
 #include <RG.H>
 #include <math.h>
 
-DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat limit, DBInt maxRadius, bool gui) {
+DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat tolerance, DBInt maxRadius) {
     DBInt pointID, ret = DBFault, count = 0, pRadius, cellCount = 0;
     DBFloat relDiff, cVal, tVal, min = HUGE_VAL, max = -HUGE_VAL, cellLength = 0.0;
     DBCoordinate coord;
@@ -56,15 +56,15 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
             if ((cellRec = netIF->Cell(pos)) != (DBObjRecord *) NULL) {
                 cVal = cField->Float(cellRec);
                 relDiff = fabs(cVal - tVal) / (cVal + tVal);
-                if (relDiff < limit * (1.0 - limit)) continue; 
+                if (relDiff < tolerance * (1.0 - tolerance)) continue; 
             }
             pRadius = (DBInt) ceil ((float) maxRadius * (log(tVal) - min) / (max - min));
-            if ((cellRec = netIF->Cell (coord, cField, tVal, pRadius)) != (DBObjRecord *) NULL) {
+            if ((cellRec = netIF->Cell (coord, cField, tVal, pRadius, tolerance)) != (DBObjRecord *) NULL) {
                 cVal = cField->Float(cellRec);
                 relDiff = fabs(cVal - tVal) / (cVal + tVal);
-                if (relDiff < limit) { 
+                if (relDiff < tolerance) { 
                     coord = netIF->Center(cellRec);
-                    if (gui) pntRec->Flags (DBObjectFlagSelected,DBSet);
+                    pntRec->Flags (DBObjectFlagSelected,DBSet);
                 }
             }
         }

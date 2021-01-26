@@ -19,7 +19,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -n,--network   [network coverage]");
     CMmsgPrint(CMmsgInfo, "     -f,--field     [source field]");
     CMmsgPrint(CMmsgInfo, "     -c,--cfield    [compare field]");
-    CMmsgPrint(CMmsgInfo, "     -l,--limit     [error limit]");
+    CMmsgPrint(CMmsgInfo, "     -T,--tolerance [error tolerance]");
     CMmsgPrint(CMmsgInfo, "     -p,--pradius   [pixel radius]");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *networkName = (char *) NULL;
     DBInt pRadius = 10;
-    DBFloat limit = 0.10;
+    DBFloat tolerance = 0.10;
     DBObjData *data, *netData;
     DBObjTable *pTable, *cTable;
 
@@ -68,12 +68,12 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-l", "--limit")) {
+        if (CMargTest (argv[argPos], "-T", "--tolerance")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing limit!");
                 return (CMfailed);
             }
-            if (sscanf (argv[argPos],"%lf",&limit) != 1) {
+            if (sscanf (argv[argPos],"%lf",&tolerance) != 1) {
                 CMmsgPrint(CMmsgUsrError, "Invalid limit!");
                 return (CMfailed);
             }
@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
     if (version != (char *) NULL) data->Document(DBDocVersion, version);
 
     data->LinkedData(netData);
-    if ((ret = RGlibPointSTNCoordinates (data, pTable->Field(sFieldName),cTable->Field(dFieldName),limit,pRadius,false)) == DBSuccess)
+    if ((ret = RGlibPointSTNCoordinates (data, pTable->Field(sFieldName),cTable->Field(dFieldName),tolerance,pRadius)) == DBSuccess)
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
 
     delete netData;
