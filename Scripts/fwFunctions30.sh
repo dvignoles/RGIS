@@ -416,13 +416,15 @@ function _fwPreprocess () {
 		do
 			local fwInputITEM=${_fwStateARRAY[${fwI}]}
 			local    fwSOURCE=($(_fwDataSource "${fwInputITEM}" "static"))
+echo "${fwInputITEM}:${fwSOURCE[0]}"
 			[ "${fwSOURCE[0]}" == "" ] && continue;
-
+echo "Itt Jartam 1"
 			if [ "${fwSOURCE[3]}" == "const" ]
 			then
 				[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} Constant input"
 			elif [ "${fwSOURCE[3]}" == "file" ]
 			then
+echo "Itt Jartam 2"
 				[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} File input"
             	if [ -e "${fwSOURCE[4]}" ]
             	then
