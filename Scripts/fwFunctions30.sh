@@ -410,7 +410,7 @@ function _fwPreprocess () {
 	[ -e "${_fwGDSDomainDIR}"  ] || mkdir -p "${_fwGDSDomainDIR}"
 	[ -e "${_fwGDSDomainFILE}" ] || rgis2domain ${_fwLENGTHCORRECTION} "${_fwRGISDomainFILE}" "${_fwGDSDomainFILE}"
     
-	if [ _fwSTART == "TRUE" ]
+	if [ ${_fwSTART} == "TRUE" ]
 	then
 echo "Itt Jartam 1"
 		for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
