@@ -435,10 +435,10 @@ function _fwPreprocess () {
 
 		if [ "${fwSOURCE[3]}" == "const" ]
 		then
-			[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} Constant input"
+			[ "${FwVERBOSE}" == "on" ] && echo "            ${fwInputITEM} Constant input"
 		elif [ "${fwSOURCE[3]}" == "file" ]
 		then
-			[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} File input"
+			[ "${FwVERBOSE}" == "on" ] && echo "            ${fwInputITEM} File input"
             if [ -e "${fwSOURCE[4]}" ]
             then
 				[ -e "${_fwGDSDomainDIR}/${fwSOURCE[2]}" ] || mkdir -p "${_fwGDSDomainDIR}/${fwSOURCE[2]}"
@@ -460,10 +460,10 @@ function _fwPreprocess () {
 			[ "${fwSOURCE[0]}" == "" ] && continue;
 			if [ "${fwSOURCE[3]}" == "const" ]
 			then
-				[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} Constant input"
+				[ "${FwVERBOSE}" == "on" ] && echo "            ${fwInputITEM} Constant input"
 			elif [ "${fwSOURCE[3]}" == "file" ]
 			then
-				[ "${FwVERBOSE}" == "on" ] && echo "         ${fwInputITEM} File input"
+				[ "${FwVERBOSE}" == "on" ] && echo "            ${fwInputITEM} File input"
             	if [ -e "${fwSOURCE[4]}" ]
             	then
 					[ -e "${_fwGDSDomainDIR}/${fwSOURCE[2]}" ] || mkdir -p "${_fwGDSDomainDIR}/${fwSOURCE[2]}"
