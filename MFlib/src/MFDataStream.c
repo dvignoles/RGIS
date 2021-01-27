@@ -67,7 +67,7 @@ CMreturn MFdsHeaderRead (MFdsHeader_p header,FILE *inFile) {
 	MFdsHeader_t inHeader;
 
 	if ((inFile == (FILE *) NULL) || (fread (&inHeader,sizeof (MFdsHeader_t),1,inFile) != 1)) {
-		CMmsgPrint (CMmsgAppError,"Datastream reading error: [%s]!\n");
+		CMmsgPrint (CMmsgAppError,"Datastream reading error!\n");
 		return (CMfailed);
 	}
 
@@ -165,13 +165,11 @@ CMreturn MFdsRecordRead (MFVariable_p var) {
 		if (MFDateCompare(var->CurDate, var->InDate) != 0) {
 			do {
 				if (MFdsHeaderRead(&header, var->InStream->Handle.File) == CMfailed) {
-					if (readNum < 1) {
 						CMmsgPrint(CMmsgSysError, "Data stream (%s %s %s) reading error", var->Name, var->CurDate, var->InDate);
 						return (CMfailed);
 					}
 					break;
 				}
-				readNum++;
 				if (var->ItemNum != header.ItemNum) {
 					CMmsgPrint(CMmsgUsrError, "Variable [%] has inconsistent data stream (%d != %d)", header.ItemNum,
 							   var->ItemNum);
