@@ -83,8 +83,7 @@ int MFVarGetID (char *name,char *unit,int type, bool flux, bool initial) {
 	MFVariable_p var;
 
 	if ((var = _MFVarFindEntry (name)) == (MFVariable_p) NULL) {
-		if ((var = _MFVarNewEntry (name)) == (MFVariable_p) NULL)
-			return (CMfailed);
+		if ((var = _MFVarNewEntry (name)) == (MFVariable_p) NULL) return (CMfailed);
 		if (type == MFRoute) var->Route = true;
 		var->Type = type == MFInput ? MFInput : MFOutput;
 		var->Set  = type == MFInput ? initial : true;
@@ -94,18 +93,14 @@ int MFVarGetID (char *name,char *unit,int type, bool flux, bool initial) {
 		case MFRoute:
 		case MFOutput:
 			switch (type) {
-				case MFInput: if (!var->Set) type = MFInput; break;
-				default: 
-					var->Type = type;
-					switch (var->Type) {
-						case MFByte:	var->Missing.Int   = MFDefaultMissingByte;  break;
-						case MFShort:
-						case MFInt:		var->Missing.Int   = MFDefaultMissingInt;   break;
-						case MFFloat:
-						case MFDouble:	var->Missing.Float = MFDefaultMissingFloat; break;
-					}
+				case MFInput: if (!var->Set) var->Type = MFInput; break;
 				case MFRoute:
 				case MFOutput: break;
+				case MFByte:	var->Type = type; var->Missing.Int   = MFDefaultMissingByte;  break;
+				case MFShort:
+				case MFInt:		var->Type = type; var->Missing.Int   = MFDefaultMissingInt;   break;
+				case MFFloat:
+				case MFDouble:	var->Type = type; var->Missing.Float = MFDefaultMissingFloat; break;
 			}
 			break;
 		default:
