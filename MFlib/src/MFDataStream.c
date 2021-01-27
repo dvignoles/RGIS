@@ -66,10 +66,7 @@ int MFDataStreamClose (MFDataStream_p dStream)
 CMreturn MFdsHeaderRead (MFdsHeader_p header,FILE *inFile) {
 	MFdsHeader_t inHeader;
 
-	if ((inFile == (FILE *) NULL) || (fread (&inHeader,sizeof (MFdsHeader_t),1,inFile) != 1)) {
-		CMmsgPrint (CMmsgAppError,"Datastream reading error!\n");
-		return (CMfailed);
-	}
+	if ((inFile == (FILE *) NULL) || (fread (&inHeader,sizeof (MFdsHeader_t),1,inFile) != 1)) return (CMfailed);
 
 	memcpy (header,&inHeader,sizeof (MFdsHeader_t));
 	if (header->Swap != 1) {
