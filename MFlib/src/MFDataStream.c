@@ -99,7 +99,7 @@ CMreturn MFdsHeaderWrite (MFdsHeader_p header,FILE *outFile) {
 }
 
 CMreturn MFdsRecordRead (MFVariable_p var) {
-	int i, sLen, readNum = 0;
+	int i, sLen;
 	MFdsHeader_t header;
 
     if (var->InStream->Type == MFConst) {
@@ -167,8 +167,6 @@ CMreturn MFdsRecordRead (MFVariable_p var) {
 				if (MFdsHeaderRead(&header, var->InStream->Handle.File) == CMfailed) {
 						CMmsgPrint(CMmsgSysError, "Data stream (%s %s %s) reading error", var->Name, var->CurDate, var->InDate);
 						return (CMfailed);
-					}
-					break;
 				}
 				if (var->ItemNum != header.ItemNum) {
 					CMmsgPrint(CMmsgUsrError, "Variable [%] has inconsistent data stream (%d != %d)", header.ItemNum,
