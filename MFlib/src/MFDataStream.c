@@ -99,7 +99,7 @@ CMreturn MFdsHeaderWrite (MFdsHeader_p header,FILE *outFile) {
 }
 
 CMreturn MFdsRecordRead (MFVariable_p var) {
-	int i, sLen, redNum = 0;
+	int i, sLen, readNum = 0;
 	MFdsHeader_t header;
 
     if (var->InStream->Type == MFConst) {
