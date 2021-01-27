@@ -136,12 +136,12 @@ static bool _MFVarTestMissingVal (MFVariable_p var,int itemID)
 		case MFByte:   return ((int) (((char *)  var->Buffer) [itemID]) == var->Missing.Int);
 		case MFShort:  return ((int) (((short *) var->Buffer) [itemID]) == var->Missing.Int);
 		case MFInt:	   return ((int) (((int *)   var->Buffer) [itemID]) == var->Missing.Int);
-		case MFInput:
-		case MFRoute:
 		case MFFloat:  return (CMmathEqualValues ((((float *)  var->Buffer) [itemID]),var->Missing.Float));
 		case MFDouble: return (CMmathEqualValues ((((double *) var->Buffer) [itemID]),var->Missing.Float));
+		default:
+			CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%s,%d] type [%d] in %s:%d",var->Name, itemID, var->Type,__FILE__,__LINE__);
+			break;
 	}
-	CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%s,%d] type [%d] in %s:%d",var->Name, itemID, var->Type,__FILE__,__LINE__);
 	return (true);
 }
 
@@ -172,10 +172,11 @@ void MFVarSetMissingVal (int id, int itemID)
 		case MFByte:	((char *)   var->Buffer) [itemID] = (char)   var->Missing.Int;		break;
 		case MFShort:	((short *)  var->Buffer) [itemID] = (short)  var->Missing.Int;		break;
 		case MFInt:		((int *)    var->Buffer) [itemID] = (int)    var->Missing.Int;		break;
-		case MFInput:
-		case MFRoute:
 		case MFFloat:	((float *)  var->Buffer) [itemID] = (float)  var->Missing.Float;	break;
 		case MFDouble:	((double *) var->Buffer) [itemID] = (double) var->Missing.Float;	break;
+		default:
+			CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%s,%d] type [%d] in %s:%d",var->Name, itemID, var->Type,__FILE__,__LINE__);
+			break;
 	}
 }
 
@@ -193,8 +194,6 @@ void MFVarSetFloat (int id,int itemID,double val) {
 		case MFByte:	((char *)   var->Buffer) [itemID] = (char)  val; break;
 		case MFShort:	((short *)  var->Buffer) [itemID] = (short) val; break;
 		case MFInt:		((int *)    var->Buffer) [itemID] = (int)   val; break;
-		case MFInput:
-		case MFRoute:
 		case MFFloat:	((float *)  var->Buffer) [itemID] = (float) val; break;
 		case MFDouble:	((double *) var->Buffer) [itemID] =         val; break;
 		default:
@@ -218,8 +217,6 @@ double MFVarGetFloat (int id,int itemID,double missingVal) {
 		case MFByte:	val = (double) (((char *)   var->Buffer) [itemID]); break;
 		case MFShort:	val = (double) (((short *)  var->Buffer) [itemID]); break;
 		case MFInt:		val = (double) (((int *)    var->Buffer) [itemID]); break;
-		case MFInput:
-		case MFRoute:
 		case MFFloat:	val = (double) (((float *)  var->Buffer) [itemID]); break;
 		case MFDouble:	val = (double) (((double *) var->Buffer) [itemID]); break;
 		default:
@@ -243,8 +240,6 @@ void MFVarSetInt (int id,int itemID,int val) {
 		case MFByte:	((char *)   var->Buffer) [itemID] = (char)   val;	break;
 		case MFShort:	((short *)  var->Buffer) [itemID] = (short)  val;	break;
 		case MFInt:		((int *)    var->Buffer) [itemID] = (int)    val;	break;
-		case MFInput:
-		case MFRoute:
 		case MFFloat:	((float *)  var->Buffer) [itemID] = (float)  val;	break;
 		case MFDouble:	((double *) var->Buffer) [itemID] = (double) val;	break;
 		default:
@@ -269,8 +264,6 @@ int MFVarGetInt (int id,int itemID, int missingVal) {
 		case MFByte:	val = (int) (((char *)   var->Buffer) [itemID]); break;
 		case MFShort:	val = (int) (((short *)  var->Buffer) [itemID]); break;
 		case MFInt:		val = (int) (((int *)    var->Buffer) [itemID]); break;
-		case MFInput:
-		case MFRoute:
 		case MFFloat:	val = (int) (((float *)  var->Buffer) [itemID]); break;
 		case MFDouble:	val = (int) (((double *) var->Buffer) [itemID]); break;
 		default:
@@ -285,8 +278,6 @@ size_t MFVarItemSize (int type) {
 		case MFByte:	return (sizeof (char));
 		case MFShort:	return (sizeof (short));
 		case MFInt:		return (sizeof (int));
-		case MFInput:
-		case MFRoute:
 		case MFFloat:	return (sizeof (float));
 		case MFDouble:	return (sizeof (double));
 		default:
