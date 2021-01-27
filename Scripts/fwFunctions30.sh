@@ -407,7 +407,7 @@ function _fwPreprocess () {
 	[ -e "${_fwRGISDomainFILE}" ] || ( echo "Missing domain file: ${_fwRGISDomainFILE}"; return 1; )
 
 	[ "${FwVERBOSE}" == "on" ] && echo "      Preprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"
-	[ "${FwVERBOSE}" == "on" ] && echo "         Reading Boundary Variables:"
+	[ "${FwVERBOSE}" == "on" ] && echo "         Boundary Variables:"
 	[ -e "${_fwGDSDomainDIR}"  ] || mkdir -p "${_fwGDSDomainDIR}"
 	[ -e "${_fwGDSDomainFILE}" ] || rgis2domain ${_fwLENGTHCORRECTION} "${_fwRGISDomainFILE}" "${_fwGDSDomainFILE}"
     
@@ -452,7 +452,7 @@ function _fwPreprocess () {
 
 	if [ ${_fwSTART} == "TRUE" ]
 	then
-		[ "${FwVERBOSE}" == "on" ] && echo "         Reading Initial Variables:"
+		[ "${FwVERBOSE}" == "on" ] && echo "         Initial Variables:"
 		for (( fwI = 0; fwI < ${#_fwStateARRAY[@]} ; ++fwI ))
 		do
 			local fwInputITEM=${_fwStateARRAY[${fwI}]}
