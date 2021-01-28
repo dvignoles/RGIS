@@ -628,9 +628,9 @@ function _fwSpinup () {
 		echo "${fwOptions}" > ${fwOptionsFILE}
 		[ "${FwVERBOSE}" == "on" ] && echo "   Passnum [${fwPASS}] started:  $(date '+%Y-%m-%d %H:%M:%S')"
 
-        echo ${fwOptions} | xargs ${_fwModelBIN} || echo "Model run failed" || exit 1
+        echo ${fwOptions} | xargs ${_fwModelBIN} || return 1
 	done
-	_fwPostprocess "${fwVERSION}" ""
+	_fwPostprocess "${fwVERSION}" "" || return 1
 	[ "${FwVERBOSE}"      == "on" ] && echo "Initialization finished: $(date '+%Y-%m-%d %H:%M:%S')"
 
 	local fwInputList=$(echo "${fwOptions}" | grep -e "-i" | grep -e "file:"| grep -e "Input" | sed "s:.*file\:\(.*\):\1:")
@@ -724,9 +724,9 @@ function _fwRun () {
 		echo "${fwOptions}" > ${fwOptionsFILE}
 
 		[ "${FwVERBOSE}" == "on" ] && echo "   Running year [${fwYEAR}] started:  $(date '+%Y-%m-%d %H:%M:%S')"
-		_fwPreprocess "${fwYEAR}"
-        echo ${fwOptions} | xargs ${_fwModelBIN} || echo "Model run failed" || exit 1
-		_fwPostprocess "${fwVERSION}" "${fwYEAR}"
+		_fwPreprocess "${fwYEAR}"                 || return 1
+        echo ${fwOptions} | xargs ${_fwModelBIN}  || return 1
+		_fwPostprocess "${fwVERSION}" "${fwYEAR}" || return 1
 		local fwInputList=$(echo "${fwOptions}" | grep -e "-i" | grep -e "file:"| grep -e "Input" | sed "s:.*file\:\(.*\):\1:")
 		[ "${fwInputList}" == "" ] || rm -f ${fwInputList}
 	done
