@@ -71,6 +71,7 @@ function FwArguments () {
 			(-r|--restart)
 				shift
 				 _fwRESTART="${1}"
+				 _fwSTART="FALSE"
 			;;
 			(-s|--spinup)
 				shift
