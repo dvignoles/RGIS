@@ -743,7 +743,8 @@ function FwRun () {
 
 	[ "${_fwTESTONLY}" == "on" ] && { { _fwPrintTest || return 1; } && return 0; }
 	[ -e "${_fwGDSLogDIR}" ] || mkdir -p ${_fwGDSLogDIR}
-	[ "${_fwSPINUP}"   == "on" ] && { _fwSpinup "${fwVERSION}"                                 || { echo "Spinup failed";    return 1; } }
+
+	[ "${_fwSPINUP}"   == "on" && "${_fwRESTART} == "" ] && { _fwSpinup "${fwVERSION}"         || { echo "Spinup failed";    return 1; } }
 	[ "${_fwFINALRUN}" == "on" ] && { _fwRun    "${fwVERSION}" "${fwStartYEAR}" "${fwEndYEAR}" || { echo "Final run failed"; return 1; } }
 	return 0
 }
