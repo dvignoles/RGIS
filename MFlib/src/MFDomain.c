@@ -138,7 +138,7 @@ MFDomain_p MFDomainRead (FILE *inFile) {
 
 int MFDomainSetBifurcations(MFDomain_p domain, const char *path) {
     char line[1024];
-    int fromID, toID, dlink, dlink0, ulink, objID;
+    int fromID, toID, dlink, link, ulink, objID;
     float weight, sum;
 
     FILE *inFile;
@@ -161,17 +161,16 @@ int MFDomainSetBifurcations(MFDomain_p domain, const char *path) {
                 free(domain->Objects[fromID].DWeights);
                 domain->Objects[fromID].DWeights = (float *) NULL;
             } else {
-                for (dlink=0; dlink < domain->Objects[fromID].DLinkNum+1; dlink++)
-                    if (domain->Objects[fromID].DLinks[dlink] == (size_t) toID)
-                        break;
+                for (dlink = 0; dlink < domain->Objects[fromID].DLinkNum + 1; dlink++)
+                    if (domain->Objects[fromID].DLinks[dlink] == (size_t) toID) break;
                 if (domain->Objects[fromID].DLinks[dlink] != (size_t) toID) {
                     CMmsgPrint (CMmsgSysError,"Bifur input data bad. fromID: %d, toID: %d, not initially downlinked, in: %s:%d", toID+1, fromID+1, __FILE__,__LINE__);
                     fclose(inFile);
                     return (CMfailed);
                 }
                 // remove dlink by moving rest of array up, realloc to smaller size
-                for (int _dlink = dlink; _dlink < domain->Objects[fromID].DLinkNum+1; _dlink++) {
-                    domain->Objects[fromID].DLinks[_dlink] = domain->Objects[fromID].DLinks[_dlink+1];
+                for (int link = dlink; link < domain->Objects[fromID].DLinkNum + 1; link++) {
+                    domain->Objects[fromID].DLinks[link] = domain->Objects[fromID].DLinks[link + 1];
                 }
                 domain->Objects[fromID].DLinks = (size_t *) realloc (domain->Objects[fromID].DLinks, domain->Objects [fromID].DLinkNum * sizeof (size_t));
                 if (domain->Objects[fromID].DLinks == (size_t *) NULL) {
@@ -180,8 +179,8 @@ int MFDomainSetBifurcations(MFDomain_p domain, const char *path) {
                     return (CMfailed);
                 }
                 // remove dweight by moving rest of array up, realloc to smaller size
-                for (int _dlink = dlink; _dlink < domain->Objects[fromID].DLinkNum+1; _dlink++) {
-                    domain->Objects[fromID].DWeights[_dlink] = domain->Objects[fromID].DWeights[_dlink+1];
+                for (int link = dlink; link < domain->Objects[fromID].DLinkNum + 1; link++) {
+                    domain->Objects[fromID].DWeights[link] = domain->Objects[fromID].DWeights[link+1];
                 }
                 domain->Objects[fromID].DWeights = (float *) realloc (domain->Objects[fromID].DWeights, domain->Objects [fromID].DLinkNum * sizeof (float));
                 if (domain->Objects[fromID].DWeights == (float *) NULL) {
