@@ -32,18 +32,17 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
         for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
             pntRec = pntIF->Item(pointID);
             tVal = pField->Float(pntRec);
-            if (CMmathEqualValues(tVal, pField->FloatNoData())) continue;
-            count++;
             if ((cellRec = netIF->Cell(pntIF->Coordinate(pntRec))) != (DBObjRecord *) NULL) {
                 cellCount++;
                 cellLength += netIF->CellLength(cellRec);
             }
+            if (CMmathEqualValues(tVal, pField->FloatNoData())) continue;
+            count++;
             if (min > tVal) min = tVal;
             if (max < tVal) max = tVal;
         }
-        if ((count == 0) || (max <= min) || (min <= 0.0)) pField = (DBObjTableField *) NULL;
-        else { max = log(max); min = log(min); }
         if (cellCount > 0) { cellLength = cellLength / cellCount; maxRadius = (DBInt) ceil((DBFloat) maxRadius / cellLength); }
+        if ((count != 0) && (max > min) && (min > 0.0)) { max = log(max); min = log(min); }
     }
     if (tolerance <= 0.0) CMmsgPrint(CMmsgWarning,"Maximum search: %d\n",maxRadius);
     for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
