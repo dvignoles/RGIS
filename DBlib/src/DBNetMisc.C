@@ -144,7 +144,7 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat t
     if (pos.Col >= ColNum()) return ((DBObjRecord *) NULL);
     if (pos.Row >= RowNum()) return ((DBObjRecord *) NULL);
 
-    if (tolerance < 0.0001) { // When tolerance is zero or negative searching for largest value irrespective ot the target value
+    if (tolerance <= 0.0) { // When tolerance is zero or negative searching for largest value irrespective ot the target value
         bestDelta = -HUGE_VAL;
         for (sign = 0; sign < 2; ++sign) for (i = sign; i < pRadius; ++i) for (j = sign; j < pRadius; ++j) {
             if (i * i + j * j > pR2) continue;

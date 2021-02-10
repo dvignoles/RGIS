@@ -45,7 +45,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
         else { max = log(max); min = log(min); }
         if (cellCount > 0) { cellLength = cellLength / cellCount; maxRadius = (DBInt) ceil((DBFloat) maxRadius / cellLength); }
     }
-    if (tolerance < 0.00001) CMmsgPrint(CMmsgWarning,"Maximum search: %d\n",maxRadius);
+    if (tolerance <= 0.0) CMmsgPrint(CMmsgWarning,"Maximum search: %d\n",maxRadius);
     for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
         pntRec = pntIF->Item(pointID);
         if (DBPause(pointID * 100 / pntIF->ItemNum())) goto Stop;
@@ -55,7 +55,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
         netIF->Pos2Coord(pos, coord);
         if (pField != (DBObjTableField *) NULL) {
             if (CMmathEqualValues(tVal = pField->Float(pntRec), pField->FloatNoData())) {
-                if (tolerance < 0.00001) {
+                if (tolerance <= 0.0) {
                     // When tolerance is zero or negative searching for largest value irrespective ot the target value
                     if ((cellRec = netIF->Cell (coord, cField, tVal, maxRadius, tolerance)) != (DBObjRecord *) NULL) {
                         coord = netIF->Center(cellRec);
