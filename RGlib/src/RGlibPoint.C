@@ -75,6 +75,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
                         if (relDiff < tolerance) { 
                             coord = netIF->Center(cellRec);
                             pntRec->Flags (DBObjectFlagSelected,DBSet);
+                        }
                     }
                 } // else do nothing
             }
