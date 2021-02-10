@@ -16,7 +16,7 @@ bfekete@gc.cuny.edu
 #include <math.h>
 
 DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat tolerance, DBInt maxRadius) {
-    DBInt pointID, ret = DBFault, count = 0, pRadius, cellCount = 0;
+    DBInt pointID, ret = DBFault, valCount = 0, pntCount = 0, pRadius;
     DBFloat relDiff, cVal, tVal, min = HUGE_VAL, max = -HUGE_VAL, cellLength = 0.0;
     DBCoordinate coord;
     DBPosition pos;
@@ -33,18 +33,21 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
             pntRec = pntIF->Item(pointID);
             tVal = pField->Float(pntRec);
             if ((cellRec = netIF->Cell(pntIF->Coordinate(pntRec))) != (DBObjRecord *) NULL) {
-                cellCount++;
+                pntCount++;
                 cellLength += netIF->CellLength(cellRec);
             }
-            if (CMmathEqualValues(tVal, pField->FloatNoData())) continue;
-            count++;
-            if (min > tVal) min = tVal;
-            if (max < tVal) max = tVal;
+            if (!CMmathEqualValues(tVal, pField->FloatNoData())) {
+                if (min > tVal) min = tVal;
+                if (max < tVal) max = tVal;
+                valCount++;
+            }
         }
-        if (cellCount > 0) { cellLength = cellLength / cellCount; maxRadius = (DBInt) ceil((DBFloat) maxRadius / cellLength); }
-        if ((count != 0) && (max > min) && (min > 0.0)) { max = log(max); min = log(min); }
+        if (pntCount > 0) { cellLength = cellLength / pntCount; maxRadius = (DBInt) ceil((DBFloat) maxRadius / cellLength); }
+        if ((valCount != 0) && (max > min) && (min > 0.0)) { max = log(max); min = log(min); }
     }
-    if (tolerance <= 0.0) CMmsgPrint(CMmsgWarning,"Maximum search: %d\n",maxRadius);
+    if (tolerance <= 0.0)
+         CMmsgPrint(CMmsgWarning,"Maximum search: %d %d %d\n",maxRadius, pntCount, valCount);
+    else CMmsgPrint(CMmsgWarning,"Field search: %d %d\n",maxRadius, pntCount, valCount);
     for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
         pntRec = pntIF->Item(pointID);
         if (DBPause(pointID * 100 / pntIF->ItemNum())) goto Stop;
@@ -62,7 +65,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
                     }
                 } // else do nothing.
             } else {
-                if (tolerance > 0.0) {
+                if (valCount > 0 && tolerance > 0.0) {
                     if ((cellRec = netIF->Cell(pos)) != (DBObjRecord *) NULL) {
                         cVal = cField->Float(cellRec);
                         relDiff = fabs(cVal - tVal) / (cVal + tVal);
