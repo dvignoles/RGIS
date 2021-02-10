@@ -43,11 +43,11 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
             }
         }
         if (pntCount > 0) { cellLength = cellLength / pntCount; maxRadius = (DBInt) ceil((DBFloat) maxRadius / cellLength); }
-        if ((valCount != 0) && (max > min) && (min > 0.0)) { max = log(max); min = log(min); }
+        if ((valCount > 0) && (max > min) && (min > 0.0)) { max = log(max); min = log(min); }
     }
     if (tolerance <= 0.0)
          CMmsgPrint(CMmsgWarning,"Maximum search: %d %d %d\n",maxRadius, pntCount, valCount);
-    else CMmsgPrint(CMmsgWarning,"Field search: %d %d\n",maxRadius, pntCount, valCount);
+    else CMmsgPrint(CMmsgWarning,"Field search: %d %d %d\n",maxRadius, pntCount, valCount);
     for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
         pntRec = pntIF->Item(pointID);
         if (DBPause(pointID * 100 / pntIF->ItemNum())) goto Stop;
