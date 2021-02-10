@@ -139,28 +139,47 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat t
     DBObjRecord *cellRec, *bestCellRec = (DBObjRecord *) NULL;
     DBPosition cellPos;
 
-    if (pos.Col < 0) return ((DBObjRecord *) NULL);
-    if (pos.Row < 0) return ((DBObjRecord *) NULL);
+    if (pos.Col < 0)         return ((DBObjRecord *) NULL);
+    if (pos.Row < 0)         return ((DBObjRecord *) NULL);
     if (pos.Col >= ColNum()) return ((DBObjRecord *) NULL);
     if (pos.Row >= RowNum()) return ((DBObjRecord *) NULL);
 
-    bestDelta = HUGE_VAL;
-    for (sign = 0; sign < 2; ++sign) for (i = sign; i < pRadius; ++i) for (j = sign; j < pRadius; ++j) {
-        if (i * i + j * j > pR2) continue;
-        cellPos = pos;
-        cellPos.Col += sign == 0 ? i : -i;
-        cellPos.Row += sign == 0 ? j : -j;
+    if (tolerance <= 0.0) { // When tolerance is zero or negative searching for largest value irrespective ot the target value
+        bestDelta = -HUGE_VAL;
+        for (sign = 0; sign < 2; ++sign) for (i = sign; i < pRadius; ++i) for (j = sign; j < pRadius; ++j) {
+            if (i * i + j * j > pR2) continue;
+            cellPos = pos;
+            cellPos.Col += sign == 0 ? i : -i;
+            cellPos.Row += sign == 0 ? j : -j;
 
-        if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) == DBFault) continue;
-        cellRec = CellTable->Item(cellID);
-        val     = field->Float(cellRec);
-        if (CMmathEqualValues(val, field->FloatNoData())) continue;
-        delta = fabs(val - target);
-        if (delta < bestDelta) {
-            bestDelta   = delta;
-            bestCellRec = cellRec;
+            if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) == DBFault) continue;
+            cellRec = CellTable->Item(cellID);
+            val     = field->Float(cellRec);
+            if (CMmathEqualValues(val, field->FloatNoData())) continue;
+            if (val > bestDelta) {
+                bestDelta   = val;
+                bestCellRec = cellRec;
+            }
         }
+    } else {
+        bestDelta = HUGE_VAL;
+        for (sign = 0; sign < 2; ++sign) for (i = sign; i < pRadius; ++i) for (j = sign; j < pRadius; ++j) {
+            if (i * i + j * j > pR2) continue;
+            cellPos = pos;
+            cellPos.Col += sign == 0 ? i : -i;
+            cellPos.Row += sign == 0 ? j : -j;
+
+            if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) == DBFault) continue;
+            cellRec = CellTable->Item(cellID);
+            val     = field->Float(cellRec);
+            if (CMmathEqualValues(val, field->FloatNoData())) continue;
+            delta = fabs(val - target);
+            if (delta < bestDelta) {
+                bestDelta   = delta;
+                bestCellRec = cellRec;
+            }
         if (fabs(bestDelta) / (val + target) < tolerance) break;
+        }
     }
     return (bestCellRec);
 }
