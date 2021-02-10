@@ -56,10 +56,8 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
             if (CMmathEqualValues(tVal = pField->Float(pntRec), pField->FloatNoData())) {
                 if (tolerance <= 0.0) {
                     // When tolerance is zero or negative searching for largest value irrespective ot the target value
-                    if ((cellRec = netIF->Cell (coord, cField, tVal, 3, tolerance)) != (DBObjRecord *) NULL) {
+                    if ((cellRec = netIF->Cell (coord, cField, tVal, 3, tolerance)) != (DBObjRecord *) NULL)
                         coord = netIF->Center(cellRec);
-                            
-                    }
                 } // else do nothing.
             } else {
                 if (tolerance > 0.0) {
@@ -72,10 +70,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
                     if ((cellRec = netIF->Cell (coord, cField, tVal, pRadius, tolerance)) != (DBObjRecord *) NULL) {
                         cVal = cField->Float(cellRec);
                         relDiff = fabs(cVal - tVal) / (cVal + tVal);
-                        if (relDiff < tolerance) { 
-                            coord = netIF->Center(cellRec);
-                            pntRec->Flags (DBObjectFlagSelected,DBSet);
-                        }
+                        if (relDiff < tolerance) coord = netIF->Center(cellRec);
                     }
                 } // else do nothing
             }
