@@ -54,7 +54,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
         netIF->Pos2Coord(pos, coord);
         if (pField != (DBObjTableField *) NULL) {
             if (CMmathEqualValues(tVal = pField->Float(pntRec), pField->FloatNoData())) {
-                if (tolerance <= 0.0) {
+                if (tolerance < 0.00001) {
                     // When tolerance is zero or negative searching for largest value irrespective ot the target value
                     if ((cellRec = netIF->Cell (coord, cField, tVal, maxRadius, tolerance)) != (DBObjRecord *) NULL) {
                         coord = netIF->Center(cellRec);
