@@ -2,7 +2,7 @@
 
 GHAAS Database library V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2020, UNH - ASRC/CUNY
+Copyright 1994-2021, UNH - ASRC/CUNY
 
 DBif.H
 
@@ -747,17 +747,21 @@ public:
 
     DBObjRecord *Cell(DBPosition) const;
 
-    DBObjRecord *Cell(DBPosition, DBFloat) const;
+    DBObjRecord *Cell(DBPosition, DBObjTableField *, DBFloat, DBInt,DBFloat) const;
+
+    DBObjRecord *Cell(DBPosition pos, DBFloat area) const { return (Cell (pos,this->SubbasinAreaFLD,area,1,1.0)); }
 
     DBObjRecord *Cell(DBCoordinate coord) const {
         DBPosition pos;
         if (Coord2Pos(coord, pos) == DBSuccess) return (Cell(pos)); else return ((DBObjRecord *) NULL);
     }
 
-    DBObjRecord *Cell(DBCoordinate coord, DBFloat area) const {
+    DBObjRecord *Cell(DBCoordinate coord, DBObjTableField *cField, DBFloat area, DBInt pRadius,DBFloat tolerance) const {
         DBPosition pos;
-        if (Coord2Pos(coord, pos) == DBSuccess) return (Cell(pos, area)); else return ((DBObjRecord *) NULL);
+        if (Coord2Pos(coord, pos) == DBSuccess) return (Cell(pos, cField, area, pRadius,tolerance)); else return ((DBObjRecord *) NULL);
     }
+ 
+    DBObjRecord *Cell(DBCoordinate coord, DBFloat area) const { return (Cell (coord,this->SubbasinAreaFLD, area, 1,1.0)); }
 
     DBObjRecord *ToCell(const DBObjRecord *) const;
 

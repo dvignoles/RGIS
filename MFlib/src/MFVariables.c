@@ -2,7 +2,7 @@
 
 GHAAS Water Balance Model Library V1.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2020, UNH - ASRC/CUNY
+Copyright 1994-2021, UNH - ASRC/CUNY
 
 MFVariables.c
 
@@ -83,8 +83,7 @@ int MFVarGetID (char *name,char *unit,int type, bool flux, bool initial) {
 	MFVariable_p var;
 
 	if ((var = _MFVarFindEntry (name)) == (MFVariable_p) NULL) {
-		if ((var = _MFVarNewEntry (name)) == (MFVariable_p) NULL)
-			return (CMfailed);
+		if ((var = _MFVarNewEntry (name)) == (MFVariable_p) NULL) return (CMfailed);
 		if (type == MFRoute) var->Route = true;
 		var->Type = type == MFInput ? MFInput : MFOutput;
 		var->Set  = type == MFInput ? initial : true;
@@ -94,18 +93,14 @@ int MFVarGetID (char *name,char *unit,int type, bool flux, bool initial) {
 		case MFRoute:
 		case MFOutput:
 			switch (type) {
-				case MFInput: if (!var->Set) type = MFInput; break;
-				default: 
-					var->Type = type;
-					switch (var->Type) {
-						case MFByte:	var->Missing.Int   = MFDefaultMissingByte;  break;
-						case MFShort:
-						case MFInt:		var->Missing.Int   = MFDefaultMissingInt;   break;
-						case MFFloat:
-						case MFDouble:	var->Missing.Float = MFDefaultMissingFloat; break;
-					}
+				case MFInput: if (!var->Set) var->Type = MFInput; break;
 				case MFRoute:
 				case MFOutput: break;
+				case MFByte:	var->Type = type; var->Missing.Int   = MFDefaultMissingByte;  break;
+				case MFShort:
+				case MFInt:		var->Type = type; var->Missing.Int   = MFDefaultMissingInt;   break;
+				case MFFloat:
+				case MFDouble:	var->Type = type; var->Missing.Float = MFDefaultMissingFloat; break;
 			}
 			break;
 		default:
@@ -143,8 +138,10 @@ static bool _MFVarTestMissingVal (MFVariable_p var,int itemID)
 		case MFInt:	   return ((int) (((int *)   var->Buffer) [itemID]) == var->Missing.Int);
 		case MFFloat:  return (CMmathEqualValues ((((float *)  var->Buffer) [itemID]),var->Missing.Float));
 		case MFDouble: return (CMmathEqualValues ((((double *) var->Buffer) [itemID]),var->Missing.Float));
+		default:
+			CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%s,%d] type [%d] in %s:%d",var->Name, itemID, var->Type,__FILE__,__LINE__);
+			break;
 	}
-	CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%s,%d] type [%d] in %s:%d",var->Name, itemID, var->Type,__FILE__,__LINE__);
 	return (true);
 }
 
@@ -177,6 +174,9 @@ void MFVarSetMissingVal (int id, int itemID)
 		case MFInt:		((int *)    var->Buffer) [itemID] = (int)    var->Missing.Int;		break;
 		case MFFloat:	((float *)  var->Buffer) [itemID] = (float)  var->Missing.Float;	break;
 		case MFDouble:	((double *) var->Buffer) [itemID] = (double) var->Missing.Float;	break;
+		default:
+			CMmsgPrint (CMmsgAppError,"Error: Invalid variable [%s,%d] type [%d] in %s:%d",var->Name, itemID, var->Type,__FILE__,__LINE__);
+			break;
 	}
 }
 

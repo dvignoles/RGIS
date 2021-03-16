@@ -2,7 +2,7 @@
 
 GHAAS Water Balance/Transport Model
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2020, UNH - ASRC/CUNY
+Copyright 1994-2021, UNH - ASRC/CUNY
 
 MDIrrRefETFAO.c
 
@@ -99,7 +99,7 @@ int MDIrrigation_ReferenceETFAODef () {
 	if (((_MDInDayLengthID          = MDCommon_SolarRadDayLengthDef()) == CMfailed) ||
         ((_MDInI0HDayID            = MDCommon_SolarRadI0HDayDef()) == CMfailed) ||
         ((_MDInSolRadID            = MDCommon_SolarRadDef()) == CMfailed) ||
-        ((_MDInElevationID         = MFVarGetID (MDVarCommon_MeanElevation, "m", MFInput, MFState, MFBoundary)) == CMfailed) ||
+        ((_MDInElevationID         = MFVarGetID (MDVarCommon_Elevation, "m", MFInput, MFState, MFBoundary)) == CMfailed) ||
         ((_MDInCommon_AtMeanID            = MFVarGetID (MDVarCommon_AirTemperature, "degC", MFInput, MFState, MFBoundary)) == CMfailed) ||
         ((_MDInAtMinID             = MFVarGetID (MDVarCommon_AirTempMinimum, "degC", MFInput, MFState, MFBoundary)) == CMfailed) ||
         ((_MDInAtMaxID             = MFVarGetID (MDVarCommon_AirTempMaximum, "degC", MFInput, MFState, MFBoundary)) == CMfailed) ||

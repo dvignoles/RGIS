@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Libarary V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2020, UNH - ASRC/CUNY
+Copyright 1994-2021, UNH - ASRC/CUNY
 
 RGlibPoint.C
 
@@ -13,21 +13,39 @@ bfekete@gc.cuny.edu
 #include <DB.H>
 #include <DBif.H>
 #include <RG.H>
+#include <math.h>
 
-
-DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *field) {
-    DBInt pointID, ret = DBFault;
-    DBFloat areaDiff;
+DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat tolerance, DBInt maxRadius) {
+    DBInt pointID, ret = DBFault, valCount = 0, pntCount = 0, pRadius;
+    DBFloat relDiff, cVal, tVal, min = HUGE_VAL, max = -HUGE_VAL, cellLength = 0.0;
     DBCoordinate coord;
     DBPosition pos;
     DBObjData *linkedData = dbData->LinkedData();
     DBVPointIF *pntIF;
     DBNetworkIF *netIF;
-    DBObjRecord *pntRec, *cellRec, *bestCellRec;
+    DBObjRecord *pntRec, *cellRec;
 
     if ((linkedData == (DBObjData *) NULL) && (linkedData->Type() != DBTypeNetwork)) return (DBFault);
     pntIF = new DBVPointIF(dbData);
     netIF = new DBNetworkIF(linkedData);
+    if (pField != (DBObjTableField *) NULL) {
+        for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
+            pntRec = pntIF->Item(pointID);
+            tVal = pField->Float(pntRec);
+            if ((cellRec = netIF->Cell(pntIF->Coordinate(pntRec))) != (DBObjRecord *) NULL) {
+                cellLength += netIF->CellLength(cellRec);
+                pntCount++;
+            }
+            if (!CMmathEqualValues(tVal, pField->FloatNoData())) {
+                if (min > tVal) min = tVal;
+                if (max < tVal) max = tVal;
+                valCount++;
+            }
+        }
+        if ((max <= min) || (min <= 0.0)) valCount = 0;
+        if (pntCount > 0) { cellLength = cellLength / pntCount; maxRadius = (DBInt) ceil((DBFloat) maxRadius / cellLength); }
+        if (valCount > 0) { max = log(max); min = log(min); }
+    }
     for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
         pntRec = pntIF->Item(pointID);
         if (DBPause(pointID * 100 / pntIF->ItemNum())) goto Stop;
@@ -35,16 +53,33 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *field) {
         coord = pntIF->Coordinate(pntRec);
         if (netIF->Coord2Pos(coord, pos) == DBFault) continue;
         netIF->Pos2Coord(pos, coord);
-        cellRec = netIF->Cell (coord);
-        if ((field != (DBObjTableField *) NULL) && (!CMmathEqualValues(field->Float(pntRec), field->FloatNoData()))) {
-            bestCellRec = netIF->Cell(coord, field->Float(pntRec));
-            if ((cellRec != (DBObjRecord *) NULL) && (bestCellRec != (DBObjRecord *) NULL)) {
-                // The 4 cell area corresponds to the hard coded search radius in netIF->Cell ().
-                areaDiff = fabs(netIF->CellBasinArea(cellRec) - netIF->CellBasinArea(bestCellRec));
-                coord    = areaDiff < 4 * netIF->CellArea(cellRec) ? netIF->Center(cellRec) : netIF->Center(bestCellRec);
+        if (pField != (DBObjTableField *) NULL) {
+            if (CMmathEqualValues(tVal = pField->Float(pntRec), pField->FloatNoData())) {
+                if (tolerance <= 0.0) {
+                    // When tolerance is zero or negative searching for largest value irrespective ot the target value
+                    if ((cellRec = netIF->Cell (coord, cField, tVal, maxRadius, tolerance)) != (DBObjRecord *) NULL) {
+                        coord = netIF->Center(cellRec);
+                        pntRec->Flags (DBObjectFlagSelected,DBSet);
+                    }
+                } // else do nothing.
+            } else {
+                if (valCount > 0 && tolerance > 0.0) {
+                    if ((cellRec = netIF->Cell(pos)) != (DBObjRecord *) NULL) {
+                        cVal = cField->Float(cellRec);
+                        relDiff = fabs(cVal - tVal) / (cVal + tVal);
+                        if (relDiff < tolerance * (1.0 - tolerance)) continue; 
+                    }
+                    pRadius = (DBInt) ceil ((float) maxRadius * (log(tVal) - min) / (max - min));
+                    if ((cellRec = netIF->Cell (coord, cField, tVal, pRadius, tolerance)) != (DBObjRecord *) NULL) {
+                        cVal = cField->Float(cellRec);
+                        relDiff = fabs(cVal - tVal) / (cVal + tVal);
+                        if (relDiff < tolerance) { 
+                            coord = netIF->Center(cellRec);
+                            pntRec->Flags (DBObjectFlagSelected,DBSet);
+                        }
+                    }
+                } // else do nothing
             }
-            else if (cellRec     != (DBObjRecord *) NULL) coord = netIF->Center(cellRec);
-            else if (bestCellRec != (DBObjRecord *) NULL) coord = netIF->Center(bestCellRec);
         }
         pntIF->Coordinate(pntRec, coord);
     }

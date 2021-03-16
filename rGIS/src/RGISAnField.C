@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS V3.0
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2020, UNH - ASRC/CUNY
+Copyright 1994-2021, UNH - ASRC/CUNY
 
 RGISAnField.C
 
@@ -523,6 +523,13 @@ void RGISAnalyseFieldsCompareCBK (Widget widget,void *data,XmAnyCallbackStruct *
 								NULL);
 		XmStringFree (string);
 		XtAddCallback (mButton,XmNactivateCallback,(XtCallbackProc) UIAuxSetIntegerCBK,(XtPointer) 2);
+		string = XmStringCreate ((char *) "Absolute %",UICharSetNormal);
+		mButton = XtVaCreateManagedWidget ("RGISAnalyseCompFieldsMenuButton",xmPushButtonWidgetClass,menu,
+								XmNlabelString,             string,
+								XmNuserData,                &diffMethod,
+								NULL);
+		XmStringFree (string);
+		XtAddCallback (mButton,XmNactivateCallback,(XtCallbackProc) UIAuxSetIntegerCBK,(XtPointer) 3);
 		string = XmStringCreate ((char *) "Difference Method:",UICharSetBold);
 		menu = XtVaCreateManagedWidget ("RGISAnalyseCompFieldsMenu",xmRowColumnWidgetClass,mainForm,
 								XmNtopAttachment,           XmATTACH_WIDGET,

@@ -2,7 +2,7 @@
 
 GHAAS RiverGIS Library V2.1
 Global Hydrologic Archive and Analysis System
-Copyright 1994-2020, UNH - ASRC/CUNY
+Copyright 1994-2021, UNH - ASRC/CUNY
 
 RG.H
 
@@ -40,7 +40,7 @@ DBInt RGlibGenFuncTopoSubtract(DBObjTable *, char *, char *, char *);
 
 DBInt RGlibGenFuncSymbolField(DBObjData *, const char *);
 
-DBInt RGlibPointSTNCoordinates(DBObjData *, DBObjTableField *);
+DBInt RGlibPointSTNCoordinates(DBObjData *, DBObjTableField *, DBObjTableField *,DBFloat, DBInt);
 
 DBInt RGlibPointSTNCharacteristics(DBObjData *);
 
