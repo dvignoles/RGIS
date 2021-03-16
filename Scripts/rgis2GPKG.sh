@@ -48,7 +48,7 @@ function _GPKGattribTable () {
 	echo "SELECT \"${schemaName}_${tableName}\", \"feature_count\" FROM "gpkg_ogr_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
 	echo "SELECT gpkgAddGeometryColumn(\"${schemaName}_${tableName}\", \"geom\", '${dataType}', 0, 0, 4326);"
 	echo "UPDATE \"${schemaName}_${tableName}\""
-	echo "SET \"geom\" = (SELECT ST_COLLECT (\"${schemaName}_${tableName}_geom\".\"geom\")"
+	echo "SET \"geom\" = (SELECT ST_BUFFER (ST_UNION (\"${schemaName}_${tableName}_geom\".\"geom\"),0.0)"
  	echo "                FROM \"${schemaName}_${tableName}_geom\""
 	echo "                WHERE \"${schemaName}_${tableName}\".\"${relateID}\" = \"${schemaName}_${tableName}_geom\".\"${joinID}\""
 	echo "                GROUP BY \"${schemaName}_${tableName}_geom\".\"${joinID}\");"
