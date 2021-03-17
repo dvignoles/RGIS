@@ -162,7 +162,7 @@ case "${EXTENSION}" in
 		mv -f "${TEMPFILE}-Disolved.shp" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
 		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" | spatialite -silent -batch  "${GEOPACKAGE}"
-    #    rm "${TEMPFILE}".*
+        rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
 		[ -e "${GEOPACKAGE}" ] && [ "${MODE}" == "append" ] && (echo "DROP TABLE IF EXISTS \"${SCHEMA}_${TBLNAME}\"" | spatialite -silent -batch  "${GEOPACKAGE}")
