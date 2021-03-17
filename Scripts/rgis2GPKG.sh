@@ -164,7 +164,7 @@ case "${EXTENSION}" in
 		rm "${TEMPFILE}".*
  	;;
 	(gdbd|gdbd.gz)
-		rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
+		rgis2ascii -I "${RGISFILE}" "${TEMPFILE}.grd"
 		gdal_translate -a_srs EPSG:4326 "${TEMPFILE}.grd" "${TEMPFILE}.tif"
 		gdal_polygonize.py -nomask -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
 		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}.shp"

@@ -23,6 +23,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -l,--layer [layername]");
     CMmsgPrint(CMmsgInfo, "     -i,--list");
     CMmsgPrint(CMmsgInfo, "     -n,--num");
+    CMmsgPrint(CMmsgInfo, "     -I,--ID");
     CMmsgPrint(CMmsgInfo, "     -V,--verbose");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
@@ -31,7 +32,7 @@ int main(int argc, char *argv[]) {
     FILE *outFile;
     int argPos, argNum = argc, ret, verbose = false;
     char *layerName = (char *) NULL;
-    int doList = false, doNum = false, doAll = true;
+    int doList = false, doNum = false, doAll = true, gridVal = true;
     DBInt layerID;
     DBObjData *data;
     DBObjRecord *layerRec;
@@ -63,6 +64,11 @@ int main(int argc, char *argv[]) {
             layerName = argv[argPos];
             doAll = false;
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-I", "--ID")) {
+            argNum = CMargShiftLeft(argPos, argv, argNum);
+            gridVal = false;
             continue;
         }
         if (CMargTest (argv[argPos], "-V", "--verbose")) {
@@ -130,7 +136,7 @@ int main(int argc, char *argv[]) {
                     CMmsgPrint(CMmsgUsrError, "Wrong layername");
                     ret = CMfailed;
                 }
-                else ret = DBExportARCGridLayer(data, layerRec, outFile);
+                else ret = DBExportARCGridLayer(data, layerRec, gridVal, outFile);
             }
             delete gridIF;
             break;
