@@ -2159,10 +2159,6 @@ DBInt DBExportARCTableDef(DBObjData *, char *, char *);
 
 DBInt DBExportARCGridLayer(DBObjData *, DBObjRecord *, FILE *);
 
-DBInt DBExportARCGridLayer(DBObjData *, DBObjRecord *, bool, FILE *);
-
-DBInt DBExportARCGridLayer(DBObjData *, DBObjRecord *, bool, const char *);
-
 DBInt DBExportARCGridLayer(DBObjData *, DBObjRecord *, const char *);
 
 DBInt DBExportDMGrid(DBObjData *, FILE *);

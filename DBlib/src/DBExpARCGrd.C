@@ -14,10 +14,6 @@ bfekete@gc.cuny.edu
 #include <DBif.H>
 
 DBInt DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, const char *fileName) {
-    return (DBExportARCGridLayer(data,layerRec,true,fileName));
-}
-
-int DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, bool gridVal, const char *fileName) {
     FILE *file;
     DBInt ret;
 
@@ -25,20 +21,15 @@ int DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, bool gridVal, c
         CMmsgPrint(CMmsgSysError, "File Opening Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);
     }
-    ret = DBExportARCGridLayer(data, layerRec, gridVal, file);
+    ret = DBExportARCGridLayer(data, layerRec, file);
     fclose(file);
     return (ret);
 }
 
 DBInt DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, FILE *file) {
-    return (DBExportARCGridLayer(data, layerRec, true, file));
-}
-
-int DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, bool gridVal, FILE *file) {
     DBInt row, col;
     DBPosition pos;
     DBGridIF *gridIF = new DBGridIF(data);
-    DBObjRecord *gridItem;
 
     fprintf(file, "ncols         %d\n", gridIF->ColNum());
     fprintf(file, "nrows         %d\n", gridIF->RowNum());
@@ -82,12 +73,7 @@ int DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, bool gridVal, F
             for (col = 0; col < gridIF->ColNum(); col++) {
                 pos.Row = row;
                 pos.Col = col;
-                if (gridVal)
-                    fprintf(file, " %d", gridIF->GridValue(layerRec, pos));
-                else {
-                    gridItem = gridIF->GridItem(layerRec,pos);
-                    fprintf(file, " %d", gridItem != (DBObjRecord *) NULL ? gridItem->RowID () : -9999);
-                }
+                fprintf(file, " %d", gridIF->GridValue(layerRec, pos));
             }
             fprintf(file, "\n");
         }
