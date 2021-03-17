@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
             if (doAll) {
                 for (layerID = 0; layerID < gridIF->LayerNum(); ++layerID) {
                     layerRec = gridIF->Layer(layerID);
-                    if ((ret = DBExportARCGridLayer(data, layerRec, outFile)) == CMfailed) break;
+                    if ((ret = DBExportARCGridLayer(data, layerRec, gridVal, outFile)) == CMfailed) break;
                 }
             }
             else if (layerName != (char *) NULL) {
