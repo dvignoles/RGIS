@@ -156,10 +156,10 @@ case "${EXTENSION}" in
 	(gdbd|gdbd.gz)
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
 		gdal_translate -a_srs EPSG:4326 "${TEMPFILE}.grd" "${TEMPFILE}.tif"
-		gdal_polygonize.py -nomask -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
+		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
 		ogr2ogr "${TEMPFILE}-Disolved.shp" "${TEMPFILE}.shp" -dialect sqlite -sql "SELECT DN, ST_Union(geometry) FROM ${TEMPFILE##*/} GROUP BY DN"
 		mv -f "${TEMPFILE}-Disolved.shp" "${TEMPFILE}.shp"
-		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}.shp"
+		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" "${GEOPACKAGE}" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
 		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" | spatialite -silent -batch  "${GEOPACKAGE}"
         rm "${TEMPFILE}".*
