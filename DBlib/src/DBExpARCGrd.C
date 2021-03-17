@@ -38,6 +38,7 @@ int DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, bool gridVal, F
     DBInt row, col;
     DBPosition pos;
     DBGridIF *gridIF = new DBGridIF(data);
+    DBObjRecord *gridItem;
 
     fprintf(file, "ncols         %d\n", gridIF->ColNum());
     fprintf(file, "nrows         %d\n", gridIF->RowNum());
@@ -81,7 +82,12 @@ int DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, bool gridVal, F
             for (col = 0; col < gridIF->ColNum(); col++) {
                 pos.Row = row;
                 pos.Col = col;
-                fprintf(file, " %d", gridVal ? gridIF->GridValue(layerRec, pos) : gridIF->GridItem(layerRec,pos)->RowID ());
+                if (gridVal)
+                    fprintf(file, " %d", gridIF->GridValue(layerRec, pos));
+                else {
+                    gridItem = gridIF->GridItem(layerRec,pos);
+                    fprintf(file, " %d", gridItem != (DBObjRecord *) NULL ? gridItem->RowID () : -9999);
+                }
             }
             fprintf(file, "\n");
         }
