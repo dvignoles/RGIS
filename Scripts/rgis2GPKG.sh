@@ -50,10 +50,12 @@ function _GPKGattribTable () {
 	echo "UPDATE \"${schemaName}_${tableName}\""
 	if [[ "${dataType}" == "POLYGON" ]]
 	then
-		echo "SET \"geom\" = (SELECT ST_BUFFER (ST_UNION (\"${schemaName}_${tableName}_geom\".\"geom\"),0.0)"
- 		echo "                FROM \"${schemaName}_${tableName}_geom\""
-		echo "                WHERE \"${schemaName}_${tableName}\".\"${relateID}\" = \"${schemaName}_${tableName}_geom\".\"${joinID}\""
-		echo "                GROUP BY \"${schemaName}_${tableName}_geom\".\"${joinID}\");"
+		echo "SET \"geom\" = \"geom_table\".\"geom\""
+ 		echo "                FROM (SELECT \"${joinID}\" AS \"${joinID}\","
+		echo "                             ST_BUFFER (ST_UNION (\"${schemaName}_${tableName}_geom\".\"geom\"),0.0) AS \"geom\""
+		echo "                      FROM     \"${schemaName}_${tableName}_geom\""
+		echo "                      GROUP BY \"${schemaName}_${tableName}_geom\".\"${joinID}\") AS \"geom_table\")"
+		echo "                WHERE \"${schemaName}_${tableName}\".\"${relateID}\" = \"geom_table\".\"${joinID}\";"
 	else
 		echo "SET \"geom\" = (SELECT \"${schemaName}_${tableName}_geom\".\"geom\""
  		echo "                FROM \"${schemaName}_${tableName}_geom\""
