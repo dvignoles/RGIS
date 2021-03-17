@@ -48,7 +48,7 @@ function _GPKGattribTable () {
 	echo "SELECT \"${schemaName}_${tableName}\", \"feature_count\" FROM "gpkg_ogr_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
 	echo "SELECT gpkgAddGeometryColumn(\"${schemaName}_${tableName}\", \"geom\", '${dataType}', 0, 0, 4326);"
 	echo "UPDATE \"${schemaName}_${tableName}\""
-	if [[ "${dataType}" == "POLYGON" ]]
+	if [[ "${dataType}" == "xxxPOLYGON" ]]
 	then
 		echo "SET \"geom\" = (SELECT \"geom_table\".\"geom\""
  		echo "                FROM (SELECT \"${joinID}\" AS \"${joinID}\","
