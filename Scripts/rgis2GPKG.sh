@@ -60,7 +60,8 @@ function _GPKGattribTable () {
 		echo "SET \"geom\" = (SELECT \"${schemaName}_${tableName}_geom\".\"geom\""
  		echo "                FROM \"${schemaName}_${tableName}_geom\""
 		echo "                WHERE \"${schemaName}_${tableName}\".\"${relateID}\" = \"${schemaName}_${tableName}_geom\".\"${joinID}\");"
-	fi	echo "DROP TABLE \"${schemaName}_${TBLNAME}_geom\";"
+	fi
+	echo "DROP TABLE \"${schemaName}_${TBLNAME}_geom\";"
 	echo "DELETE FROM \"gpkg_metadata_reference\" WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
 	echo "DELETE FROM \"gpkg_geometry_columns\"   WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
 	echo "DELETE FROM \"gpkg_contents\"           WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
