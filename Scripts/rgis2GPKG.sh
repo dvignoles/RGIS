@@ -48,7 +48,7 @@ function _GPKGattribTable () {
 	echo "SELECT \"${schemaName}_${tableName}\", \"feature_count\" FROM "gpkg_ogr_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
 	echo "SELECT gpkgAddGeometryColumn(\"${schemaName}_${tableName}\", \"geom\", '${dataType}', 0, 0, 4326);"
 	echo "UPDATE \"${schemaName}_${tableName}\""
-	if [[ "${dataType}" == "xxxPOLYGON" ]]
+	if [[ "${dataType}" == "POLYGON" ]]
 	then
 		echo "SET \"geom\" = (SELECT \"geom_table\".\"geom\""
  		echo "                FROM (SELECT \"${joinID}\" AS \"${joinID}\","
@@ -170,7 +170,7 @@ case "${EXTENSION}" in
 		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
 		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" | spatialite -silent -batch  "${GEOPACKAGE}"
-        rm "${TEMPFILE}".*
+    #    rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
 		[ -e "${GEOPACKAGE}" ] && [ "${MODE}" == "append" ] && (echo "DROP TABLE IF EXISTS \"${SCHEMA}_${TBLNAME}\"" | spatialite -silent -batch  "${GEOPACKAGE}")
