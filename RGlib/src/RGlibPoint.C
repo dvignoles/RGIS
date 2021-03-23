@@ -63,6 +63,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
                     }
                 } // else do nothing.
             } else {
+                printf ("Itt Jartam\n")
                 if (valCount > 0 && tolerance > 0.0) {
                     if ((cellRec = netIF->Cell(pos)) != (DBObjRecord *) NULL) {
                         cVal = cField->Float(cellRec);
