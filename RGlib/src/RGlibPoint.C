@@ -59,11 +59,9 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
                     // When tolerance is zero or negative searching for largest value irrespective ot the target value
                     if ((cellRec = netIF->Cell (coord, cField, tVal, maxRadius, tolerance)) != (DBObjRecord *) NULL) {
                         coord = netIF->Center(cellRec);
-                        pntRec->Flags (DBObjectFlagSelected,DBSet);
                     }
                 } // else do nothing.
             } else {
-                printf ("Itt Jartam\n")
                 if (valCount > 0 && tolerance > 0.0) {
                     if ((cellRec = netIF->Cell(pos)) != (DBObjRecord *) NULL) {
                         cVal = cField->Float(cellRec);
@@ -76,7 +74,6 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
                         relDiff = fabs(cVal - tVal) / (cVal + tVal);
                         if (relDiff < tolerance) { 
                             coord = netIF->Center(cellRec);
-                            pntRec->Flags (DBObjectFlagSelected,DBSet);
                         }
                     }
                 } // else do nothing
