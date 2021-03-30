@@ -489,8 +489,8 @@ function _fwPostprocess () {
 	if [ "${fwYEAR}" == "" ]; then local fwSUFFIX="LT"; else local fwSUFFIX="TS${fwYEAR}"; fi
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"; }
 
-	if [ "${_fwDAILYOUTPUT}" == "on" ]; then local maxProc=4; else local maxProc=_${fwMAXPROC}; fi
-	echo "MaxProc: ${maxProc}"
+	if [ "${_fwDAILYOUTPUT}" == "on" ]; then local maxProc=4; else local maxProc=${_fwMAXPROC}; fi
+
 	local procNum=0
 	local files=""
 	for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
@@ -519,7 +519,6 @@ function _fwPostprocess () {
 			                      -m ${_fwRGISDomainFILE} -d "${_fwDomainNAME}" -u "${fwVARIABLE}" -s blue \
 			                      "${fwGDSFileNAME}" "${fwRGISFileNAME}") &
 		fi
-		echo "Itt jartam"
 		if (( ${procNum} < ${maxProc} ))
     	then
 			local procNum=$((${procNum} + 1))
