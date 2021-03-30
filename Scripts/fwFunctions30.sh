@@ -489,7 +489,8 @@ function _fwPostprocess () {
 	if [ "${fwYEAR}" == "" ]; then local fwSUFFIX="LT"; else local fwSUFFIX="TS${fwYEAR}"; fi
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"; }
 
-	[ "${_fwDAILYOUTPUT}" == "off" ] && local maxProc=_${fwMAXPROC} || local maxProc=4
+	if [ "${_fwDAILYOUTPUT}" == "off" ]; then local maxProc=_${fwMAXPROC}; else local maxProc=4; fi
+
 	local procNum=0
 	local files=""
 	for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
