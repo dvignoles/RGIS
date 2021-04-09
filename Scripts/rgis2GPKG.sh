@@ -142,9 +142,7 @@ TEMPFILE="$(mktemp -u -t rgis2gpkgXXXX)"
  
 case "${EXTENSION}" in
 	(gdbt|gdbt.gz)
-		rgis2sql -c "${CASE}" -m "${MODE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" > "${TEMPFILE}".sql
-		ogr2ogr -sql @"${TEMPFILE}.sql" -append -f "GPKG" "${GEOPACKAGE}"
-		rm "${TEMPFILE}.sql"
+		rgis2sql -c "${CASE}" -m "${MODE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
 	;;
 	(gdbp|gdbp.gz|gdbl|gdbl.gz)
 		[ "${EXTENSION%.gz}" == gdbp ] && DATATYPE="POINT" || DATATYPE="LINESTRING"
@@ -152,8 +150,7 @@ case "${EXTENSION}" in
 		ogr2ogr -a_srs EPSG:4326 -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
 		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" "${GEOPACKAGE}" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" > "${TEMPFILE}.sql"
-		ogr2ogr -sql @"${TEMPFILE}.sql" -append -f "GPKG" "${GEOPACKAGE}"
+		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | spatialite -silent -batch  "${GEOPACKAGE}"
 		rm "${TEMPFILE}".*
  	;;
 	(gdbd|gdbd.gz)
@@ -163,8 +160,7 @@ case "${EXTENSION}" in
 		ogr2ogr "${TEMPFILE}-Disolved.shp" "${TEMPFILE}.shp" -dialect sqlite -sql "SELECT DN, ST_Union(geometry) FROM ${TEMPFILE##*/} GROUP BY DN"
 		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}-Disolved.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" > "${TEMPFILE}.sql"
-		ogr2ogr -sql $"${TEMPFILE}.sql" -append -f "GPKG" "${GEOPACKAGE}"
+		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" | spatialite -silent -batch  "${GEOPACKAGE}"
         rm "${TEMPFILE}".* "${TEMPFILE}-Disolved.shp"
 	;;
 	(gdbc|gdbc.gz|nc)
