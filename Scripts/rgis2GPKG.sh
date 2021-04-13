@@ -56,7 +56,7 @@ function _GPKGattribTable () {
 	echo "DELETE FROM \"gpkg_geometry_columns\"   WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
 	echo "DELETE FROM \"gpkg_contents\"           WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
 	echo "DELETE FROM \"gpkg_ogr_contents\"       WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
-	echo "SELECT gpkgCreateSpatialIndex(\"${schemaName}_${tableName}\", \"geom\");"
+	echo "SELECT gpkgAddSpatialIndex(\"${schemaName}_${tableName}\", \"geom\");"
 }
 
 while [ "${1}" != "" ]
