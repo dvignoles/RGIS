@@ -51,12 +51,12 @@ function _GPKGattribTable () {
 	echo "SET \"geom\" = (SELECT \"${schemaName}_${tableName}_geom\".\"geom\""
  	echo "                FROM \"${schemaName}_${tableName}_geom\""
 	echo "                WHERE \"${schemaName}_${tableName}\".\"${relateID}\" = \"${schemaName}_${tableName}_geom\".\"${joinID}\");"
-	echo "DROP TABLE \"${schemaName}_${tableName}_geom\";"
+	echo "DROP TABLE \"${schemaName}_${TBLNAME}_geom\";"
 	echo "DELETE FROM \"gpkg_metadata_reference\" WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
 	echo "DELETE FROM \"gpkg_geometry_columns\"   WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
 	echo "DELETE FROM \"gpkg_contents\"           WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
 	echo "DELETE FROM \"gpkg_ogr_contents\"       WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
-	echo "SELECT gpkgCreateSpatialIndex(\"${schemaName}_${tableName}\", \"geom\");"
+	echo "SELECT gpkgCreateSpatialIndex(\"${schemaName}_${tableName}\", \"geom\");
 }
 
 while [ "${1}" != "" ]
@@ -150,8 +150,8 @@ case "${EXTENSION}" in
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.asc"
 		ogr2ogr -a_srs EPSG:4326 -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
 		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" "${GEOPACKAGE}" "${TEMPFILE}.shp"
-		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | sqlite3 -batch "${GEOPACKAGE}"
+		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
+		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | spatialite -silent -batch  "${GEOPACKAGE}"
 		rm "${TEMPFILE}".*
  	;;
 	(gdbd|gdbd.gz)
@@ -160,8 +160,8 @@ case "${EXTENSION}" in
 		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
 		ogr2ogr "${TEMPFILE}-Disolved.shp" "${TEMPFILE}.shp" -dialect sqlite -sql "SELECT DN, ST_Union(geometry) FROM ${TEMPFILE##*/} GROUP BY DN"
 		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}-Disolved.shp"
-		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" | spatialite -silent -batch "${GEOPACKAGE}"
+		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
+		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" | spatialite -silent -batch  "${GEOPACKAGE}"
         rm "${TEMPFILE}".* "${TEMPFILE}-Disolved.shp"
 	;;
 	(gdbc|gdbc.gz|nc)
