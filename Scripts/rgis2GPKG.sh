@@ -51,7 +51,8 @@ function _GPKGattribTable () {
 	echo "SET \"geom\" = (SELECT \"${schemaName}_${tableName}_geom\".\"geom\""
  	echo "                FROM \"${schemaName}_${tableName}_geom\""
 	echo "                WHERE \"${schemaName}_${tableName}\".\"${relateID}\" = \"${schemaName}_${tableName}_geom\".\"${joinID}\");"
-	echo "DROP TABLE \"${schemaName}_${TBLNAME}_geom\";"
+	echo "SELECT CreateSpatialIndex(\"${schemaName}_${tableName}\", \"geom\");"
+	echo "DROP TABLE \"${schemaName}_${tableName}_geom\";"
 	echo "DELETE FROM \"gpkg_metadata_reference\" WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
 	echo "DELETE FROM \"gpkg_geometry_columns\"   WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
 	echo "DELETE FROM \"gpkg_contents\"           WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
@@ -151,7 +152,6 @@ case "${EXTENSION}" in
 		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" "${GEOPACKAGE}" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
 		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | spatialite -silent -batch  "${GEOPACKAGE}"
-		ogrinfo -SQL "SELECT CreateSpatialIndex(\"${SCHEMA}_${TBLNAME}\", \"geom\")" "${GEOPACKAGE}"
 		rm "${TEMPFILE}".*
  	;;
 	(gdbd|gdbd.gz)
@@ -162,7 +162,6 @@ case "${EXTENSION}" in
 		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}-Disolved.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
 		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" | spatialite -silent -batch  "${GEOPACKAGE}"
-		ogrinfo -SQL "SELECT CreateSpatialIndex(\"${SCHEMA}_${TBLNAME}\", \"geom\")" "${GEOPACKAGE}"
         rm "${TEMPFILE}".* "${TEMPFILE}-Disolved.shp"
 	;;
 	(gdbc|gdbc.gz|nc)
