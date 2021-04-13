@@ -139,7 +139,7 @@ GRIDVALUE=$(caseFunc "${CASE}" "GridValue")
 
 TEMPFILE="$(mktemp -u -t rgis2gpkgXXXX)"
 
-[ -e "${GEOPACKAGE}" ] && [ "${MODE}" == "replace" ] && (echo "DROP TABLE IF EXISTS \"${SCHEMA}_${TBLNAME}\";" | spatialite -silent -batch  "${GEOPACKAGE}")
+[ -e "${GEOPACKAGE}" ] && [ "${MODE}" == "replace" ] && (echo "DROP TABLE IF EXISTS \"${SCHEMA}_${TBLNAME}\";" | sqlite3 -batch  "${GEOPACKAGE}")
  
 case "${EXTENSION}" in
 	(gdbt|gdbt.gz)
