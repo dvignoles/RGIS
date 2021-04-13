@@ -145,6 +145,10 @@ TEMPFILE="$(mktemp -u -t rgis2gpkgXXXX)"
 case "${EXTENSION}" in
 	(gdbt|gdbt.gz)
 		rgis2sql -c "${CASE}" -m "${MODE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
+		if (( $(echo "SELECT COUNT(\"table_name\") FROM \"gpkg_contents\" WHERE \"table_name\" = \"${SCHEMA}\"_\"${TBLNAME}\";" | spatialite -silent -batch "${GEOPACKAGE}") == 0 ))
+		then
+			echo "INSERT INTO \"gpkg_contents\" (\"table_name\", \"data_type\",\"identifier\",\:kast_change\") VALUES ('${SCHEMA}_${TBLNAME}','attributes', '${SCHEMA}_${TBLNAME}',datetime('now'));" | spatialite -silent -batch "${GEOPACKAGE}"
+		fi
 	;;
 	(gdbp|gdbp.gz|gdbl|gdbl.gz)
 		[ "${EXTENSION%.gz}" == gdbp ] && DATATYPE="POINT" || DATATYPE="LINESTRING"
