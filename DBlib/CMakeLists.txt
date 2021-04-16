@@ -1,4 +1,10 @@
+cmake_minimum_required(VERSION 3.20)
+
 project(DBlib)
+
+# -fPIC gcc flag
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 FILE(GLOB sources src/*.C)
 add_library(DB30 ${sources})
 target_include_directories(DB30 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
