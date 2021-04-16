@@ -15,6 +15,7 @@ swig_add_library(pyDBlib
 
 find_package(PythonLibs REQUIRED)
 set_property(TARGET pyDBlib PROPERTY SWIG_USE_TARGET_INCLUDE_DIRECTORIES ON)
+set_property(TARGET pyDBlib PROPERTY LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/pyDBlib)
 
 target_include_directories(pyDBlib
   PRIVATE
