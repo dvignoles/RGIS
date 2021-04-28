@@ -4,8 +4,8 @@ GHAAS RiverGIS Utilities V3.0
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-CMDnetTransfer.C
-Based on CMDnetErosion.C
+CMDnetTransfer.cpp
+Based on CMDnetErosion.cpp
 
 wil.wollheim@unh.edu
 

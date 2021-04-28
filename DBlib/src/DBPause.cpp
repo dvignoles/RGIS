@@ -4,7 +4,7 @@ GHAAS Database library V3.0
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-DBPause.C
+DBPause.cpp
 
 bfekete@gc.cuny.edu
 

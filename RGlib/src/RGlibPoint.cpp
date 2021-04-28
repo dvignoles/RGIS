@@ -4,7 +4,7 @@ GHAAS RiverGIS Libarary V3.0
 Global Hydrologic Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-RGlibPoint.C
+RGlibPoint.cpp
 
 bfekete@gc.cuny.edu
 
