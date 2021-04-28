@@ -14,7 +14,7 @@ netPourElevation netPotReservoir netTrim netUnaccumulate netUpstreamAvg pntGridS
 pntSymbolField rgis2ascii rgis2domain rgis2ds rgis2netcdf rgis2sql rgis2table rgisMetadb setHeader setProperties table2rgis tblAddField tblAddXY tblCalculate tblConv2Point
 tblConvCoord tblDecimalDate tblDeleteField tblDeleteRec tblIdleRec tblJoinTables tblMergeCoord tblMergeDate tblMJoinTables tblRedefField tblSelectRec vdbLookup
 tblSortRec tblSplitDate tblStatistics tblTopoCalc )
-	add_executable(${loop_var} src/CMD${loop_var}.C)
+	add_executable(${loop_var} src/CMD${loop_var}.cpp)
 	if(${CMAKE_HOST_APPLE})
 		target_link_libraries(${loop_var} LINK_PUBLIC VDB30 RG30 MF30 DB30 CM30 -lnetcdf -ludunits2 -lm)
 	else(${CMAKE_HOST_APPLE})

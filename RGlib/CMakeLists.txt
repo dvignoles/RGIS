@@ -1,5 +1,5 @@
 project(RGlib)
-FILE(GLOB sources src/*.C)
+FILE(GLOB sources src/*.cpp)
 add_library(RG30 ${sources})
 target_include_directories(RG30 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
                                        ${CMAKE_CURRENT_SOURCE_DIR}/../DBlib/include
