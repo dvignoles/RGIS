@@ -148,8 +148,8 @@ DBInt UIDataHeaderForm(DBObjData *data) {
                                                XmNleftAttachment, XmATTACH_WIDGET,
                                                XmNleftWidget, label,
                                                XmNleftOffset, 5,
-                                               XmNmaxLength, DBDataSubjectLen - 1,
-                                               XmNcolumns, DBDataSubjectLen - 1,
+                                               XmNmaxLength, 0x20 - 1,
+                                               XmNcolumns,   0x20 - 1,
                                                NULL);
         XtAddCallback(subjectTextF, XmNvalueChangedCallback, (XtCallbackProc) _UIDataHeaderTextFieldCBK,
                       changed + var++);
@@ -189,8 +189,8 @@ DBInt UIDataHeaderForm(DBObjData *data) {
                                               XmNleftAttachment, XmATTACH_WIDGET,
                                               XmNleftWidget, label,
                                               XmNleftOffset, 5,
-                                              XmNmaxLength, DBDataSubjectLen - 1,
-                                              XmNcolumns, DBDataSubjectLen - 1,
+                                              XmNmaxLength, 0x20 - 1,
+                                              XmNcolumns,   0x20 - 1,
                                               NULL);
         XtAddCallback(geoDomTextF, XmNvalueChangedCallback, (XtCallbackProc) _UIDataHeaderTextFieldCBK,
                       changed + var++);

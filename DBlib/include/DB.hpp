@@ -1652,14 +1652,14 @@ public:
 #define DBDocOwnerPerson        ((char *) "Contact Person")
 #define DBDocComment            ((char *) "Comment")
 
-#define DBDataNameLen            0x040
+#define DBDataNameLen           0x040
 #define DBDataVersionLen        0x008
-#define DBDataGeoDomainLen        0x020
+#define DBDataGeoDomainLen      0x100
 #define DBDataSubjectLen        0x020
 #define DBDataCitationRefLen    0x100
-#define DBDataCitationInstLen    0x040
-#define DBDataSourceInstLen    0x040
-#define DBDataSourcePersonLen    0x020
+#define DBDataCitationInstLen   0x040
+#define DBDataSourceInstLen     0x040
+#define DBDataSourcePersonLen   0x020
 #define DBDataCommentLen        0x100
 
 class DBObjData : public DBObject, public DBDataHeader {
@@ -1754,9 +1754,9 @@ class DBObjMetaEntry : public DBObject {
 private:
     DBInt TypeVAR;
     DBInt DummyVAR;
-    char FileNameSTR[DBDataFileNameLen];
-    char SubjectSTR[DBStringLength];
-    char GeoDomainSTR[DBStringLength];
+    char FileNameSTR [DBDataFileNameLen];
+    char SubjectSTR  [DBDataSubjectLen];
+    char GeoDomainSTR[DBDataGeoDomainLen];
 
     void Initialize() {
         TypeVAR = DBFault;

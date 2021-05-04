@@ -119,41 +119,51 @@ DBDataset::~DBDataset() {
     delete GeoDomainLIST;
 }
 
+struct DBDatasetHeader {
+    DBShort Version   = 3;
+    DBShort ByteOrder = 1;
+};
+
 int DBDataset::Read(const char *fileName) {
     FILE *file;
-    DBInt byteOrder, id, swap;
+    struct DBDatasetHeader header;
+    DBInt id, swap;
 
     if ((file = fopen(fileName, "r")) == NULL) return (DBFault);
 
-    if (fread(&byteOrder, sizeof(DBInt), 1, file) != 1) {
+    if (fread(&header, sizeof(struct DBDatasetHeader), 1, file) != 1) {
         CMmsgPrint(CMmsgSysError, "File Reading Error in: %s %d", __FILE__, __LINE__);
         fclose(file);
         return (DBFault);
     }
-
-    swap = byteOrder != 1 ? true : false;
-    if (SubjectLIST->Read(file, swap) == DBFault) return (DBFault);
-    for (id = 0; id < SubjectLIST->ItemNum(); ++id)
-        if (SubjectLIST->ReadItem(file, id, swap) == DBFault) return (DBFault);
-    if (GeoDomainLIST->Read(file, swap) == DBFault) return (DBFault);
-    for (id = 0; id < GeoDomainLIST->ItemNum(); ++id)
-        if (GeoDomainLIST->ReadItem(file, id, swap) == DBFault) return (DBFault);
-    if (MetaLIST->Read(file, swap) == DBFault) return (DBFault);
-    for (id = 0; id < MetaLIST->ItemNum(); ++id)
-        if (MetaLIST->ReadItem(file, id, swap) == DBFault) return (DBFault);
+    if (header.Version > 0) {
+        swap = header.ByteOrder != 1 ? true : false;
+        if (SubjectLIST->Read(file, swap) == DBFault) return (DBFault);
+        for (id = 0; id < SubjectLIST->ItemNum(); ++id)
+            if (SubjectLIST->ReadItem(file, id, swap) == DBFault) return (DBFault);
+        if (GeoDomainLIST->Read(file, swap) == DBFault) return (DBFault);
+        for (id = 0; id < GeoDomainLIST->ItemNum(); ++id)
+            if (GeoDomainLIST->ReadItem(file, id, swap) == DBFault) return (DBFault);
+        if (MetaLIST->Read(file, swap) == DBFault) return (DBFault);
+        for (id = 0; id < MetaLIST->ItemNum(); ++id)
+            if (MetaLIST->ReadItem(file, id, swap) == DBFault) return (DBFault);
+    }
     fclose(file);
     return (DBSuccess);
 }
 
 int DBDataset::Write(const char *fileName) {
     FILE *file;
-    DBInt byteOrder = 1, id;
+    struct DBDatasetHeader header;
+    DBInt id;
 
     if ((file = fopen(fileName, "w")) == NULL) {
         CMmsgPrint(CMmsgSysError, "File Opening Error in: %s %d", __FILE__, __LINE__);
         return (DBFault);
     }
-    if (fwrite(&byteOrder, sizeof(DBInt), 1, file) != 1) {
+    header.Version   = 3;
+    header.ByteOrder = 1;
+    if (fwrite(&header, sizeof(struct DBDatasetHeader), 1, file) != 1) {
         CMmsgPrint(CMmsgSysError, "File Writiing Error in: %s %d", __FILE__, __LINE__);
         fclose(file);
         return (DBFault);
