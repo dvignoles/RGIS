@@ -133,7 +133,7 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos) const {
 }
 
 DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat target, DBInt pRadius, DBFloat tolerance) const {
-    DBInt i, j, sign, pR2 = pRadius * pRadius;
+    DBInt i, j, k, l, radius, dir, pR2 = pRadius * pRadius;
     DBInt cellID;
     DBFloat bestDelta, delta, val;
     DBObjRecord *cellRec, *bestCellRec = (DBObjRecord *) NULL;
@@ -146,12 +146,20 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat t
 
     if (tolerance <= 0.0) { // When tolerance is zero or negative searching for largest value irrespective ot the target value
         bestDelta = -HUGE_VAL;
-        for (sign = 0; sign < 2; ++sign) for (i = 0; i < pRadius; ++i) for (j = 0; j < pRadius; ++j) {
-            if ((sign == 1) && (i == 0) && (j == 0)) continue;
-            if (i * i + j * j > pR2) continue;
-            cellPos = pos;
-            cellPos.Col += sign == 0 ? i : -i;
-            cellPos.Row += sign == 0 ? j : -j;
+        for (radius = 0; radius < pRadius; ++radius) for (l = 0;l < 4; ++l)  for (k = 0; k <= radius; ++radius) for (dir = 0; dir < 2; ++dir) {
+            switch (l) {
+                case 0: i = dir == 0 ? k : -k; j = - radius;          break; // Horizontal line North
+                case 1: i = radius;            j = dir == 0 ? k : -k; break; // Vertical line East
+                case 2: i = dir == 0 ? k : -k; j =   radius;          break; // Horizon line South
+                case 3: i = - radius;          j = dir == 0 ? k : -k; break; // Vertical line West
+                default: continue;
+            }
+            if ((dir == 1) && (i == 0) && (j == 0)) continue;
+            if (i * i + j * j > pR2)                continue;
+            
+            cellPos      = pos;
+            cellPos.Col += i;
+            cellPos.Row += j;
 
             if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) == DBFault) continue;
             cellRec = CellTable->Item(cellID);
@@ -164,12 +172,20 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat t
         }
     } else {
         bestDelta = HUGE_VAL;
-        for (sign = 0; sign < 2; ++sign) for (i = 0; i < pRadius; ++i) for (j = 0; j < pRadius; ++j) {
-            if ((sign == 1) && (i == 0) && (j == 0)) continue;
-            if (i * i + j * j > pR2) continue;
-            cellPos = pos;
-            cellPos.Col += sign == 0 ? i : -i;
-            cellPos.Row += sign == 0 ? j : -j;
+        for (radius = 0; radius < pRadius; ++radius) for (l = 0;l < 4; ++l)  for (k = 0; k <= radius; ++radius) for (dir = 0; dir < 2; ++dir) {
+            switch (l) {
+                case 0: i = dir == 0 ? k : -k; j = - radius;          break; // Horizontal line North
+                case 1: i = radius;            j = dir == 0 ? k : -k; break; // Vertical line East
+                case 2: i = dir == 0 ? k : -k; j =   radius;          break; // Horizon line South
+                case 3: i = - radius;          j = dir == 0 ? k : -k; break; // Vertical line West
+                default: continue;
+            }
+            if ((dir == 1) && (i == 0) && (j == 0)) continue;
+            if (i * i + j * j > pR2)                continue;
+            
+            cellPos      = pos;
+            cellPos.Col += i;
+            cellPos.Row += j;
 
             if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) == DBFault) continue;
             cellRec = CellTable->Item(cellID);
