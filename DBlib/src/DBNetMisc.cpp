@@ -164,7 +164,8 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat t
         }
     } else {
         bestDelta = HUGE_VAL;
-        for (sign = 0; sign < 2; ++sign) for (i = sign; i < pRadius; ++i) for (j = sign; j < pRadius; ++j) {
+        for (sign = 0; sign < 2; ++sign) for (i = 0; i < pRadius; ++i) for (j = 0; j < pRadius; ++j) {
+            if ((sign == 1) && (i == 0) && (j == 0)) continue;
             if (i * i + j * j > pR2) continue;
             cellPos = pos;
             cellPos.Col += sign == 0 ? i : -i;
