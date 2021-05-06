@@ -80,6 +80,7 @@ static VDBmasterTable_t _VDBmasterTable2 [] = {
         {"energy",        "shortwave_upwelling_radiation",     "Radiation-ShortWave-Upwelling",   "Upwelling Short Wave Radiation",    VDBcontinuous, VDBgrey,          VDBavg},
         {"hydrography",   "daily_precipitation_fraction",      "Precipitation-DailyFraction",     "Daily Precipitation Fraction",      VDBcontinuous, VDBgrey,          VDBavg},
         {"hydrography",   "discharge",                         "Discharge",                       "Discharge",                         VDBcontinuous, VDBblue,          VDBavg},
+        {"hydrography",   "discharge-gauge",                   "DischargeGauge",                  "Discharge Gauge",                   VDBpoint,      VDBblue,          VDBnotApplicable},
         {"hydrography",   "evapotranspiration",                "Evapotranspiration",              "Evapotranspiration",                VDBcontinuous, VDBgrey,          VDBsum},
         {"hydrography",   "potential_evapotranspiration",      "PotEvapotranspiration",           "Potential Evapotranspiration",      VDBcontinuous, VDBgrey,          VDBsum},
         {"hydrography",   "precipitation",                     "Precipitation",                   "Precipitation",                     VDBcontinuous, VDBblue,          VDBsum},
