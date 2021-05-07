@@ -158,14 +158,14 @@ int main(int argc, char *argv[]) {
     if (verbose) RGlibPauseOpen(argv[0]);
 
     netData = new DBObjData();
-    cTable = netData->Table(DBrNCells);
     if ((netData->Read(networkName) == DBFault) || (netData->Type() != DBTypeNetwork)) {
         CMmsgPrint(CMmsgUsrError, "Invalid network coverage!");
         _CMDprintUsage (argv[0]);
         delete netData;
         return (CMfailed);
     }
-
+    cTable = netData->Table(DBrNCells);
+    
     data = new DBObjData();
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Read(argv[1]) : data->Read(stdin);
     if ((ret == DBFault) || (data->Type() != DBTypeVectorPoint)) {
