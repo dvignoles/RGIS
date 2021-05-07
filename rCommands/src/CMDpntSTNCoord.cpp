@@ -19,7 +19,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -n,--network   [network coverage]");
     CMmsgPrint(CMmsgInfo, "     -f,--field     [area field]");
     CMmsgPrint(CMmsgInfo, "     -c,--cfield    [compare field]");
-    CMmsgPrint(CMmsgInfo, "     -T,--tolerance [error tolerance]");
+    CMmsgPrint(CMmsgInfo, "     -T,--tolerance [error tolerance in percent]");
     CMmsgPrint(CMmsgInfo, "     -p,--pradius   [pixel radius]");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
@@ -35,8 +35,8 @@ int main(int argc, char *argv[]) {
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *networkName = (char *) NULL;
-    DBInt pRadius = 10;
-    DBFloat tolerance = 0.10;
+    DBInt pRadius   = 10;
+    DBInt tolerance = 10;
     DBObjData *data, *netData;
     DBObjTable *pTable, *cTable;
 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
                 CMmsgPrint(CMmsgUsrError, "Missing limit!");
                 return (CMfailed);
             }
-            if (sscanf (argv[argPos],"%lf",&tolerance) != 1) {
+            if (sscanf (argv[argPos],"%d",&tolerance) != 1) {
                 CMmsgPrint(CMmsgUsrError, "Invalid limit!");
                 return (CMfailed);
             }
@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
     if (version != (char *) NULL) data->Document(DBDocVersion, version);
 
     data->LinkedData(netData);
-    if ((ret = RGlibPointSTNCoordinates (data, pTable->Field(sFieldName),cTable->Field(dFieldName),tolerance,pRadius)) == DBSuccess)
+    if ((ret = RGlibPointSTNCoordinates (data, pTable->Field(sFieldName),cTable->Field(dFieldName),(DBFloat) tolerance / 100.0,pRadius)) == DBSuccess)
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
 
     delete netData;
