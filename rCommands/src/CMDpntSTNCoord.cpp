@@ -17,7 +17,7 @@ bfekete@gc.cuny.edu
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input point> <output point>", CMfileName(arg0));
     CMmsgPrint(CMmsgInfo, "     -n,--network   [network coverage]");
-    CMmsgPrint(CMmsgInfo, "     -f,--field     [source field]");
+    CMmsgPrint(CMmsgInfo, "     -f,--field     [area field]");
     CMmsgPrint(CMmsgInfo, "     -c,--cfield    [compare field]");
     CMmsgPrint(CMmsgInfo, "     -T,--tolerance [error tolerance]");
     CMmsgPrint(CMmsgInfo, "     -p,--pradius   [pixel radius]");
