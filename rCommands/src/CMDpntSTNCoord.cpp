@@ -182,7 +182,7 @@ int main(int argc, char *argv[]) {
     if (version != (char *) NULL) data->Document(DBDocVersion, version);
 
     data->LinkedData(netData);
-    if ((ret = RGlibPointSTNCoordinates (data, pTable->Field(sFieldName),cTable->Field(dFieldName),(DBFloat) tolerance / 100.0,pRadius)) == DBSuccess)
+    if ((ret = RGlibPointSTNCoordinates (data, sFieldNam != (char *) NULL ? pTable->Field(sFieldName) : (DBObjTableField *) NULL,cTable->Field(dFieldName),(DBFloat) tolerance / 100.0,pRadius)) == DBSuccess)
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
 
     delete netData;
