@@ -17,7 +17,7 @@ bfekete@gc.cuny.edu
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input point> <output point>", CMfileName(arg0));
     CMmsgPrint(CMmsgInfo, "     -n,--network   [network coverage]");
-    CMmsgPrint(CMmsgInfo, "     -f,--field     [area field]");
+    CMmsgPrint(CMmsgInfo, "     -f,--field     [source field]");
     CMmsgPrint(CMmsgInfo, "     -c,--cfield    [compare field]");
     CMmsgPrint(CMmsgInfo, "     -T,--tolerance [error tolerance in percent]");
     CMmsgPrint(CMmsgInfo, "     -p,--pradius   [pixel radius]");
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
                 CMmsgPrint(CMmsgUsrError, "Missing fieldname!");
                 return (CMfailed);
             }
-            sFieldName = argv[argPos];
+            dFieldName = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
@@ -148,11 +148,6 @@ int main(int argc, char *argv[]) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
         _CMDprintUsage (argv[0]);
         return (CMfailed);
-    }
-    if (sFieldName == (char *) NULL) {
-         CMmsgPrint(CMmsgUsrError, "Missing area source fieldname!");
-        _CMDprintUsage (argv[0]);
-        return (CMfailed);       
     }
     if (networkName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Network coverage is not specified");
