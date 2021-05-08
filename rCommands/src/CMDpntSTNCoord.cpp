@@ -31,7 +31,7 @@ static void _CMDprintUsage (const char *arg0) {
 
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
-    char *sFieldName = (char *) NULL, *dFieldName = DBrNCellArea;
+    char *pFieldName = (char *) NULL, *cFieldName = DBrNCellArea;
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *networkName = (char *) NULL;
@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
     DBInt tolerance = 10;
     DBObjData *data, *netData;
     DBObjTable *pTable, *cTable;
+    DBObjTableField *pField, *cField;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-n", "--network")) {
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
                 CMmsgPrint(CMmsgUsrError, "Missing fieldname!");
                 return (CMfailed);
             }
-            sFieldName = argv[argPos];
+            pFieldName = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]) {
                 CMmsgPrint(CMmsgUsrError, "Missing fieldname!");
                 return (CMfailed);
             }
-            dFieldName = argv[argPos];
+            cFieldName = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
@@ -165,7 +166,7 @@ int main(int argc, char *argv[]) {
         return (CMfailed);
     }
     cTable = netData->Table(DBrNCells);
-    
+
     data = new DBObjData();
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Read(argv[1]) : data->Read(stdin);
     if ((ret == DBFault) || (data->Type() != DBTypeVectorPoint)) {
@@ -182,7 +183,9 @@ int main(int argc, char *argv[]) {
     if (version != (char *) NULL) data->Document(DBDocVersion, version);
 
     data->LinkedData(netData);
-    if ((ret = RGlibPointSTNCoordinates (data, sFieldName != (char *) NULL ? pTable->Field(sFieldName) : (DBObjTableField *) NULL,cTable->Field(dFieldName),(DBFloat) tolerance / 100.0,pRadius)) == DBSuccess)
+    pField = pFieldName != (char *) NULL ? pTable->Field(pFieldName) : (DBObjTableField *) NULL;
+    cField = cTable->Field(cFieldName);
+    if ((ret = RGlibPointSTNCoordinates (data, pField, cField, (DBFloat) tolerance / 100.0, pRadius)) == DBSuccess)
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
 
     delete netData;
