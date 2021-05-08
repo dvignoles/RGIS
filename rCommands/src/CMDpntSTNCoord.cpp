@@ -31,7 +31,7 @@ static void _CMDprintUsage (const char *arg0) {
 
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
-    char *pFieldName = (char *) NULL, *cFieldName = DBrNCellArea;
+    char *pFieldName = (char *) NULL, *cFieldName = DBrNSubbasinArea;
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *networkName = (char *) NULL;
