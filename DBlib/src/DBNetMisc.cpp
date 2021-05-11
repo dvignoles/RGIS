@@ -167,10 +167,11 @@ DBObjRecord *DBNetworkIF::Cell(DBPosition pos, DBObjTableField *field, DBFloat t
             if ((cellID = ((DBInt *) DataRec->Data())[(size_t) cellPos.Row * (size_t) ColNum() + (size_t) cellPos.Col]) == DBFault) continue;
             cellRec = CellTable->Item(cellID);
             val     = field->Float(cellRec);
-            if (CMmathEqualValues(val, field->FloatNoData())) continue;
-            if (val > bestDelta) {
-                bestDelta   = val;
-                bestCellRec = cellRec;
+            if (CMmathEqualValues(val, field->FloatNoData()) || val <= 0.0) {
+                if (val > bestDelta) {
+                    bestDelta   = val;
+                    bestCellRec = cellRec;
+                }
             }
         }
     } else {
