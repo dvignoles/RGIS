@@ -46,3 +46,7 @@ _deps
 *.exe
 *.out
 *.app
+
+# Python
+__pycache__/
+setup.py
