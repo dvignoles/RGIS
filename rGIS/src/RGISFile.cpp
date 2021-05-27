@@ -204,7 +204,7 @@ static void _RGISFileSaveAsCBK (Widget widget,RGISWorkspace *workspace,XmAnyCall
 	DBObjectLIST<DBObjMetaEntry>	*metaList = dataset->MetaList ();
 	DBObjMetaEntry *metaEntry;
 
-	if (_RGISFileSelect == NULL) _RGISFileSelect = UIFileSelectionCreate ((char *) "GHAAS Data",NULL,(char *) "*.gdb?",XmFILE_REGULAR);
+	if (_RGISFileSelect == NULL) _RGISFileSelect = UIFileSelectionCreate ((char *) "GHAAS Data",NULL,(char *) "*.gdb*",XmFILE_REGULAR);
 
 	if ((fileName = UIFileSelection (_RGISFileSelect,false)) == NULL) return;
 	data->FileName (fileName);
@@ -222,7 +222,7 @@ static void _RGISFileSaveAllCBK (Widget widget,RGISWorkspace *workspace,XmAnyCal
 	DBObjectLIST<DBObjMetaEntry>	*metaList = dataset->MetaList ();
 	DBObjMetaEntry *metaEntry;
 
-	if (_RGISFileSelect == NULL) _RGISFileSelect = UIFileSelectionCreate ((char *) "GHAAS Data",NULL,(char *) "*.gdb?",XmFILE_REGULAR);
+	if (_RGISFileSelect == NULL) _RGISFileSelect = UIFileSelectionCreate ((char *) "GHAAS Data",NULL,(char *) "*.gdb*",XmFILE_REGULAR);
 
 	for (data = dataset->FirstData ();data != (DBObjData *) NULL;data = dataset->NextData ())
 		{
