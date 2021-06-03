@@ -341,7 +341,7 @@ static VDBmasterTable_t _VDBmasterTable3 [] = {
         {"river",         "river_subbasin",                               "River-Subbasin",                               "Subbasin",                            VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"river",         "river_travel_time",                            "River-TravelTime",                             "Travel Time",                         VDBcontinuous, VDBgrey,          VDBmax},
         {"river",         "river_upstream_area",                          "River-UpstreamArea",                           "Upstream Area",                       VDBcontinuous, VDBgrey,          VDBavg},
-        {"socioeconomy",  "socioeconomy_energy_regions",                  "Socioeconomy-Energy-Regions",                 "Energy Regions",                      VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
+        {"socioeconomy",  "socioeconomy_energy_regions",                  "Socioeconomy-Energy-Regions",                  "Energy Regions",                      VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"socioeconomy",  "socioeconomy_population",                      "Socioeconomy-Population",                      "Population",                          VDBcontinuous, VDBgrey,          VDBsum},
         {"socioeconomy",  "socioeconomy_population_density",	          "Socioeconomy-Population-Density",              "Population Density",                  VDBcontinuous, VDBgrey,          VDBavg},
         {"socioeconomy",  "socioeconomy_population-rural",                "Socioeconomy-Population-Rural",                "Rural Population",                    VDBcontinuous, VDBgrey,          VDBavg},
