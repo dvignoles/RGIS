@@ -20,7 +20,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -f,--field     [source field]");
     CMmsgPrint(CMmsgInfo, "     -c,--cfield    [compare field]");
     CMmsgPrint(CMmsgInfo, "     -T,--tolerance [error tolerance in percent]");
-    CMmsgPrint(CMmsgInfo, "     -p,--pradius   [pixel radius]");
+    CMmsgPrint(CMmsgInfo, "     -R,--radius   [radius]");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
     CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
@@ -35,8 +35,8 @@ int main(int argc, char *argv[]) {
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *networkName = (char *) NULL;
-    DBInt pRadius   = 10;
-    DBInt tolerance = 10;
+    DBFloat radius    = 10.0;
+    DBFloat tolerance = 10.0;
     DBObjData *data, *netData;
     DBObjTable *pTable, *cTable;
     DBObjTableField *pField, *cField;
@@ -74,19 +74,19 @@ int main(int argc, char *argv[]) {
                 CMmsgPrint(CMmsgUsrError, "Missing limit!");
                 return (CMfailed);
             }
-            if (sscanf (argv[argPos],"%d",&tolerance) != 1) {
+            if (sscanf (argv[argPos],"%lf",&tolerance) != 1) {
                 CMmsgPrint(CMmsgUsrError, "Invalid limit!");
                 return (CMfailed);
             }
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-p", "--pradius")) {
+        if (CMargTest (argv[argPos], "-R", "--radius")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing pixel radius!");
                 return (CMfailed);
             }
-            if (sscanf (argv[argPos],"%d", &pRadius) != 1) {
+            if (sscanf (argv[argPos],"%lf", &radius) != 1) {
                 CMmsgPrint(CMmsgUsrError, "Invalid pixel radius!");
                 return (CMfailed);
             }
@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
     data->LinkedData(netData);
     pField = pFieldName != (char *) NULL ? pTable->Field(pFieldName) : (DBObjTableField *) NULL;
     cField = cTable->Field(cFieldName);
-    if ((ret = RGlibPointSTNCoordinates (data, pField, cField, (DBFloat) tolerance / 100.0, pRadius)) == DBSuccess)
+    if ((ret = RGlibPointSTNCoordinates (data, pField, cField, (DBFloat) tolerance / 100.0, radius)) == DBSuccess)
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
 
     delete netData;

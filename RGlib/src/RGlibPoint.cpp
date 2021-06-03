@@ -15,8 +15,8 @@ bfekete@gc.cuny.edu
 #include <RG.hpp>
 #include <math.h>
 
-DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat tolerance, DBInt maxRadius) {
-    DBInt pointID, ret = DBFault, valCount = 0, pntCount = 0, pRadius;
+DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObjTableField *cField, DBFloat tolerance, DBFloat radius) {
+    DBInt pointID, ret = DBFault, valCount = 0, pntCount = 0, pRadius, maxRadius;
     DBFloat relDiff, cVal, tVal, min = HUGE_VAL, max = -HUGE_VAL, cellLength = 0.0;
     DBCoordinate coord;
     DBPosition pos;
@@ -43,7 +43,7 @@ DBInt RGlibPointSTNCoordinates(DBObjData *dbData, DBObjTableField *pField, DBObj
             }
         }
         if ((max <= min) || (min <= 0.0)) valCount = 0;
-        if (pntCount > 0) { cellLength = cellLength / pntCount; maxRadius = (DBInt) ceil((DBFloat) maxRadius / cellLength); }
+        if (pntCount > 0) { cellLength = cellLength / pntCount; maxRadius = (DBInt) ceil(radius / cellLength); }
         if (valCount > 0) { max = log(max); min = log(min); }
     }
     for (pointID = 0; pointID < pntIF->ItemNum(); ++pointID) {
