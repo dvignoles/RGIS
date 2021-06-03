@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
     data->LinkedData(netData);
     pField = pFieldName != (char *) NULL ? pTable->Field(pFieldName) : (DBObjTableField *) NULL;
     cField = cTable->Field(cFieldName);
-    if ((ret = RGlibPointSTNCoordinates (data, pField, cField, (DBFloat) tolerance / 100.0, radius)) == DBSuccess)
+    if ((ret = RGlibPointSTNCoordinates (data, pField, cField, tolerance / 100.0, radius)) == DBSuccess)
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
 
     delete netData;
