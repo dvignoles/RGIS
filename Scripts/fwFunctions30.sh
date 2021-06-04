@@ -13,6 +13,7 @@ _fwMAXPROC="${GHAASprocessorNum}"
 _fwPASSNUM=5
 _fwRESTART=""
 _fwSTART="TRUE"
+_fwCLEANUP="on"
 
 function _fwDataSource () {
 	for (( fwI = 0; fwI < ${#_fwDSourceARRAY[@]} ; ++fwI ))
@@ -68,19 +69,25 @@ function FwArguments () {
 	while [ "${1}" != "" ]
 	do
 		case ${1} in
-			(-r|--restart)
-				shift
-				 _fwRESTART="${1}"
-				 _fwSTART="FALSE"
-			;;
-			(-s|--spinup)
+			(-C|--cleanup)
 				shift
 				case ${1} in
 					(on|off)
-						_fwSPINUP="${1}"
+						_fwCLEANUP=${1}
 					;;
 					(*)
-						echo "Invalid --spinup argument [${1}]"
+						echo "Invalid --cleanup argument [${1}]"
+					;;
+				esac
+			;;
+			(-D|--dailyoutput)
+				shift
+				case ${1} in
+					(on|off)
+						_fwDAILYOUTPUT="${1}"
+					;;
+					(*)
+						echo "Invalid --dailyoutput argument [${1}]"
 					;;
 				esac
 			;;
@@ -99,15 +106,6 @@ function FwArguments () {
 				shift
 				_fwLENGTHCORRECTION="-l ${1}"
 			;;
-			(-n|--passnum)
-				shift
-				if (( "${1}" < 1 || "${1}" > 20 ))
-				then
-					echo "Invalid --preprocess argument [${1}]"
-				else
-					_fwPASSNUM="${1}"
-				fi
-			;;
 			(-m|--outputformat)
 				shift
 				case ${1} in
@@ -121,17 +119,15 @@ function FwArguments () {
 						echo "Invalid --preprocess argument [${1}]"
 					;;
 				esac
-				;;
-			(-W|--warnings)
+			;;
+			(-n|--passnum)
 				shift
-				case ${1} in
-					(on|off)
-						FwWARNINGS="${1}"
-					;;
-					(*)
-						echo "Invalid --warnings argument [${1}]"
-					;;
-				esac
+				if (( "${1}" < 1 || "${1}" > 20 ))
+				then
+					echo "Invalid --preprocess argument [${1}]"
+				else
+					_fwPASSNUM="${1}"
+				fi
 			;;
 			(-O|--optionsprint)
 				_fwOPTIONSPRINT="on"
@@ -146,17 +142,33 @@ function FwArguments () {
 					_fwMAXPROC=${1}
 				fi
 			;;
-			(-T|--testonly)
-				_fwTESTONLY="on"
+			(-r|--restart)
+				shift
+				 _fwRESTART="${1}"
+				 _fwSTART="FALSE"
 			;;
-			(-D|--dailyoutput)
+			(-s|--spinup)
 				shift
 				case ${1} in
 					(on|off)
-						_fwDAILYOUTPUT="${1}"
+						_fwSPINUP="${1}"
 					;;
 					(*)
-						echo "Invalid --dailyoutput argument [${1}]"
+						echo "Invalid --spinup argument [${1}]"
+					;;
+				esac
+			;;
+			(-T|--testonly)
+				_fwTESTONLY="on"
+			;;
+			(-W|--warnings)
+				shift
+				case ${1} in
+					(on|off)
+						FwWARNINGS="${1}"
+					;;
+					(*)
+						echo "Invalid --warnings argument [${1}]"
 					;;
 				esac
 			;;
@@ -166,19 +178,19 @@ function FwArguments () {
 			(-h|--help)
 				_fwPROGNAME="${0##*/}" # I don't know how this one works.
 				echo "${_fwPROGNAME} [-s on|off] [-f on|off] [-p on|off] -W on|off -T -V"
-				echo "           -r, --restart      <year>"
-				echo "           -s, --spinup       on|off"
+				echo"            -C|--cleanup       on|off"
+				echo "           -D, --dailyoutput  on|off"
 				echo "           -f, --finalrun     on|off"
 				echo "           -l, --lengthcorrection [value]"
-				echo "           -n, --passnum      [num]"
 				echo "           -m, --outputformat [rgis|netcdf]"
-				echo "           -P, --processors   [# of processors]"
-				echo "           -W, --warnings     on|off"
-				echo "           -T, --testonly"
+				echo "           -n, --passnum      [num]"
 				echo "           -O, --optionsprint"
-				echo "           -D, --dailyoutput  on|off"
+				echo "           -P, --processors   [# of processors]"
+				echo "           -r, --restart      <year>"
+				echo "           -s, --spinup       on|off"
+				echo "           -T, --testonly"
+				echo "           -W, --warnings     on|off"
 				echo "           -V, --verbose"
-                echo "           -g, --gdb"
 				return 1
 		esac
 		shift
@@ -489,13 +501,11 @@ function _fwPostprocess () {
 	if [ "${fwYEAR}" == "" ]; then local fwSUFFIX="LT"; else local fwSUFFIX="TS${fwYEAR}"; fi
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"; }
 
-	if [ "${_fwDAILYOUTPUT}" == "on" ]; then local maxProc=3; else local maxProc=${_fwMAXPROC}; fi
-
 	local procNum=0
 	local files=""
 	for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
 	do
-		if (( ${procNum} < ${maxProc} ))
+		if (( ${procNum} < ${_fwMAXPROC} ))
     	then
 			local procNum=$((${procNum} + 1))
 		else
@@ -532,7 +542,7 @@ function _fwPostprocess () {
 	do
 		local fwVARIABLE="${_fwOutputARRAY[${fwI}]}"
 		local fwGDSFileNAME="$(FwGDSFilename "${fwVARIABLE}" "Output" "${fwExperiment}" "${fwYEAR}" "d")"
-		[ -e "${fwGDSFileNAME}" ] && rm "${fwGDSFileNAME}"
+		[ "${_fwCLEANUP}" == "on" ] && [ -e "${fwGDSFileNAME}" ] && rm "${fwGDSFileNAME}"
 	done
 	[ "${FwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"; }
 	return 0
