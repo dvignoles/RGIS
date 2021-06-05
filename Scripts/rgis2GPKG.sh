@@ -153,8 +153,8 @@ case "${EXTENSION}" in
 	(gdbp|gdbp.gz|gdbl|gdbl.gz)
 		[ "${EXTENSION%.gz}" == gdbp ] && DATATYPE="POINT" || DATATYPE="LINESTRING"
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.asc"
-		ogr2ogr -a_srs EPSG:4326 -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
-		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" "${GEOPACKAGE}" "${TEMPFILE}.shp"
+		ogr2ogr -a_srs EPSG:4326 -makevalid -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
+		ogr2ogr -update -overwrite -makevalid -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" "${GEOPACKAGE}" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
 		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | spatialite -silent -batch  "${GEOPACKAGE}"
 		rm "${TEMPFILE}".*
@@ -163,8 +163,8 @@ case "${EXTENSION}" in
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
 		gdal_translate -a_srs EPSG:4326 "${TEMPFILE}.grd" "${TEMPFILE}.tif"
 		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
-		ogr2ogr "${TEMPFILE}-Disolved.shp" "${TEMPFILE}.shp" -dialect sqlite -sql "SELECT DN, ST_Union(geometry) FROM ${TEMPFILE##*/} GROUP BY DN"
-		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}-Disolved.shp"
+		ogr2ogr "${TEMPFILE}-Disolved.shp" "${TEMPFILE}.shp" -makevalid -dialect sqlite -sql "SELECT DN, ST_Union(geometry) FROM ${TEMPFILE##*/} GROUP BY DN"
+		ogr2ogr -update -overwrite -makevalid -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}-Disolved.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
 		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" | spatialite -silent -batch  "${GEOPACKAGE}"
         rm "${TEMPFILE}".* "${TEMPFILE}-Disolved.shp"
