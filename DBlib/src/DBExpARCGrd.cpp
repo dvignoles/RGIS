@@ -52,21 +52,21 @@ DBInt DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, FILE *file) {
                     fprintf(file, "\n");
                 }
                 break;
-            case DBTableFieldInt:
-                DBInt intVal;
-                fprintf(file, "NODATA_value  %d\n", (DBInt) gridIF->MissingValue());
-                for (row = gridIF->RowNum() - 1; row >= 0; row--) {
-                    for (col = 0; col < gridIF->ColNum(); col++) {
-                        pos.Row = row;
-                        pos.Col = col;
-                        if (gridIF->Value(layerRec, pos, &intVal)) fprintf(file, " %d", intVal);
-                        else fprintf(file, " %d", (DBInt) gridIF->MissingValue());
+                case DBTableFieldInt:
+                    DBInt intVal;
+                    fprintf(file, "NODATA_value  %d\n", (DBInt) gridIF->MissingValue());
+                    for (row = gridIF->RowNum() - 1; row >= 0; row--) {
+                        for (col = 0; col < gridIF->ColNum(); col++) {
+                            pos.Row = row;
+                            pos.Col = col;
+                            if (gridIF->Value(layerRec, pos, &intVal)) fprintf(file, " %d", intVal);
+                            else fprintf(file, " %d", (DBInt) gridIF->MissingValue());
+                        }
+                        fprintf(file, "\n");
                     }
-                    fprintf(file, "\n");
-                }
                 break;
             }
-            break;
+        break;
         case DBTypeGridDiscrete:
             fprintf(file, "NODATA_value  %d\n", DBFault);
             for (row = gridIF->RowNum() - 1; row >= 0; row--) {
@@ -76,8 +76,8 @@ DBInt DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, FILE *file) {
                     fprintf(file, " %d", gridIF->GridValue(layerRec, pos));
                 }
                 fprintf(file, "\n");
-            break;
-        }
+            }
+        break;
     }
     delete gridIF;
     return (DBSuccess);
