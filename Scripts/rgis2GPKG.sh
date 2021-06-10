@@ -34,30 +34,28 @@ RGISFILE=""
     CASE="sensitive"
 	MODE="append"
 
-function _GPKGattribTable () {
-    local schemaName="${1}"; shift
-    local  tableName="${1}"; shift
+function _GPKGsql () {
+	local schemaName="${1}"; shift
+	local  tableName="${1}"; shift
 	local   dataType="${1}"; shift
 	local   relateID="${1}"; shift
 	local     joinID="${1}"; shift
 
-	echo "INSERT INTO \"gpkg_contents\""
-	echo "SELECT \"${schemaName}_${tableName}\", \"data_type\", \"${schemaName}_${tableName}\", \"description\", \"last_change\", \"min_x\", \"min_y\", \"max_x\", \"max_y\", \"srs_id\""
-	echo "FROM "gpkg_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
-	echo "INSERT INTO \"gpkg_ogr_contents\""
-	echo "SELECT \"${schemaName}_${tableName}\", \"feature_count\" FROM "gpkg_ogr_contents" WHERE "table_name" = \"${schemaName}_${tableName}_geom\";"
-	echo "SELECT gpkgAddGeometryColumn(\"${schemaName}_${tableName}\", \"geom\", '${dataType}', 0, 0, 4326);"
-	echo "UPDATE \"${schemaName}_${tableName}\""
-	echo "SET \"geom\" = (SELECT \"${schemaName}_${tableName}_geom\".\"geom\""
- 	echo "                FROM \"${schemaName}_${tableName}_geom\""
-	echo "                WHERE \"${schemaName}_${tableName}\".\"${relateID}\" = \"${schemaName}_${tableName}_geom\".\"${joinID}\");"
-	echo "DROP TABLE \"${schemaName}_${TBLNAME}_geom\";"
-	echo "DROP TABLE \"rtree_${schemaName}_${tableName}_geom_geom\";"
-	echo "DELETE FROM \"gpkg_metadata_reference\" WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
-	echo "DELETE FROM \"gpkg_geometry_columns\"   WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
-	echo "DELETE FROM \"gpkg_contents\"           WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
-	echo "DELETE FROM \"gpkg_ogr_contents\"       WHERE \"table_name\" = \"${schemaName}_${tableName}_geom\";"
-	echo "SELECT gpkgAddSpatialIndex(\"${schemaName}_${tableName}\", \"geom\");"
+	case "${dataType}" in
+		(POINT|LINESTRING)
+			echo "SELECT   \"${SCHEMA}_${TBLNAME}\".*, geom.geom"
+			echo "FROM     \"${SCHEMA}_${TBLNAME}\" JOIN geom"
+			echo "ON       \"${SCHEMA}_${TBLNAME}\".\"${relateID}\" = geom.\"${joinID}\""
+			echo "ORDER BY \"${SCHEMA}_${TBLNAME}\".\"${relateID}\""
+		;;
+		(POLYGON)	
+			echo "SELECT   \"${SCHEMA}_${TBLNAME}\".*, ST_Collect(geom.geom) AS \"geom\""
+			echo "FROM     \"${SCHEMA}_${TBLNAME}\" JOIN geom"
+			echo "ON       \"${SCHEMA}_${TBLNAME}\".\"${relateID}\" = geom.\"${joinID}\""
+			echo "GROUP BY \"${SCHEMA}_${TBLNAME}\".\"${relateID}\""
+			echo "ORDER BY \"${SCHEMA}_${TBLNAME}\".\"${relateID}\""
+		;;
+	esac
 }
 
 while [ "${1}" != "" ]
@@ -144,30 +142,35 @@ TEMPFILE="$(mktemp -u -t rgis2gpkgXXXX)"
  
 case "${EXTENSION}" in
 	(gdbt|gdbt.gz)
-		rgis2sql -c "${CASE}" -m "${MODE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
-		if (( $(echo "SELECT COUNT(\"table_name\") FROM \"gpkg_contents\" WHERE \"table_name\" = \"${SCHEMA}\"_\"${TBLNAME}\";" | spatialite -silent -batch "${GEOPACKAGE}") == 0 ))
+		rgis2sql -c "${CASE}" -m "${MODE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" |\
+		sqlite3 "${GEOPACKAGE}"
+		local sql="SELECT COUNT(\"table_name\") FROM \"gpkg_contents\" WHERE \"table_name\" = \"${SCHEMA}\"_\"${TBLNAME}\";"
+		if (( $(echo "${sql}" | sqlite3 "${GEOPACKAGE}") == 0 ))
 		then
-			echo "INSERT INTO \"gpkg_contents\" (\"table_name\", \"data_type\",\"identifier\",\:kast_change\") VALUES ('${SCHEMA}_${TBLNAME}','attributes', '${SCHEMA}_${TBLNAME}',datetime('now'));" | spatialite -silent -batch "${GEOPACKAGE}"
+			echo "INSERT INTO \"gpkg_contents\" (\"table_name\", \"data_type\",\"identifier\",\:kast_change\") VALUES ('${SCHEMA}_${TBLNAME}','attributes', '${SCHEMA}_${TBLNAME}',datetime('now'));" |\
+			sqlit3 "${GEOPACKAGE}"
 		fi
 	;;
 	(gdbp|gdbp.gz|gdbl|gdbl.gz)
 		[ "${EXTENSION%.gz}" == gdbp ] && DATATYPE="POINT" || DATATYPE="LINESTRING"
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.asc"
-		ogr2ogr -a_srs EPSG:4326 -f "ESRI Shapefile" "${TEMPFILE}.shp" "${TEMPFILE}.asc"
-		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" "${GEOPACKAGE}" "${TEMPFILE}.shp"
-		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" | spatialite -silent -batch  "${GEOPACKAGE}"
+		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "geom" "${TEMPFILE}.gpkg" "${TEMPFILE}.asc"
+		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" |\
+		sqlite3 "${TEMPFILE}.gpkg"
+		_GPKGsql "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" > "${TEMPFILE}.sql"
+		ogr2ogr -update -overwrite -nln "${SCHEMA}_${TBLNAME}" -nlt "${DATATYPE}" -dialect "sqlite" -sql "@${TEMPFILE}.sql" "${GEOPACKAGE}" "${TEMPFILE}.gpkg"
 		rm "${TEMPFILE}".*
  	;;
 	(gdbd|gdbd.gz)
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
 		gdal_translate -a_srs EPSG:4326 "${TEMPFILE}.grd" "${TEMPFILE}.tif"
-		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
-		ogr2ogr -dialect sqlite -sql "SELECT DN, ST_Union(geometry) FROM ${TEMPFILE##*/} GROUP BY DN" "${TEMPFILE}-Disolved.shp" "${TEMPFILE}.shp"
-		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "${SCHEMA}_${TBLNAME}_geom" -nlt PROMOTE_TO_MULTI "${GEOPACKAGE}" "${TEMPFILE}-Disolved.shp"
-		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" | spatialite -silent -batch  "${GEOPACKAGE}"
-		_GPKGattribTable "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" | spatialite -silent -batch  "${GEOPACKAGE}"
-        rm "${TEMPFILE}".* "${TEMPFILE}-Disolved.shp"
+		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "GPKG" "${TEMPFILE}.gpkg" "geom" 
+		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" |\
+		sqlite3 "${TEMPFILE}.gpkg"
+		_GPKGsql "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" > "${TEMPFILE}.sql"
+		ogr2ogr -update -overwrite -nln "${SCHEMA}_${TBLNAME}" -nlt "POLYGON" -dialect "sqlite" -sql "@${TEMPFILE}.sql" "${GEOPACKAGE}" "${TEMPFILE}.gpkg"
+		echo "DELETE FROM \"${SCHEMA}_${TBLNAME}\" WHERE \"${GRIDVALUE}\" = -9999" | sqlite3 "${GEOPACKAGE}" 
+        	rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
 		[ -e "${GEOPACKAGE}" ] && [ "${MODE}" == "append" ] && (echo "DROP TABLE IF EXISTS \"${SCHEMA}_${TBLNAME}\"" | spatialite -silent -batch  "${GEOPACKAGE}")
