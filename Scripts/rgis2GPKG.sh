@@ -160,7 +160,7 @@ case "${EXTENSION}" in
 		_GPKGsql "${SCHEMA}" "${TBLNAME}" "${GRIDVALUE}" "DN" > "${TEMPFILE}.sql"
 		ogr2ogr -update -overwrite -nln "${SCHEMA}_${TBLNAME}" -nlt "POLYGON" -dialect "sqlite" -sql "@${TEMPFILE}.sql" "${GEOPACKAGE}" "${TEMPFILE}.gpkg"
 		echo "DELETE FROM \"${SCHEMA}_${TBLNAME}\" WHERE \"${GRIDVALUE}\" = -9999" | sqlite3 "${GEOPACKAGE}" 
-        	rm "${TEMPFILE}".*
+		rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
 		[ -e "${GEOPACKAGE}" ] && [ "${MODE}" == "append" ] && (echo "DROP TABLE IF EXISTS \"${SCHEMA}_${TBLNAME}\"" | spatialite -silent -batch  "${GEOPACKAGE}")
