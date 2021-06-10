@@ -37,25 +37,13 @@ RGISFILE=""
 function _GPKGsql () {
 	local schemaName="${1}"; shift
 	local  tableName="${1}"; shift
-	local   dataType="${1}"; shift
 	local   relateID="${1}"; shift
 	local     joinID="${1}"; shift
 
-	case "${dataType}" in
-		(POINT|LINESTRING)
-			echo "SELECT   \"${SCHEMA}_${TBLNAME}\".*, geom.geom"
-			echo "FROM     \"${SCHEMA}_${TBLNAME}\" JOIN geom"
-			echo "ON       \"${SCHEMA}_${TBLNAME}\".\"${relateID}\" = geom.\"${joinID}\""
-			echo "ORDER BY \"${SCHEMA}_${TBLNAME}\".\"${relateID}\""
-		;;
-		(POLYGON)	
-			echo "SELECT   \"${SCHEMA}_${TBLNAME}\".*, ST_Collect(geom.geom) AS \"geom\""
-			echo "FROM     \"${SCHEMA}_${TBLNAME}\" JOIN geom"
-			echo "ON       \"${SCHEMA}_${TBLNAME}\".\"${relateID}\" = geom.\"${joinID}\""
-			echo "GROUP BY \"${SCHEMA}_${TBLNAME}\".\"${relateID}\""
-			echo "ORDER BY \"${SCHEMA}_${TBLNAME}\".\"${relateID}\""
-		;;
-	esac
+	echo "SELECT   \"${SCHEMA}_${TBLNAME}\".*, geom.*"
+	echo "FROM     \"${SCHEMA}_${TBLNAME}\" JOIN geom"
+	echo "ON       \"${SCHEMA}_${TBLNAME}\".\"${relateID}\" = geom.\"${joinID}\""
+	echo "ORDER BY \"${SCHEMA}_${TBLNAME}\".\"${relateID}\""
 }
 
 while [ "${1}" != "" ]
@@ -157,17 +145,19 @@ case "${EXTENSION}" in
 		ogr2ogr -update -overwrite -a_srs EPSG:4326 -f "GPKG" -nln "geom" "${TEMPFILE}.gpkg" "${TEMPFILE}.asc"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" |\
 		sqlite3 "${TEMPFILE}.gpkg"
-		_GPKGsql "${SCHEMA}" "${TBLNAME}" "${DATATYPE}" "${ID}" "fid" > "${TEMPFILE}.sql"
+		_GPKGsql "${SCHEMA}" "${TBLNAME}" "${ID}" "fid" > "${TEMPFILE}.sql"
 		ogr2ogr -update -overwrite -nln "${SCHEMA}_${TBLNAME}" -nlt "${DATATYPE}" -dialect "sqlite" -sql "@${TEMPFILE}.sql" "${GEOPACKAGE}" "${TEMPFILE}.gpkg"
 		rm "${TEMPFILE}".*
  	;;
 	(gdbd|gdbd.gz)
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
 		gdal_translate -a_srs EPSG:4326 "${TEMPFILE}.grd" "${TEMPFILE}.tif"
-		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "GPKG" "${TEMPFILE}.gpkg" "geom" 
+		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
+		ogr2ogr -dialect sqlite -sql "SELECT DN, ST_Union(geometry) FROM ${TEMPFILE##*/} GROUP BY DN" \
+			-f "GPKG" -nln "geom" "${TEMPFILE}.gpkg" "${TEMPFILE}.shp"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" |\
 		sqlite3 "${TEMPFILE}.gpkg"
-		_GPKGsql "${SCHEMA}" "${TBLNAME}" "POLYGON" "${GRIDVALUE}" "DN" > "${TEMPFILE}.sql"
+		_GPKGsql "${SCHEMA}" "${TBLNAME}" "${GRIDVALUE}" "DN" > "${TEMPFILE}.sql"
 		ogr2ogr -update -overwrite -nln "${SCHEMA}_${TBLNAME}" -nlt "POLYGON" -dialect "sqlite" -sql "@${TEMPFILE}.sql" "${GEOPACKAGE}" "${TEMPFILE}.gpkg"
 		echo "DELETE FROM \"${SCHEMA}_${TBLNAME}\" WHERE \"${GRIDVALUE}\" = -9999" | sqlite3 "${GEOPACKAGE}" 
         	rm "${TEMPFILE}".*
