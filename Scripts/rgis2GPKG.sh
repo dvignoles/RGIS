@@ -147,7 +147,7 @@ case "${EXTENSION}" in
 		local sql="SELECT COUNT(\"table_name\") FROM \"gpkg_contents\" WHERE \"table_name\" = \"${SCHEMA}\"_\"${TBLNAME}\";"
 		if (( $(echo "${sql}" | sqlite3 "${GEOPACKAGE}") == 0 ))
 		then
-			echo "INSERT INTO \"gpkg_contents\" (\"table_name\", \"data_type\",\"identifier\",\:kast_change\") VALUES ('${SCHEMA}_${TBLNAME}','attributes', '${SCHEMA}_${TBLNAME}',datetime('now'));" |\
+			echo "INSERT INTO \"gpkg_contents\" (\"table_name\", \"data_type\",\"identifier\",\"last_change\") VALUES ('${SCHEMA}_${TBLNAME}','attributes', '${SCHEMA}_${TBLNAME}',datetime('now'));" |\
 			sqlit3 "${GEOPACKAGE}"
 		fi
 	;;
