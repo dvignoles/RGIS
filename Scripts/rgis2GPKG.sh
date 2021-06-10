@@ -146,21 +146,23 @@ case "${EXTENSION}" in
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" |\
 		sqlite3 "${TEMPFILE}.gpkg"
 		_GPKGsql "${SCHEMA}" "${TBLNAME}" "${ID}" "fid" > "${TEMPFILE}.sql"
-		ogr2ogr -update -overwrite -nln "${SCHEMA}_${TBLNAME}" -nlt "${DATATYPE}" -dialect "sqlite" -sql "@${TEMPFILE}.sql" "${GEOPACKAGE}" "${TEMPFILE}.gpkg"
+		ogr2ogr -update -overwrite -nln "${SCHEMA}_${TBLNAME}" -nlt "${DATATYPE}" -dialect "sqlite" \
+			-sql "@${TEMPFILE}.sql" "${GEOPACKAGE}" "${TEMPFILE}.gpkg"
 		rm "${TEMPFILE}".*
  	;;
 	(gdbd|gdbd.gz)
 		rgis2ascii "${RGISFILE}" "${TEMPFILE}.grd"
 		gdal_translate -a_srs EPSG:4326 "${TEMPFILE}.grd" "${TEMPFILE}.tif"
-		gdal_polygonize.py -8 "${TEMPFILE}.tif" -f "ESRI Shapefile" "${TEMPFILE}.shp"
-		ogr2ogr -dialect sqlite -sql "SELECT DN, ST_Union(geometry) FROM ${TEMPFILE##*/} GROUP BY DN" \
-			-f "GPKG" -nln "geom" "${TEMPFILE}.gpkg" "${TEMPFILE}.shp"
+		gdal_polygonize.py "${TEMPFILE}.tif" -f "GPKG" "${TEMPFILE}.gpkg" "full_geom"
+		ogr2ogr -update -overwrite -nlt POLYGON -dialect sqlite \
+			-sql "SELECT DN, ST_Union(geom) FROM full_geom GROUP BY DN" \
+			-f "GPKG" -nln "geom" "${TEMPFILE}.gpkg" "${TEMPFILE}.gpkg"
 		rgis2sql -c "${CASE}" -a "DBItems" -s "${SCHEMA}" -q "${TBLNAME}" -d "sqlite" -r off "${RGISFILE}" |\
 		sqlite3 "${TEMPFILE}.gpkg"
 		_GPKGsql "${SCHEMA}" "${TBLNAME}" "${GRIDVALUE}" "DN" > "${TEMPFILE}.sql"
-		ogr2ogr -update -overwrite -nln "${SCHEMA}_${TBLNAME}" -nlt "POLYGON" -dialect "sqlite" -sql "@${TEMPFILE}.sql" "${GEOPACKAGE}" "${TEMPFILE}.gpkg"
-		echo "DELETE FROM \"${SCHEMA}_${TBLNAME}\" WHERE \"${GRIDVALUE}\" = -9999" | sqlite3 "${GEOPACKAGE}" 
-		rm "${TEMPFILE}".*
+		ogr2ogr -update -overwrite -nln "${SCHEMA}_${TBLNAME}" -nlt "POLYGON" -dialect "sqlite" \
+			-sql "@${TEMPFILE}.sql" "${GEOPACKAGE}" "${TEMPFILE}.gpkg"
+	 	rm "${TEMPFILE}".*
 	;;
 	(gdbc|gdbc.gz|nc)
 		[ -e "${GEOPACKAGE}" ] && [ "${MODE}" == "append" ] && (echo "DROP TABLE IF EXISTS \"${SCHEMA}_${TBLNAME}\"" | spatialite -silent -batch  "${GEOPACKAGE}")
