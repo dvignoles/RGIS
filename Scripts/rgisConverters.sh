@@ -6,9 +6,8 @@
 #
 ##############################################################################################jjjkkj############
 
-#if [[ "${GHAASDIR}" == "" ]]; then GHAASDIR="/usr/local/share/ghaas"; fi
-#source "${GHAASDIR}/Scripts/RGISfunctions.sh"
-RGISarchiveVDBversion "vdb3"
+if [[ "${GHAASDIR}" == "" ]]; then GHAASDIR="/usr/local/share/ghaas"; fi
+source "${GHAASDIR}/Scripts/RGISfunctions.sh"
 
 function shp2rgisGrid () {
    local    archive="${1}"; shift
