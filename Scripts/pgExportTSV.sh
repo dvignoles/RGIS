@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 USAGE="Usage ${0##*/} <dbname> <schema>"
 if [[ "${2}" == "" ]]; then echo "${USAGE}"; exit 1; fi

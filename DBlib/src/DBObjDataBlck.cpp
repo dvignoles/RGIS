@@ -112,23 +112,23 @@ DBObjTable *_DBCreateDataBlockNetCells() {
 
 DBObjTable *_DBCreateDataBlockGridLayers() {
     DBTableFieldDefinition fieldDefs[] =
-            {DBTableFieldDefinition(DBrNRowNum, DBTableFieldInt, (char *) "%8d", sizeof(DBInt), true),
-             DBTableFieldDefinition(DBrNColNum, DBTableFieldInt, (char *) "%8d", sizeof(DBInt), true),
-             DBTableFieldDefinition(DBrNValueType, DBTableFieldInt, (char *) "%1d", sizeof(DBByte), true),
-             DBTableFieldDefinition(DBrNValueSize, DBTableFieldInt, (char *) "%1d", sizeof(DBByte), true),
-             DBTableFieldDefinition(DBrNCellWidth, DBTableFieldFloat, (char *) "%10.7f", sizeof(DBFloat), true),
+            {DBTableFieldDefinition(DBrNRowNum,     DBTableFieldInt,   (char *) "%8d", sizeof(DBInt), true),
+             DBTableFieldDefinition(DBrNColNum,     DBTableFieldInt,   (char *) "%8d", sizeof(DBInt), true),
+             DBTableFieldDefinition(DBrNValueType,  DBTableFieldInt,   (char *) "%1d", sizeof(DBByte), true),
+             DBTableFieldDefinition(DBrNValueSize,  DBTableFieldInt,   (char *) "%1d", sizeof(DBByte), true),
+             DBTableFieldDefinition(DBrNCellWidth,  DBTableFieldFloat, (char *) "%10.7f", sizeof(DBFloat), true),
              DBTableFieldDefinition(DBrNCellHeight, DBTableFieldFloat, (char *) "%10.7f", sizeof(DBFloat), true),
-             DBTableFieldDefinition(DBrNLayer, DBTableFieldDataRec, DBHiddenField, sizeof(DBAddress), true),
+             DBTableFieldDefinition(DBrNLayer,      DBTableFieldDataRec, DBHiddenField, sizeof(DBAddress), true),
              DBTableFieldDefinition()};
     return (new DBObjTable(DBrNLayers, fieldDefs));
 }
 
 DBObjTable *_DBCreateDataBlockGridVariableStats() {
     DBTableFieldDefinition fieldDefs[] =
-            {DBTableFieldDefinition(DBrNMinimum, DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat), true),
-             DBTableFieldDefinition(DBrNMaximum, DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat), true),
-             DBTableFieldDefinition(DBrNAverage, DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat), true),
-             DBTableFieldDefinition(DBrNStdDev, DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat), true),
+            {DBTableFieldDefinition(DBrNMinimum,      DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat), true),
+             DBTableFieldDefinition(DBrNMaximum,      DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat), true),
+             DBTableFieldDefinition(DBrNAverage,      DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat), true),
+             DBTableFieldDefinition(DBrNStdDev,       DBTableFieldFloat, (char *) "%10.3f", sizeof(DBFloat), true),
              DBTableFieldDefinition(DBrNMissingValue, DBTableFieldFloat, DBHiddenField, sizeof(DBFloat), true),
              DBTableFieldDefinition()};
     return (new DBObjTable(DBrNItems, fieldDefs));

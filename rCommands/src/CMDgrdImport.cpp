@@ -344,11 +344,8 @@ int main(int argc, char *argv[]) {
 
     DBObjData *grdData;
 
-    if (Continuous_Grid_Mode)
-        grdData = new DBObjData("", DBTypeGridContinuous);
-    else
-        grdData = new DBObjData("", DBTypeGridDiscrete);
-
+    if (Continuous_Grid_Mode) grdData = new DBObjData("", DBTypeGridContinuous);
+    else                      grdData = new DBObjData("", DBTypeGridDiscrete);
 
     grdData->Name("Untitled");
     FILE *inFILE, *lstFILE = (FILE *) NULL;
@@ -359,8 +356,7 @@ int main(int argc, char *argv[]) {
     DBRegion extent;
     DBObjTable *layerTable = grdData->Table(DBrNLayers);
     DBObjTable *itemTable = grdData->Table(DBrNItems);
-    DBObjTableField *missingValueFLD = grdData->Type() == DBTypeGridContinuous ?
-                                       itemTable->Field(DBrNMissingValue) : (DBObjTableField *) NULL;
+    DBObjTableField *missingValueFLD = grdData->Type() == DBTypeGridContinuous ? itemTable->Field(DBrNMissingValue) : (DBObjTableField *) NULL;
     DBObjTableField *rowNumFLD = layerTable->Field(DBrNRowNum);
     DBObjTableField *colNumFLD = layerTable->Field(DBrNColNum);
     DBObjTableField *cellWidthFLD = layerTable->Field(DBrNCellWidth);
@@ -464,6 +460,7 @@ int main(int argc, char *argv[]) {
         colNumFLD->Int(layerRec, colNum);
         cellWidthFLD->Float(layerRec, cellWidth);
         cellHeightFLD->Float(layerRec, cellHeight);
+
         switch (binaryType) {
             case RGISBinTypeByte:
             case RGISBinTypeShort:
@@ -497,8 +494,9 @@ int main(int argc, char *argv[]) {
                 delete grdData;
                 return 0;
             }
-            missingValueFLD->Float(itemRec, (DBFloat) missingVal);
+            missingValueFLD->Float(itemRec,  (DBFloat) missingVal);
         }
+
         if (fileType == RGISGridBinary) {
             recordLen = (layout == RGISLaoutByRow ? colNum : rowNum) * itemSize + skipPad;
             for (j = 0; (chunk = fread(buffer, 1, sizeof(buffer), inFILE)) > 0; ++j)
@@ -588,11 +586,7 @@ int main(int argc, char *argv[]) {
     }
     if (listFile) fclose(lstFILE);
     gridIF = new DBGridIF(grdData);
-    if (grdData->Type() == DBTypeGridContinuous) {
-        DBObjTableField *missingValueFLD = itemTable->Field(DBrNMissingValue);
-        missingValueFLD->Float(itemTable->Item(layerRec->Name()), (DBFloat) missingVal);
-        gridIF->RecalcStats();
-    }
+    if (grdData->Type() == DBTypeGridContinuous) gridIF->RecalcStats();
     else {
         DBInt intVal;
         DBObjRecord *symRec = (grdData->Table(DBrNSymbols))->Add("Default Symbol");
@@ -620,24 +614,32 @@ int main(int argc, char *argv[]) {
                         intVal = (DBInt) (*((DBInt *) ((char *) dataRec->Data() + item * itemSize)));
                         break;
                 }
-                sprintf(buffer, "Category%d", intVal);
-                if ((itemRec = itemTable->Item(buffer)) == (DBObjRecord *) NULL) {
-                    if ((itemRec = itemTable->Add(buffer)) == (DBObjRecord *) NULL) {
-                        CMmsgPrint(CMmsgAppError, "Item Object Creation Error in: %s %d", __FILE__, __LINE__);
-                        delete gridIF;
-                        delete grdData;
-                        return 0;
+                if (intVal != (DBInt) missingVal) {
+                    sprintf(buffer, "Category%010d", intVal);
+                    if ((itemRec = itemTable->Item(buffer)) == (DBObjRecord *) NULL) {
+                        if ((itemRec = itemTable->Add(buffer)) == (DBObjRecord *) NULL) {
+                            CMmsgPrint(CMmsgAppError, "Item Object Creation Error in: %s %d", __FILE__, __LINE__);
+                            delete gridIF;
+                            delete grdData;
+                            return 0;
+                        }
+                        gridValueFLD->Int(itemRec, intVal);
+                        gridSymbolFLD->Record(itemRec, symRec);
                     }
-                    gridValueFLD->Int(itemRec, intVal);
-                    gridSymbolFLD->Record(itemRec, symRec);
+                    intVal = itemRec->RowID();
+                    switch (itemSize) {
+                        case 1:  *((DBByte *)  ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
+                        case 2:  *((DBShort *) ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
+                        default: *((DBInt *)   ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
+                    }
                 }
-                intVal = itemRec->RowID();
-                switch (itemSize) {
-                    case 1:  *((DBByte *)  ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
-                    case 2:  *((DBShort *) ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
-                    default: *((DBInt *)   ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
+                else {
+                    switch (itemSize) {
+                        case 1:  *((DBByte *)  ((char *) dataRec->Data() + item * itemSize)) = DBFault; break;
+                        case 2:  *((DBShort *) ((char *) dataRec->Data() + item * itemSize)) = DBFault; break;
+                        default: *((DBInt *)   ((char *) dataRec->Data() + item * itemSize)) = DBFault; break;
+                    }
                 }
-
             }
         }
         itemTable->ListSort(gridValueFLD);
@@ -649,8 +651,10 @@ int main(int argc, char *argv[]) {
                     case 2:  intVal = (DBInt) (*((DBShort *) ((char *) dataRec->Data() + item * itemSize))); break;
                     default: intVal = (DBInt) (*((DBInt *)   ((char *) dataRec->Data() + item * itemSize))); break;
                 }
-                itemRec = itemTable->Item(intVal);
-                intVal = itemRec->ListPos();
+                if (intVal != DBFault) {
+                    itemRec = itemTable->Item(intVal);
+                    intVal = itemRec->ListPos();
+                }
                 switch (itemSize) {
                     case 1:   *((DBByte *)  ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
                     case 2:   *((DBShort *) ((char *) dataRec->Data() + item * itemSize)) = intVal; break;

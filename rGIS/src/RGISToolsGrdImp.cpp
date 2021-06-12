@@ -19,19 +19,14 @@ bfekete@gc.cuny.edu
 #include <Xm/PushBG.h>
 #include <rgis.hpp>
 
-
-static int _RGISToolsImportWidgetMaxWidth (Widget widget,int maxWidth)
-
-	{
+static int _RGISToolsImportWidgetMaxWidth (Widget widget,int maxWidth) {
 	Dimension width;
 
 	XtVaGetValues (widget,XmNwidth, &width, NULL);
 	return (maxWidth > width ? maxWidth : width);
-	}
+}
 
-static void _RGISToolsImportSetButtonWidth (Widget menu,Dimension width)
-
-	{
+static void _RGISToolsImportSetButtonWidth (Widget menu,Dimension width) {
 	Cardinal childrenNum, child;
 	WidgetList children;
 
@@ -40,22 +35,18 @@ static void _RGISToolsImportSetButtonWidth (Widget menu,Dimension width)
 
 	for (child = 0;child < childrenNum;++child)
 		XtVaSetValues (children [child],XmNwidth, width, XmNrecomputeSize, False, NULL);
-	}
+}
 
-static void _RGISToolsImpGridMapMenuCBK (Widget widget,Widget mapWidget, XmAnyCallbackStruct *callData)
-
-	{
+static void _RGISToolsImpGridMapMenuCBK (Widget widget,Widget mapWidget, XmAnyCallbackStruct *callData) {
 	DBInt *val;
 
 	XtVaGetValues (widget,XmNuserData, 	&val, NULL);
 	if ((*val & 0x01) == 0x01)
 			XtUnmapWidget (mapWidget);
 	else	XtMapWidget (mapWidget);
-	}
+}
 
-static void _RGISToolsImpGridSetMapCallback (Widget menu,Widget mapWidget)
-
-	{
+static void _RGISToolsImpGridSetMapCallback (Widget menu,Widget mapWidget) {
 	Cardinal childrenNum, child;
 	WidgetList children;
 
@@ -63,7 +54,7 @@ static void _RGISToolsImpGridSetMapCallback (Widget menu,Widget mapWidget)
 	XtVaGetValues (menu,XmNchildren, &children,XmNnumChildren, &childrenNum, NULL);
 	for (child = 0;child < childrenNum;++child)
 		XtAddCallback (children [child],XmNactivateCallback, (XtCallbackProc) _RGISToolsImpGridMapMenuCBK,(void *) mapWidget);
-	}
+}
 
 #define RGISLaoutByRow			0
 #define RGISLaoutByCol			1
@@ -83,9 +74,7 @@ static void _RGISToolsImpGridSetMapCallback (Widget menu,Widget mapWidget)
 #define RGISBinTypeSingle		3
 #define RGISBinTypeDouble		4
 
-void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbackStruct *callData)
-
-	{
+void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbackStruct *callData) {
 	int confOk, colNum, rowNum;
 	char *text, listFileName [DBDataFileNameLen], buffer [256];
 	double cellWidth, cellHeight, llXCoord, llYCoord;
@@ -97,8 +86,7 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 	static Widget rowNumFLD, colNumFLD, cellWidthFLD, llCellRowFLD, llCellColFLD, cellHeightFLD, llXCoordFLD, llYCoordFLD;
 	static Widget missingValFLD, skipHeaderFLD, skipPadFLD, listFileNameFLD, listFileTGL;
 
-	if (dShell == (Widget) NULL)
-		{
+	if (dShell == (Widget) NULL) {
 		Dimension buttonWidth = 0, optionWidth = 0, widgetHeight;
 		Widget rowColWGT, colWGT, label, button;
 		Widget layoutMenu, rowOrderMenu, fileTypeMenu;
@@ -564,7 +552,7 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 		XtAddCallback (listFileTGL,XmNvalueChangedCallback,(XtCallbackProc) UIAuxSetToggleCBK,&listFile);
 
 		XtAddCallback (UIDialogFormGetOkButton (dShell),XmNactivateCallback,(XtCallbackProc) UIAuxSetBooleanTrueCBK,&proc);
-		}
+	}
 	sprintf (buffer,"%d",llCellCol);
 	XmTextFieldSetString (llCellColFLD,buffer);
 	sprintf (buffer,"%d",llCellRow);
@@ -578,50 +566,43 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 
 	proc = false;
 	UIDialogFormPopup (dShell);
-	while (UILoop ())
-		{
+	while (UILoop ()) {
 		confOk = True;
 		text =  XmTextFieldGetString (rowNumFLD);
 		if (sscanf (text,"%d",&rowNum) != 1) confOk = False;
 		XtFree (text);
-		if (confOk)
-			{
+		if (confOk) {
 			text =  XmTextFieldGetString (colNumFLD);
 			if (sscanf (text,"%d",&colNum) != 1) confOk = False;
 			XtFree (text);
-			}
-		if (confOk)
-			{
+		}
+		if (confOk) {
 			text =  XmTextFieldGetString (cellWidthFLD);
 			if (sscanf (text,"%lf",&cellWidth) != 1) confOk = False;
 			XtFree (text);
-			}
-		if (confOk)
-			{
+		}
+		if (confOk) {
 			text =  XmTextFieldGetString (cellHeightFLD);
 			if (sscanf (text,"%lf",&cellHeight) != 1) confOk = False;
 			XtFree (text);
-			}
-		if (confOk)
-			{
+		}
+		if (confOk) {
 			text =  XmTextFieldGetString (llXCoordFLD);
 			if (sscanf (text,"%lf",&llXCoord) != 1) confOk = False;
 			XtFree (text);
-			}
-		if (confOk)
-			{
+		}
+		if (confOk) {
 			text =  XmTextFieldGetString (llYCoordFLD);
 			if (sscanf (text,"%lf",&llYCoord) != 1) confOk = False;
 			XtFree (text);
-			}
-		if (confOk)
-			{
+		}
+		if (confOk) {
 			text =  XmTextFieldGetString (listFileNameFLD);
 			if (sscanf (text,"%s",listFileName) != 1) confOk = False;
 			XtFree (text);
-			}
-		XtSetSensitive (UIDialogFormGetOkButton (dShell),confOk);
 		}
+		XtSetSensitive (UIDialogFormGetOkButton (dShell),confOk);
+	}
 	UIDialogFormPopdown (dShell);
 	text =  XmTextFieldGetString (llCellColFLD);
 	if (sscanf (text,"%d",&llCellCol) != 1) llCellCol = 0;
@@ -641,24 +622,22 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 	if (sscanf (text,"%f",&missingVal) != 1) missingVal = DBDefaultMissingFloatVal;
 	XtFree (text);
 
-	if (proc)
-		{
+	if (proc) {
 		DBObjData *grdData = new DBObjData ("",binaryType == RGISBinTypeShort || binaryType == RGISBinTypeLong ?
-				DBTypeGrid : (binaryType < RGISBinTypeShort ? DBTypeGridDiscrete : DBTypeGridContinuous));
+		                     DBTypeGrid : (binaryType < RGISBinTypeShort ? DBTypeGridDiscrete : DBTypeGridContinuous));
 
-		if (UIDataHeaderForm (grdData))
-			{
+		if (UIDataHeaderForm (grdData)) {
 			FILE *inFILE, *lstFILE = (FILE *) NULL;
 			char fileName [DBDataFileNameLen + strlen(buffer)], recordName [DBStringLength];
+			DBAddress item;
 			DBInt pathLen, itemSize, chunk, i, j, row, col, recordLen;
 			DBCoordinate coord;
 			DBRegion extent;
 			DBObjTable *layerTable = grdData->Table (DBrNLayers);
 			DBObjTable *itemTable  = grdData->Table (DBrNItems);
-			DBObjTableField *missingValueFLD	= grdData->Type () == DBTypeGridContinuous ?
-														  itemTable->Field (DBrNMissingValue) : (DBObjTableField *) NULL;
-			DBObjTableField *rowNumFLD		= layerTable->Field (DBrNRowNum);
-			DBObjTableField *colNumFLD 	= layerTable->Field (DBrNColNum);
+			DBObjTableField *missingValueFLD = grdData->Type () == DBTypeGridContinuous ? itemTable->Field (DBrNMissingValue) : (DBObjTableField *) NULL;
+			DBObjTableField *rowNumFLD	  = layerTable->Field (DBrNRowNum);
+			DBObjTableField *colNumFLD 	  = layerTable->Field (DBrNColNum);
 			DBObjTableField *cellWidthFLD = layerTable->Field (DBrNCellWidth);
 			DBObjTableField *cellHeightFLD= layerTable->Field (DBrNCellHeight);
 			DBObjTableField *valueTypeFLD = layerTable->Field (DBrNValueType);
@@ -677,8 +656,7 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 			grdData->Projection (DBMathGuessProjection (extent));
 			grdData->Precision  (DBMathGuessPrecision (extent));
 
-			switch (binaryType)
-				{
+			switch (binaryType) {
 				case RGISBinTypeByte:	itemSize = sizeof (DBByte);	break;
 				case RGISBinTypeShort:	itemSize = sizeof (DBShort);	break;
 				case RGISBinTypeLong:	itemSize = sizeof (DBInt);		break;
@@ -688,25 +666,21 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 					CMmsgPrint (CMmsgAppError, "Invalid Data Type in: %s %d",__FILE__,__LINE__);
 					delete grdData;
 					return;
-				}
+			}
 
 			for (pathLen = strlen (listFileName) - 1;(pathLen > 0) && (listFileName [pathLen] != '/');--pathLen);
 			if (listFileName [pathLen] == '/') ++pathLen;
-			if (listFile)
-				{
-				if ((lstFILE = fopen (listFileName,"r")) == (FILE *) NULL)
-					{
+			if (listFile) {
+				if ((lstFILE = fopen (listFileName,"r")) == (FILE *) NULL) {
 					CMmsgPrint (CMmsgAppError, "List File Openining Error in: %s %d",__FILE__,__LINE__);
 					delete grdData;
 					return;
-					}
-				listFileName [pathLen] = '\0';
 				}
+				listFileName [pathLen] = '\0';
+			}
 
-			while (true)
-				{
-				if (listFile)
-					{
+			while (true) {
+				if (listFile) {
 					if (fgets (buffer,sizeof (buffer) - 2,lstFILE) != buffer)	break;
 					if (buffer [strlen (buffer) - 1] == '\n') buffer [strlen (buffer) - 1] = '\0';
 					if (buffer [0] == '/')	strncpy (fileName,buffer,sizeof (fileName) - 1);
@@ -715,31 +689,27 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 					for (i = strlen (fileName) - 1;(i > 0) && fileName [i] != '/';--i);
 					if (fileName [i] == '/') ++i;
 					strncpy (recordName,fileName + i,sizeof (recordName) - 1);
-					}
-				else
-					{
+				}
+				else {
 					if (layerTable->ItemNum () > 0) break;
 					strncpy (fileName,listFileName,sizeof (fileName) - 1);
 					strncpy (recordName,listFileName + pathLen,sizeof (recordName) - 1);
-					}
+				}
 
 				if ((inFILE = fopen (fileName,"r")) == (FILE *) NULL)
 					{ CMmsgPrint (CMmsgSysError, "File Openining Error in: %s %d",__FILE__,__LINE__); delete grdData; return; }
-				if (fileType == RGISGridBinary)
-					{
+				if (fileType == RGISGridBinary) {
 					int skip = skipHeader;
-					while (skip > 0)
-						{
+					while (skip > 0) {
 						chunk = skip < (int) sizeof (buffer) ? skip : (int) sizeof (buffer);
-						if (fread (buffer,chunk,1,inFILE) != 1)
-							{
+						if (fread (buffer,chunk,1,inFILE) != 1) {
 							CMmsgPrint (CMmsgSysError, "File Reading Error in: %s %d",__FILE__,__LINE__);
 							fclose (inFILE);
 							delete grdData;
-							}
-						skip -= chunk;
 						}
+						skip -= chunk;
 					}
+				}
 				else
 					for (chunk = 0;chunk < skipHeader;++chunk)
 						do	fgets (buffer,sizeof (buffer) - 2,inFILE);
@@ -747,62 +717,52 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 
 				for (i = 0;i < (int) strlen (recordName);++i) if (recordName [i] == '.') recordName [i] = ' ';
 				layerTable->Add (recordName);
-				if ((layerRec = layerTable->Item ()) == (DBObjRecord *) NULL)
-					{ fclose (inFILE); delete grdData; return; }
+				if ((layerRec = layerTable->Item ()) == (DBObjRecord *) NULL) { fclose (inFILE); delete grdData; return; }
 				rowNumFLD->Int (layerRec,rowNum);
 				colNumFLD->Int (layerRec,colNum);
 				cellWidthFLD->Float  (layerRec,cellWidth);
 				cellHeightFLD->Float (layerRec,cellHeight);
-				switch (binaryType)
-					{
+				switch (binaryType) {
 					case RGISBinTypeByte:
 					case RGISBinTypeShort:
-					case RGISBinTypeLong:
-						valueTypeFLD->Int (layerRec,DBTableFieldInt);	break;
+					case RGISBinTypeLong:   valueTypeFLD->Int (layerRec,DBTableFieldInt);	break;
 					case RGISBinTypeSingle:
-					case RGISBinTypeDouble:
-						valueTypeFLD->Int (layerRec,DBTableFieldFloat);	break;
+					case RGISBinTypeDouble: valueTypeFLD->Int (layerRec,DBTableFieldFloat);	break;
 					default:
 						CMmsgPrint (CMmsgAppError, "Invalid Data Type in: %s %d",__FILE__,__LINE__);
 						fclose (inFILE); delete grdData;
 						return;
-					}
+				}
 				valueSizeFLD->Int (layerRec,itemSize);
 				dataRec = new DBObjRecord (layerRec->Name (),(size_t) colNum * (size_t) rowNum, valueSizeFLD->Int (layerRec));
 				if (dataRec == (void *) NULL) { delete dataRec, delete grdData; fclose (inFILE); return; }
 				(grdData->Arrays ())->Add (dataRec);
 				layerFLD->Record (layerRec,dataRec);
-				if (grdData->Type () == DBTypeGridContinuous)
-					{
+				if (grdData->Type () == DBTypeGridContinuous){
 					itemTable->Add (layerRec->Name ());
-					if ((itemRec = itemTable->Item ()) == (DBObjRecord *) NULL)
-						{ fclose (inFILE); delete grdData; return; }
-					missingValueFLD->Float (itemRec,(DBFloat) missingVal);
-					}
-				if (fileType == RGISGridBinary)
-					{
+					if ((itemRec = itemTable->Item ()) == (DBObjRecord *) NULL) { fclose (inFILE); delete grdData; return; }
+					missingValueFLD->Float (itemRec,  (DBFloat) missingVal);
+				}
+
+				if (fileType == RGISGridBinary) {
 					recordLen = (layout == RGISLaoutByRow ? colNum : rowNum) * itemSize + skipPad;
-					for (j = 0;(chunk = fread (buffer,1,sizeof (buffer),inFILE)) > 0;++j)
-						for (i = 0;i < chunk;i += itemSize)
-							{
+					for (j = 0;(chunk = fread (buffer,1,sizeof (buffer),inFILE)) > 0;++j) {
+						for (i = 0;i < chunk;i += itemSize) {
 							if (byteOrder != DBByteOrder ())
-								switch (itemSize)
-									{
+								switch (itemSize) {
 									default:	break;
 									case 2:	DBByteOrderSwapHalfWord	(buffer + i);	break;
 									case 4:	DBByteOrderSwapWord 		(buffer + i);	break;
 									case 8:	DBByteOrderSwapLongWord	(buffer + i);	break;
-									}
-							if (layout == RGISLaoutByRow)
-								{
+								}
+							if (layout == RGISLaoutByRow) {
 								if ((row =  (j * sizeof (buffer) + i) / recordLen) >= rowNum) continue;
 								if ((col = ((j * sizeof (buffer) + i) % recordLen) / itemSize) >= colNum) continue;
-								}
-							else
-								{
+							}
+							else {
 								if ((col =  (j * sizeof (buffer) + i) / recordLen) >= colNum) continue;
 								if ((row = ((j * sizeof (buffer) + i) % recordLen) / itemSize) >= rowNum) continue;
-								}
+							}
 							if (rowOrder == RGISItemOrderBottomUp)
 								row = rowNum - row - 1;
 							col -= llCellCol;
@@ -810,24 +770,22 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 							row -= llCellRow;
 							row = row < 0 ? rowNum + row : row;
 							memcpy (((char *) dataRec->Data ()) + (row * colNum + col) * itemSize,buffer + i,itemSize);
-							}
+						}
 					}
-				else
-					{
+				}
+				else {
 					DBFloat val;
 					i = j = 0;
-					while (fscanf (inFILE,"%lf",&val) == 1)
-						{
+					while (fscanf (inFILE,"%lf",&val) == 1) {
 						if (j >= rowNum) continue;
 						if (i >= colNum) continue;
-						switch (binaryType)
-							{
+						switch (binaryType) {
 							case RGISBinTypeByte:	((DBByte *) 	buffer) [0] = (DBByte) 	val;	break;
 							case RGISBinTypeShort:	((DBShort *)	buffer) [0] = (DBShort) val;	break;
 							case RGISBinTypeLong:	((DBInt *)		buffer) [0] = (DBInt) 	val;	break;
 							case RGISBinTypeSingle:	((DBFloat4 *)	buffer) [0] = (DBFloat4)val;	break;
 							case RGISBinTypeDouble:	((DBFloat *)	buffer) [0] = (DBFloat)	val;	break;
-							}
+						}
 						col = i; row = j;
 						if (rowOrder == RGISItemOrderBottomUp)
 							row = rowNum - row - 1;
@@ -836,30 +794,22 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 						row -= llCellRow;
 						row = row < 0 ? rowNum + row : row;
 						memcpy (((char *) dataRec->Data ()) + ((DBAddress) row * (DBAddress) colNum + (DBAddress) col) * (DBAddress) itemSize,buffer,itemSize);
-						if (layout == RGISLaoutByRow)
-							{
+						if (layout == RGISLaoutByRow) {
 							i += 1;
 							if (i >= colNum) { i = 0; j += 1; }
-							}
-						else
-							{
+						}
+						else {
 							j += 1;
 							if (j >= rowNum) { j = 0; i += 1; }
-							}
 						}
 					}
-				fclose (inFILE);
 				}
+				fclose (inFILE);
+			}
 			if (listFile) fclose (lstFILE);
 			gridIF = new DBGridIF (grdData);
-			if (grdData->Type () == DBTypeGridContinuous)
-				{
-				DBObjTableField *missingValueFLD	= itemTable->Field (DBrNMissingValue);
-				missingValueFLD->Float (itemTable->Item (layerRec->Name ()),(DBFloat) missingVal);
-				gridIF->RecalcStats ();
-				}
-			else
-				{
+			if (grdData->Type () == DBTypeGridContinuous)  gridIF->RecalcStats ();
+			else {
 				DBInt intVal;
 				DBObjRecord *symRec = (grdData->Table (DBrNSymbols))->Add ("Default Symbol");
 				DBObjTableField *gridValueFLD  = itemTable->Field (DBrNGridValue);
@@ -873,55 +823,63 @@ void RGISToolsImportGridCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbac
 				foregroundFLD->Int (symRec,1);
 				backgroundFLD->Int (symRec,0);
 				styleFLD->Int (symRec,0);
-				for (dataRec = (grdData->Arrays ())->First ();dataRec != (DBObjRecord *) NULL;dataRec = (grdData->Arrays ())->Next ())
-					{
-					for (i = 0;i < colNum * rowNum;++i)
-						{
-						if (itemSize == (int) sizeof (DBByte))
-								intVal = (DBInt) (*((DBByte *)  ((char *) dataRec->Data () + i * itemSize)));
-						else	intVal = (DBInt) (*((DBShort *) ((char *) dataRec->Data () + i * itemSize)));
-						sprintf (buffer,"Category%d",intVal);
-						if ((itemRec = itemTable->Item (buffer)) == (DBObjRecord *) NULL)
-							{
-							if ((itemRec = itemTable->Add (buffer)) == (DBObjRecord *) NULL)
-								{
-								CMmsgPrint (CMmsgAppError, "Item Object Creation Error in: %s %d",__FILE__,__LINE__);
-								delete gridIF; delete grdData;
-								return;
-								}
-							gridValueFLD->Int (itemRec,intVal);
-							gridSymbolFLD->Record (itemRec,symRec);
-							}
-						intVal = itemRec->RowID ();
-						if (itemSize == (int) sizeof (DBByte))
-								*((DBByte *)  ((char *) dataRec->Data () + i * itemSize)) = intVal;
-						else	*((DBShort *) ((char *) dataRec->Data () + i * itemSize)) = intVal;
-						}
-					}
+				for (dataRec = (grdData->Arrays ())->First ();dataRec != (DBObjRecord *) NULL;dataRec = (grdData->Arrays ())->Next ()) {
+            		for (item = 0; item < colNum * rowNum; ++item) {
+                		switch (itemSize) {
+                    		case 1:  intVal = (DBInt) (*((DBByte *)  ((char *) dataRec->Data() + item * itemSize))); break;
+                    		case 2:  intVal = (DBInt) (*((DBShort *) ((char *) dataRec->Data() + item * itemSize))); break;
+                    		default: intVal = (DBInt) (*((DBInt *)   ((char *) dataRec->Data() + item * itemSize))); break;
+                		}
+                		if (intVal != (DBInt) missingVal) {
+                    		sprintf(buffer, "Category%010d", intVal);
+                    		if ((itemRec = itemTable->Item(buffer)) == (DBObjRecord *) NULL) {
+                        		if ((itemRec = itemTable->Add(buffer)) == (DBObjRecord *) NULL) {
+                            		CMmsgPrint(CMmsgAppError, "Item Object Creation Error in: %s %d", __FILE__, __LINE__);
+                            		delete gridIF;
+                            		delete grdData;
+                            		return;
+                        		}
+                        		gridValueFLD->Int(itemRec, intVal);
+                        		gridSymbolFLD->Record(itemRec, symRec);
+                    		}
+                    		intVal = itemRec->RowID();
+                    		switch (itemSize) {
+                        		case 1:  *((DBByte *)  ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
+                        		case 2:  *((DBShort *) ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
+                        		default: *((DBInt *)   ((char *) dataRec->Data() + item * itemSize)) = intVal; break;
+                    		}
+                		}
+                		else {
+                    		switch (itemSize) {
+                        		case 1:  *((DBByte *)  ((char *) dataRec->Data() + item * itemSize)) = DBFault; break;
+                        		case 2:  *((DBShort *) ((char *) dataRec->Data() + item * itemSize)) = DBFault; break;
+                        		default: *((DBInt *)   ((char *) dataRec->Data() + item * itemSize)) = DBFault; break;
+                    		}
+                		}
+            		}
+				}	
 				itemTable->ListSort (gridValueFLD);
-				for (dataRec = (grdData->Arrays ())->First ();dataRec != (DBObjRecord *) NULL;dataRec = (grdData->Arrays ())->Next ())
-					{
-					for (i = 0;i < colNum * rowNum;++i)
-						{
+				for (dataRec = (grdData->Arrays ())->First ();dataRec != (DBObjRecord *) NULL;dataRec = (grdData->Arrays ())->Next ()) {
+					for (i = 0;i < colNum * rowNum;++i) {
 						if (itemSize == (int) sizeof (DBByte))
-								intVal = (DBInt) (*((DBByte *)  ((char *) dataRec->Data () + i * itemSize)));
-						else	intVal = (DBInt) (*((DBShort *) ((char *) dataRec->Data () + i * itemSize)));
+							 intVal = (DBInt) (*((DBByte *)  ((char *) dataRec->Data () + i * itemSize)));
+						else intVal = (DBInt) (*((DBShort *) ((char *) dataRec->Data () + i * itemSize)));
 						itemRec = itemTable->Item (intVal);
 						intVal = itemRec->ListPos ();
 						if (itemSize == (int) sizeof (DBByte))
-								*((DBByte *)  ((char *) dataRec->Data () + i * itemSize)) = intVal;
-						else	*((DBShort *) ((char *) dataRec->Data () + i * itemSize)) = intVal;
-						}
+							 *((DBByte *)  ((char *) dataRec->Data () + i * itemSize)) = intVal;
+						else *((DBShort *) ((char *) dataRec->Data () + i * itemSize)) = intVal;
 					}
+				}
 				itemTable->ItemSort ();
 				gridIF->DiscreteStats ();
-				}
+			}
 			delete gridIF;
 			workspace->CurrentData (grdData);
-			}
-		else delete grdData;
 		}
+		else delete grdData;
 	}
+}
 
 void RGISToolsImportGridDMCBK (Widget widget,RGISWorkspace *workspace,XmAnyCallbackStruct *callData)
 

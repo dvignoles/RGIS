@@ -443,18 +443,19 @@ public:
     DBInt Value(DBCoordinate coord, DBFloat value) { return (Value(LayerTable->Item(), coord, value)); }
 
     DBFloat MissingValue(DBObjRecord *layerRec) const {
-        return (MissingValueFLD->Float(ItemTable->Item(layerRec->RowID())));
+        return (MissingValueFLD != (DBObjTableField *) NULL ? MissingValueFLD->Float (ItemTable->Item(layerRec->RowID())) : DBFault);
     }
 
     void MissingValue(DBObjRecord *layerRec, DBFloat value) {
-        MissingValueFLD->Float(ItemTable->Item(layerRec->RowID()), value);
+        if (MissingValueFLD != (DBObjTableField *) NULL) MissingValueFLD->Float(ItemTable->Item(layerRec->RowID()), value);
     }
 
     DBFloat MissingValue() const { return (MissingValue(LayerTable->Item())); }
 
     void MissingValue(DBFloat value) {
         DBInt layerID;
-        for (layerID = 0; layerID < LayerNum(); ++layerID) MissingValue(LayerTable->Item(layerID), value);
+        if (MissingValueFLD != (DBObjTableField *) NULL) 
+            for (layerID = 0; layerID < LayerNum(); ++layerID) MissingValue(ItemTable->Item(layerID), value);
     }
 
     DBObjRecord *GridItem(DBObjRecord *, DBPosition) const;
@@ -471,7 +472,7 @@ public:
 
     DBInt GridValue(DBObjRecord *layerRec, DBPosition pos) const {
         DBObjRecord *gridRec = GridItem(layerRec, pos);
-        if (gridRec == NULL) return (DBFault);
+        if (gridRec == NULL) return (MissingValueFLD != (DBObjTableField *) NULL ? MissingValueFLD->Float(layerRec) : DBFault);
         else return (GridValueFLD->Int(gridRec));
     }
 
@@ -479,7 +480,7 @@ public:
 
     DBInt GridValue(DBObjRecord *layerRec, DBCoordinate coord) const {
         DBObjRecord *gridRec = GridItem(layerRec, coord);
-        if (gridRec == NULL) return (DBFault);
+        if (gridRec == NULL) return (MissingValueFLD != (DBObjTableField *) NULL ? MissingValueFLD->Float(layerRec) : DBFault);
         else return (GridValueFLD->Int(gridRec));
     }
 

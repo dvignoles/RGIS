@@ -22,8 +22,8 @@ void DBGridIF::Initialize(DBObjData *data, bool flat) {
     DBObjTableField *valueSizeFLD;
     DBObjRecord *layerRec;
 
-    DataPTR = data;
-    ItemTable = data->Table(DBrNItems);
+    DataPTR    = data;
+    ItemTable  = data->Table(DBrNItems);
     switch (data->Type()) {
         case DBTypeGridDiscrete:
             SymbolTable = data->Table(DBrNSymbols);

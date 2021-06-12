@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 TMPDIR=${TMPDIR:=/tmp}
 
 PLOTF=${TMPDIR}/ghaasplot.$$

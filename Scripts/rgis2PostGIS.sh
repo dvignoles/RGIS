@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function PrintUsage () {
 	echo "Usage ${0##*/} [options] <rgisfile>"

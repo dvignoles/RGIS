@@ -54,13 +54,12 @@ DBInt DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, FILE *file) {
                 break;
                 case DBTableFieldInt:
                     DBInt intVal;
-                    fprintf(file, "NODATA_value  %d\n", (DBInt) gridIF->MissingValue());
+                    fprintf(file, "NODATA_value  %d\n", DBFault);
                     for (row = gridIF->RowNum() - 1; row >= 0; row--) {
                         for (col = 0; col < gridIF->ColNum(); col++) {
                             pos.Row = row;
                             pos.Col = col;
-                            if (gridIF->Value(layerRec, pos, &intVal)) fprintf(file, " %d", intVal);
-                            else fprintf(file, " %d", (DBInt) gridIF->MissingValue());
+                            fprintf(file, " %d", intVal);
                         }
                         fprintf(file, "\n");
                     }
@@ -68,7 +67,7 @@ DBInt DBExportARCGridLayer(DBObjData *data, DBObjRecord *layerRec, FILE *file) {
             }
         break;
         case DBTypeGridDiscrete:
-            fprintf(file, "NODATA_value  %d\n", DBFault);
+            fprintf(file, "NODATA_value  %d\n", (DBInt) gridIF->MissingValue ());
             for (row = gridIF->RowNum() - 1; row >= 0; row--) {
                 for (col = 0; col < gridIF->ColNum(); col++) {
                     pos.Row = row;

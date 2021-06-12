@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -z "${GHAAS_DIR}" ]; then
 	if [ -e "/usr/local/share/ghaas" ]; then

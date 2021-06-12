@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 if [ "${GHAASDIR}" == "" ]; then GHAASDIR="/usr/local/share/ghaas"; fi
 source "${GHAASDIR}/Scripts/RGISfunctions.sh"
 
