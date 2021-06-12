@@ -271,7 +271,7 @@ static VDBmasterTable_t _VDBmasterTable3 [] = {
         {"energy",        "energy_hydropower_subbasin",                   "Energy-HydroPower-Subbasin",                   "Hydropower Subbasin",                   VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"energy",        "energy_thermalpower_plant",                    "Energy-ThermalPower-Plant",                    "Thermal Power Plant",                   VDBpoint,      VDBnotApplicable, VDBnotApplicable},
         {"energy",        "energy_thermalpower_subbasin",                 "Energy-ThermalPower-Subbasin",                 "Thermal Power Subbasin",                VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
-        {"energy",        "energy_electricity_region",                    "Energy-ElectricityRegion",                     "Electricity Balancing Region",          VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
+        {"energy",        "energy_electricity_region",                    "Energy-Electricity-Region",                    "Electricity Balancing Region",          VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"energy",        "energy_electricity_region_crossing",           "Energy-Electricity-RegionCrossing",            "Electricity Balancing Region Crossing", VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"geography",     "geography_continent",                          "Geography-Continent",                          "Continent",                             VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"geography",     "geography_county",                             "Geography-County",                             "County",                                VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
