@@ -51,8 +51,8 @@ function shp2rgisGrid () {
 }
 
 function _GPKGsql () {
-	local  schema="${1}"; shift
-	local tblName="${1}"; shift
+	local   schema="${1}"; shift
+	local  tblName="${1}"; shift
 	local relateID="${1}"; shift
 	local   joinID="${1}"; shift
 
