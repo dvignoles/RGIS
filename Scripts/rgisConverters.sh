@@ -69,7 +69,7 @@ function rgisFile2gpkg {
     local   tblName="${1}"; shift
     local      mode="${1}"; shift
 
-    local    schema=$(echo "${SCHEMA}"  | sed "s:-::g" | sed "s:+::g")
+    local    schema=$(echo "${schema}"  | sed "s:-::g" | sed "s:+::g")
     local   tblName=$(echo "${tblName}" | sed "s:-::g" | sed "s:+::g")
     local   tmpFile="$(mktemp -u -t rgis2gpkgXXXX)"
 	local extension="${rgisFile#*.}"
