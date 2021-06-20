@@ -132,6 +132,6 @@ function rgis2gpkg {
 
    [[ -e "${gpkgFile%/*}" ]] || mkdir -p "${gpkgFile%/*}"
    local rgisFile=$(RGISfile "${archive}" "${domain}"  "${variable}" "${product}" "${resolution}" "static")
-   rgisFile2gpkg "${rgisFile}" "${gpkgFile}"  "${product}" "$(RGISlookupSubject "${variable}")"
+   rgisFile2gpkg "${rgisFile}" "${gpkgFile}" "$(RGISlookupSubject "${variable}")" "${product}"
    return 0
 }
