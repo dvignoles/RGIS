@@ -92,8 +92,7 @@ function rgisFile2gpkg {
 		    rgis2sql -c "sensitive" -a "DBItems" -s "${schema}" -q "${tblName}" -d "sqlite" -r off "${rgisFile}" |\
 		    sqlite3 "${tmpFile}.gpkg"
 		    _GPKGsql "${schema}" "${tblName}" "ID" "fid" > "${tmpFile}.sql"
-		    ogr2ogr -update -overwrite -nln "${chema}_${tblName}" -nlt "${DATATYPE}" -dialect "sqlite" \
-			        -sql "@${tmpFile}.sql" "${gpkgFile}" "${tmpFile}.gpkg"
+		    ogr2ogr -update -overwrite -nln "${schema}_${tblName}" -nlt "${DATATYPE}" -dialect "sqlite" -sql "@${tmpFile}.sql" "${gpkgFile}" "${tmpFile}.gpkg"
 		    rm "${tmpFile}".*
  	    ;;
 	    (gdbd|gdbd.gz)
@@ -106,8 +105,7 @@ function rgisFile2gpkg {
 		    rgis2sql -c "sensitive" -a "DBItems" -s "${schema}" -q "${tblName}" -d "sqlite" -r off "${rgisFile}" |\
 		    sqlite3 "${tmpFile}.gpkg"
 		    _GPKGsql "${schema}" "${tblName}" "GridValue" "DN" > "${tmpFile}.sql"
-		    ogr2ogr -update -overwrite -nln "${chema}_${tblName}" -nlt "POLYGON" -dialect "sqlite" \
-			        -sql "@${tmpFile}.sql" "${gpkgFile}" "${tmpFile}.gpkg"
+		    ogr2ogr -update -overwrite -nln "${schema}_${tblName}" -nlt "POLYGON" -dialect "sqlite" -sql "@${tmpFile}.sql" "${gpkgFile}" "${tmpFile}.gpkg"
 	    	rm "${tmpFile}".*
 	    ;;
 	    (gdbc|gdbc.gznc)
