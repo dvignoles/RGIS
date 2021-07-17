@@ -1,6 +1,6 @@
 /******************************************************************************
 GHAAS Water Balance/Transport Model
-Global Hydrologic Archive and Analysis System
+Global Hydrological Archive and Analysis System
 Copyright 1994-2007, University of New Hampshire
 
 MDThermalInputs3.c

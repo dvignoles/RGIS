@@ -1,7 +1,7 @@
 /******************************************************************************
 
 GHAAS Database library V3.0
-Global Hydrologic Archive and Analysis System
+Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
 DBtf.h
@@ -11,7 +11,7 @@ bfekete@gc.cuny.edu
 *******************************************************************************/
 
 typedef unsigned char DBByte;
-typedef int DBInt;
+typedef int BInt;
 typedef unsigned DBUnsigned;
 typedef short DBShort;
 typedef unsigned short DBUShort;

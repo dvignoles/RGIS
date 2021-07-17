@@ -1,7 +1,7 @@
 /******************************************************************************
 
 GHAAS Command Line Library V1.0
-Global Hydrologic Archive and Analysis System
+Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
 cmThreads.c

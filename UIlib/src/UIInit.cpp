@@ -1,7 +1,7 @@
 /******************************************************************************
 
 GHAAS User Interface library V2.1
-Global Hydrologic Archive and Analysis System
+Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
 UIInit.cpp
@@ -173,7 +173,7 @@ Widget UIInitialize(char *title, char *icon, char *helpFile, UIMenuItem mainMenu
                                         XmNbottomAttachment, XmATTACH_FORM,
                                         XmNbottomOffset, 5,
                                         NULL);
-    string = XmStringCreate((char *) "Global Hydrological Archive and Analysis System", UICharSetNormal);
+    string = XmStringCreate((char *) "Global Hydrologicalal Archive and Analysis System", UICharSetNormal);
     XtVaCreateManagedWidget("GHAASLabel", xmLabelWidgetClass, mainForm,
                             XmNlabelString, string,
                             XmNtopAttachment, XmATTACH_OPPOSITE_WIDGET,

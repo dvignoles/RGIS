@@ -1,7 +1,7 @@
 /******************************************************************************
 
 GHAAS Command Line Library V3.0
-Global Hydrologic Archive and Analysis System
+Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
 VDBvariableDB.c
@@ -86,7 +86,7 @@ static VDBmasterTable_t _VDBmasterTable2 [] = {
         {"geopgraphy",    "country_crossing",                  "CountryCrossing",                 "Country Crossing",                      VDBpoint,      VDBnotApplicable, VDBnotApplicable},
         {"geopgraphy",    "state",                             "State",                           "State",                                 VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"geopgraphy",    "state_crossing",                    "StateCrossing",                   "State Crossing",                        VDBpoint,      VDBnotApplicable, VDBnotApplicable},
-        {"geopgraphy",    "hydro_unit",                        "Hydro-Unit",                      "Hydrological Unit",                     VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
+        {"geopgraphy",    "hydro_unit",                        "Hydro-Unit",                      "Hydrologicalal Unit",                     VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"geography",     "marine_region",                     "MarineRegion",                    "Marine Region",                         VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"geography",     "ocean",                             "Ocean",                           "Ocean",                                 VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"hydrography",   "daily_precipitation_fraction",      "Precipitation-DailyFraction",     "Daily Precipitation Fraction",          VDBcontinuous, VDBgrey,          VDBavg},
@@ -285,8 +285,8 @@ static VDBmasterTable_t _VDBmasterTable3 [] = {
         {"geography",     "geography_state",                              "Geography-State",                              "State",                                 VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"geography",     "geography_state_crossing",                     "Geography-StateCrossing",                      "State Crossing",                        VDBpoint,      VDBnotApplicable, VDBnotApplicable},
         {"geography",     "geography_landmask",                           "Geography-Landmask",                           "Landmask",                              VDBcontinuous, VDBgrey,          VDBavg},
-        {"geography",     "geography_hydrological_unit",                  "Geography-Hydrological-Unit",                  "Hydrological Unit",                     VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
-        {"geography",     "geography_hydrological_unit_crossing",         "Geography-Hydrological-UnitCrossing",          "Hydrological Unit Crossing",            VDBpoint,      VDBnotApplicable, VDBnotApplicable},
+        {"geography",     "geography_hydrological_unit",                  "Geography-Hydrologicalal-Unit",                  "Hydrologicalal Unit",                     VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
+        {"geography",     "geography_hydrological_unit_crossing",         "Geography-Hydrologicalal-UnitCrossing",          "Hydrologicalal Unit Crossing",            VDBpoint,      VDBnotApplicable, VDBnotApplicable},
         {"geography",     "geography_marine_region",                      "Geography-MarineRegion",                       "Marine Region",                         VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"geography",     "geography_ocean",                              "Geography-Ocean",                              "Ocean",                                 VDBdiscrete,   VDBnotApplicable, VDBnotApplicable},
         {"hydrography",   "hydrography_discharge",                        "Hydrography-Discharge",                        "Discharge",                             VDBcontinuous, VDBblue,          VDBavg},
