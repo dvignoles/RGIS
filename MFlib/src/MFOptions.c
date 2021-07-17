@@ -106,6 +106,11 @@ int MFOptionParse (int argc, char *argv []) {
 }
 
 void MFOptionMessage (const char *optName, const char *optStr, const char *options []) {
+	int opt;
 	if ((optStr == (char *) NULL) || (strcmp (optStr,"help") == 0)) CMoptPrintList (CMmsgInfo,optName,options);
-	else CMmsgPrint (CMmsgUsrError, "Invalid [%s] option: %s.\n", optName, optStr);	
+	else CMmsgPrint (CMmsgUsrError, "Invalid [%s] option: %s\nValid options: ", optName, optStr);
+
+	CMmsgIndent (CMmsgUsrError,true);
+	for (opt = 0; options[opt] != (char *) NULL; opt++) CMmsgPrint (CMmsgUsrError, "%s", options[opt]);
+	CMmsgIndent (CMmsgUsrError,false);
 }
