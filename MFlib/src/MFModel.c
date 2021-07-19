@@ -279,9 +279,8 @@ static int _MFModelParse (int argc, char *argv [],int argNum, int (*mainDefFunc)
 	}
 
 	ret = mainDefFunc ();
-
-	if ((ret == CMfailed) || (help)) {
-		MFOptionPrintList ();
+	MFOptionPrintList ();
+	if ((ret == CMfailed) || (help)) {	
 		_MFModelVarEntriesFree(inputVars,  inputVarNum);
 		_MFModelVarEntriesFree(outputVars, outputVarNum);
 		_MFModelVarEntriesFree(stateVars,  stateVarNum);

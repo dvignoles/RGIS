@@ -194,6 +194,12 @@ int   MFDateTimeStepLength(const char *,int);
 
 float MFRungeKutta(float, float, float, float (*deltaFunc)(float, float));
 
+#define MFinputStr     "input"
+#define MFlookupStr    "lookup"
+#define MFcalculateStr "calculate"
+#define MFnoneStr      "none"
+#define MFhelpStr      "help"
+
 #if defined(__cplusplus)
 }
 #endif

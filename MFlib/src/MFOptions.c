@@ -78,7 +78,6 @@ void MFOptionPrintList () {
 	int opt;
 	CMmsgPrint (CMmsgInfo,"Options:");
 	for (opt = 0;opt < _MFOptionNum;++opt) if (_MFOptions [opt].InUse) CMmsgPrint (CMmsgInfo," %s",_MFOptions [opt].Name);
-	CMmsgPrint (CMmsgInfo,"\n");
 }
 
 int MFOptionParse (int argc, char *argv []) {
@@ -107,10 +106,6 @@ int MFOptionParse (int argc, char *argv []) {
 
 void MFOptionMessage (const char *optName, const char *optStr, const char *options []) {
 	int opt;
-	if ((optStr == (char *) NULL) || (strcmp (optStr,"help") == 0)) CMoptPrintList (CMmsgInfo,optName,options);
+	if ((optStr == (char *) NULL) || (strcmp (optStr,MFhelpStr) == 0)) CMoptPrintList (CMmsgInfo,optName,options);
 	else CMmsgPrint (CMmsgUsrError, "Invalid [%s] option: %s\nValid options: ", optName, optStr);
-
-	CMmsgIndent (CMmsgUsrError,true);
-	for (opt = 0; options[opt] != (char *) NULL; opt++) CMmsgPrint (CMmsgUsrError, "%s", options[opt]);
-	CMmsgIndent (CMmsgUsrError,false);
 }
