@@ -31,9 +31,8 @@ static void _MDRouting_DischRelease (int itemID) {
 }
 
 int MDRouting_DischargeReleaseDef () {
-
-   const char *optStr;
-   const char *options [] = { MDNoneStr, (char *) NULL };
+	const char *optStr;
+	const char *options [] = { MDNoneStr, (char *) NULL };
 
    
 	if (_MDOutRouting_DischargeID != MFUnset) return (_MDOutRouting_DischargeID);
