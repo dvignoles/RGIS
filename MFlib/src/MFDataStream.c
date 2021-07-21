@@ -194,6 +194,7 @@ CMreturn MFdsRecordRead (MFVariable_p var) {
 							break;
 					}
 					switch (strlen(header.Date)) {
+						default: strcpy (header.Date,"XXXX");
 						case 4:
 							var->TStep = MFTimeStepYear;
 							break;
@@ -206,9 +207,6 @@ CMreturn MFdsRecordRead (MFVariable_p var) {
 						case 13:
 							var->TStep = MFTimeStepHour;
 							break;
-						default:
-							CMmsgPrint(CMmsgUsrError, "Invalid date in data stream %s", var->Name);
-							return (CMfailed);
 					}
 				}
 				else if (header.ItemNum != var->ItemNum) {
