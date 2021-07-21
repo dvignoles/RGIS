@@ -200,6 +200,16 @@ float MFRungeKutta(float, float, float, float (*deltaFunc)(float, float));
 #define MFnoneStr      "none"
 #define MFhelpStr      "help"
 
+enum { MFhelp      = 0,
+       MFinput     = 1, MFoff = 1,
+       MFcalculate = 2, MFon  = 2, MFlookup = 2,
+       MFnone      = 3 };
+
+extern const char *MFcalcOptions   [];
+extern const char *MFsourceOptions [];
+extern const char *MFlookupOptions [];
+extern const char *MFswitchOptions [];
+
 #if defined(__cplusplus)
 }
 #endif

@@ -24,6 +24,11 @@ typedef struct MFOption_s {
 static MFOption_p _MFOptions = (MFOption_p) NULL;
 static int _MFOptionNum = 0;
 
+const char *MFcalcOptions   [] = { MFhelpStr, MFinputStr, MFcalculateStr, MFnoneStr, (char *) NULL };
+const char *MFsourceOptions [] = { MFhelpStr, MFinputStr, MFcalculateStr, (char *) NULL };
+const char *MFlookupOptions [] = { MFhelpStr, MFinputStr, MFlookupStr,    (char *) NULL };
+const char *MFswitchOptions [] = { MFhelpStr, MFnoneStr,  MFcalculateStr, (char *) NULL };
+
 bool _MFOptionTestInUse () {
 	int opt;
 	bool ret = true;
