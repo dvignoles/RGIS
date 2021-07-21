@@ -545,11 +545,12 @@ function _fwPostprocess () {
 		local fwGDSFileNAME="$(FwGDSFilename "${fwVARIABLE}" "Output" "${fwExperiment}" "${fwYEAR}" "d")"
 		if [ "${_fwCLEANUP}" == "on" ]
 		then
-			[ -e "${fwGDSFileNAME}" ] && rm "${fwGDSFileNAME}"
+			[ -e "${fwGDSFileNAME}" ] && rm "${fwGDSFileNAME}"   &
 		else
-			[ -e "${fwGDSFileNAME}" ] && gzip "${fwGDSFileNAME}"
+			[ -e "${fwGDSFileNAME}" ] && gzip "${fwGDSFileNAME}" &
 		fi
 	done
+	wait
 	[ "${_fwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"; }
 	return 0
 }
