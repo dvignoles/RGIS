@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
     pntData->Projection(DBMathGuessProjection(extent));
     pntData->Precision(DBMathGuessPrecision(extent));
     for (tblFLD = table->Fields()->First(); tblFLD != (DBObjTableField *) NULL; tblFLD = table->Fields()->Next())
-        if ((tblFLD != nField) && (tblFLD != xField) && (tblFLD != yField) && DBTableFieldIsVisible(tblFLD)) {
+        if (DBTableFieldIsVisible(tblFLD)) {
             pntTable->AddField(pntFLD = new DBObjTableField(*tblFLD));
             pntFLD->Required(false);
             pntRec = pntTable->First();
