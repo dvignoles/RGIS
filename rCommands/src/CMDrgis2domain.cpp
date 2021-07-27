@@ -70,6 +70,13 @@ int main(int argc, char *argv[]) {
 
     data = new DBObjData();
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Read(argv[1]) : data->Read(stdin);
+    if (ret == DBFault) {
+        CMmsgPrint(CMmsgUsrError, "Domain reading error in: %s", CMfileName(argv[0]));
+        _CMDprintUsage (argv[0]);
+        if (outFile != stdout) fclose (outFile);
+        return(DBFault);
+
+    }
 
     if ((domain = (MFDomain_t *) calloc(1, sizeof(MFDomain_t))) != (MFDomain_t *) NULL) {
         domain->Objects = (MFObject_t *) NULL;
@@ -82,6 +89,7 @@ int main(int argc, char *argv[]) {
                     (MFObject_t *) NULL) {
                     CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s %d", __FILE__, __LINE__);
                     MFDomainFree(domain);
+                    delete pntIF;
                     goto Stop;
                 }
                 for (objID = 0; objID < domain->ObjNum; ++objID) {
@@ -97,12 +105,11 @@ int main(int argc, char *argv[]) {
                     domain->Objects[objID].Area = 0.0;
                     domain->Objects[objID].Length = 0.0;
                 }
-            }
-                break;
+                delete pntIF;
+            } break;
             case DBTypeGridContinuous:
             case DBTypeGridDiscrete: {
-            }
-                break;
+            } break;
             case DBTypeNetwork: {
                 DBInt dir;
                 DBObjRecord *nextCell;
@@ -112,6 +119,7 @@ int main(int argc, char *argv[]) {
                     (MFObject_t *) NULL) {
                     CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s %d", __FILE__, __LINE__);
                     MFDomainFree(domain);
+                    delete netIF;
                     goto Stop;
                 }
                 for (objID = 0; objID < domain->ObjNum; ++objID) {
@@ -134,6 +142,7 @@ int main(int argc, char *argv[]) {
                             (size_t *) NULL) {
                             CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s %d", __FILE__, __LINE__);
                             MFDomainFree(domain);
+                            delete netIF;
                             goto Stop;
                         }
                         domain->Objects[objID].DLinks[domain->Objects[objID].DLinkNum] = nextCell->RowID();
@@ -146,18 +155,20 @@ int main(int argc, char *argv[]) {
                                                                                     size)) == (size_t *) NULL) {
                                 CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s %d", __FILE__, __LINE__);
                                 MFDomainFree(domain);
+                                delete netIF;
                                 goto Stop;
                             }
                             domain->Objects[objID].ULinks[domain->Objects[objID].ULinkNum] = nextCell->RowID();
                             domain->Objects[objID].ULinkNum++;
                         }
                 }
-            }
-                break;
+                delete netIF;
+            } break;
         }
         ret = MFDomainWrite(domain, outFile);
     }
     Stop:
+    delete data;
     if (outFile != stdout) fclose(outFile);
     return (ret);
 }

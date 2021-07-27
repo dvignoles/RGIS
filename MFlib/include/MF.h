@@ -174,6 +174,19 @@ int  MFDomainSetBifurcations(MFDomain_t *, const char *);
 #define MFBifurcationOpt "bifurcations"
 void MFDomainFree(MFDomain_t *);
 
+enum { MFsamplePoint, MFsampleZone };
+
+typedef struct MFSampler_s {
+    short Swap, Type;
+    int SampleNum;
+    long int ObjNum;
+    int *SampleIDs;
+} MFSampler_t, *MFSampler_p;
+
+MFSampler_t *MFSamperRead (FILE *);
+int  MFSamplerWrite (MFSampler_t *, FILE *);
+void MFSamplerFree  (MFSampler_t *);
+
 int  MFDateCompare (const char *, const char *);
 char *MFDateGetCurrent ();
 bool  MFDateSetCurrent (char *);

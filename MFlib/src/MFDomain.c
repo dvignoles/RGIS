@@ -43,7 +43,8 @@ MFDomain_p MFDomainRead (FILE *inFile) {
 		return ((MFDomain_p) NULL);
 	}
 	if (domain->Swap != 1) {
-		MFSwapHalfWord (&(domain->Type));		
+        MFSwapHalfWord (&(domain->Swap));
+		MFSwapHalfWord (&(domain->Type));
 		MFSwapWord (&(domain->ObjNum));
 	}
 	if ((domain->Objects = (MFObject_p) calloc (domain->ObjNum,sizeof (MFObject_t))) == (MFObject_p) NULL) {
