@@ -138,7 +138,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         }
         while (MFdsHeaderRead(&header, inFile) == CMsucceeded) {
             if (header.ItemNum != sampler->ObjNum) {
-                CMmsgPrint(CMmsgUsrError, "Data stream and sampler missmatch!");
+                CMmsgPrint(CMmsgUsrError, "Data stream [%d] and sampler [%d] missmatch!", header.ItemNum, sampler->ObjNum);
                 goto Stop;
             }
             if (items == (void *) NULL) {
