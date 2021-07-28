@@ -134,6 +134,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
 
     for (argPos = 0; argPos < argNum; ++argPos) {
         if (argNum > 1) {
+            if (argPos == 0) continue;
             if ((argPos == 1) && (strcmp(argv[argPos], "-") == 0)) inFile = stdin;
             else {
                 if (strncmp(CMfileExtension(argv[argPos]), "gz", 2) == 0) {
@@ -147,12 +148,11 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                     compressed  = false;
                 }
             }
-            if (inFile == (FILE *) NULL) {
-                CMmsgPrint(CMmsgSysError, "Input file opening error in: %s %d", __FILE__, __LINE__);
-                goto Stop;
-            }
+        } else inFile = stdin;        
+        if (inFile == (FILE *) NULL) {
+            CMmsgPrint(CMmsgSysError, "Input file opening error in: %s %d", __FILE__, __LINE__);
+            goto Stop;
         }
-        else inFile = stdin;        
 
         while (MFdsHeaderRead(&header, inFile) == CMsucceeded) {
             if (header.ItemNum != sampler->ObjNum) {
