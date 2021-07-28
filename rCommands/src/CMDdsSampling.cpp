@@ -227,11 +227,11 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                 switch (sampler->Type) {
                     case MFsamplePoint: samplerStats [sampleID].Mean   = val; break;
                     case MFsampleZone:
-                        samplerStats [sampleID].Weight += domain->Objects[itemID].Area;
-                        samplerStats [sampleID].Mean   += val * domain->Objects[itemID].Area;
-                        samplerStats [sampleID].Min     = val < samplerStats [itemID].Min ? val : samplerStats [itemID].Min;
-                        samplerStats [sampleID].Max     = val > samplerStats [itemID].Max ? val : samplerStats [itemID].Max;
-                        samplerStats [sampleID].StdDev  = val * val * domain->Objects[itemID].Area;
+                        samplerStats [sampleID].Weight  += domain->Objects[itemID].Area;
+                        samplerStats [sampleID].Mean    += val * domain->Objects[itemID].Area;
+                        samplerStats [sampleID].Min      = val < samplerStats [itemID].Min ? val : samplerStats [itemID].Min;
+                        samplerStats [sampleID].Max      = val > samplerStats [itemID].Max ? val : samplerStats [itemID].Max;
+                        samplerStats [sampleID].StdDev  += val * val * domain->Objects[itemID].Area;
                         break;
                     default: break;
                 }
