@@ -35,6 +35,7 @@ typedef struct MFSamplerStats_s {
 } MFSamplerStats_t, *MFSamplerStats_p;
 
 int main(int argc, char *argv[]) {
+    bool compressed = false;
     int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemID, sampleID, maxCount;
     double val;
     FILE *inFile;
@@ -132,10 +133,23 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
     }
 
     for (argPos = 1; argPos <= argNum; ++argPos) {
-        if ((inFile = (argNum > 1) && (strcmp(argv[argPos], "-") != 0) ? fopen(argv[argPos], "r") : stdin) == (FILE *) NULL) {
-            CMmsgPrint(CMmsgSysError, "Input file opening error in: %s %d", __FILE__, __LINE__);
-            goto Stop;
+        if ((argNum > 1) && (strcmp(argv[argPos], "-") != 0)) {
+            if (strncmp(CMfileExtension(argv[argPos]), "gz", 2) == 0) {
+                char pCommand[strlen(argv[argPos]) + 16];
+                sprintf(pCommand, "gunzip -c %s", argv[argPos]);
+                inFile = popen(pCommand, "r");
+                compressed = true;
+            }
+            else {
+                inFile = fopen(argv[argPos], "r");
+                compressed  = false;
+            }
+            if (inFile == (FILE *) NULL) {
+                CMmsgPrint(CMmsgSysError, "Input file opening error in: %s %d", __FILE__, __LINE__);
+                goto Stop;
+            }
         }
+        else inFile = stdin;
         while (MFdsHeaderRead(&header, inFile) == CMsucceeded) {
             if (header.ItemNum != sampler->ObjNum) {
                 CMmsgPrint(CMmsgUsrError, "Data stream [%d] and sampler [%d] missmatch!", header.ItemNum, sampler->ObjNum);
@@ -232,11 +246,11 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
             CMmsgPrint(CMmsgSysError, "Input file reading error in: %s %d", __FILE__, __LINE__);
             ret = CMfailed;
         }
-        fclose (inFile);
+        if (compressed) pclose (inFile); else fclose(inFile);
         inFile = stdin;
     }
 Stop:
-    if (inFile != stdin) fclose (inFile);
+    if (inFile != stdin) { if (compressed) pclose (inFile); else fclose (inFile); }
     MFDomainFree  (domain);
     MFSamplerFree (sampler);
     return (ret);
