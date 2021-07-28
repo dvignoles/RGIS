@@ -132,24 +132,28 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         return (CMfailed);
     }
 
-    for (argPos = 1; argPos <= argNum; ++argPos) {
-        if ((argNum > 1) && (strcmp(argv[argPos], "-") != 0)) {
-            if (strncmp(CMfileExtension(argv[argPos]), "gz", 2) == 0) {
-                char pCommand[strlen(argv[argPos]) + 16];
-                sprintf(pCommand, "gunzip -c %s", argv[argPos]);
-                inFile = popen(pCommand, "r");
-                compressed = true;
-            }
+    for (argPos = 0; argPos < argNum; ++argPos) {
+        if (argNum > 1) {
+            if ((argPos == 1) && (strcmp(argv[argPos], "-") == 0)) inFile = stdin;
             else {
-                inFile = fopen(argv[argPos], "r");
-                compressed  = false;
+                if (strncmp(CMfileExtension(argv[argPos]), "gz", 2) == 0) {
+                    char pCommand[strlen(argv[argPos]) + 16];
+                    sprintf(pCommand, "gunzip -c %s", argv[argPos]);
+                    inFile = popen(pCommand, "r");
+                    compressed = true;
+                }
+                else {
+                    inFile = fopen(argv[argPos], "r");
+                    compressed  = false;
+                }
             }
             if (inFile == (FILE *) NULL) {
                 CMmsgPrint(CMmsgSysError, "Input file opening error in: %s %d", __FILE__, __LINE__);
                 goto Stop;
             }
         }
-        else inFile = stdin;
+        else inFile = stdin;        
+
         while (MFdsHeaderRead(&header, inFile) == CMsucceeded) {
             if (header.ItemNum != sampler->ObjNum) {
                 CMmsgPrint(CMmsgUsrError, "Data stream [%d] and sampler [%d] missmatch!", header.ItemNum, sampler->ObjNum);
