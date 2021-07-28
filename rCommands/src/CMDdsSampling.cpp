@@ -10,40 +10,72 @@ bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
+#include <math.h>
 #include <cm.h>
+#include <DB.hpp>
 #include <MF.h>
 #include <stdlib.h>
 #include <string.h>
 
 static void _CMDprintUsage (const char *arg0) {
-    CMmsgPrint(CMmsgUsrError, "%s [options] <in datastream> <out datastream>", CMfileName(arg0));
-    CMmsgPrint(CMmsgUsrError, "  -i, --item [item]");
+    CMmsgPrint(CMmsgUsrError, "%s [options] <datastream 1> <datastream 2> ... <datastream N>", CMfileName(arg0));
+    CMmsgPrint(CMmsgUsrError, "  -d, --domain");
+    CMmsgPrint(CMmsgUsrError, "  -s, --sampler");
+    CMmsgPrint(CMmsgUsrError, "  -o, --output");
     CMmsgPrint(CMmsgUsrError, "  -h,--help");
 }
 
+typedef struct MFSamplerStats_s {
+    int Count;
+    double Weight;
+    double Mean;
+    double Min;
+    double Max;
+    double StdDev;
+} MFSamplerStats_t, *MFSamplerStats_p;
+
 int main(int argc, char *argv[]) {
-    int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemID;
-    FILE *inFile = stdin, *outFile = stdout;
+    int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemID, sampleID, maxCount;
+    double val;
+    FILE *inFile;
     void *items = (void *) NULL;
+    char *domainFileName = (char *) NULL, *samplerFileName = (char *) NULL, *outFileName = (char *) NULL;
+    MFDomain_p  domain;
+    MFSampler_p sampler;
     MFdsHeader_t header;
+    MFSamplerStats_p samplerStats;
 
     if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
-        if (CMargTest(argv[argPos], "-i", "--item")) {
+        if (CMargTest(argv[argPos], "-d", "--domain")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing sampling item!");
                 return (CMfailed);
             }
-            if ((sscanf(argv[argPos], "%d", &itemID)) != 1) {
-                CMmsgPrint(CMmsgUsrError, "Invalid sampling item");
-                return (CMfailed);
-            }
+            domainFileName = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        Help:
-        if (CMargTest(argv[argPos], "-h", "--help")) {
+        if (CMargTest(argv[argPos], "-s", "--sampler")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing sampling item!");
+                return (CMfailed);
+            }
+            samplerFileName = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest(argv[argPos], "-o", "--output")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing output file!");
+                return (CMfailed);
+            }
+            outFileName = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) < argPos) break;
             _CMDprintUsage (argv[0]);
             ret = CMsucceeded;
@@ -58,78 +90,148 @@ int main(int argc, char *argv[]) {
     if (argNum > 3) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
         _CMDprintUsage (argv[0]);
-        goto Stop;
+        return(CMfailed);
     }
 
-    if ((inFile = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? fopen(argv[1], "r") : stdin) == (FILE *) NULL) {
-        CMmsgPrint(CMmsgSysError, "Input file opening error in: %s %d", __FILE__, __LINE__);
-        goto Stop;
+    if (samplerFileName == (char *) NULL) {
+        CMmsgPrint(CMmsgUsrError, "Missing sampler file!");
+        _CMDprintUsage (argv[0]);
+        return (CMfailed);
     }
-    if ((outFile = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? fopen(argv[2], "w") : stdout) == (FILE *) NULL) {
-        CMmsgPrint(CMmsgSysError, "Output file opening error in: %s %d", __FILE__, __LINE__);
-        goto Stop;
+    if ((inFile = fopen(domainFileName, "w")) == (FILE *) NULL) {
+        CMmsgPrint(CMmsgUsrError, "Domain file [%s] opening error!",samplerFileName);
+        return (CMfailed);
+    }
+    if ((domain = MFDomainRead (inFile)) == (MFDomain_p) NULL) {
+        CMmsgPrint(CMmsgUsrError, "Domain reading error!",samplerFileName);
+        fclose(inFile);
+        MFDomainFree (domain);
+        return (CMfailed);
+    }
+     if ((inFile = fopen(samplerFileName, "w")) == (FILE *) NULL) {
+        CMmsgPrint(CMmsgUsrError, "Sampler file [%s] opening error!",samplerFileName);
+        return (CMfailed);
+    }
+    if ((sampler = MFSamplerRead (inFile)) == (MFSampler_p) NULL) {
+        CMmsgPrint(CMmsgUsrError, "Sampler reading error!",samplerFileName);
+        fclose(inFile);
+        MFDomainFree  (domain);
+        MFSamplerFree (sampler);
+        return (CMfailed);
+    }
+    fclose (inFile);
+    if ((samplerStats = (MFSamplerStats_p) calloc (sampler->ObjNum,sizeof(MFSamplerStats_t))) == (MFSamplerStats_p) NULL) {
+        CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+        return (CMfailed);
     }
 
-    while (MFdsHeaderRead(&header, inFile) == CMsucceeded) {
-        if (items == (void *) NULL) {
-            itemSize = MFVarItemSize(header.Type);
-            if ((items = (void *) calloc(header.ItemNum, itemSize)) == (void *) NULL) {
-                CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
-                goto Stop;
-            }
-        }
-        if ((int) fread(items, itemSize, header.ItemNum, inFile) != header.ItemNum) {
-            CMmsgPrint(CMmsgSysError, "Input reading error in: %s:%d", __FILE__, __LINE__);
+    for (argPos = 1; argPos <= argNum; ++argPos) {
+        if ((inFile = (argNum > 1) && (strcmp(argv[argPos], "-") != 0) ? fopen(argv[argPos], "r") : stdin) == (FILE *) NULL) {
+            CMmsgPrint(CMmsgSysError, "Input file opening error in: %s %d", __FILE__, __LINE__);
             goto Stop;
         }
-        if ((itemID < 0) || (itemID >= header.ItemNum)) {
-            CMmsgPrint(CMmsgAppError, "Invalid Item id [%d]", itemID);
-            continue;
+        while (MFdsHeaderRead(&header, inFile) == CMsucceeded) {
+            if (header.ItemNum != sampler->ObjNum) {
+                CMmsgPrint(CMmsgUsrError, "Inconsisten data stream and sampler missmatch!");
+                goto Stop;
+            }
+            if (items == (void *) NULL) {
+                itemSize = MFVarItemSize(header.Type);
+                if ((items = (void *) calloc(header.ItemNum, itemSize)) == (void *) NULL) {
+                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                    goto Stop;
+                }
+            }
+            else {
+                if (itemSize != MFVarItemSize(header.Type)) {
+                    CMmsgPrint(CMmsgUsrError, "Inconsisten data stream sequence!");
+                    goto Stop;
+                }
+            }
+            if ((int) fread(items, itemSize, header.ItemNum, inFile) != header.ItemNum) {
+                CMmsgPrint(CMmsgSysError, "Data stream reading error in: %s:%d", __FILE__, __LINE__);
+                goto Stop;
+            }
+            for (sampleID = 0; sampleID < sampler->ObjNum; ++sampleID) {
+                samplerStats [sampleID].Count  = 0;
+                samplerStats [sampleID].Weight = 0.0;
+                samplerStats [sampleID].Mean   =
+                samplerStats [sampleID].StdDev = 0.0;
+                samplerStats [sampleID].Min    =  HUGE_VAL;
+                samplerStats [sampleID].Max    = -HUGE_VAL;
+            }
+            maxCount = 0;
+            for (itemID = 0; itemID < header.ItemNum; ++itemID) {
+                sampleID = sampler->SampleIDs[itemID];
+                if (sampleID == DBFault) continue;
+                if (sampleID >= sampler->SampleNum) {
+                    CMmsgPrint(CMmsgUsrError, "Inconsisten sampler!");
+                    goto Stop;
+                }
+                switch (header.Type) {
+                    case MFByte:
+                        if (((char *) items)[itemID]  == header.Missing.Int) continue;
+                        val = (double) ((char *) items)[itemID];
+                        break;
+                    case MFShort:
+                        if (header.Swap != 1) MFSwapHalfWord(((short *) items) + itemID);
+                        if (((short *) items)[itemID] == header.Missing.Int) continue;
+                        val = (double) ((short *) items)[itemID];
+                        break;
+                    case MFInt:
+                        if (header.Swap != 1) MFSwapWord(((int *) items) + itemID);
+                        if (((int *) items)[itemID]   == header.Missing.Int) continue;
+                        val = (double) ((int *) items)[itemID];
+                        break;
+                    case MFFloat:
+                        if (header.Swap != 1) MFSwapWord(((float *) items) + itemID);
+                        if (CMmathEqualValues(((float *) items)[itemID],  header.Missing.Float)) continue;
+                        val = (double) ((float *) items)[itemID];
+                        break;
+                    case MFDouble:
+                        if (header.Swap != 1) MFSwapLongWord(((double *) items) + itemID);
+                        if (CMmathEqualValues(((double *) items)[itemID], header.Missing.Float)) continue;
+                        val = (double) ((double *) items)[itemID];
+                        break;
+                }
+                samplerStats [sampleID].Count  += 1;
+                samplerStats [sampleID].Weight += domain->Objects[itemID].Area;
+                samplerStats [sampleID].Mean   += val * domain->Objects[itemID].Area;
+                samplerStats [sampleID].Min     = val < samplerStats [itemID].Min ? val : samplerStats [itemID].Min;
+                samplerStats [sampleID].Max     = val > samplerStats [itemID].Max ? val : samplerStats [itemID].Max;
+                samplerStats [sampleID].StdDev  = val * val * domain->Objects[itemID].Area;
+                maxCount = samplerStats [itemID].Count > maxCount ? samplerStats [itemID].Count : maxCount;
+            }
+            switch (sampler->Type) {
+                case MFsamplePoint:
+                    if (maxCount > 1) {
+                        CMmsgPrint(CMmsgUsrError, "Point sampler have more than one point with the same ID!");
+                        goto Stop;
+                    }
+                    for (sampleID = 0;sampleID < sampler->SampleNum; ++samplerStats)
+                        printf ("%d\t%s\t%f\n", sampleID + 1, header.Date, samplerStats [sampleID].Mean / samplerStats [sampleID].Weight);
+                    break;
+                case MFsampleZone:
+                    for (sampleID = 0;sampleID < sampler->SampleNum; ++samplerStats)
+                        samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Weight;
+                        samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Weight - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
+                        samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev > 0.0 ? sqrt (samplerStats [sampleID].StdDev) : 0.0;
+                        printf ("%d\t%s\t%f\t%f\t%f\t%f\n",sampleID + 1, header.Date, samplerStats [sampleID].Mean, samplerStats [sampleID].Min, samplerStats [sampleID].Max, samplerStats [sampleID].StdDev);
+                    break;
+                default:
+                    break;
+            }
         }
-        switch (header.Type) {
-            case MFByte:
-                if (((char *) items)[itemID] != header.Missing.Int)
-                    fprintf(outFile, "%s\t%d\n", header.Date, (int) ((char *) items)[itemID]);
-                else
-                    fprintf(outFile, "%s\t\n", header.Date);
-                break;
-            case MFShort:
-                if (header.Swap != 1) MFSwapHalfWord(((short *) items) + itemID);
-                if (((short *) items)[itemID] != header.Missing.Int)
-                    fprintf(outFile, "\t%d\n", (int) ((short *) items)[itemID]);
-                else
-                    fprintf(outFile, "%s\t\n", header.Date);
-                break;
-            case MFInt:
-                if (header.Swap != 1) MFSwapWord(((int *) items) + itemID);
-                if (((int *) items)[itemID] != header.Missing.Int)
-                    fprintf(outFile, "%s\t%d\n", header.Date, (int) ((int *) items)[itemID]);
-                else
-                    fprintf(outFile, "%s\t\n", header.Date);
-                break;
-            case MFFloat:
-                if (header.Swap != 1) MFSwapWord(((float *) items) + itemID);
-                if (CMmathEqualValues(((float *) items)[itemID], header.Missing.Float) == false)
-                    fprintf(outFile, "%s\t%f\n", header.Date, (float) ((float *) items)[itemID]);
-                else
-                    fprintf(outFile, "%s\t\n", header.Date);
-                break;
-            case MFDouble:
-                if (header.Swap != 1) MFSwapLongWord(((double *) items) + itemID);
-                if (CMmathEqualValues(((double *) items)[itemID], header.Missing.Float) == false)
-                    fprintf(outFile, "%s\t%lf\n", header.Date, (double) ((double *) items)[itemID]);
-                else
-                    fprintf(outFile, "%s\t\n", header.Date);
-                break;
+        if (ferror (inFile) != 0) {
+            CMmsgPrint(CMmsgSysError, "Input file reading error in: %s %d", __FILE__, __LINE__);
+            ret = CMfailed;
         }
+        fclose (inFile);
+        inFile = stdin;
     }
-    if (ferror (inFile) != 0) {
-        CMmsgPrint(CMmsgSysError, "Input file reading error in: %s %d", __FILE__, __LINE__);
-        ret = CMfailed;
-    }
-    else ret = CMsucceeded;
 Stop:
-    if (inFile != stdin) fclose(inFile);
-    if (outFile != stdout) fclose(outFile);
+    if (inFile != stdin) fclose (inFile);
+    MFDomainFree  (domain);
+    MFSamplerFree (sampler);
     return (ret);
 }

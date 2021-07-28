@@ -37,10 +37,7 @@ int main(int argc, char *argv[]) {
     double value, binSize, binMax, binMin, percentMin; /* percentMax */
     MFdsHeader_t header, outHeader;
 
-    if (argNum < 2) {
-        _CMDprintUsage (argv[0]);
-        return (1);
-    }
+    if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest(argv[argPos], "-i", "--input")) {
@@ -74,7 +71,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest(argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) < argPos) break;
             _CMDprintUsage (argv[0]);
             return (CMsucceeded);

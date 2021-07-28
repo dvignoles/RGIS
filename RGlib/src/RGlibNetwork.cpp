@@ -1071,7 +1071,7 @@ DBInt RGlibNetworkBasinStats(DBObjData *netData, DBObjData *grdData, DBObjData *
                     average = average / area;
                     stdDev = stdDev / area;
                     stdDev = stdDev - average * average;
-                    stdDev = sqrt(stdDev);
+                    stdDev = stdDev > 0.0 ? sqrt (stdDev) : 0.0;
                     minimumFLD->Float(tblRec, minimum);
                     maximumFLD->Float(tblRec, maximum);
                     averageFLD->Float(tblRec, average);
@@ -1101,7 +1101,7 @@ DBInt RGlibNetworkBasinStats(DBObjData *netData, DBObjData *grdData, DBObjData *
         average = average / area;
         stdDev = stdDev / area;
         stdDev = stdDev - average * average;
-        stdDev = sqrt(stdDev);
+        stdDev = stdDev > 0.0 ? sqrt(stdDev) : 0.0;
         minimumFLD->Float(tblRec, minimum);
         maximumFLD->Float(tblRec, maximum);
         averageFLD->Float(tblRec, average);
@@ -1230,7 +1230,7 @@ DBInt RGlibNetworkHeadStats(DBObjData *netData, DBObjData *grdData, DBObjData *t
         average = average / area;
         stdDev = stdDev / area;
         stdDev = stdDev - average * average;
-        stdDev = sqrt(stdDev);
+        stdDev = stdDev > 0.0 ? sqrt(stdDev) : 0.0;
         minimumFLD->Float(tblRec, minimum);
         maximumFLD->Float(tblRec, maximum);
         averageFLD->Float(tblRec, average);

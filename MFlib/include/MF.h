@@ -183,7 +183,7 @@ typedef struct MFSampler_s {
     int *SampleIDs;
 } MFSampler_t, *MFSampler_p;
 
-MFSampler_t *MFSamperRead (FILE *);
+MFSampler_t *MFSamplerRead (FILE *);
 int  MFSamplerWrite (MFSampler_t *, FILE *);
 void MFSamplerFree  (MFSampler_t *);
 

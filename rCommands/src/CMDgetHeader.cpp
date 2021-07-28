@@ -42,10 +42,7 @@ int main(int argc, char *argv[]) {
     DBObjData *dbData = new DBObjData();
     DBDataHeader header;
 
-    if (argc == 1) {
-        _CMDprintUsage (argv[0]);
-        return 0;
-    }
+    if (argc == 1) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-a", "--all")) {
@@ -58,7 +55,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage (argv[0]);
             return 0;
         }

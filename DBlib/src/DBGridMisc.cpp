@@ -502,7 +502,7 @@ void DBGridIF::RecalcStats(DBObjRecord *layerRec) {
         average = average / sumWeight;
         stdDev = stdDev / sumWeight;
         stdDev = stdDev - average * average;
-        stdDev = sqrt(stdDev);
+        stdDev = stdDev > 0.0 ? sqrt (stdDev) : 0.0;
     }
     else
         average = stdDev = minimum = maximum = MissingValue();
