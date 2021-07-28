@@ -172,13 +172,22 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                 CMmsgPrint(CMmsgSysError, "Data stream reading error in: %s:%d", __FILE__, __LINE__);
                 goto Stop;
             }
-            for (sampleID = 0; sampleID < sampler->ObjNum; ++sampleID) {
-                samplerStats [sampleID].Count  = 0;
-                samplerStats [sampleID].Weight = 0.0;
-                samplerStats [sampleID].Mean   =
-                samplerStats [sampleID].StdDev = 0.0;
-                samplerStats [sampleID].Min    =  HUGE_VAL;
-                samplerStats [sampleID].Max    = -HUGE_VAL;
+
+            switch (sampler->Type) {
+                case MFsamplePoint:
+                    for (sampleID = 0; sampleID < sampler->ObjNum; ++sampleID) samplerStats [sampleID].Count  = 0;
+                    break; 
+                case MFsampleZone:
+                    for (sampleID = 0; sampleID < sampler->ObjNum; ++sampleID) {
+                        samplerStats [sampleID].Count  = 0;
+                        samplerStats [sampleID].Weight =
+                        samplerStats [sampleID].Mean   =
+                        samplerStats [sampleID].StdDev = 0.0;
+                        samplerStats [sampleID].Min    =  HUGE_VAL;
+                        samplerStats [sampleID].Max    = -HUGE_VAL;
+                    }
+                    break;
+                default: break;
             }
             maxCount = 0;
             for (itemID = 0; itemID < header.ItemNum; ++itemID) {
@@ -214,20 +223,17 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                         val = (double) ((double *) items)[itemID];
                         break;
                 }
+                samplerStats [sampleID].Count  += 1;
                 switch (sampler->Type) {
-                case MFsamplePoint:
-                    samplerStats [sampleID].Count  += 1;
-                    samplerStats [sampleID].Mean   = val;
-                    break; 
-                case MFsampleZone:
-                    samplerStats [sampleID].Count  += 1;
-                    samplerStats [sampleID].Weight += domain->Objects[itemID].Area;
-                    samplerStats [sampleID].Mean   += val * domain->Objects[itemID].Area;
-                    samplerStats [sampleID].Min     = val < samplerStats [itemID].Min ? val : samplerStats [itemID].Min;
-                    samplerStats [sampleID].Max     = val > samplerStats [itemID].Max ? val : samplerStats [itemID].Max;
-                    samplerStats [sampleID].StdDev  = val * val * domain->Objects[itemID].Area;
-                    break;
-                default: break;
+                    case MFsamplePoint: samplerStats [sampleID].Mean   = val; break;
+                    case MFsampleZone:
+                        samplerStats [sampleID].Weight += domain->Objects[itemID].Area;
+                        samplerStats [sampleID].Mean   += val * domain->Objects[itemID].Area;
+                        samplerStats [sampleID].Min     = val < samplerStats [itemID].Min ? val : samplerStats [itemID].Min;
+                        samplerStats [sampleID].Max     = val > samplerStats [itemID].Max ? val : samplerStats [itemID].Max;
+                        samplerStats [sampleID].StdDev  = val * val * domain->Objects[itemID].Area;
+                        break;
+                    default: break;
                 }
                 maxCount = samplerStats [itemID].Count > maxCount ? samplerStats [itemID].Count : maxCount;
             }
@@ -246,7 +252,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                             samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Weight;
                             samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Weight - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
                             samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev > 0.0 ? sqrt (samplerStats [sampleID].StdDev) : 0.0;
-                            printf ("%d\t%s\t%f\t%f\t%f\t%f\n",sampleID + 1, header.Date, samplerStats [sampleID].Mean, samplerStats [sampleID].Min, samplerStats [sampleID].Max, samplerStats [sampleID].StdDev);
+                            printf ("%d\t%s\t%d\t%f\t%f\t%f\t%f\n",sampleID + 1, header.Date, samplerStats [sampleID].Count, samplerStats [sampleID].Mean, samplerStats [sampleID].Min, samplerStats [sampleID].Max, samplerStats [sampleID].StdDev);
                         }
                         else
                             printf ("%d\t%s\t\t\t\t\n",sampleID + 1, header.Date);
