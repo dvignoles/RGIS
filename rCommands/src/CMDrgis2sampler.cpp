@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
             case DBTypeVectorPoint: {
                 DBVPointIF *pntIF = new DBVPointIF(samplerData);
                 DBObjRecord *pntRec;
-
+                sampler->Type = MFsamplePoint;
                 sampler->SampleNum = pntIF->ItemNum();
                 for (sampleID = 0;sampleID < sampler->SampleNum; ++sampleID) {
                     pntRec = pntIF->Item (sampleID);
@@ -124,8 +124,9 @@ int main(int argc, char *argv[]) {
             case DBTypeGridDiscrete: {
                 DBGridIF *gridIF = new DBGridIF(samplerData);
                 DBObjRecord *gridRec;
-                sampler->SampleNum = (samplerData->Table(DBrNItems))->ItemNum ();
 
+                sampler->Type = MFsampleZone;
+                sampler->SampleNum = (samplerData->Table(DBrNItems))->ItemNum ();
                 for (objID = 0;objID < sampler->ObjNum; ++objID) {
                     cellRec = netIF->Cell(objID);
                     coord   = netIF->Center (cellRec);
