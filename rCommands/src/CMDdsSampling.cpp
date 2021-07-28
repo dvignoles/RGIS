@@ -214,12 +214,21 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                         val = (double) ((double *) items)[itemID];
                         break;
                 }
-                samplerStats [sampleID].Count  += 1;
-                samplerStats [sampleID].Weight += domain->Objects[itemID].Area;
-                samplerStats [sampleID].Mean   += val * domain->Objects[itemID].Area;
-                samplerStats [sampleID].Min     = val < samplerStats [itemID].Min ? val : samplerStats [itemID].Min;
-                samplerStats [sampleID].Max     = val > samplerStats [itemID].Max ? val : samplerStats [itemID].Max;
-                samplerStats [sampleID].StdDev  = val * val * domain->Objects[itemID].Area;
+                switch (sampler->Type) {
+                case MFsamplePoint:
+                    samplerStats [sampleID].Count  += 1;
+                    samplerStats [sampleID].Mean   = val;
+                    break; 
+                case MFsampleZone:
+                    samplerStats [sampleID].Count  += 1;
+                    samplerStats [sampleID].Weight += domain->Objects[itemID].Area;
+                    samplerStats [sampleID].Mean   += val * domain->Objects[itemID].Area;
+                    samplerStats [sampleID].Min     = val < samplerStats [itemID].Min ? val : samplerStats [itemID].Min;
+                    samplerStats [sampleID].Max     = val > samplerStats [itemID].Max ? val : samplerStats [itemID].Max;
+                    samplerStats [sampleID].StdDev  = val * val * domain->Objects[itemID].Area;
+                    break;
+                default: break;
+                }
                 maxCount = samplerStats [itemID].Count > maxCount ? samplerStats [itemID].Count : maxCount;
             }
             switch (sampler->Type) {
@@ -229,17 +238,20 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                         goto Stop;
                     }
                     for (sampleID = 0;sampleID < sampler->SampleNum; ++samplerStats)
-                        printf ("%d\t%s\t%f\n", sampleID + 1, header.Date, samplerStats [sampleID].Mean / samplerStats [sampleID].Weight);
+                        printf ("%d\t%s\t%f\n", sampleID + 1, header.Date, samplerStats [sampleID].Mean);
                     break;
                 case MFsampleZone:
                     for (sampleID = 0;sampleID < sampler->SampleNum; ++samplerStats)
-                        samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Weight;
-                        samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Weight - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
-                        samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev > 0.0 ? sqrt (samplerStats [sampleID].StdDev) : 0.0;
-                        printf ("%d\t%s\t%f\t%f\t%f\t%f\n",sampleID + 1, header.Date, samplerStats [sampleID].Mean, samplerStats [sampleID].Min, samplerStats [sampleID].Max, samplerStats [sampleID].StdDev);
+                        if (samplerStats [sampleID].Weight > 0.0) {
+                            samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Weight;
+                            samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Weight - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
+                            samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev > 0.0 ? sqrt (samplerStats [sampleID].StdDev) : 0.0;
+                            printf ("%d\t%s\t%f\t%f\t%f\t%f\n",sampleID + 1, header.Date, samplerStats [sampleID].Mean, samplerStats [sampleID].Min, samplerStats [sampleID].Max, samplerStats [sampleID].StdDev);
+                        }
+                        else
+                            printf ("%d\t%s\t\t\t\t\n",sampleID + 1, header.Date);
                     break;
-                default:
-                    break;
+                default: break;
             }
         }
         if (ferror (inFile) != 0) {
