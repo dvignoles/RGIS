@@ -237,11 +237,11 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                         CMmsgPrint(CMmsgUsrError, "Point sampler have more than one point with the same ID!");
                         goto Stop;
                     }
-                    for (sampleID = 0;sampleID < sampler->SampleNum; ++samplerStats)
+                    for (sampleID = 0;sampleID < sampler->SampleNum; ++sampleID)
                         printf ("%d\t%s\t%f\n", sampleID + 1, header.Date, samplerStats [sampleID].Mean);
                     break;
                 case MFsampleZone:
-                    for (sampleID = 0;sampleID < sampler->SampleNum; ++samplerStats)
+                    for (sampleID = 0;sampleID < sampler->SampleNum; ++sampleID)
                         if (samplerStats [sampleID].Weight > 0.0) {
                             samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Weight;
                             samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Weight - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
