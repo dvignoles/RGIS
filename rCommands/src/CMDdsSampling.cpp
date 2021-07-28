@@ -120,6 +120,12 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         return (CMfailed);
     }
     fclose (inFile);
+    if (domain->ObjNum != sampler->ObjNum) {
+        CMmsgPrint(CMmsgUsrError, "Domain and Sampler missmatch!",samplerFileName);
+        MFDomainFree  (domain);
+        MFSamplerFree (sampler);
+        return (CMfailed);
+    }
     if ((samplerStats = (MFSamplerStats_p) calloc (sampler->ObjNum,sizeof(MFSamplerStats_t))) == (MFSamplerStats_p) NULL) {
         CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
         return (CMfailed);
@@ -132,7 +138,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         }
         while (MFdsHeaderRead(&header, inFile) == CMsucceeded) {
             if (header.ItemNum != sampler->ObjNum) {
-                CMmsgPrint(CMmsgUsrError, "Inconsisten data stream and sampler missmatch!");
+                CMmsgPrint(CMmsgUsrError, "Data stream and sampler missmatch!");
                 goto Stop;
             }
             if (items == (void *) NULL) {
