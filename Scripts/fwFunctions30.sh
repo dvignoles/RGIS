@@ -547,7 +547,8 @@ function _fwPostprocess () {
 		then
 			[ -e "${fwGDSFileNAME}" ] && rm "${fwGDSFileNAME}"   &
 		else
-			[ -e "${fwGDSFileNAME}" ] && gzip "${fwGDSFileNAME}" &
+			[ -e "${fwGDSFileNAME}.gz" ] && rm "${fwGDSFileNAME}.gz"
+			[ -e "${fwGDSFileNAME}" ]    && gzip "${fwGDSFileNAME}" &
 		fi
 	done
 	wait

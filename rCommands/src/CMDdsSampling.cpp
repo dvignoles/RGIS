@@ -98,7 +98,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if ((inFile = fopen(domainFileName, "w")) == (FILE *) NULL) {
+    if ((inFile = fopen(domainFileName, "r")) == (FILE *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Domain file [%s] opening error!",samplerFileName);
         return (CMfailed);
     }
@@ -108,7 +108,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         MFDomainFree (domain);
         return (CMfailed);
     }
-     if ((inFile = fopen(samplerFileName, "w")) == (FILE *) NULL) {
+     if ((inFile = fopen(samplerFileName, "r")) == (FILE *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Sampler file [%s] opening error!",samplerFileName);
         return (CMfailed);
     }
