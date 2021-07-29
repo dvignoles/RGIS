@@ -384,7 +384,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
     }
     switch (samplerPTR->Type) {
         case MFsamplePoint:
-            valueFLD->Format (DBMathFloatAutoFormat (maxVal));
+                valueFLD->Format (DBMathFloatAutoFormat (maxVal));
             break;
         case MFsampleZone:
             meanValueFLD->Format (DBMathFloatAutoFormat (maxVal));
