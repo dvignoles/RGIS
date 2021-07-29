@@ -11,7 +11,7 @@ grdCycleMean grdDateLayers grdDifference grdExtractLayers grdHeatIndex grdImport
 grdSeasonAggr grdSeasonMean grdTimeSeries grdTSAggr grdZoneHist grdZoneStats netAccumulate netBasinDistrib netBasinHist netBasinProf netBasinStats netBuild
 netcdf2ds netcdf2rgis netCells2Grid netCellSearch netCellSlopes netConfluence netCreatePnts netDefragment netErosion netImportASCII netInvAccum netStreamlines netSubset netTransfer
 netPourElevation netPotReservoir netTrim netUnaccumulate netUpstreamAvg pntGridSampling pntGridValue pntStationDist pntSTNChar pntSTNCoord pntSubbasCenter pntSubbasHist pntSubbasins pntSubbasStats
-pntSymbolField rgis2ascii rgis2domain rgis2ds rgis2netcdf rgis2sampler rgis2sql rgis2table rgisMetadb setHeader setProperties table2rgis tblAddField tblAddXY tblCalculate tblConv2Point
+pntSymbolField rgis2ascii rgis2domain rgis2ds rgis2netcdf rgis2mapper rgis2sql rgis2table rgisMetadb setHeader setProperties table2rgis tblAddField tblAddXY tblCalculate tblConv2Point
 tblConvCoord tblDecimalDate tblDeleteField tblDeleteRec tblIdleRec tblJoinTables tblMergeCoord tblMergeDate tblMJoinTables tblRedefField tblSelectRec vdbLookup
 tblSortRec tblSplitDate tblStatistics tblTopoCalc )
 	add_executable(${loop_var} src/CMD${loop_var}.cpp)

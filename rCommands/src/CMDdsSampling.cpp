@@ -20,7 +20,7 @@ bfekete@gc.cuny.edu
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <datastream 1> <datastream 2> ... <datastream N>", CMfileName(arg0));
     CMmsgPrint(CMmsgInfo, "  -D, --domainfile [filename]");
-    CMmsgPrint(CMmsgInfo, "  -S, --sampler    [filename]");
+    CMmsgPrint(CMmsgInfo, "  -M, --mapper     [filename]");
     CMmsgPrint(CMmsgInfo, "  -o, --output     [filename]");
     CMmsgPrint(CMmsgInfo, "  -t,--title       [dataset title]");
     CMmsgPrint(CMmsgInfo, "  -u,--subject     [subject]");
@@ -29,14 +29,14 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgUsrError, "  -h,--help");
 }
 
-typedef struct MFSamplerStats_s {
+typedef struct MFMapperStats_s {
     int Count;
     double Area;
     double Mean;
     double Min;
     double Max;
     double StdDev;
-} MFSamplerStats_t, *MFSamplerStats_p;
+} MFMapperStats_t, *MFMapperStats_p;
 
 int main(int argc, char *argv[]) {
     bool compressed = false;
@@ -44,14 +44,14 @@ int main(int argc, char *argv[]) {
     double val, maxVal = -HUGE_VAL;
     FILE *inFile;
     void *items = (void *) NULL;
-    char *domainFileName = (char *) NULL, *samplerFileName = (char *) NULL, *outFileName = (char *) NULL;
+    char *domainFileName = (char *) NULL, *mapperFileName = (char *) NULL, *outFileName = (char *) NULL;
     char *title  = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     DBDate date;
     MFDomain_p  domainPTR;
-    MFSampler_p samplerPTR;
+    MFMapper_p mapperPTR;
     MFdsHeader_t header;
-    MFSamplerStats_p samplerStats;
+    MFMapperStats_p mapperStats;
     DBObjData  *data;
     DBObjTable *table;
     DBObjTableField *sampleIDFLD;
@@ -76,12 +76,12 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest(argv[argPos], "-S", "--sampler")) {
+        if (CMargTest(argv[argPos], "-S", "--mapper")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing sampling item!");
                 return (CMfailed);
             }
-            samplerFileName = argv[argPos];
+            mapperFileName = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
@@ -153,40 +153,40 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (samplerFileName == (char *) NULL) {
-        CMmsgPrint(CMmsgUsrError, "Missing sampler file name!");
+    if (mapperFileName == (char *) NULL) {
+        CMmsgPrint(CMmsgUsrError, "Missing mapper file name!");
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
     if ((inFile = fopen(domainFileName, "r")) == (FILE *) NULL) {
-        CMmsgPrint(CMmsgUsrError, "Domain file [%s] opening error!",samplerFileName);
+        CMmsgPrint(CMmsgUsrError, "Domain file [%s] opening error!",mapperFileName);
         return (CMfailed);
     }
     if ((domainPTR = MFDomainRead (inFile)) == (MFDomain_p) NULL) {
-        CMmsgPrint(CMmsgUsrError, "Domain reading error!",samplerFileName);
+        CMmsgPrint(CMmsgUsrError, "Domain reading error!",mapperFileName);
         fclose(inFile);
         MFDomainFree (domainPTR);
         return (CMfailed);
     }
-     if ((inFile = fopen(samplerFileName, "r")) == (FILE *) NULL) {
-        CMmsgPrint(CMmsgUsrError, "Sampler file [%s] opening error!",samplerFileName);
+     if ((inFile = fopen(mapperFileName, "r")) == (FILE *) NULL) {
+        CMmsgPrint(CMmsgUsrError, "Mapper file [%s] opening error!",mapperFileName);
         return (CMfailed);
     }
-    if ((samplerPTR = MFSamplerRead (inFile)) == (MFSampler_p) NULL) {
-        CMmsgPrint(CMmsgUsrError, "Sampler reading error!",samplerFileName);
+    if ((mapperPTR = MFMapperRead (inFile)) == (MFMapper_p) NULL) {
+        CMmsgPrint(CMmsgUsrError, "Mapper reading error!",mapperFileName);
         fclose(inFile);
         MFDomainFree  (domainPTR);
-        MFSamplerFree (samplerPTR);
+        MFMapperFree (mapperPTR);
         return (CMfailed);
     }
     fclose (inFile);
-    if (domainPTR->ObjNum != samplerPTR->ObjNum) {
-        CMmsgPrint(CMmsgUsrError, "Domain and Sampler missmatch!");
+    if (domainPTR->ObjNum != mapperPTR->ObjNum) {
+        CMmsgPrint(CMmsgUsrError, "Domain and Mapper missmatch!");
         MFDomainFree  (domainPTR);
-        MFSamplerFree (samplerPTR);
+        MFMapperFree (mapperPTR);
         return (CMfailed);
     }
-    if ((samplerStats = (MFSamplerStats_p) calloc (samplerPTR->ObjNum,sizeof(MFSamplerStats_t))) == (MFSamplerStats_p) NULL) {
+    if ((mapperStats = (MFMapperStats_p) calloc (mapperPTR->ObjNum,sizeof(MFMapperStats_t))) == (MFMapperStats_p) NULL) {
         CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
         return (CMfailed);
     }
@@ -201,7 +201,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
     data->Document(DBDocGeoDomain, domain);
     data->Document(DBDocVersion,   version);
     table = data->Table(DBrNItems);
-    switch (samplerPTR->Type) {
+    switch (mapperPTR->Type) {
         case MFsamplePoint:
             table->AddField (sampleIDFLD  = new DBObjTableField("SampleID", DBTableFieldInt,   "%8d",    sizeof(DBInt)));
             table->AddField (dateFLD      = new DBObjTableField("Date",     DBTableFieldDate,  "%s",     sizeof(DBDate)));
@@ -242,8 +242,8 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         }
 
         while (MFdsHeaderRead(&header, inFile) == CMsucceeded) {
-            if (header.ItemNum != samplerPTR->ObjNum) {
-                CMmsgPrint(CMmsgUsrError, "Data stream [%d] and samplerPTR [%d] missmatch!", header.ItemNum, samplerPTR->ObjNum);
+            if (header.ItemNum != mapperPTR->ObjNum) {
+                CMmsgPrint(CMmsgUsrError, "Data stream [%d] and mapperPTR [%d] missmatch!", header.ItemNum, mapperPTR->ObjNum);
                 goto Stop;
             }
             if (items == (void *) NULL) {
@@ -263,21 +263,21 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                 CMmsgPrint(CMmsgSysError, "Data stream reading error in: %s:%d", __FILE__, __LINE__);
                 goto Stop;
             }
-            switch (samplerPTR->Type) {
+            switch (mapperPTR->Type) {
                 case MFsamplePoint:
-                    for (sampleID = 0; sampleID < samplerPTR->ObjNum; ++sampleID) {
-                        samplerStats [sampleID].Count = 0;
-                        samplerStats [sampleID].Mean  = valueFLD->FloatNoData ();
+                    for (sampleID = 0; sampleID < mapperPTR->ObjNum; ++sampleID) {
+                        mapperStats [sampleID].Count = 0;
+                        mapperStats [sampleID].Mean  = valueFLD->FloatNoData ();
                     }
                     break; 
                 case MFsampleZone:
-                    for (sampleID = 0; sampleID < samplerPTR->ObjNum; ++sampleID) {
-                        samplerStats [sampleID].Count  = 0;
-                        samplerStats [sampleID].Area   =
-                        samplerStats [sampleID].Mean   =
-                        samplerStats [sampleID].StdDev = 0.0;
-                        samplerStats [sampleID].Min    =  HUGE_VAL;
-                        samplerStats [sampleID].Max    = -HUGE_VAL;
+                    for (sampleID = 0; sampleID < mapperPTR->ObjNum; ++sampleID) {
+                        mapperStats [sampleID].Count  = 0;
+                        mapperStats [sampleID].Area   =
+                        mapperStats [sampleID].Mean   =
+                        mapperStats [sampleID].StdDev = 0.0;
+                        mapperStats [sampleID].Min    =  HUGE_VAL;
+                        mapperStats [sampleID].Max    = -HUGE_VAL;
                     }
                     break;
                 default: break;
@@ -285,10 +285,10 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
             maxCount = 0;
             date.Set (header.Date);
             for (itemID = 0; itemID < header.ItemNum; ++itemID) {
-                sampleID = samplerPTR->SampleIDs[itemID];
+                sampleID = mapperPTR->SampleIDs[itemID];
                 if (sampleID == DBFault) continue;
-                if (sampleID >= samplerPTR->SampleNum) {
-                    CMmsgPrint(CMmsgUsrError, "Inconsisten samplerPTR!");
+                if (sampleID >= mapperPTR->SampleNum) {
+                    CMmsgPrint(CMmsgUsrError, "Inconsisten mapperPTR!");
                     goto Stop;
                 }
                 switch (header.Type) {
@@ -317,51 +317,51 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                         val = (double) ((double *) items)[itemID];
                         break;
                 }
-                samplerStats [sampleID].Count  += 1;
-                switch (samplerPTR->Type) {
-                    case MFsamplePoint: samplerStats [sampleID].Mean   = val; break;
+                mapperStats [sampleID].Count  += 1;
+                switch (mapperPTR->Type) {
+                    case MFsamplePoint: mapperStats [sampleID].Mean   = val; break;
                     case MFsampleZone:
-                        samplerStats [sampleID].Area  += domainPTR->Objects[itemID].Area;
-                        samplerStats [sampleID].Mean    += val * domainPTR->Objects[itemID].Area;
-                        samplerStats [sampleID].Min      = val < samplerStats [sampleID].Min ? val : samplerStats [sampleID].Min;
-                        samplerStats [sampleID].Max      = val > samplerStats [sampleID].Max ? val : samplerStats [sampleID].Max;
-                        samplerStats [sampleID].StdDev  += val * val * domainPTR->Objects[itemID].Area;
+                        mapperStats [sampleID].Area  += domainPTR->Objects[itemID].Area;
+                        mapperStats [sampleID].Mean    += val * domainPTR->Objects[itemID].Area;
+                        mapperStats [sampleID].Min      = val < mapperStats [sampleID].Min ? val : mapperStats [sampleID].Min;
+                        mapperStats [sampleID].Max      = val > mapperStats [sampleID].Max ? val : mapperStats [sampleID].Max;
+                        mapperStats [sampleID].StdDev  += val * val * domainPTR->Objects[itemID].Area;
                         break;
                     default: break;
                 }
-                maxCount = samplerStats [itemID].Count > maxCount ? samplerStats [itemID].Count : maxCount;
+                maxCount = mapperStats [itemID].Count > maxCount ? mapperStats [itemID].Count : maxCount;
             }
            
-            switch (samplerPTR->Type) {
+            switch (mapperPTR->Type) {
                 case MFsamplePoint:
                     if (maxCount > 1) {
-                        CMmsgPrint(CMmsgUsrError, "Point samplerPTR have more than one point with the same ID!");
+                        CMmsgPrint(CMmsgUsrError, "Point mapperPTR have more than one point with the same ID!");
                         goto Stop;
                     }
-                    for (sampleID = 0;sampleID < samplerPTR->SampleNum; ++sampleID) {
+                    for (sampleID = 0;sampleID < mapperPTR->SampleNum; ++sampleID) {
                         tblRec = table->Add ();
                         sampleIDFLD->Int (tblRec,sampleID + 1);
                         dateFLD->Date    (tblRec,date);
-                        valueFLD->Float  (tblRec,samplerStats [sampleID].Mean);
-                        maxVal = samplerStats [sampleID].Mean > maxVal ? samplerStats [sampleID].Mean : maxVal;
+                        valueFLD->Float  (tblRec,mapperStats [sampleID].Mean);
+                        maxVal = mapperStats [sampleID].Mean > maxVal ? mapperStats [sampleID].Mean : maxVal;
                     }
                     break;
                 case MFsampleZone:
                     date.Set (header.Date);
-                    for (sampleID = 0;sampleID < samplerPTR->SampleNum; ++sampleID) {
+                    for (sampleID = 0;sampleID < mapperPTR->SampleNum; ++sampleID) {
                         tblRec = table->Add ();
                         sampleIDFLD->Int (tblRec,sampleID + 1);
                         dateFLD->Date    (tblRec,date);
-                        if (samplerStats [sampleID].Area > 0.0) {
-                            samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Area;
-                            samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Area - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
-                            samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev > 0.0 ? sqrt (samplerStats [sampleID].StdDev) : 0.0;
-                            zoneAreaFLD->Float  (tblRec, samplerStats [sampleID].Area);
-                            meanValueFLD->Float (tblRec, samplerStats [sampleID].Mean);
-                            minValueFLD->Float  (tblRec, samplerStats [sampleID].Min);
-                            maxValueFLD->Float  (tblRec, samplerStats [sampleID].Max);
-                            stdDevFLD->Float    (tblRec, samplerStats [sampleID].StdDev);
-                            maxVal = samplerStats [sampleID].Mean > maxVal ? samplerStats [sampleID].Mean : maxVal;
+                        if (mapperStats [sampleID].Area > 0.0) {
+                            mapperStats [sampleID].Mean   = mapperStats [sampleID].Mean   / mapperStats [sampleID].Area;
+                            mapperStats [sampleID].StdDev = mapperStats [sampleID].StdDev / mapperStats [sampleID].Area - mapperStats [sampleID].Mean * mapperStats [sampleID].Mean;
+                            mapperStats [sampleID].StdDev = mapperStats [sampleID].StdDev > 0.0 ? sqrt (mapperStats [sampleID].StdDev) : 0.0;
+                            zoneAreaFLD->Float  (tblRec, mapperStats [sampleID].Area);
+                            meanValueFLD->Float (tblRec, mapperStats [sampleID].Mean);
+                            minValueFLD->Float  (tblRec, mapperStats [sampleID].Min);
+                            maxValueFLD->Float  (tblRec, mapperStats [sampleID].Max);
+                            stdDevFLD->Float    (tblRec, mapperStats [sampleID].StdDev);
+                            maxVal = mapperStats [sampleID].Mean > maxVal ? mapperStats [sampleID].Mean : maxVal;
                         }
                         else {
                             zoneAreaFLD->Float  (tblRec, 0.0);
@@ -382,7 +382,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         if (compressed) pclose (inFile); else fclose(inFile);
         inFile = stdin;
     }
-    switch (samplerPTR->Type) {
+    switch (mapperPTR->Type) {
         case MFsamplePoint:
                 valueFLD->Format (DBMathFloatAutoFormat (maxVal));
             break;
@@ -396,7 +396,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
     }
 Stop:
     MFDomainFree  (domainPTR);
-    MFSamplerFree (samplerPTR);
+    MFMapperFree (mapperPTR);
     if (outFileName != (char *) NULL) data->Write (outFileName); else data->Write(stdout);
     delete data;
     if (inFile != stdin) { if (compressed) pclose (inFile); else fclose (inFile); }

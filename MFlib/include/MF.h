@@ -176,16 +176,16 @@ void MFDomainFree(MFDomain_t *);
 
 enum { MFsamplePoint, MFsampleZone };
 
-typedef struct MFSampler_s {
+typedef struct MFMapper_s {
     short Swap, Type;
     int SampleNum;
     long int ObjNum;
     int *SampleIDs;
-} MFSampler_t, *MFSampler_p;
+} MFMapper_t, *MFMapper_p;
 
-MFSampler_t *MFSamplerRead (FILE *);
-int  MFSamplerWrite (MFSampler_t *, FILE *);
-void MFSamplerFree  (MFSampler_t *);
+MFMapper_t *MFMapperRead (FILE *);
+int  MFMapperWrite (MFMapper_t *, FILE *);
+void MFMapperFree  (MFMapper_t *);
 
 int  MFDateCompare (const char *, const char *);
 char *MFDateGetCurrent ();

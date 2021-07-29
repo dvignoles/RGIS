@@ -16,7 +16,7 @@ bfekete@gc.cuny.edu
 #include <MF.h>
 
 static void _CMDprintUsage (const char *arg0) {
-    CMmsgPrint(CMmsgInfo, "%s [options] <sampling data> <output sampler>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "%s [options] <sampling data> <output mapper>", CMfileName(arg0));
     CMmsgPrint(CMmsgInfo, "     -d,--domain");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
@@ -26,9 +26,9 @@ int main(int argc, char *argv[]) {
     DBInt argPos, argNum = argc, ret;
     int objID, sampleID;
     char *domain = (char *) NULL;
-    MFSampler_p sampler = (MFSampler_p) NULL;
+    MFMapper_p mapper = (MFMapper_p) NULL;
     DBCoordinate coord;
-    DBObjData *domainData, *samplerData;
+    DBObjData *domainData, *mapperData;
     DBNetworkIF *netIF;
     DBObjRecord *cellRec;
 
@@ -85,67 +85,67 @@ int main(int argc, char *argv[]) {
         return(DBFault);
     }
 
-    samplerData = new DBObjData();
-    ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? samplerData->Read(argv[1]) : samplerData->Read(stdin);
+    mapperData = new DBObjData();
+    ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? mapperData->Read(argv[1]) : mapperData->Read(stdin);
     if (ret == DBFault) {
-        CMmsgPrint(CMmsgUsrError, "Sampler reading error in: %s", CMfileName(argv[0]));
+        CMmsgPrint(CMmsgUsrError, "Mapper reading error in: %s", CMfileName(argv[0]));
         _CMDprintUsage (argv[0]);
         delete domainData;
         if (outFile != stdout) fclose (outFile);
         return(DBFault);
     }
 
-    if ((sampler = (MFSampler_p) calloc (1, sizeof(MFSampler_t))) != (MFSampler_p) NULL) {
+    if ((mapper = (MFMapper_p) calloc (1, sizeof(MFMapper_t))) != (MFMapper_p) NULL) {
         netIF = new DBNetworkIF (domainData);
-        sampler->Swap = 1;
-        sampler->ObjNum = netIF->CellNum ();
-        if ((sampler->SampleIDs = (int *) calloc (sampler->ObjNum, sizeof (int))) == (int *) NULL) {
+        mapper->Swap = 1;
+        mapper->ObjNum = netIF->CellNum ();
+        if ((mapper->SampleIDs = (int *) calloc (mapper->ObjNum, sizeof (int))) == (int *) NULL) {
             CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s %d", __FILE__, __LINE__);
-            MFSamplerFree(sampler);
+            MFMapperFree(mapper);
             delete netIF;
             ret = DBFault;
             goto Stop;
         }
-        for (objID = 0; objID < sampler->ObjNum; ++objID) sampler->SampleIDs [objID] = DBFault;
-        switch (samplerData->Type()) {
+        for (objID = 0; objID < mapper->ObjNum; ++objID) mapper->SampleIDs [objID] = DBFault;
+        switch (mapperData->Type()) {
             case DBTypeVectorPoint: {
-                DBVPointIF *pntIF = new DBVPointIF(samplerData);
+                DBVPointIF *pntIF = new DBVPointIF(mapperData);
                 DBObjRecord *pntRec;
-                sampler->Type = MFsamplePoint;
-                sampler->SampleNum = pntIF->ItemNum();
-                for (sampleID = 0;sampleID < sampler->SampleNum; ++sampleID) {
+                mapper->Type = MFsamplePoint;
+                mapper->SampleNum = pntIF->ItemNum();
+                for (sampleID = 0;sampleID < mapper->SampleNum; ++sampleID) {
                     pntRec = pntIF->Item (sampleID);
                     coord = pntIF->Coordinate (pntRec);
                     if ((cellRec = netIF->Cell(coord)) != (DBObjRecord *) NULL) {
-                        sampler->SampleIDs [cellRec->RowID ()] = pntRec->RowID ();
+                        mapper->SampleIDs [cellRec->RowID ()] = pntRec->RowID ();
                     }
                 }
             } break;
             case DBTypeGridDiscrete: {
-                DBGridIF *gridIF = new DBGridIF(samplerData);
+                DBGridIF *gridIF = new DBGridIF(mapperData);
                 DBObjRecord *gridRec;
 
-                sampler->Type = MFsampleZone;
-                sampler->SampleNum = (samplerData->Table(DBrNItems))->ItemNum ();
-                for (objID = 0;objID < sampler->ObjNum; ++objID) {
+                mapper->Type = MFsampleZone;
+                mapper->SampleNum = (mapperData->Table(DBrNItems))->ItemNum ();
+                for (objID = 0;objID < mapper->ObjNum; ++objID) {
                     cellRec = netIF->Cell(objID);
                     coord   = netIF->Center (cellRec);
                     if ((gridRec = gridIF->GridItem (coord)) != (DBObjRecord *) NULL) {
-                        sampler->SampleIDs [objID] = gridRec->RowID ();
+                        mapper->SampleIDs [objID] = gridRec->RowID ();
                     }
                 }
             } break;
             default: {
-                CMmsgPrint(CMmsgUsrError, "Sampler reading error in: %s", CMfileName(argv[0]));
+                CMmsgPrint(CMmsgUsrError, "Mapper reading error in: %s", CMfileName(argv[0]));
                 ret = DBFault;
                 goto Stop;
             }
         }
-        ret = MFSamplerWrite(sampler, outFile);
+        ret = MFMapperWrite(mapper, outFile);
     }
     Stop:
     delete domainData;
-    delete samplerData;
+    delete mapperData;
     if (outFile != stdout) fclose(outFile);
     return (ret);
 }

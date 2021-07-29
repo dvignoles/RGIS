@@ -4,7 +4,7 @@ GHAAS Water Balance Model Library V1.0
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MFSampler.c
+MFMapper.c
 
 bfekete@gc.cuny.edu
 
@@ -15,55 +15,55 @@ bfekete@gc.cuny.edu
 #include <cm.h>
 #include <MF.h>
 
-void MFSamplerFree (MFSampler_p sampler) {
+void MFMapperFree (MFMapper_p mapper) {
 	int objID;
 
-	if (sampler->SampleIDs != (int *) NULL) free (sampler->SampleIDs);
-	free (sampler);	
+	if (mapper->SampleIDs != (int *) NULL) free (mapper->SampleIDs);
+	free (mapper);	
 }
 
-MFSampler_p MFSamplerRead (FILE *inFile) {
+MFMapper_p MFMapperRead (FILE *inFile) {
 	int objNum, i;
-	MFSampler_p sampler;
+	MFMapper_p mapper;
 
-	if ((sampler = (MFSampler_p) calloc (1,sizeof (MFSampler_t))) == (MFSampler_p) NULL) return ((MFSampler_p) NULL);
-	sampler->SampleIDs = (int *) NULL;
+	if ((mapper = (MFMapper_p) calloc (1,sizeof (MFMapper_t))) == (MFMapper_p) NULL) return ((MFMapper_p) NULL);
+	mapper->SampleIDs = (int *) NULL;
 
-	if (fread (sampler, sizeof (MFSampler_t) - sizeof (int *), 1, inFile) != 1) {
+	if (fread (mapper, sizeof (MFMapper_t) - sizeof (int *), 1, inFile) != 1) {
 		CMmsgPrint (CMmsgSysError,"File Reading Error in: %s:%d",__FILE__,__LINE__);
-		MFSamplerFree (sampler);
-		return ((MFSampler_p) NULL);
+		MFMapperFree (mapper);
+		return ((MFMapper_p) NULL);
 	}
-	if (sampler->Swap != 1) {
-        MFSwapHalfWord (&(sampler->Swap));
-		MFSwapHalfWord (&(sampler->Type));
-        MFSwapWord (&(sampler->SampleNum));
-		MFSwapLongWord (&(sampler->ObjNum));
+	if (mapper->Swap != 1) {
+        MFSwapHalfWord (&(mapper->Swap));
+		MFSwapHalfWord (&(mapper->Type));
+        MFSwapWord (&(mapper->SampleNum));
+		MFSwapLongWord (&(mapper->ObjNum));
 	}
-	if ((sampler->SampleIDs = (int *) calloc (sampler->ObjNum, sizeof (int))) == (int *) NULL) {
+	if ((mapper->SampleIDs = (int *) calloc (mapper->ObjNum, sizeof (int))) == (int *) NULL) {
 		CMmsgPrint (CMmsgSysError,"Memory Allocation Error in: %s:%d",__FILE__,__LINE__);
-		MFSamplerFree (sampler);
-		return ((MFSampler_p) NULL);
+		MFMapperFree (mapper);
+		return ((MFMapper_p) NULL);
 	}
 	
-	if (fread (sampler->SampleIDs,sampler->ObjNum * sizeof (int), 1, inFile) != 1) {
+	if (fread (mapper->SampleIDs,mapper->ObjNum * sizeof (int), 1, inFile) != 1) {
 		CMmsgPrint (CMmsgSysError,"File Reading Error in: %s:%d",__FILE__,__LINE__);
-		MFSamplerFree (sampler);
-		return ((MFSampler_p) NULL);
+		MFMapperFree (mapper);
+		return ((MFMapper_p) NULL);
 	}
-	return (sampler);
+	return (mapper);
 }
 
-int MFSamplerWrite (MFSampler_p sampler, FILE *outFile) {
+int MFMapperWrite (MFMapper_p mapper, FILE *outFile) {
 	int objID;
 
-	sampler->Swap = 1;
-	if (fwrite (sampler,sizeof (MFSampler_t) - sizeof (int *),1,outFile) != 1) {
+	mapper->Swap = 1;
+	if (fwrite (mapper,sizeof (MFMapper_t) - sizeof (int *),1,outFile) != 1) {
 		CMmsgPrint (CMmsgSysError,"File Writing Error in: %s:%d",__FILE__,__LINE__);
 		return (CMfailed);
 	}
 
-	if (fwrite (sampler->SampleIDs,sampler->ObjNum * sizeof (int),1,outFile) != 1) {
+	if (fwrite (mapper->SampleIDs,mapper->ObjNum * sizeof (int),1,outFile) != 1) {
 		CMmsgPrint (CMmsgSysError,"File Writng Error in: %s:%d",__FILE__,__LINE__);
 		return (CMfailed);
 	}
