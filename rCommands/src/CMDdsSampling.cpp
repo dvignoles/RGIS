@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest(argv[argPos], "-S", "--mapper")) {
+        if (CMargTest(argv[argPos], "-M", "--mapper")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing sampling item!");
                 return (CMfailed);
