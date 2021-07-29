@@ -41,8 +41,10 @@ int main(int argc, char *argv[]) {
     FILE *inFile;
     void *items = (void *) NULL;
     char *domainFileName = (char *) NULL, *samplerFileName = (char *) NULL, *outFileName = (char *) NULL;
-    MFDomain_p  domain;
-    MFSampler_p sampler;
+    char *title  = (char *) NULL, *subject = (char *) NULL;
+    char *domain = (char *) NULL, *version = (char *) NULL;
+    MFDomain_p  domainPTR;
+    MFSampler_p samplerPTR;
     MFdsHeader_t header;
     MFSamplerStats_p samplerStats;
     DBObjData  *data;
@@ -60,7 +62,7 @@ int main(int argc, char *argv[]) {
     if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
-        if (CMargTest(argv[argPos], "-d", "--domain")) {
+        if (CMargTest(argv[argPos], "-d", "--domainPTR")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing sampling item!");
                 return (CMfailed);
@@ -69,7 +71,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest(argv[argPos], "-s", "--sampler")) {
+        if (CMargTest(argv[argPos], "-s", "--samplerPTR")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing sampling item!");
                 return (CMfailed);
@@ -105,8 +107,13 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         return(CMfailed);
     }
 
+    if (domainFileName == (char *) NULL) {
+        CMmsgPrint(CMmsgUsrError, "Missing domain file name!");
+        _CMDprintUsage (argv[0]);
+        return (CMfailed);
+    }
     if (samplerFileName == (char *) NULL) {
-        CMmsgPrint(CMmsgUsrError, "Missing sampler file!");
+        CMmsgPrint(CMmsgUsrError, "Missing sampler file name!");
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
@@ -114,38 +121,46 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         CMmsgPrint(CMmsgUsrError, "Domain file [%s] opening error!",samplerFileName);
         return (CMfailed);
     }
-    if ((domain = MFDomainRead (inFile)) == (MFDomain_p) NULL) {
+    if ((domainPTR = MFDomainRead (inFile)) == (MFDomain_p) NULL) {
         CMmsgPrint(CMmsgUsrError, "Domain reading error!",samplerFileName);
         fclose(inFile);
-        MFDomainFree (domain);
+        MFDomainFree (domainPTR);
         return (CMfailed);
     }
      if ((inFile = fopen(samplerFileName, "r")) == (FILE *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Sampler file [%s] opening error!",samplerFileName);
         return (CMfailed);
     }
-    if ((sampler = MFSamplerRead (inFile)) == (MFSampler_p) NULL) {
+    if ((samplerPTR = MFSamplerRead (inFile)) == (MFSampler_p) NULL) {
         CMmsgPrint(CMmsgUsrError, "Sampler reading error!",samplerFileName);
         fclose(inFile);
-        MFDomainFree  (domain);
-        MFSamplerFree (sampler);
+        MFDomainFree  (domainPTR);
+        MFSamplerFree (samplerPTR);
         return (CMfailed);
     }
     fclose (inFile);
-    if (domain->ObjNum != sampler->ObjNum) {
-        CMmsgPrint(CMmsgUsrError, "Domain and Sampler missmatch!",samplerFileName);
-        MFDomainFree  (domain);
-        MFSamplerFree (sampler);
+    if (domainPTR->ObjNum != samplerPTR->ObjNum) {
+        CMmsgPrint(CMmsgUsrError, "Domain and Sampler missmatch!");
+        MFDomainFree  (domainPTR);
+        MFSamplerFree (samplerPTR);
         return (CMfailed);
     }
-    if ((samplerStats = (MFSamplerStats_p) calloc (sampler->ObjNum,sizeof(MFSamplerStats_t))) == (MFSamplerStats_p) NULL) {
+    if ((samplerStats = (MFSamplerStats_p) calloc (samplerPTR->ObjNum,sizeof(MFSamplerStats_t))) == (MFSamplerStats_p) NULL) {
         CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
         return (CMfailed);
     }
 
-    data  = new DBObjData ();
+    if (title   == (char *) NULL) title   = (char *) "Model Statistics";
+    if (subject == (char *) NULL) subject = (char *) "Statistics";
+    if (domain  == (char *) NULL) domain  = (char *) "Unspecified Domain";
+    if (version == (char *) NULL) version = (char *) "0.01pre";
+
+    data = new DBObjData(title, DBTypeTable);
+    data->Document(DBDocSubject,   subject);
+    data->Document(DBDocGeoDomain, domain);
+    data->Document(DBDocVersion,   version);
     table = data->Table(DBrNItems);
-    switch (sampler->Type) {
+    switch (samplerPTR->Type) {
         case MFsamplePoint:
             table->AddField (sampleIDFLD  = new DBObjTableField("SampleID", DBTableFieldInt,   "%8d",    sizeof(DBInt)));
             table->AddField (valueFLD     = new DBObjTableField("Value",    DBTableFieldFloat, "%10.1f", sizeof(DBFloat4)));
@@ -184,8 +199,8 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         }
 
         while (MFdsHeaderRead(&header, inFile) == CMsucceeded) {
-            if (header.ItemNum != sampler->ObjNum) {
-                CMmsgPrint(CMmsgUsrError, "Data stream [%d] and sampler [%d] missmatch!", header.ItemNum, sampler->ObjNum);
+            if (header.ItemNum != samplerPTR->ObjNum) {
+                CMmsgPrint(CMmsgUsrError, "Data stream [%d] and samplerPTR [%d] missmatch!", header.ItemNum, samplerPTR->ObjNum);
                 goto Stop;
             }
             if (items == (void *) NULL) {
@@ -206,15 +221,15 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                 goto Stop;
             }
 
-            switch (sampler->Type) {
+            switch (samplerPTR->Type) {
                 case MFsamplePoint:
-                    for (sampleID = 0; sampleID < sampler->ObjNum; ++sampleID) {
+                    for (sampleID = 0; sampleID < samplerPTR->ObjNum; ++sampleID) {
                         samplerStats [sampleID].Count = 0;
                         samplerStats [sampleID].Mean  = valueFLD->FloatNoData ();
                     }
                     break; 
                 case MFsampleZone:
-                    for (sampleID = 0; sampleID < sampler->ObjNum; ++sampleID) {
+                    for (sampleID = 0; sampleID < samplerPTR->ObjNum; ++sampleID) {
                         samplerStats [sampleID].Count  = 0;
                         samplerStats [sampleID].Area   =
                         samplerStats [sampleID].Mean   =
@@ -227,10 +242,10 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
             }
             maxCount = 0;
             for (itemID = 0; itemID < header.ItemNum; ++itemID) {
-                sampleID = sampler->SampleIDs[itemID];
+                sampleID = samplerPTR->SampleIDs[itemID];
                 if (sampleID == DBFault) continue;
-                if (sampleID >= sampler->SampleNum) {
-                    CMmsgPrint(CMmsgUsrError, "Inconsisten sampler!");
+                if (sampleID >= samplerPTR->SampleNum) {
+                    CMmsgPrint(CMmsgUsrError, "Inconsisten samplerPTR!");
                     goto Stop;
                 }
                 switch (header.Type) {
@@ -260,14 +275,14 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                         break;
                 }
                 samplerStats [sampleID].Count  += 1;
-                switch (sampler->Type) {
+                switch (samplerPTR->Type) {
                     case MFsamplePoint: samplerStats [sampleID].Mean   = val; break;
                     case MFsampleZone:
-                        samplerStats [sampleID].Area  += domain->Objects[itemID].Area;
-                        samplerStats [sampleID].Mean    += val * domain->Objects[itemID].Area;
+                        samplerStats [sampleID].Area  += domainPTR->Objects[itemID].Area;
+                        samplerStats [sampleID].Mean    += val * domainPTR->Objects[itemID].Area;
                         samplerStats [sampleID].Min      = val < samplerStats [sampleID].Min ? val : samplerStats [sampleID].Min;
                         samplerStats [sampleID].Max      = val > samplerStats [sampleID].Max ? val : samplerStats [sampleID].Max;
-                        samplerStats [sampleID].StdDev  += val * val * domain->Objects[itemID].Area;
+                        samplerStats [sampleID].StdDev  += val * val * domainPTR->Objects[itemID].Area;
                         break;
                     default: break;
                 }
@@ -275,18 +290,18 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
             }
             tblRec = table->Add ();
             sampleIDFLD->Int (tblRec,sampleID + 1);
-            switch (sampler->Type) {
+            switch (samplerPTR->Type) {
                 case MFsamplePoint:
                     if (maxCount > 1) {
-                        CMmsgPrint(CMmsgUsrError, "Point sampler have more than one point with the same ID!");
+                        CMmsgPrint(CMmsgUsrError, "Point samplerPTR have more than one point with the same ID!");
                         goto Stop;
                     }
-                    for (sampleID = 0;sampleID < sampler->SampleNum; ++sampleID) {
+                    for (sampleID = 0;sampleID < samplerPTR->SampleNum; ++sampleID) {
                         valueFLD->Float  (tblRec,samplerStats [sampleID].Mean);
                     }
                     break;
                 case MFsampleZone:
-                    for (sampleID = 0;sampleID < sampler->SampleNum; ++sampleID)
+                    for (sampleID = 0;sampleID < samplerPTR->SampleNum; ++sampleID)
                         if (samplerStats [sampleID].Area > 0.0) {
                             samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Area;
                             samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Area - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
@@ -316,8 +331,8 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         inFile = stdin;
     }
 Stop:
-    MFDomainFree  (domain);
-    MFSamplerFree (sampler);
+    MFDomainFree  (domainPTR);
+    MFSamplerFree (samplerPTR);
     if (outFileName != (char *) NULL) data->Write (outFileName); else data->Write(stdout);
     delete data;
     if (inFile != stdin) { if (compressed) pclose (inFile); else fclose (inFile); }

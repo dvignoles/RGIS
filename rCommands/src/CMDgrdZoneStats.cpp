@@ -27,7 +27,7 @@ static void _CMDprintUsage (const char *arg0) {
 
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
-    char *title = (char *) NULL, *subject = (char *) NULL;
+    char *title  = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *zoneGridName = (char *) NULL;
     DBObjData *data, *zGrdData, *wGrdData;
@@ -122,15 +122,15 @@ int main(int argc, char *argv[]) {
         return (CMfailed);
     }
 
-    if (title == (char *) NULL) title = (char *) "Zone Statistics";
+    if (title   == (char *) NULL) title   = (char *) "Zone Statistics";
     if (subject == (char *) NULL) subject = (char *) "Basin Statistics";
-    if (domain == (char *) NULL) domain = zGrdData->Document(DBDocGeoDomain);
+    if (domain  == (char *) NULL) domain  = zGrdData->Document(DBDocGeoDomain);
     if (version == (char *) NULL) version = (char *) "0.01pre";
 
     data = new DBObjData(title, DBTypeTable);
-    data->Document(DBDocSubject, subject);
+    data->Document(DBDocSubject,   subject);
     data->Document(DBDocGeoDomain, domain);
-    data->Document(DBDocVersion, version);
+    data->Document(DBDocVersion,   version);
 
     if ((ret = RGlibGridZoneStatistics(zGrdData, wGrdData, data)) == DBSuccess)
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
