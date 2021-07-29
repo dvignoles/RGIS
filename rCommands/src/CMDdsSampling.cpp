@@ -41,7 +41,7 @@ typedef struct MFSamplerStats_s {
 int main(int argc, char *argv[]) {
     bool compressed = false;
     int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemID, sampleID, maxCount;
-    double val;
+    double val, maxVal = -HUGE_VAL;
     FILE *inFile;
     void *items = (void *) NULL;
     char *domainFileName = (char *) NULL, *samplerFileName = (char *) NULL, *outFileName = (char *) NULL;
@@ -210,7 +210,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         case MFsampleZone:
             table->AddField (sampleIDFLD  = new DBObjTableField("SampleID", DBTableFieldInt,   "%8d",    sizeof(DBInt)));
             table->AddField (dateFLD      = new DBObjTableField("Date",     DBTableFieldDate,  "%s",     sizeof(DBDate)));
-            table->AddField (zoneAreaFLD  = new DBObjTableField("ZoneArea", DBTableFieldFloat, "%10.1f", sizeof(DBFloat4)));
+            table->AddField (zoneAreaFLD  = new DBObjTableField("ZoneArea", DBTableFieldFloat, "%10.0f", sizeof(DBFloat4)));
             table->AddField (meanValueFLD = new DBObjTableField("Mean",     DBTableFieldFloat, "%10.3f", sizeof(DBFloat4)));
             table->AddField (minValueFLD  = new DBObjTableField("Minimum",  DBTableFieldFloat, "%10.3f", sizeof(DBFloat4)));
             table->AddField (maxValueFLD  = new DBObjTableField("Maximum",  DBTableFieldFloat, "%10.3f", sizeof(DBFloat4)));
@@ -343,6 +343,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                         sampleIDFLD->Int (tblRec,sampleID + 1);
                         dateFLD->Date    (tblRec,date);
                         valueFLD->Float  (tblRec,samplerStats [sampleID].Mean);
+                        maxVal = samplerStats [sampleID].Mean > maxVal ? samplerStats [sampleID].Mean : maxVal;
                     }
                     break;
                 case MFsampleZone:
@@ -360,6 +361,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                             minValueFLD->Float  (tblRec, samplerStats [sampleID].Min);
                             maxValueFLD->Float  (tblRec, samplerStats [sampleID].Max);
                             stdDevFLD->Float    (tblRec, samplerStats [sampleID].StdDev);
+                            maxVal = samplerStats [sampleID].Mean > maxVal ? samplerStats [sampleID].Mean : maxVal;
                         }
                         else {
                             zoneAreaFLD->Float  (tblRec, 0.0);
@@ -379,6 +381,18 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         }
         if (compressed) pclose (inFile); else fclose(inFile);
         inFile = stdin;
+    }
+    switch (samplerPTR->Type) {
+        case MFsamplePoint:
+            valueFLD->Format (DBMathFloatAutoFormat (maxVal));
+            break;
+        case MFsampleZone:
+            meanValueFLD->Format (DBMathFloatAutoFormat (maxVal));
+             minValueFLD->Format (DBMathFloatAutoFormat (maxVal));
+             maxValueFLD->Format (DBMathFloatAutoFormat (maxVal));
+               stdDevFLD->Format (DBMathFloatAutoFormat (maxVal));
+            break;
+        default: break;
     }
 Stop:
     MFDomainFree  (domainPTR);
