@@ -27,7 +27,7 @@ static void _CMDprintUsage (const char *arg0) {
 
 typedef struct MFSamplerStats_s {
     int Count;
-    double Weight;
+    double Area;
     double Mean;
     double Min;
     double Max;
@@ -184,7 +184,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                 case MFsampleZone:
                     for (sampleID = 0; sampleID < sampler->ObjNum; ++sampleID) {
                         samplerStats [sampleID].Count  = 0;
-                        samplerStats [sampleID].Weight =
+                        samplerStats [sampleID].Area =
                         samplerStats [sampleID].Mean   =
                         samplerStats [sampleID].StdDev = 0.0;
                         samplerStats [sampleID].Min    =  HUGE_VAL;
@@ -231,7 +231,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                 switch (sampler->Type) {
                     case MFsamplePoint: samplerStats [sampleID].Mean   = val; break;
                     case MFsampleZone:
-                        samplerStats [sampleID].Weight  += domain->Objects[itemID].Area;
+                        samplerStats [sampleID].Area  += domain->Objects[itemID].Area;
                         samplerStats [sampleID].Mean    += val * domain->Objects[itemID].Area;
                         samplerStats [sampleID].Min      = val < samplerStats [sampleID].Min ? val : samplerStats [sampleID].Min;
                         samplerStats [sampleID].Max      = val > samplerStats [sampleID].Max ? val : samplerStats [sampleID].Max;
@@ -252,11 +252,11 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                     break;
                 case MFsampleZone:
                     for (sampleID = 0;sampleID < sampler->SampleNum; ++sampleID)
-                        if (samplerStats [sampleID].Weight > 0.0) {
-                            samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Weight;
-                            samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Weight - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
+                        if (samplerStats [sampleID].Area > 0.0) {
+                            samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Area;
+                            samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Area - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
                             samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev > 0.0 ? sqrt (samplerStats [sampleID].StdDev) : 0.0;
-                            printf ("%d\t%s\t%d\t%f\t%f\t%f\t%f\n",sampleID + 1, header.Date, samplerStats [sampleID].Count, samplerStats [sampleID].Mean, samplerStats [sampleID].Min, samplerStats [sampleID].Max, samplerStats [sampleID].StdDev);
+                            printf ("%d\t%s\t%f\t%f\t%f\t%f\t%f\n",sampleID + 1, header.Date, samplerStats [sampleID].Area, samplerStats [sampleID].Mean, samplerStats [sampleID].Min, samplerStats [sampleID].Max, samplerStats [sampleID].StdDev);
                         }
                         else
                             printf ("%d\t%s\t\t\t\t\n",sampleID + 1, header.Date);
