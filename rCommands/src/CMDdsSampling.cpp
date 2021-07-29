@@ -18,10 +18,14 @@ bfekete@gc.cuny.edu
 #include <string.h>
 
 static void _CMDprintUsage (const char *arg0) {
-    CMmsgPrint(CMmsgUsrError, "%s [options] <datastream 1> <datastream 2> ... <datastream N>", CMfileName(arg0));
-    CMmsgPrint(CMmsgUsrError, "  -d, --domain");
-    CMmsgPrint(CMmsgUsrError, "  -s, --sampler");
-    CMmsgPrint(CMmsgUsrError, "  -o, --output");
+    CMmsgPrint(CMmsgInfo, "%s [options] <datastream 1> <datastream 2> ... <datastream N>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "  -D, --domainfile [filename]");
+    CMmsgPrint(CMmsgInfo, "  -S, --sampler    [filename]");
+    CMmsgPrint(CMmsgInfo, "  -o, --output     [filename]");
+    CMmsgPrint(CMmsgInfo, "  -t,--title       [dataset title]");
+    CMmsgPrint(CMmsgInfo, "  -u,--subject     [subject]");
+    CMmsgPrint(CMmsgInfo, "  -d,--domain      [domain]");
+    CMmsgPrint(CMmsgInfo, "  -v,--version     [version]");
     CMmsgPrint(CMmsgUsrError, "  -h,--help");
 }
 
@@ -62,7 +66,7 @@ int main(int argc, char *argv[]) {
     if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
-        if (CMargTest(argv[argPos], "-d", "--domainPTR")) {
+        if (CMargTest(argv[argPos], "-D", "--domainfile")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing sampling item!");
                 return (CMfailed);
@@ -71,7 +75,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest(argv[argPos], "-s", "--samplerPTR")) {
+        if (CMargTest(argv[argPos], "-S", "--sampler")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing sampling item!");
                 return (CMfailed);
@@ -89,6 +93,29 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
+        if (CMargTest (argv[argPos], "-t", "--title")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing title!");
+                return (CMfailed);
+            }
+            title = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-u", "--subject")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing subject!");
+                return (CMfailed);
+            }
+            subject = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest (argv[argPos], "-d", "--domain")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing domain!");
+                return (CMfailed);
+            }
 Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) < argPos) break;
             _CMDprintUsage (argv[0]);
@@ -289,7 +316,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                 maxCount = samplerStats [itemID].Count > maxCount ? samplerStats [itemID].Count : maxCount;
             }
             tblRec = table->Add ();
-            sampleIDFLD->Int (tblRec,sampleID + 1);
+           
             switch (samplerPTR->Type) {
                 case MFsamplePoint:
                     if (maxCount > 1) {
@@ -297,11 +324,13 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                         goto Stop;
                     }
                     for (sampleID = 0;sampleID < samplerPTR->SampleNum; ++sampleID) {
+                        sampleIDFLD->Int (tblRec,sampleID + 1);
                         valueFLD->Float  (tblRec,samplerStats [sampleID].Mean);
                     }
                     break;
                 case MFsampleZone:
-                    for (sampleID = 0;sampleID < samplerPTR->SampleNum; ++sampleID)
+                    for (sampleID = 0;sampleID < samplerPTR->SampleNum; ++sampleID) {
+                        sampleIDFLD->Int (tblRec,sampleID + 1);
                         if (samplerStats [sampleID].Area > 0.0) {
                             samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Area;
                             samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Area - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
@@ -319,6 +348,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                             maxValueFLD->Float  (tblRec, maxValueFLD->FloatNoData ());
                             stdDevFLD->Float    (tblRec, stdDevFLD->FloatNoData ());
                         }
+                    }
                     break;
                 default: break;
             }
