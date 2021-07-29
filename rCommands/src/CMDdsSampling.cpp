@@ -45,6 +45,17 @@ int main(int argc, char *argv[]) {
     MFSampler_p sampler;
     MFdsHeader_t header;
     MFSamplerStats_p samplerStats;
+    DBObjData  *data;
+    DBObjTable *table;
+    DBObjTableField *sampleIDFLD;
+    DBObjTableField *zoneAreaFLD;
+    DBObjTableField *valueFLD;
+    DBObjTableField *meanValueFLD;
+    DBObjTableField *minValueFLD;
+    DBObjTableField *maxValueFLD;
+    DBObjTableField *stdDevFLD;
+    DBObjRecord *tblRec;
+
 
     if (argNum < 2) goto Help;
 
@@ -132,6 +143,24 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         return (CMfailed);
     }
 
+    data  = new DBObjData ();
+    table = data->Table(DBrNItems);
+    switch (sampler->Type) {
+        case MFsamplePoint:
+            table->AddField (sampleIDFLD  = new DBObjTableField("SampleID", DBTableFieldInt,   "%8d",    sizeof(DBInt)));
+            table->AddField (valueFLD     = new DBObjTableField("Value",    DBTableFieldFloat, "%10.1f", sizeof(DBFloat4)));
+            break; 
+        case MFsampleZone:
+            table->AddField (sampleIDFLD  = new DBObjTableField("SampleID", DBTableFieldInt,   "%8d",    sizeof(DBInt)));
+            table->AddField (zoneAreaFLD  = new DBObjTableField("ZoneArea", DBTableFieldFloat, "%10.1f", sizeof(DBFloat4)));
+            table->AddField (meanValueFLD = new DBObjTableField("Mean",     DBTableFieldFloat, "%10.3f", sizeof(DBFloat4)));
+            table->AddField (minValueFLD  = new DBObjTableField("Minimum",  DBTableFieldFloat, "%10.3f", sizeof(DBFloat4)));
+            table->AddField (maxValueFLD  = new DBObjTableField("Maximum",  DBTableFieldFloat, "%10.3f", sizeof(DBFloat4)));
+            table->AddField (stdDevFLD    = new DBObjTableField("StdDev",   DBTableFieldFloat, "%10.3f", sizeof(DBFloat4)));
+            break;
+        default: break;
+    }
+
     for (argPos = 0; argPos < argNum; ++argPos) {
         if (argNum > 1) {
             if (argPos == 0) continue;
@@ -179,12 +208,15 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
 
             switch (sampler->Type) {
                 case MFsamplePoint:
-                    for (sampleID = 0; sampleID < sampler->ObjNum; ++sampleID) samplerStats [sampleID].Count  = 0;
+                    for (sampleID = 0; sampleID < sampler->ObjNum; ++sampleID) {
+                        samplerStats [sampleID].Count = 0;
+                        samplerStats [sampleID].Mean  = valueFLD->FloatNoData ();
+                    }
                     break; 
                 case MFsampleZone:
                     for (sampleID = 0; sampleID < sampler->ObjNum; ++sampleID) {
                         samplerStats [sampleID].Count  = 0;
-                        samplerStats [sampleID].Area =
+                        samplerStats [sampleID].Area   =
                         samplerStats [sampleID].Mean   =
                         samplerStats [sampleID].StdDev = 0.0;
                         samplerStats [sampleID].Min    =  HUGE_VAL;
@@ -241,14 +273,17 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                 }
                 maxCount = samplerStats [itemID].Count > maxCount ? samplerStats [itemID].Count : maxCount;
             }
+            tblRec = table->Add ();
+            sampleIDFLD->Int (tblRec,sampleID + 1);
             switch (sampler->Type) {
                 case MFsamplePoint:
                     if (maxCount > 1) {
                         CMmsgPrint(CMmsgUsrError, "Point sampler have more than one point with the same ID!");
                         goto Stop;
                     }
-                    for (sampleID = 0;sampleID < sampler->SampleNum; ++sampleID)
-                        printf ("%d\t%s\t%f\n", sampleID + 1, header.Date, samplerStats [sampleID].Mean);
+                    for (sampleID = 0;sampleID < sampler->SampleNum; ++sampleID) {
+                        valueFLD->Float  (tblRec,samplerStats [sampleID].Mean);
+                    }
                     break;
                 case MFsampleZone:
                     for (sampleID = 0;sampleID < sampler->SampleNum; ++sampleID)
@@ -256,10 +291,19 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                             samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Area;
                             samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Area - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
                             samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev > 0.0 ? sqrt (samplerStats [sampleID].StdDev) : 0.0;
-                            printf ("%d\t%s\t%f\t%f\t%f\t%f\t%f\n",sampleID + 1, header.Date, samplerStats [sampleID].Area, samplerStats [sampleID].Mean, samplerStats [sampleID].Min, samplerStats [sampleID].Max, samplerStats [sampleID].StdDev);
+                            zoneAreaFLD->Float  (tblRec, samplerStats [sampleID].Area);
+                            meanValueFLD->Float (tblRec, samplerStats [sampleID].Mean);
+                            minValueFLD->Float  (tblRec, samplerStats [sampleID].Min);
+                            maxValueFLD->Float  (tblRec, samplerStats [sampleID].Max);
+                            stdDevFLD->Float    (tblRec, samplerStats [sampleID].StdDev);
                         }
-                        else
-                            printf ("%d\t%s\t\t\t\t\n",sampleID + 1, header.Date);
+                        else {
+                            zoneAreaFLD->Float  (tblRec, 0.0);
+                            meanValueFLD->Float (tblRec, meanValueFLD->FloatNoData ());
+                            minValueFLD->Float  (tblRec, minValueFLD->FloatNoData ());
+                            maxValueFLD->Float  (tblRec, maxValueFLD->FloatNoData ());
+                            stdDevFLD->Float    (tblRec, stdDevFLD->FloatNoData ());
+                        }
                     break;
                 default: break;
             }
@@ -272,8 +316,10 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         inFile = stdin;
     }
 Stop:
-    if (inFile != stdin) { if (compressed) pclose (inFile); else fclose (inFile); }
     MFDomainFree  (domain);
     MFSamplerFree (sampler);
+    if (outFileName != (char *) NULL) data->Write (outFileName); else data->Write(stdout);
+    delete data;
+    if (inFile != stdin) { if (compressed) pclose (inFile); else fclose (inFile); }
     return (ret);
 }

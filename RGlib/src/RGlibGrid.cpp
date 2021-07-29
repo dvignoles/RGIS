@@ -914,7 +914,7 @@ DBInt RGlibGridZoneStatistics(DBObjData *zGrdData, DBObjData *wGrdData, DBObjDat
     outTable->AddField(outZoneIDFLD     = new DBObjTableField("ZoneGridID",      DBTableFieldInt,   "%8d",    sizeof(DBInt)));
     outTable->AddField(outZoneValueFLD  = new DBObjTableField("ZoneGridValue",   DBTableFieldInt,   "%8d",    sizeof(DBInt)));
     outTable->AddField(outZoneNameFLD   = new DBObjTableField("ZoneGridName",    DBTableFieldString,"%s",     zoneNameLen));
-    outTable->AddField(outZoneAreaFLD   = new DBObjTableField(RGlibZoneArea,           DBTableFieldFloat, "%10.1f", sizeof(DBFloat4)));
+    outTable->AddField(outZoneAreaFLD   = new DBObjTableField(RGlibZoneArea,     DBTableFieldFloat, "%10.1f", sizeof(DBFloat4)));
     outTable->AddField(outZLayerIDFLD   = new DBObjTableField("ZoneLayerID",     DBTableFieldInt,   "%4d",    sizeof(DBShort)));
     outTable->AddField(outZLayerNameFLD = new DBObjTableField("ZoneLayerName",   DBTableFieldString,"%s",     DBStringLength));
     outTable->AddField(outWLayerIDFLD   = new DBObjTableField("WeightLayerID",   DBTableFieldInt,   "%4d",    sizeof(DBShort)));
@@ -967,7 +967,7 @@ DBInt RGlibGridZoneStatistics(DBObjData *zGrdData, DBObjData *wGrdData, DBObjDat
             for (zoneID = 0; zoneID < zoneTable->ItemNum(); ++zoneID) {
                 zoneRec = zoneTable->Item(zoneID);
                 if (tmpSumWeightFLD->Float(zoneRec) > 0) {
-                    tmpWSumValFLD->Float(zoneRec, tmpWSumValFLD->Float(zoneRec) / tmpSumWeightFLD->Float(zoneRec));
+                    tmpWSumValFLD->Float(zoneRec,   tmpWSumValFLD->Float(zoneRec)   / tmpSumWeightFLD->Float(zoneRec));
                     tmpSumValSqrFLD->Float(zoneRec, tmpSumValSqrFLD->Float(zoneRec) / tmpSumWeightFLD->Float(zoneRec));
                     outRec = outTable->Add(zoneRec->Name());
                     outZoneIDFLD->Int(outRec, zoneRec->RowID() + 1);
@@ -981,8 +981,7 @@ DBInt RGlibGridZoneStatistics(DBObjData *zGrdData, DBObjData *wGrdData, DBObjDat
                     outAverageFLD->Float(outRec, tmpWSumValFLD->Float(zoneRec));
                     outMinimumFLD->Float(outRec, tmpMinimumFLD->Float(zoneRec));
                     outMaximumFLD->Float(outRec, tmpMaximumFLD->Float(zoneRec));
-                    outStdDevFLD->Float(outRec, sqrt(tmpSumValSqrFLD->Float(zoneRec) -
-                                                     outAverageFLD->Float(outRec) * outAverageFLD->Float(outRec)));
+                    outStdDevFLD->Float(outRec, sqrt(tmpSumValSqrFLD->Float(zoneRec) - outAverageFLD->Float(outRec) * outAverageFLD->Float(outRec)));
                 }
             }
         }
