@@ -47,6 +47,7 @@ int main(int argc, char *argv[]) {
     char *domainFileName = (char *) NULL, *samplerFileName = (char *) NULL, *outFileName = (char *) NULL;
     char *title  = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
+    DBDate date;
     MFDomain_p  domainPTR;
     MFSampler_p samplerPTR;
     MFdsHeader_t header;
@@ -54,6 +55,7 @@ int main(int argc, char *argv[]) {
     DBObjData  *data;
     DBObjTable *table;
     DBObjTableField *sampleIDFLD;
+    DBObjTableField *dateFLD;
     DBObjTableField *zoneAreaFLD;
     DBObjTableField *valueFLD;
     DBObjTableField *meanValueFLD;
@@ -61,7 +63,6 @@ int main(int argc, char *argv[]) {
     DBObjTableField *maxValueFLD;
     DBObjTableField *stdDevFLD;
     DBObjRecord *tblRec;
-
 
     if (argNum < 2) goto Help;
 
@@ -203,10 +204,12 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
     switch (samplerPTR->Type) {
         case MFsamplePoint:
             table->AddField (sampleIDFLD  = new DBObjTableField("SampleID", DBTableFieldInt,   "%8d",    sizeof(DBInt)));
+            table->AddField (dateFLD      = new DBObjTableField("Date",     DBTableFieldDate,  "%s",     sizeof(DBDate)));
             table->AddField (valueFLD     = new DBObjTableField("Value",    DBTableFieldFloat, "%10.1f", sizeof(DBFloat4)));
             break; 
         case MFsampleZone:
             table->AddField (sampleIDFLD  = new DBObjTableField("SampleID", DBTableFieldInt,   "%8d",    sizeof(DBInt)));
+            table->AddField (dateFLD      = new DBObjTableField("Date",     DBTableFieldDate,  "%s",     sizeof(DBDate)));
             table->AddField (zoneAreaFLD  = new DBObjTableField("ZoneArea", DBTableFieldFloat, "%10.1f", sizeof(DBFloat4)));
             table->AddField (meanValueFLD = new DBObjTableField("Mean",     DBTableFieldFloat, "%10.3f", sizeof(DBFloat4)));
             table->AddField (minValueFLD  = new DBObjTableField("Minimum",  DBTableFieldFloat, "%10.3f", sizeof(DBFloat4)));
@@ -260,7 +263,6 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                 CMmsgPrint(CMmsgSysError, "Data stream reading error in: %s:%d", __FILE__, __LINE__);
                 goto Stop;
             }
-
             switch (samplerPTR->Type) {
                 case MFsamplePoint:
                     for (sampleID = 0; sampleID < samplerPTR->ObjNum; ++sampleID) {
@@ -281,6 +283,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                 default: break;
             }
             maxCount = 0;
+            date.Set (header.Date);
             for (itemID = 0; itemID < header.ItemNum; ++itemID) {
                 sampleID = samplerPTR->SampleIDs[itemID];
                 if (sampleID == DBFault) continue;
@@ -328,7 +331,6 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                 }
                 maxCount = samplerStats [itemID].Count > maxCount ? samplerStats [itemID].Count : maxCount;
             }
-            tblRec = table->Add ();
            
             switch (samplerPTR->Type) {
                 case MFsamplePoint:
@@ -337,13 +339,18 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                         goto Stop;
                     }
                     for (sampleID = 0;sampleID < samplerPTR->SampleNum; ++sampleID) {
+                        tblRec = table->Add ();
                         sampleIDFLD->Int (tblRec,sampleID + 1);
+                        dateFLD->Date    (tblRec,date);
                         valueFLD->Float  (tblRec,samplerStats [sampleID].Mean);
                     }
                     break;
                 case MFsampleZone:
+                    date.Set (header.Date);
                     for (sampleID = 0;sampleID < samplerPTR->SampleNum; ++sampleID) {
+                        tblRec = table->Add ();
                         sampleIDFLD->Int (tblRec,sampleID + 1);
+                        dateFLD->Date    (tblRec,date);
                         if (samplerStats [sampleID].Area > 0.0) {
                             samplerStats [sampleID].Mean   = samplerStats [sampleID].Mean   / samplerStats [sampleID].Area;
                             samplerStats [sampleID].StdDev = samplerStats [sampleID].StdDev / samplerStats [sampleID].Area - samplerStats [sampleID].Mean * samplerStats [sampleID].Mean;
