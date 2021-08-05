@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDSoilAvailWaterCap.c
+MDCore_SoilAvailWaterCap.c
 
 bfekete@gc.cuny.edu
 
@@ -34,27 +34,25 @@ static void _MDSoilAvailWaterCap (int itemID) {
 	MFVarSetFloat (_MDOutSoilAvailWaterCapID, itemID, rootingDepth * (fieldCapacity - wiltingPoint));
 }
 
-enum { MDinput, MDcalculate};
 int MDCore_SoilAvailWaterCapDef () {
-	int  optID = MDinput;
-	const char *optStr, *optName = MDVarCore_SoilAvailWaterCap;
-	const char *options [] = { MDInputStr, MDCalculateStr,  (char *) NULL };
+	int  optID = MFinput;
+	const char *optStr;
 	
 	if (_MDOutSoilAvailWaterCapID != MFUnset) return (_MDOutSoilAvailWaterCapID);
 
 	MFDefEntering ("Soil available water capacity");
-
-	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);
+	if ((optStr = MFOptionGet (MDVarCore_SoilAvailWaterCap)) != (char *) NULL) optID = CMoptLookup (MFsourceOptions, optStr, true);
 		switch (optID) {
-		case MDinput: _MDOutSoilAvailWaterCapID = MFVarGetID (MDVarCore_SoilAvailWaterCap, "mm", MFInput, MFState, MFBoundary); break;
-		case MDcalculate:
-			if (((_MDInSoilFieldCapacityID  = MFVarGetID (MDVarCore_SoilFieldCapacity, "mm/m", MFInput, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDInSoilWiltingPointID   = MFVarGetID (MDVarCore_SoilWiltingPoint, "mm/m", MFInput, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDInSoilRootingDepthID   = MFVarGetID (MDVarCore_SoilRootingDepth, "mm", MFInput, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDOutSoilAvailWaterCapID = MFVarGetID (MDVarCore_SoilAvailWaterCap, "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
-                (MFModelAddFunction (_MDSoilAvailWaterCap) == CMfailed)) return (CMfailed);
-			break;
-		default: MFOptionMessage (optName, optStr, options); return (CMfailed);
+			default:      MFOptionMessage (MDVarCore_SoilAvailWaterCap, optStr, MFsourceOptions); return (CMfailed);
+			case MFhelp:  MFOptionMessage (MDVarCore_SoilAvailWaterCap, optStr, MFsourceOptions);
+			case MFinput: _MDOutSoilAvailWaterCapID = MFVarGetID (MDVarCore_SoilAvailWaterCap, "mm", MFInput, MFState, MFBoundary); break;
+			case MFcalculate:
+				if (((_MDInSoilFieldCapacityID  = MFVarGetID (MDVarCore_SoilFieldCapacity,     "mm/m", MFInput,  MFState, MFBoundary)) == CMfailed) ||
+                	((_MDInSoilWiltingPointID   = MFVarGetID (MDVarCore_SoilWiltingPoint,      "mm/m", MFInput,  MFState, MFBoundary)) == CMfailed) ||
+                	((_MDInSoilRootingDepthID   = MFVarGetID (MDVarCore_SoilRootingDepth,      "mm",   MFInput,  MFState, MFBoundary)) == CMfailed) ||
+                	((_MDOutSoilAvailWaterCapID = MFVarGetID (MDVarCore_SoilAvailWaterCap,     "mm",   MFOutput, MFState, MFBoundary)) == CMfailed) ||
+                	(MFModelAddFunction (_MDSoilAvailWaterCap) == CMfailed)) return (CMfailed);
+				break;
 		}
 	MFDefLeaving  ("Soil available water capacity");
 	return (_MDOutSoilAvailWaterCapID);

@@ -3,7 +3,7 @@
  Global Hydrological Archive and Analysis System
  Copyright 1994-2021, UNH - ASRC/CUNY
 
- MDSpecificHumidity.c
+ MDCommon_HumiditySpecific.c
 
  amiara@ccny.cuny.edu
 
@@ -47,33 +47,26 @@ static void _MDSpecificHumidity(int itemID) {
     MFVarSetFloat(_MDOutCommon_HumiditySpecificID, itemID, specifichumidity);
 }
 
-enum {
-    MDnone, MDinput, MDcalculate
-};
-
 int MDCommon_HumiditySpecificDef () {
-    int optID = MFUnset;
-    const char *optStr, *optName = MDOptWeather_SpecificHumidity;
-    const char *options [] = { MDNoneStr, MDInputStr, MDCalculateStr, (char *) NULL};
+    int optID = MFinput;
+    const char *optStr;
     
-    if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);
-    if ((optID == MDnone) || (_MDOutCommon_HumiditySpecificID != MFUnset)) return (_MDOutCommon_HumiditySpecificID);
+    if (_MDOutCommon_HumiditySpecificID != MFUnset) return (_MDOutCommon_HumiditySpecificID);
     
     MFDefEntering ("SpecificHumidity");
-    
-    switch (optID) {
-        case MDinput:
-            if ((_MDOutCommon_HumiditySpecificID = MFVarGetID (MDVarCommon_HumiditySpecific, "%",      MFInput, MFState, MFBoundary)) == CMfailed) return (CMfailed);
-            break;
-        case MDcalculate:
-            if (((_MDInCommon_HumidityRelativeID  = MDCommon_HumidityRelativeDef()) == CMfailed) ||
-                ((_MDInCommon_AirTemperatureID    = MFVarGetID (MDVarCommon_AirTemperature,   "degC", MFInput, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDInCommon_AirPressureID       = MFVarGetID (MDVarCommon_AirPressure,      "kPa",  MFInput, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDOutCommon_HumiditySpecificID = MFVarGetID (MDVarCommon_HumiditySpecific, "%",    MFOutput, MFState, MFBoundary)) == CMfailed) ||
-                ((MFModelAddFunction (_MDSpecificHumidity) == CMfailed))) return (CMfailed);
-            break;
-        default: MFOptionMessage (optName, optStr, options); return (CMfailed);
-    }
+    if ((optStr = MFOptionGet (MDOptWeather_SpecificHumidity)) != (char *) NULL) optID = CMoptLookup (MFsourceOptions, optStr, true);
+        switch (optID) {
+            default:      MFOptionMessage (MDOptWeather_SpecificHumidity, optStr, MFsourceOptions); return (CMfailed);
+            case MFhelp:  MFOptionMessage (MDOptWeather_SpecificHumidity, optStr, MFsourceOptions);
+            case MFinput: _MDOutCommon_HumiditySpecificID = MFVarGetID (MDVarCommon_HumiditySpecific, "%",      MFInput, MFState, MFBoundary); break;
+            case MFcalculate:
+                if (((_MDInCommon_HumidityRelativeID  = MDCommon_HumidityRelativeDef()) == CMfailed) ||
+                    ((_MDInCommon_AirTemperatureID    = MDCommon_AirTemperatureDef ())  == CMfailed) ||
+                    ((_MDInCommon_AirPressureID       = MFVarGetID (MDVarCommon_AirPressure,      "kPa",  MFInput, MFState, MFBoundary)) == CMfailed) ||
+                    ((_MDOutCommon_HumiditySpecificID = MFVarGetID (MDVarCommon_HumiditySpecific, "%",    MFOutput, MFState, MFBoundary)) == CMfailed) ||
+                    ((MFModelAddFunction (_MDSpecificHumidity) == CMfailed))) return (CMfailed);
+                break;
+        }
     MFDefLeaving ("SpecificHumidity");
     return (_MDOutCommon_HumiditySpecificID);
 }

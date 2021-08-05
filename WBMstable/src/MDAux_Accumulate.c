@@ -31,7 +31,7 @@ int MDAux_AccumPrecipDef() {
 	if (_MDOutAux_AccPrecipID != MFUnset) return (_MDOutAux_AccPrecipID);
 
 	MFDefEntering ("Accumulate Precipitation");
-	if (((_MDInCommon_PrecipID     = MDCommon_PrecipitationDef()) == CMfailed) ||
+	if (((_MDInCommon_PrecipID  = MDCommon_PrecipitationDef()) == CMfailed) ||
         ((_MDOutAux_AccPrecipID = MFVarGetID (MDVarAux_AccPrecipitation, "m3/s", MFRoute, MFState, MFBoundary)) == CMfailed) ||
         (MFModelAddFunction(_MDAux_AccumPrecip) == CMfailed)) return (CMfailed);
 

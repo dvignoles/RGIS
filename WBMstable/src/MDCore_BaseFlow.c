@@ -4,12 +4,13 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDBaseFlow.c
+MDCore_BaseFlow.c
 
 bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
+#include <string.h>
 #include <MF.h>
 #include <MD.h>
 
@@ -99,9 +100,11 @@ int MDCore_BaseFlowDef () {
 
 	if (_MDOutCore_BaseFlowID != MFUnset) return (_MDOutCore_BaseFlowID);
 
-	MFDefEntering ("Base flow");
-	if (((optStr = MFOptionGet (MDParGroundWatBETA))  != (char *) NULL) && (sscanf (optStr,"%f",&par) == 1)) _MDGroundWatBETA = par;
-
+	MFDefEntering ("Base flow");;
+	if ((optStr = MFOptionGet (MDParGroundWatBETA))  != (char *) NULL) {
+		if (strcmp(optStr,MFhelpStr) == 0) CMmsgPrint (CMmsgInfo,"%s = %f", MDParGroundWatBETA, _MDGroundWatBETA);
+		_MDGroundWatBETA = sscanf (optStr,"%f",&par) == 1 ? par : _MDGroundWatBETA;
+	}
 	if (((_MDInCore_RechargeID       = MDCore_RainInfiltrationDef()) == CMfailed) ||
         ((_MDInIrrigation_GrossDemandID = MDIrrigation_GrossDemandDef()) == CMfailed)) return (CMfailed);
 

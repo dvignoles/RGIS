@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDEvapotransp.c
+MDCore_Evapotransp.c
 
 bfekete@gc.cuny.edu
 
@@ -32,20 +32,30 @@ static void _MDEvapotransp (int itemID) {
 }
 
 int MDCore_EvapotranspirationDef () {
-	int ret;
+	int optID = MFnone, ret;
+	const char *optStr;
+
 	if (_MDOutEvapotranspID != MFUnset) return (_MDOutEvapotranspID);
 
 	MFDefEntering ("Evapotranspiration");
-	if (((ret = MDIrrigation_GrossDemandDef()) != MFUnset) &&
-        ((ret == CMfailed) ||
-	     ((_MDInIrrEvapotranspID = MFVarGetID (MDVarIrrigation_Evapotranspiration, "mm", MFInput, MFFlux, MFBoundary)) == CMfailed)))
-	     return (CMfailed);
-	if (((ret = MDReservoir_FarmPondReleaseDef()) != MFUnset) &&
-        ((ret == CMfailed) ||
-	     ((_MDInSmallResEvapoID  = MFVarGetID (MDVarReservoir_FarmPondEvaporation, "mm", MFInput, MFFlux, MFBoundary)) == CMfailed)))
-		return (CMfailed);
-	if (((_MDInRainEvapotranspID = MFVarGetID (MDVarCore_RainEvapotranspiration, "mm", MFInput, MFFlux, MFBoundary)) == CMfailed) ||
-		((_MDOutEvapotranspID    = MFVarGetID (MDVarCore_Evapotranspiration, "mm", MFOutput, MFFlux, MFBoundary)) == CMfailed) ||
+	if ((optStr = MFOptionGet (MDOptConfig_Irrigation)) != (char *) NULL) optID = CMoptLookup (MFcalcOptions, optStr, true);
+	switch (optID) {
+		case MFhelp:
+		case MFnone:  
+		case MFinput: break;
+		case MFcalculate: 
+			if ((_MDInIrrEvapotranspID = MFVarGetID (MDVarIrrigation_Evapotranspiration, "mm", MFInput, MFFlux, MFBoundary)) == CMfailed) return (CMfailed);
+			if ((ret = MDReservoir_FarmPondReleaseDef ()) != MFUnset) {
+				if ((ret == CMfailed) ||
+					((_MDInSmallResEvapoID  = MFVarGetID (MDVarReservoir_FarmPondEvaporation, "mm", MFInput, MFFlux, MFBoundary)) == CMfailed))
+					return (CMfailed);
+			}
+			break;
+		default: return (CMfailed);
+	}
+ 
+	if (((_MDInRainEvapotranspID = MFVarGetID (MDVarCore_RainEvapotranspiration, "mm", MFInput,  MFFlux, MFBoundary)) == CMfailed) ||
+		((_MDOutEvapotranspID    = MFVarGetID (MDVarCore_Evapotranspiration,     "mm", MFOutput, MFFlux, MFBoundary)) == CMfailed) ||
 		(MFModelAddFunction (_MDEvapotransp) == CMfailed)) return (CMfailed);
 	MFDefLeaving ("Evapotranspiration");
 	return (_MDOutEvapotranspID);

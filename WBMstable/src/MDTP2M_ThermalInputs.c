@@ -1,9 +1,10 @@
 /******************************************************************************
+
 GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
-Copyright 1994-2007, University of New Hampshire
+Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDThermalInputs3.c
+MDTP2M_ThermalInputs.c
 
 amiara@ccny.cuny.edu & rob.stewart@unh.edu
 
@@ -1089,10 +1090,10 @@ static void _MDThermalInputs3 (int itemID) {
 int MDTP2M_ThermalInputsDef () {
 
 	MFDefEntering ("Thermal Inputs");
-    if (((_MDPlaceHolderID             = MDTP2M_WTempRiverRouteDef()) == CMfailed) ||
-        ((_MDInRouting_DischargeID     = MDRouting_DischargeDef())    == CMfailed) ||
-        ((_MDInWetBulbTempID           = MDCommon_WetBulbTempDef())   == CMfailed) ||
-	    ((_MDInCommon_AirTemperatureID = MFVarGetID (MDVarCommon_AirTemperature,    "degC",      MFInput,  MFState, MFBoundary)) == CMfailed) ||
+    if (((_MDPlaceHolderID             = MDTP2M_WTempRiverRouteDef ())  == CMfailed) ||
+        ((_MDInRouting_DischargeID     = MDRouting_DischargeDef ())     == CMfailed) ||
+        ((_MDInWetBulbTempID           = MDCommon_WetBulbTempDef ())    == CMfailed) ||
+	    ((_MDInCommon_AirTemperatureID = MDCommon_AirTemperatureDef ()) == CMfailed) ||
 	    ((_MDInDischargeIncomingID     = MFVarGetID (MDVarRouting_Discharge0,       "m3/s",      MFInput,  MFState, MFInitial))  == CMfailed) ||
 	    ((_MDFluxMixing_QxTID          = MFVarGetID (MDVarTP2M_FluxMixing_QxT,      "m3*degC/d", MFInput,  MFFlux,  MFBoundary)) == CMfailed) ||
         ((_MDFlux_QxTID                = MFVarGetID (MDVarTP2M_Flux_QxT,            "m3*degC/d", MFInput,  MFFlux,  MFBoundary)) == CMfailed) ||

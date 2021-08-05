@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDWetDays.c
+MDCommon_WetDays.c
 
 bfekete@gc.cuny.edu
 
@@ -36,9 +36,9 @@ static void _MDWetDays (int itemID)
         MFVarTestMissingVal (_MDInParam_WetDaysAlphaID, itemID) ||
         MFVarTestMissingVal (_MDInParam_WetDaysBetaID, itemID)) { MFVarSetMissingVal (_MDOutCommon_WetDaysID, itemID); return; }
 
-	precip = MFVarGetFloat (_MDInCommon_PrecipID, itemID, 0.0);
+	precip = MFVarGetFloat (_MDInCommon_PrecipID,      itemID, 0.0);
 	alpha  = MFVarGetFloat (_MDInParam_WetDaysAlphaID, itemID, 1.0);
-	beta   = MFVarGetFloat (_MDInParam_WetDaysBetaID, itemID, 0.0);
+	beta   = MFVarGetFloat (_MDInParam_WetDaysBetaID,  itemID, 0.0);
 
 	nDays   = MFDateGetMonthLength ();
 	wetDays = (int) ((float) nDays * alpha * (1.0 - exp ((double) (beta * precip))));
@@ -48,21 +48,21 @@ static void _MDWetDays (int itemID)
 	MFVarSetInt (_MDOutCommon_WetDaysID,itemID,wetDays);
 	}
 
-enum { MDinput, MDlbg };
+enum { MDhelp, MDinput, MDlbg };
 
 int MDCommon_WetDaysDef ()
 	{
-	int optID = MFUnset;
-	const char *optStr, *optName = MDVarCommon_WetDays;
-	const char *options [] = { MDInputStr, "LBG", (char *) NULL };
+	int optID = MDinput;
+	const char *optStr;
+	const char *options [] = { MFhelpStr, MFinputStr, "LBG", (char *) NULL };
 
 	if (_MDOutCommon_WetDaysID != MFUnset) return (_MDOutCommon_WetDaysID);
 
 	MFDefEntering ("Wet Days");
-	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options,optStr,true);
-
-	switch (optID)
-		{
+	if ((optStr = MFOptionGet (MDVarCommon_WetDays)) != (char *) NULL) optID = CMoptLookup (options,optStr,true);
+	switch (optID) {
+		default:      MFOptionMessage (MDVarCommon_WetDays, optStr, options); return (CMfailed);
+		case MDhelp:  MFOptionMessage (MDVarCommon_WetDays, optStr, options);
 		case MDinput: _MDOutCommon_WetDaysID = MFVarGetID (MDVarCommon_WetDays, MFNoUnit, MFInput, MFState, MFBoundary); break;
 		case MDlbg:
 			if (((_MDInCommon_PrecipID      = MFVarGetID (MDVarCommon_PrecipMonthly, "mm",     MFInput,  MFFlux,  MFBoundary)) == CMfailed) ||
@@ -71,8 +71,7 @@ int MDCommon_WetDaysDef ()
                 ((_MDOutCommon_WetDaysID    = MFVarGetID (MDVarCommon_WetDays,       MFNoUnit, MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
 				(MFModelAddFunction (_MDWetDays) == CMfailed)) return (CMfailed);
 			break;
-		default: MFOptionMessage (optName, optStr, options); return (CMfailed);
-		}
+	}
 	MFDefLeaving ("Wet Days");
 	return (_MDOutCommon_WetDaysID);
 	}

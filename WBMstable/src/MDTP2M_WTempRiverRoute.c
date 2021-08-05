@@ -34,6 +34,7 @@ static int _MDInWindSpeedID               = MFUnset;
 static int _MDInCloudCoverID              = MFUnset;
 static int _MDInCommon_AirTemperatureID   = MFUnset;
 static int _MDInCommon_SnowPackID         = MFUnset;
+static int _MDInResReleaseID              = MFUnset;
 static int _MDInResStorageChangeID        = MFUnset;
 static int _MDInResStorageID              = MFUnset;
 static int _MDInResCapacityID     	      = MFUnset;
@@ -333,28 +334,13 @@ static void _MDWTempRiverRoute (int itemID) {
   	mbmix = (QxT_input + QxT_mix - QxTout_mix - DeltaStorexT_mix);
     }	//RJS 071511
 }
+
 int MDTP2M_WTempRiverRouteDef () {
-   int optID = MFUnset;
-   const char *optStr;
-   const char *options [] = { "none", "calculate", (char *) NULL };
-  
+
 	if (_MDWTempRiverRouteID != MFUnset) return (_MDWTempRiverRouteID);
 
 	MFDefEntering ("Route river temperature");
-	
-	if (((optStr = MFOptionGet (MDOptConfig_Reservoirs)) == (char *) NULL) ||
-        ((optID  = CMoptLookup ( options, optStr, true)) == CMfailed)) {
-        CMmsgPrint(CMmsgUsrError,"Reservoir Option not specified! Option none or calculate");
-	    return CMfailed;
-    }
-    if (optID == 1) {
-        if ((MDCore_WaterBalanceDef () == CMfailed) ||
-            ((_MDInResStorageChangeID = MFVarGetID (MDVarReservoir_StorageChange, "km3", MFInput, MFState, MFBoundary)) == CMfailed) ||	//RJS 071511
-            ((_MDInResStorageID       = MFVarGetID (MDVarReservoir_Storage,       "km3", MFInput, MFState, MFInitial))  == CMfailed) ||	//RJS 121311 changed from MFBoundary to MFInitial
-            ((_MDInResCapacityID      = MFVarGetID (MDVarReservoir_Capacity,      "km3", MFInput, MFState, MFBoundary)) == CMfailed))
-            return (CMfailed);
-    }
-	//input
+
 	if ((MDCore_WaterBalanceDef () == CMfailed) ||
 	    ((_MDInRouting_DischargeID       = MDRouting_DischargeDef ())       == CMfailed) ||
         ((_MDInCommon_Common_SolarRadID  = MDCommon_SolarRadDef ())         == CMfailed) ||
@@ -363,9 +349,14 @@ int MDTP2M_WTempRiverRouteDef () {
         ((_MDInRiverWidthID              = MDRouting_RiverWidthDef ())      == CMfailed) ||
         ((_MDInAux_RunoffVolumeID        = MDCore_RunoffVolumeDef ())       == CMfailed) ||
         ((_MDInCloudCoverID              = MDCommon_CloudCoverDef ())       == CMfailed) ||
+        ((_MDInCommon_AirTemperatureID   = MDCommon_AirTemperatureDef ())   == CMfailed) ||
+        (((_MDInResReleaseID             = MDReservoir_OperationDef ()) != MFUnset) && 
+         ((_MDInResReleaseID == CMfailed) ||
+          ((_MDInResStorageChangeID      = MFVarGetID (MDVarReservoir_StorageChange,     "km3",       MFInput,  MFState, MFBoundary)) == CMfailed) ||
+          ((_MDInResStorageID            = MFVarGetID (MDVarReservoir_Storage,           "km3",       MFInput,  MFState, MFInitial))  == CMfailed) ||
+          ((_MDInResCapacityID           = MFVarGetID (MDVarReservoir_Capacity,          "km3",       MFInput,  MFState, MFBoundary)) == CMfailed))) ||
         ((_MDInDischargeIncomingID       = MFVarGetID (MDVarRouting_Discharge0,          "m3/s",      MFInput,  MFState, MFInitial))  == CMfailed) ||
         ((_MDInWindSpeedID               = MFVarGetID (MDVarCommon_WindSpeed,            "m/s",       MFInput,  MFState, MFBoundary)) == CMfailed) ||
-        ((_MDInCommon_AirTemperatureID   = MFVarGetID (MDVarCommon_AirTemperature,       "degC",      MFInput,  MFState, MFBoundary)) == CMfailed) ||
         ((_MDInRiverStorageChgID         = MFVarGetID (MDVarRouting_RiverStorageChg,     "m3",        MFInput,  MFFlux,  MFBoundary)) == CMfailed) ||
         ((_MDInRiverStorageID            = MFVarGetID (MDVarRouting_RiverStorage,        "m3",        MFInput,  MFState, MFInitial))  == CMfailed) ||
         ((_MDInCommon_SnowPackID         = MFVarGetID (MDVarCore_SnowPack,               "mm",        MFInput,  MFState, MFInitial))  == CMfailed) ||

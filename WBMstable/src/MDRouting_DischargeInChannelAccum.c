@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDDichAccumulate.c
+MDRouting_DichargeInChannelAccumulate.c
 
 bfekete@gc.cuny.edu
 
@@ -14,7 +14,7 @@ bfekete@gc.cuny.edu
 #include <MD.h>
 
 // Input
-static int _MDInAux_RunoffVolumeID  = MFUnset;
+static int _MDInAux_RunoffVolumeID      = MFUnset;
 static int _MDInRouting_DischargeID     = MFUnset;
 // Output
 static int _MDOutRouting_DischLevel3ID  = MFUnset;
@@ -38,13 +38,13 @@ int MDRouting_DischargeInChannelAccumulateDef () {
 
 	if (_MDOutRouting_DischLevel3ID != MFUnset) return (_MDOutRouting_DischLevel3ID);
 
-	MFDefEntering ("Discharge Level 3 - Accumulate");
+	MFDefEntering ("Discharge Routing - Accumulate");
 	if (((_MDInAux_RunoffVolumeID  = MDCore_RunoffVolumeDef()) == CMfailed) ||
-        ((_MDInRouting_DischargeID     = MFVarGetID (MDVarRouting_Discharge, "m3/s", MFInput, MFState, MFInitial)) == CMfailed) ||
-        ((_MDOutRouting_DischLevel3ID  = MFVarGetID ("__DischLevel3",      "m3/s", MFOutput, MFState, MFBoundary)) == CMfailed) ||
-        ((_MDOutRouting_RiverStorChgID = MFVarGetID (MDVarRouting_RiverStorageChg, "m3", MFOutput, MFFlux, MFBoundary)) == CMfailed) ||
-        ((_MDOutAux_RiverStorageID = MFVarGetID (MDVarRouting_RiverStorage, "m3", MFOutput, MFState, MFInitial)) == CMfailed) ||
+        ((_MDInRouting_DischargeID     = MFVarGetID (MDVarRouting_Discharge,       "m3/s", MFInput,  MFState, MFBoundary)) == CMfailed) ||
+        ((_MDOutRouting_DischLevel3ID  = MFVarGetID ("__DischLevel3",              "m3/s", MFOutput, MFState, MFBoundary)) == CMfailed) ||
+        ((_MDOutRouting_RiverStorChgID = MFVarGetID (MDVarRouting_RiverStorageChg, "m3",   MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
+        ((_MDOutAux_RiverStorageID     = MFVarGetID (MDVarRouting_RiverStorage,    "m3",   MFOutput, MFState, MFInitial))  == CMfailed) ||
         (MFModelAddFunction (_MDDischLevel3Accumulate) == CMfailed)) return CMfailed;
-	MFDefLeaving ("Discharge Accumulate");
+	MFDefLeaving ("Discharge Routing - Accumulate");
 	return (_MDOutRouting_DischLevel3ID);
 }

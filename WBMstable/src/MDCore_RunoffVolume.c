@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDRunoffVolume.c
+MDCore_RunoffVolume.c
 
 bfekete@gc.cuny.edu
 
@@ -27,27 +27,23 @@ static void _MDRunoffVolume (int itemID) {
 	MFVarSetFloat (_MDOutRunoffVolumeID, itemID, runoff);
 }
  
-enum { MDinput, MDcalculate };
-
 int MDCore_RunoffVolumeDef () {
-	int optID = MFUnset;
-	const char *optStr, *optName = MDVarCore_RunoffVolume;
-	const char *options [] = { MDInputStr, MDCalculateStr, (char *) NULL };
+	int optID = MFinput;
+	const char *optStr;
 
 	if (_MDOutRunoffVolumeID != MFUnset) return (_MDOutRunoffVolumeID);
 
 	MFDefEntering ("Runoff Volume");
-	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);
+	if ((optStr = MFOptionGet (MDVarCore_RunoffVolume)) != (char *) NULL) optID = CMoptLookup (MFsourceOptions, optStr, true);
 	switch (optID) {
-		case MDinput:
-			_MDOutRunoffVolumeID = MFVarGetID (MDVarCore_RunoffVolume, "m3/s", MFInput, MFState, MFBoundary);
-			break;
-		case MDcalculate:
+		default:       MFOptionMessage (MDVarCore_RunoffVolume, optStr, MFsourceOptions); return (CMfailed);
+		case MFhelp:   MFOptionMessage (MDVarCore_RunoffVolume, optStr, MFsourceOptions); 
+		case MFinput: _MDOutRunoffVolumeID = MFVarGetID (MDVarCore_RunoffVolume, "m3/s", MFInput, MFState, MFBoundary); break;
+		case MFcalculate:
 			if (((_MDInCore_RunoffID        = MDCore_RunoffDef()) == CMfailed) ||
                 ((_MDOutRunoffVolumeID = MFVarGetID (MDVarCore_RunoffVolume, "m3/s", MFOutput, MFState, MFBoundary)) == CMfailed) ||
                 (MFModelAddFunction (_MDRunoffVolume) == CMfailed)) return (CMfailed);
 			break;
-		default: MFOptionMessage (optName, optStr, options); return (CMfailed);
 	}
 	MFDefLeaving  ("Runoff Volume");
 	return (_MDOutRunoffVolumeID);

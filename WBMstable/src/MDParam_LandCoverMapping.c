@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDLandCover.c
+MDParam_LandCoverMapping.c
 
 dominik.wisser@unh.edu
 
@@ -92,30 +92,31 @@ static void _MDLCTEMVegToCover (int itemID) {
 	}
 }
 
-enum { MDinput, MDLCSAGEVeg, MDLCTEMVeg };
+enum { MDhelp, MDinput, MDLCSAGEVeg, MDLCTEMVeg };
 
 int MDParam_LandCoverMappingDef () {
-	int optID = MFUnset;
-	const char *optStr, *optName = MDVarCore_LandCoverWBM;
-	const char *options [] = { MDInputStr, "SAGEVeg", "TEMVeg",(char *) NULL };
+	int optID = MDinput;
+	const char *optStr;
+	const char *options [] = { MFhelpStr, MFinputStr, "SAGEVeg", "TEMVeg", (char *) NULL };
 
 	if (_MDOutCoverID != MFUnset) return (_MDOutCoverID);
 
 	MFDefEntering ("Landcover");
-	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options,optStr,true);
+	if ((optStr = MFOptionGet (MDVarCore_LandCoverWBM)) != (char *) NULL) optID = CMoptLookup (options,optStr,true);
 	switch (optID) {
+		default:      MFOptionMessage (MDVarCore_LandCoverWBM, optStr, options); return (CMfailed);
+		case MDhelp:  MFOptionMessage (MDVarCore_LandCoverWBM, optStr, options);
 		case MDinput: _MDOutCoverID = MFVarGetID (MDVarCore_LandCoverWBM, MFNoUnit, MFInput, MFState, MFBoundary); break;
 		case MDLCSAGEVeg:
 			  if (((_MDInSAGEVegID  = MFVarGetID (MDVarCore_LandCoverSAGE, MFNoUnit, MFInput, MFState, MFBoundary)) == CMfailed) ||
-                  ((_MDOutCoverID   = MFVarGetID (MDVarCore_LandCoverWBM, MFNoUnit, MFByte, MFState, MFBoundary)) == CMfailed) ||
+                  ((_MDOutCoverID   = MFVarGetID (MDVarCore_LandCoverWBM, MFNoUnit,  MFByte,  MFState, MFBoundary)) == CMfailed) ||
                   (MFModelAddFunction (_MDLCSAGEVegToCover) == CMfailed)) return (CMfailed);
 			break;
 		case MDLCTEMVeg:
 			  if (((_MDInTEMVegID   = MFVarGetID (MDVarCore_LandCoverTEM, MFNoUnit, MFInput, MFState, MFBoundary)) == CMfailed) ||
-                  ((_MDOutCoverID   = MFVarGetID (MDVarCore_LandCoverWBM, MFNoUnit, MFByte, MFState, MFBoundary)) == CMfailed) ||
+                  ((_MDOutCoverID   = MFVarGetID (MDVarCore_LandCoverWBM, MFNoUnit, MFByte,  MFState, MFBoundary)) == CMfailed) ||
                   (MFModelAddFunction (_MDLCTEMVegToCover) == CMfailed)) return (CMfailed);
 			break;
-		default: MFOptionMessage (optName, optStr, options); return (CMfailed);
 	}
 	MFDefLeaving ("Landcover");
 	return (_MDOutCoverID);

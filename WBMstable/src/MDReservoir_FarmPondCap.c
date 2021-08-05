@@ -15,8 +15,8 @@ dominik.wisser@unh.edu
 
 //Input
 static int _MDInIrrAreaID                    = MFUnset;
-static int _MDInRainSurfCore_RunoffID             = MFUnset;
-static int _MDInIrrigation_GrossDemandID             = MFUnset;
+static int _MDInRainSurfCore_RunoffID        = MFUnset;
+static int _MDInIrrigation_GrossDemandID     = MFUnset;
 
 //Output
 static int _MDOutRainSurfRunoffAccumulatedID = MFUnset;
@@ -54,36 +54,32 @@ static void _MDSmallReservoirCapacity (int itemID) {
  	MFVarSetFloat (_MDOutSmallResCapacityID,          itemID, smallResCapacity);
 }
 
-enum { MDnone, MDinput, MDcalculate };
 
 int MDReservoir_FarmPondCapacityDef () {
 
-	int  optID = MFUnset;
-	const char *optStr, *optName = MDVarReservoir_FarmPondSmallResCapacity;
-	const char *options [] = { MDNoneStr, MDInputStr, MDCalculateStr, (char *) NULL };
-
-	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);
-		
-	if ((optID == MDnone) || (_MDOutSmallResCapacityID != MFUnset)) return (_MDOutSmallResCapacityID);
+	int  optID = MFnone;
+	const char *optStr;
+	
+	if (_MDOutSmallResCapacityID != MFUnset) return (_MDOutSmallResCapacityID);
 
 	MFDefEntering("SmallReservoirCapacity");
-	if ((_MDInIrrigation_GrossDemandID = MDIrrigation_GrossDemandDef()) != MFUnset) {
+	if ((optStr = MFOptionGet (MDVarReservoir_FarmPondSmallResCapacity)) != (char *) NULL) optID = CMoptLookup (MFcalcOptions, optStr, true);
+	if ((_MDInIrrigation_GrossDemandID = MDIrrigation_GrossDemandDef ()) != MFUnset) {
 		switch (optID) {
-			case MDinput:
-			    if ((_MDOutSmallResCapacityID       = MFVarGetID (MDVarReservoir_FarmPondSmallResCapacity, "mm", MFInput, MFState, MFBoundary)) == CMfailed)
-			    	return (CMfailed);
-			    break;
-			case MDcalculate:
+			default:      MFOptionMessage (MDVarReservoir_FarmPondSmallResCapacity, optStr, MFcalcOptions); return (CMfailed);
+			case MFhelp:  MFOptionMessage (MDVarReservoir_FarmPondSmallResCapacity, optStr, MFcalcOptions);
+			case MFnone: break;
+			case MFinput: _MDOutSmallResCapacityID       = MFVarGetID (MDVarReservoir_FarmPondSmallResCapacity, "mm", MFInput, MFState, MFBoundary); break;
+			case MFcalculate:
 				if ((_MDInIrrigation_GrossDemandID == CMfailed) ||
-                    ((_MDInIrrAreaID                    = MDIrrigation_IrrAreaDef()) == CMfailed) ||
-                    ((_MDInRainSurfCore_RunoffID             = MFVarGetID (MDVarCore_RainSurfRunoff, "mm", MFInput, MFFlux, MFBoundary)) == CMfailed) ||
+                    ((_MDInIrrAreaID                    = MDIrrigation_IrrAreaDef ()) == CMfailed) ||
+                    ((_MDInRainSurfCore_RunoffID        = MFVarGetID (MDVarCore_RainSurfRunoff, "mm", MFInput, MFFlux, MFBoundary)) == CMfailed) ||
                     ((_MDOutRainSurfRunoffAccumulatedID = MFVarGetID ("__SurfaceROAccumulated",       "mm",  MFOutput, MFState, MFInitial))  == CMfailed) ||
                     ((_MDOutIrrGrossDemandAccumulatedID = MFVarGetID ("__GrossDemandAccumulated",     "mm",  MFOutput, MFState, MFInitial))  == CMfailed) ||
                     ((_MDInSmallResStorageFractionID    = MFVarGetID (MDVarReservoir_FarmPondStorageFrac, "-", MFInput, MFState, MFBoundary)) == CMfailed) ||
                     ((_MDOutSmallResCapacityID          = MFVarGetID (MDVarReservoir_FarmPondSmallResCapacity, "mm", MFOutput, MFState, MFInitial)) == CMfailed) ||
                     (MFModelAddFunction (_MDSmallReservoirCapacity) == CMfailed)) return (CMfailed);
 				break;
-			default: MFOptionMessage (optName, optStr, options); return (CMfailed);
 		}
 	}
 	MFDefLeaving("SmallReservoirCapacity");

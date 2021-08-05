@@ -14,8 +14,8 @@ bfekete@gc.cuny.edu
 #include <MD.h>
 
 // Output
-static int _MDOutRainInfiltrationID = MFUnset;
-static int _MDOutRainSurfCore_RunoffID   = MFUnset;
+static int _MDOutRainInfiltrationID    = MFUnset;
+static int _MDOutRainSurfCore_RunoffID = MFUnset;
 
 int MDCore_RainSurfRunoffDef () {
 

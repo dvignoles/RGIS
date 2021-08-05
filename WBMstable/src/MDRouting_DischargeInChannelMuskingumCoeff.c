@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDDichRouteMuskCoeff.c
+MDRouting_DichargeInChannelMuskingumCoeff.c
 
 bfekete@gc.cuny.edu
 
@@ -75,18 +75,20 @@ static void _MDDischRouteMuskingumCoeff (int itemID) {
 	MFVarSetFloat (_MDOutCourantID,     itemID, C);
 }
 
-enum { MDinput, MDstatic };
+enum { MDhelp, MDinput, MDstatic };
 
 int MDRouting_DischargeInChannelMuskingumCoeffDef () {
-	int  optID = MFUnset;
-	const char *optStr, *optName = MDOptRouting_Muskingum;
-	const char *options [] = { MDInputStr, "static", (char *) NULL };
+	int  optID = MDinput;
+	const char *optStr;
+	const char *options [] = { MFhelpStr, MFinputStr, "static", (char *) NULL };
 
 	if (_MDOutMuskingumC0ID != MFUnset) return (_MDOutMuskingumC0ID);
 
 	MFDefEntering ("Muskingum Coefficients");
-	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);
+	if ((optStr = MFOptionGet (MDOptRouting_Muskingum)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);
 	switch (optID) {
+		default:      MFOptionMessage (MDOptRouting_Muskingum, optStr, options); return (CMfailed);
+		case MDhelp:  MFOptionMessage (MDOptRouting_Muskingum, optStr, options);
 		case MDinput:
 			if (((_MDOutMuskingumC0ID = MFVarGetID (MDVarRouting_MuskingumC0, MFNoUnit, MFInput, MFState, MFBoundary)) == CMfailed) ||
                 ((_MDOutMuskingumC1ID = MFVarGetID (MDVarRouting_MuskingumC1, MFNoUnit, MFInput, MFState, MFBoundary)) == CMfailed) ||
@@ -95,17 +97,16 @@ int MDRouting_DischargeInChannelMuskingumCoeffDef () {
 			break;
 		case MDstatic:
 			if (((_MDInRiverShapeExponentID  = MDRouting_RiverShapeExponentDef()) == CMfailed) ||
-                	    ((_MDInRiverWidthMeanID      = MFVarGetID (MDVarRouting_RiverWidthMean,    "m",      MFInput,  MFState, MFBoundary)) == CMfailed) ||
-                	    ((_MDInRiverAvgDepthMeanID   = MFVarGetID (MDVarRouting_RiverAvgDepthMean, "m",      MFInput,  MFState, MFBoundary)) == CMfailed) ||
-                	    ((_MDInRiverVelocityMeanID   = MFVarGetID (MDVarRouting_RiverVelocityMean, "m/s",    MFInput,  MFState, MFBoundary)) == CMfailed) ||
-                	    ((_MDInRiverSlopeID          = MFVarGetID (MDVarRouting_RiverSlope,        "m/km",   MFInput,  MFState, MFBoundary)) == CMfailed) ||
-                	    ((_MDOutMuskingumC0ID        = MFVarGetID (MDVarRouting_MuskingumC0,       MFNoUnit, MFOutput, MFState, MFBoundary)) == CMfailed) ||
-                	    ((_MDOutMuskingumC1ID        = MFVarGetID (MDVarRouting_MuskingumC1,       MFNoUnit, MFOutput, MFState, MFBoundary)) == CMfailed) ||
-                	    ((_MDOutMuskingumC2ID        = MFVarGetID (MDVarRouting_MuskingumC2,       MFNoUnit, MFOutput, MFState, MFBoundary)) == CMfailed) ||
-                	    ((_MDOutCourantID            = MFVarGetID ("Courant",                      MFNoUnit, MFOutput, MFState, MFBoundary)) == CMfailed) ||
-                	    (MFModelAddFunction (_MDDischRouteMuskingumCoeff) == CMfailed)) return (CMfailed);
+                ((_MDInRiverWidthMeanID      = MFVarGetID (MDVarRouting_RiverWidthMean,    "m",      MFInput,  MFState, MFBoundary)) == CMfailed) ||
+                ((_MDInRiverAvgDepthMeanID   = MFVarGetID (MDVarRouting_RiverAvgDepthMean, "m",      MFInput,  MFState, MFBoundary)) == CMfailed) ||
+                ((_MDInRiverVelocityMeanID   = MFVarGetID (MDVarRouting_RiverVelocityMean, "m/s",    MFInput,  MFState, MFBoundary)) == CMfailed) ||
+                ((_MDInRiverSlopeID          = MFVarGetID (MDVarRouting_RiverSlope,        "m/km",   MFInput,  MFState, MFBoundary)) == CMfailed) ||
+                ((_MDOutMuskingumC0ID        = MFVarGetID (MDVarRouting_MuskingumC0,       MFNoUnit, MFOutput, MFState, MFBoundary)) == CMfailed) ||
+                ((_MDOutMuskingumC1ID        = MFVarGetID (MDVarRouting_MuskingumC1,       MFNoUnit, MFOutput, MFState, MFBoundary)) == CMfailed) ||
+                ((_MDOutMuskingumC2ID        = MFVarGetID (MDVarRouting_MuskingumC2,       MFNoUnit, MFOutput, MFState, MFBoundary)) == CMfailed) ||
+                ((_MDOutCourantID            = MFVarGetID ("Courant",                      MFNoUnit, MFOutput, MFState, MFBoundary)) == CMfailed) ||
+                (MFModelAddFunction (_MDDischRouteMuskingumCoeff) == CMfailed)) return (CMfailed);
 			break;
-		default: MFOptionMessage (optName, optStr, options); return (CMfailed);
 	}
 	MFDefLeaving ("Muskingum Coefficients");
 	return (_MDOutMuskingumC0ID);

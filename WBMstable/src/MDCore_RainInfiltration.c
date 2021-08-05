@@ -17,7 +17,7 @@ bfekete@gc.cuny.edu
 // Input
 static int _MDInRainWaterSurplusID       = MFUnset;
 // Output
-static int _MDOutRainSurfCore_RunoffID        = MFUnset;
+static int _MDOutRainSurfCore_RunoffID   = MFUnset;
 static int _MDOutRainInfiltrationID      = MFUnset;
 static int _MDInRainInfiltrationID       = MFUnset;
 
@@ -41,9 +41,10 @@ int MDCore_RainInfiltrationDef () {
 	float par;
 
 	if (_MDOutRainInfiltrationID != MFUnset) return (_MDOutRainInfiltrationID);
-
-	if (((optStr = MFOptionGet (MDParInfiltrationFrac))  != (char *) NULL) && (sscanf (optStr,"%f",&par) == 1)) _MDInfiltrationFrac = par;
-	
+	if ((optStr = MFOptionGet (MDParInfiltrationFrac))  != (char *) NULL) {
+		if (strcmp(optStr,MFhelpStr) == 0) CMmsgPrint (CMmsgInfo,"%s = %f", MDParInfiltrationFrac, _MDInfiltrationFrac);
+		_MDInfiltrationFrac = sscanf (optStr,"%f",&par) == 1 ? par : _MDInfiltrationFrac;
+	}
 	MFDefEntering ("Rainfed Infiltration");
 	if (((_MDInRainWaterSurplusID = MDCore_RainWaterSurplusDef()) == CMfailed) ||
         ((_MDOutRainSurfCore_RunoffID   = MFVarGetID (MDVarCore_RainSurfRunoff, "mm", MFOutput, MFFlux, MFBoundary)) == CMfailed) ||

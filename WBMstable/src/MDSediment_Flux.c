@@ -4,7 +4,8 @@ where Q is discharge [km3/yr] (calculated by WBM), A is the contributing area [k
 R is the maximum Relief [km], T is average temperature [c] and B is for geological 
 and human factors.
 
-MDSedimentFlux.c
+MDSediment_Flux.c
+
 WBMsedNEWS1.2 - reservoir trapping Te was changed to exclude the small res calculation 
 module (as a new larger reservoir dataset is now in use) and reduce the minimum threshold
 from >0.1 to >0.0
@@ -298,8 +299,6 @@ yearlyRand = 0.00001;// Eliminate Yearly randomness!!!
 	MFVarSetFloat (_MDOutQsYieldID, itemID, QsYield); 
 }
 
-enum { MDinput, MDcalculate, MDcorrected };
-
 int MDSediment_FluxDef() {
 	
 	MFDefEntering ("SedimentFlux");
@@ -307,7 +306,7 @@ int MDSediment_FluxDef() {
 	if (((_MDInDischargeID 		     = MDRouting_DischargeDef ())          == CMfailed) ||
 		((_MDInSmallResCapacityID    = MDReservoir_FarmPondCapacityDef ()) == CMfailed) ||
 	    ((_MDInDischMeanID 		     = MDAux_MeanDiscargehDef ())          == CMfailed) ||
-	    ((_MDInAirTempID             = MFVarGetID (MDVarCommon_AirTemperature,              "degC",     MFInput,  MFState, MFBoundary)) == CMfailed) ||
+	    ((_MDInAirTempID             = MDCommon_AirTemperatureDef ())      == CMfailed) ||
 	    ((_MDInAirTempAcc_timeID     = MFVarGetID (MDVarSediment_AirTemperatureAcc_time,    "degC",     MFOutput, MFState, MFInitial))  == CMfailed) ||
 	    ((_MDInTimeStepsID           = MFVarGetID (MDVarSediment_TimeSteps,                 MFNoUnit,   MFOutput, MFState, MFInitial))  == CMfailed) ||
 	    ((_MDInReliefID              = MFVarGetID (MDVarSediment_Relief,                    "m",        MFInput,  MFState, MFBoundary)) == CMfailed) ||

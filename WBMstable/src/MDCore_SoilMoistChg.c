@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDSMoistChg.c
+MDCore_SMoistChg.c
 
 bfekete@gc.cuny.edu
 
@@ -49,15 +49,15 @@ int MDCore_SoilMoistChgDef () {
 
 	if (((ret = MDIrrigation_GrossDemandDef()) != MFUnset) &&
         ((ret == CMfailed) ||
-         ((_MDInIrrSoilMoistID     = MDIrrigation_SoilMoistDef()) == CMfailed) ||
-         ((_MDInIrrSoilMoistChgID  = MDIrrigation_SoilMoistChgDef()) == CMfailed)))
+         ((_MDInIrrSoilMoistID     = MDIrrigation_SoilMoistDef ())    == CMfailed) ||
+         ((_MDInIrrSoilMoistChgID  = MDIrrigation_SoilMoistChgDef ()) == CMfailed)))
 	     return (CMfailed);
-	if (((_MDInSoilAvailWaterCapID = MDCore_SoilAvailWaterCapDef()) == CMfailed) ||
-        ((_MDInRainSoilMoistID     = MFVarGetID (MDVarCore_RainSoilMoisture, "mm", MFInput, MFState, MFInitial)) == CMfailed) ||
-        ((_MDInRainSoilMoistChgID  = MFVarGetID (MDVarCore_RainSoilMoistChange, "mm", MFInput, MFState, MFBoundary)) == CMfailed) ||
-        ((_MDOutSoilMoistID        = MFVarGetID (MDVarCore_SoilMoisture, "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
-        ((_MDOutSoilMoistChgID     = MFVarGetID (MDVarCore_SoilMoistChange, "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
-        ((_MDOutRelSoilMoistID     = MFVarGetID (MDVarCore_RelSoilMoisture, "mm", MFOutput, MFState, MFInitial)) == CMfailed) ||
+	if (((_MDInSoilAvailWaterCapID = MDCore_SoilAvailWaterCapDef())   == CMfailed) ||
+        ((_MDInRainSoilMoistID     = MFVarGetID (MDVarCore_RainSoilMoisture,    "mm", MFInput,  MFState, MFInitial))  == CMfailed) ||
+        ((_MDInRainSoilMoistChgID  = MFVarGetID (MDVarCore_RainSoilMoistChange, "mm", MFInput,  MFState, MFBoundary)) == CMfailed) ||
+        ((_MDOutSoilMoistID        = MFVarGetID (MDVarCore_SoilMoisture,        "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
+        ((_MDOutSoilMoistChgID     = MFVarGetID (MDVarCore_SoilMoistChange,     "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
+        ((_MDOutRelSoilMoistID     = MFVarGetID (MDVarCore_RelSoilMoisture,     "mm", MFOutput, MFState, MFInitial))  == CMfailed) ||
         (MFModelAddFunction (_MDSoilMoistChg) == CMfailed)) return (CMfailed);
 	MFDefLeaving ("Soil Moisture");
 	return (_MDOutSoilMoistChgID);

@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDTempRiver.c
+MDTP2M_TempRiver.c
 
 wil.wollheim@unh.edu
 

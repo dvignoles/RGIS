@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDIrrigation.c
+MDIrrigation_IrrArea.c
 
 bfekete@gc.cuny.edu
 
@@ -46,32 +46,33 @@ static void _MDIrrigatedAreaIWMI (int itemID) {
 	MFVarSetFloat(_MDOutIrrigatedAreaFracID, itemID, irrAreaFrac);
 }
 
-enum { FAO, IWMI};
+enum { MDhelp, MDfao, MDiwmi };
 
 int MDIrrigation_IrrAreaDef () {
-	const char *mapOptions [] = { "FAO", "IWMI", (char *) NULL };
-	int optionID = FAO;
+	int optID = MDfao, irrOptID = MFnone;
 	const char *optStr;
+	const char *options [] = { MFhelpStr, "FAO", "IWMI", (char *) NULL };
 
 	if (_MDOutIrrigatedAreaFracID != MFUnset) return (_MDOutIrrigatedAreaFracID);
 
-	if (((optStr = MFOptionGet (MDOptIrrigation_AreaMap)) != (char *) NULL) && ((optionID = CMoptLookup (mapOptions, optStr, true)) == CMfailed)) {
-		CMmsgPrint (CMmsgUsrError, "Type of Irr Area not specifed! Options = 'FAO' or 'IWMI'\n");
-		return CMfailed;
-	}
-	MFDefEntering ("Irrigated Area");
+	if ((optStr = MFOptionGet (MDOptConfig_Irrigation)) != (char *) NULL) irrOptID = CMoptLookup (MFcalcOptions,optStr,true);
+	if (irrOptID != MFcalculate) return (_MDOutIrrigatedAreaFracID);
 
-	switch (optionID) {
-        default:
-        case FAO:
+	MFDefEntering ("Irrigated Area");
+	if ((optStr = MFOptionGet (MDOptIrrigation_AreaMap)) != (char *) NULL) optID = CMoptLookup (options, optStr, true);
+
+	switch (optID) {
+        default:      MFOptionMessage (MDOptIrrigation_AreaMap, optStr, options); return (CMfailed);
+		case MDhelp:  MFOptionMessage (MDOptIrrigation_AreaMap, optStr, options);
+        case MDfao:
             if ((_MDOutIrrigatedAreaFracID = MFVarGetID (MDVarIrrigation_AreaFraction, MFNoUnit, MFInput, MFState, MFBoundary)) == CMfailed) return (CMfailed);
             break;
-		case IWMI:
-		    if (((_MDOutIrrigatedAreaFracID    = MFVarGetID (MDVarIrrigation_AreaFraction, MFNoUnit, MFOutput, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDInIrrAreaFracSeason1ID = MFVarGetID (MDVarIrrigation_AreaFractionSeason1, MFNoUnit, MFInput, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDInIrrAreaFracSeason2ID = MFVarGetID (MDVarIrrigation_AreaFractionSeason2, MFNoUnit, MFInput, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDInGrowingSeason1ID     = MFVarGetID (MDVarIrrigation_GrowingSeason1Start, "DoY", MFInput, MFState, MFBoundary)) == CMfailed) ||
-                ((_MDInGrowingSeason2ID     = MFVarGetID (MDVarIrrigation_GrowingSeason2Start, "DoY", MFInput, MFState, MFBoundary)) == CMfailed) ||
+		case MDiwmi:
+		    if (((_MDInIrrAreaFracSeason1ID = MFVarGetID (MDVarIrrigation_AreaFractionSeason1, MFNoUnit, MFInput,  MFState, MFBoundary)) == CMfailed) ||
+                ((_MDInIrrAreaFracSeason2ID = MFVarGetID (MDVarIrrigation_AreaFractionSeason2, MFNoUnit, MFInput,  MFState, MFBoundary)) == CMfailed) ||
+                ((_MDInGrowingSeason1ID     = MFVarGetID (MDVarIrrigation_GrowingSeason1Start, "DoY",    MFInput,  MFState, MFBoundary)) == CMfailed) ||
+                ((_MDInGrowingSeason2ID     = MFVarGetID (MDVarIrrigation_GrowingSeason2Start, "DoY",    MFInput,  MFState, MFBoundary)) == CMfailed) ||
+				((_MDOutIrrigatedAreaFracID = MFVarGetID (MDVarIrrigation_AreaFraction,        MFNoUnit, MFOutput, MFState, MFBoundary)) == CMfailed) ||
                 (MFModelAddFunction (_MDIrrigatedAreaIWMI) == CMfailed)) return (CMfailed);
 		    break;
 	}

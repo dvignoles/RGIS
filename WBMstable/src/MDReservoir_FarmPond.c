@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDSmallReservoirs.c
+MDReservoir_FarmPond.c
 
 dominik.wisser@unh.edu
 
@@ -15,19 +15,19 @@ dominik.wisser@unh.edu
 #include <MD.h>
 
 //Input
-static int _MDInIrrigation_AreaFracID         = MFUnset;
-static int _MDInRainSurfCore_RunoffID      = MFUnset;
-static int _MDInIrrigation_GrossDemandID      = MFUnset;
-static int _MDInSmallResCapacityID    = MFUnset;
-static int _MDInPotEvapotransID       = MFUnset;
+static int _MDInIrrigation_AreaFracID    = MFUnset;
+static int _MDInRainSurfCore_RunoffID    = MFUnset;
+static int _MDInIrrigation_GrossDemandID = MFUnset;
+static int _MDInSmallResCapacityID       = MFUnset;
+static int _MDInPotEvapotransID          = MFUnset;
 
 //Output
-static int _MDOutSmallResReleaseID    = MFUnset;
-static int _MDOutSmallResStorageID    = MFUnset;
-static int _MDOutSmallResStorageChgID = MFUnset;
-static int _MDOutSmallResUptakeID     = MFUnset;
-static int _MDInSmallResStorageFracID = MFUnset;
-static int _MDOutSmallResEvapoID      = MFUnset;
+static int _MDOutSmallResReleaseID       = MFUnset;
+static int _MDOutSmallResStorageID       = MFUnset;
+static int _MDOutSmallResStorageChgID    = MFUnset;
+static int _MDOutSmallResUptakeID        = MFUnset;
+static int _MDInSmallResStorageFracID    = MFUnset;
+static int _MDOutSmallResEvapoID         = MFUnset;
 
 static void _MDSmallReservoirRelease (int itemID) {
 // Input
@@ -104,7 +104,7 @@ static void _MDSmallReservoirRelease (int itemID) {
 			printf("rest %f WaterBalance S Reser =%f  IN %f surf %f rel %f Dstor %f itemID %i\n",remainingSurfaceRO,in-out,in, surfRunoff, smallResRelease, smallResStorageChg,itemID);
 		}
 
-	} //no irrigation
+	} // no irrigation
 	else {
 		MFVarSetFloat (_MDOutSmallResUptakeID,     itemID, 0.0);
 		MFVarSetFloat (_MDOutSmallResReleaseID,    itemID, 0.0);
@@ -117,24 +117,24 @@ static void _MDSmallReservoirRelease (int itemID) {
 int MDReservoir_FarmPondReleaseDef () {
 
 	if (_MDOutSmallResReleaseID != MFUnset) return (_MDOutSmallResReleaseID);
-
-	if ((_MDInIrrigation_GrossDemandID   = MDIrrigation_GrossDemandDef()) == CMfailed) return (CMfailed);
+	if ((_MDInIrrigation_GrossDemandID   = MDIrrigation_GrossDemandDef ()) == CMfailed) return (CMfailed);
 	if  (_MDInIrrigation_GrossDemandID   == MFUnset) return (MFUnset);
-	if ((_MDInSmallResCapacityID = MDReservoir_FarmPondCapacityDef()) == CMfailed) return (CMfailed);
-	if  (_MDInSmallResCapacityID == MFUnset) return (MFUnset);
 
 	MFDefEntering("Small Reservoirs");
-    if (((_MDInRainSurfCore_RunoffID      = MDCore_RainSurfRunoffDef()) == CMfailed) ||
-        ((_MDInIrrigation_AreaFracID         = MDIrrigation_IrrAreaDef()) == CMfailed) ||
-        ((_MDInPotEvapotransID       = MDIrrigation_ReferenceETDef()) == CMfailed) ||
-        ((_MDInSmallResStorageFracID = MFVarGetID (MDVarReservoir_FarmPondStorageFrac, "-", MFInput, MFState, MFBoundary)) == CMfailed) ||
-        ((_MDOutSmallResUptakeID     = MFVarGetID (MDVarReservoir_FarmPontUptake, "mm", MFOutput, MFFlux, MFBoundary)) == CMfailed) ||
-        ((_MDOutSmallResReleaseID    = MFVarGetID (MDVarReservoir_FarmPondRelease, "mm", MFOutput, MFFlux, MFBoundary)) == CMfailed) ||
-        ((_MDOutSmallResStorageID    = MFVarGetID (MDVarReservoir_FarmPondStorage, "mm", MFOutput, MFState, MFInitial)) == CMfailed) ||
-        ((_MDOutSmallResStorageID    = MFVarGetID (MDVarReservoir_FarmPondStorage, "mm", MFOutput, MFState, MFInitial)) == CMfailed) ||
-        ((_MDOutSmallResEvapoID      = MFVarGetID (MDVarReservoir_FarmPondEvaporation, "mm", MFOutput, MFFlux, MFBoundary)) == CMfailed) ||
-        ((_MDOutSmallResStorageChgID = MFVarGetID (MDVarReservoir_FarmPondStorageChange, "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
+	if ((_MDInSmallResCapacityID = MDReservoir_FarmPondCapacityDef ()) == CMfailed) return (CMfailed);
+	if  (_MDInSmallResCapacityID != MFUnset) {
+    if (((_MDInRainSurfCore_RunoffID = MDCore_RainSurfRunoffDef ())    == CMfailed) ||
+        ((_MDInIrrigation_AreaFracID = MDIrrigation_IrrAreaDef ())     == CMfailed) ||
+        ((_MDInPotEvapotransID       = MDIrrigation_ReferenceETDef ()) == CMfailed) ||
+        ((_MDInSmallResStorageFracID = MFVarGetID (MDVarReservoir_FarmPondStorageFrac,  MFNoUnit, MFInput,  MFState, MFBoundary)) == CMfailed) ||
+        ((_MDOutSmallResUptakeID     = MFVarGetID (MDVarReservoir_FarmPontUptake,        "mm",    MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
+        ((_MDOutSmallResReleaseID    = MFVarGetID (MDVarReservoir_FarmPondRelease,       "mm",    MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
+        ((_MDOutSmallResStorageID    = MFVarGetID (MDVarReservoir_FarmPondStorage,       "mm",    MFOutput, MFState, MFInitial))  == CMfailed) ||
+        ((_MDOutSmallResStorageID    = MFVarGetID (MDVarReservoir_FarmPondStorage,       "mm",    MFOutput, MFState, MFInitial))  == CMfailed) ||
+        ((_MDOutSmallResEvapoID      = MFVarGetID (MDVarReservoir_FarmPondEvaporation,   "mm",    MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
+        ((_MDOutSmallResStorageChgID = MFVarGetID (MDVarReservoir_FarmPondStorageChange, "mm",    MFOutput, MFState, MFBoundary)) == CMfailed) ||
         ((MFModelAddFunction (_MDSmallReservoirRelease) == CMfailed))) return (CMfailed);
+	}
 	MFDefLeaving("Small Reservoirs");
 	return (_MDOutSmallResReleaseID);
 }

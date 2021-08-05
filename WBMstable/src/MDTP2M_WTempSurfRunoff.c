@@ -4,11 +4,12 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDTempSurfRunoff.c
+MDTP2M_TempSurfRunoff.c
 
 wil.wollheim@unh.edu
 
 EDITED: amiara@ccny.cuny.edu Sep 2016
+EDITED: ariel.miara@nrel.gov Feb11 2021
 
 This module calculates the temperature of surface runoff and infiltration to groundwater
 Irrigation inputs are not accounted here.
@@ -35,8 +36,11 @@ static void _MDWTempSurfRunoff (int itemID) {
     wet_b_temp         = MFVarGetFloat (_MDInWetBulbTempID,     itemID, 0.0);
     airT               = MFVarGetFloat (_MDInCommon_AirTemperatureID,         itemID, 0.0);
 
-    SurfWatT = wet_b_temp; // CHANGED TO EQUAL WET BULB --> Feb 22 2019 MIARA
-    SurfWatT = (SurfWatT >= airT) ? wet_b_temp : SurfWatT;
+//    SurfWatT = wet_b_temp; // CHANGED TO EQUAL WET BULB --> Feb 22 2019 MIARA
+//    SurfWatT = (SurfWatT >= airT) ? wet_b_temp : SurfWatT;
+
+// NEW METHOD: https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2018WR023250.
+SurfWatT = MDMaximum(airT - 1.5, 0);
 
     MFVarSetFloat (_MDOutWTempSurfROID, itemID, SurfWatT);
 }
@@ -46,13 +50,11 @@ int MDTP2M_WTempSurfRunoffDef () {
 	if (_MDOutWTempSurfROID != MFUnset) return (_MDOutWTempSurfROID);
 
 	MFDefEntering ("Surface runoff temperature");
-
-	if (((_MDInSnowMeltID     = MDCore_SnowPackMeltDef()) == CMfailed) ||
-        ((_MDInWetBulbTempID  = MDCommon_WetBulbTempDef()) == CMfailed) ||
-        ((_MDInCommon_AirTemperatureID      = MFVarGetID (MDVarCommon_AirTemperature, "degC", MFInput,  MFState, MFBoundary)) == CMfailed) ||
+	if (((_MDInSnowMeltID              = MDCore_SnowPackMeltDef ())     == CMfailed) ||
+        ((_MDInWetBulbTempID           = MDCommon_WetBulbTempDef ())    == CMfailed) ||
+        ((_MDInCommon_AirTemperatureID = MDCommon_AirTemperatureDef ()) == CMfailed) ||
         ((_MDOutWTempSurfROID = MFVarGetID (MDVarTP2M_WTempSurfRunoff,  "degC", MFOutput, MFState, MFBoundary)) == CMfailed) ||
         (MFModelAddFunction (_MDWTempSurfRunoff) == CMfailed)) return (CMfailed);
-
 	MFDefLeaving ("Surface runoff temperature");
 	return (_MDOutWTempSurfROID);
 }

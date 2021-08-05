@@ -4,12 +4,13 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDSPackChg.c
+MDCore_SPackChg.c
 
 bfekete@gc.cuny.edu
 
 *******************************************************************************/
 
+#include <string.h>
 #include <math.h>
 #include <MF.h>
 #include <MD.h>
@@ -93,26 +94,28 @@ static void _MDSPackChg (int itemID) {
 }
 
 int MDCore_SnowPackChgDef () {
-
-	if (_MDOutSPackChgID != MFUnset) return (_MDOutSPackChgID);
-	MFDefEntering ("Snow Pack Change");
 	const char *optStr;
 	float par;
 
-	if (((optStr = MFOptionGet (MDParSnowMeltThreshold))  != (char *) NULL) && (sscanf (optStr,"%f",&par) == 1))
-		_MDSnowMeltThreshold = par;
-	
-	if (((optStr = MFOptionGet (MDParSnowFallThreshold)) != (char *) NULL) && (sscanf (optStr, "%f", &par) == 1))
-		_MDFallThreshold= par;
+	if (_MDOutSPackChgID != MFUnset) return (_MDOutSPackChgID);
 
-	if (((_MDInCommon_PrecipID       = MDCommon_PrecipitationDef()) == CMfailed) ||
-        ((_MDInCommon_AtMeanID       = MFVarGetID (MDVarCommon_AirTemperature, "degC", MFInput, MFState, MFBoundary)) == CMfailed) ||
-        ((_MDOutSnowFallID    = MFVarGetID (MDVarCommon_SnowFall, "mm", MFOutput, MFFlux, MFBoundary)) == CMfailed) ||
-        ((_MDOutSnowMeltID    = MFVarGetID (MDVarCore_SnowMelt, "mm", MFOutput, MFFlux, MFBoundary)) == CMfailed) ||
-        ((_MDOutSnowDensityID = MFVarGetID (MDVarCommon_SnowDensity, "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
-        ((_MDOutSnowDepthID   = MFVarGetID (MDVarCommon_SnowDepth, "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
-        ((_MDOutSnowPackID    = MFVarGetID (MDVarCore_SnowPack, "mm", MFOutput, MFState, MFInitial)) == CMfailed) ||
-        ((_MDOutSPackChgID    = MFVarGetID (MDVarCore_SnowPackChange, "mm", MFOutput, MFFlux, MFBoundary)) == CMfailed) ||
+	MFDefEntering ("Snow Pack Change");
+	if ((optStr = MFOptionGet (MDParSnowMeltThreshold))  != (char *) NULL) {
+		if (strcmp(optStr,MFhelpStr) == 0) CMmsgPrint (CMmsgInfo,"%s = %f", MDParSnowMeltThreshold, _MDSnowMeltThreshold);
+		_MDSnowMeltThreshold = sscanf (optStr,"%f",&par) == 1 ? par : _MDSnowMeltThreshold;
+	}
+	if ((optStr = MFOptionGet (MDParSnowFallThreshold))  != (char *) NULL) {
+		if (strcmp(optStr,MFhelpStr) == 0) CMmsgPrint (CMmsgInfo,"%s = %f", MDParSnowFallThreshold, _MDFallThreshold);
+		_MDFallThreshold = sscanf (optStr,"%f",&par) == 1 ? par : _MDFallThreshold;
+	}
+	if (((_MDInCommon_PrecipID       = MDCommon_PrecipitationDef ())  == CMfailed) ||
+        ((_MDInCommon_AtMeanID       = MDCommon_AirTemperatureDef ()) == CMfailed) ||
+        ((_MDOutSnowFallID    = MFVarGetID (MDVarCommon_SnowFall,     "mm", MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
+        ((_MDOutSnowMeltID    = MFVarGetID (MDVarCore_SnowMelt,       "mm", MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
+        ((_MDOutSnowDensityID = MFVarGetID (MDVarCommon_SnowDensity,  "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
+        ((_MDOutSnowDepthID   = MFVarGetID (MDVarCommon_SnowDepth,    "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
+        ((_MDOutSnowPackID    = MFVarGetID (MDVarCore_SnowPack,       "mm", MFOutput, MFState, MFInitial))  == CMfailed) ||
+        ((_MDOutSPackChgID    = MFVarGetID (MDVarCore_SnowPackChange, "mm", MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
         (MFModelAddFunction (_MDSPackChg) == CMfailed)) return (CMfailed);
 	MFDefLeaving ("Snow Pack Change");
 	return (_MDOutSPackChgID);
@@ -122,7 +125,7 @@ int MDCore_SnowPackMeltDef () {
 
 	if (_MDOutSnowMeltID != MFUnset) return (_MDOutSnowMeltID);
 
-	if ((MDCore_SnowPackChgDef() == CMfailed) ||
+	if ((MDCore_SnowPackChgDef () == CMfailed) ||
         ((_MDOutSnowMeltID   = MFVarGetID (MDVarCore_SnowMelt, "mm", MFInput, MFFlux, MFBoundary)) == CMfailed))
 		return (CMfailed);
 	return (_MDOutSnowMeltID);

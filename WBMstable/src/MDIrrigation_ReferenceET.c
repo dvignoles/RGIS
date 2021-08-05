@@ -15,25 +15,25 @@ dominink.wisser@unh.edu
 
 static int _MDOutIrrRefEvapotransID = MFUnset;
 
-enum { MDinput, MDhamon, MDfao };
+enum { MDhelp, MDinput, MDhamon, MDfao };
 
 int MDIrrigation_ReferenceETDef () {
-	int optID = MFUnset;
-	const char *optStr, *optName = MDOptIrrigation_ReferenceET;
-	const char *options [] = { MDInputStr, "Hamon", "FAO", (char *) NULL };
+	int optID = MDinput;
+	const char *optStr;
+	const char *options [] = { MFhelpStr, MFinputStr, "Hamon", "FAO", (char *) NULL };
 
 	if (_MDOutIrrRefEvapotransID != MFUnset) return (_MDOutIrrRefEvapotransID);
 
-	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options,optStr,true);
-
 	MFDefEntering ("Irrigation Reference Evapotranspiration");
+	if ((optStr = MFOptionGet (MDOptIrrigation_ReferenceET)) != (char *) NULL) optID = CMoptLookup (options,optStr,true);
 	if (MDCore_SnowPackChgDef() == CMfailed) return (CMfailed);
 
 	switch (optID) {
+		default:      MFOptionMessage (MDOptIrrigation_ReferenceET, optStr, options); return (CMfailed);
+		case MDhelp:  MFOptionMessage (MDOptIrrigation_ReferenceET, optStr, options);
 		case MDinput: _MDOutIrrRefEvapotransID = MFVarGetID (MDVarIrrigation_RefEvapotrans, "mm", MFInput, MFFlux, false); break;
 		case MDhamon: _MDOutIrrRefEvapotransID = MDIrrigation_Reference_ETHamonDef(); break;
 		case MDfao:   _MDOutIrrRefEvapotransID = MDIrrigation_ReferenceETFAODef(); break;
-		default: MFOptionMessage (optName, optStr, options); return (CMfailed);
 	}
 	MFDefLeaving ("Irrigation Reference Evapotranspiration");
 	return (_MDOutIrrRefEvapotransID);

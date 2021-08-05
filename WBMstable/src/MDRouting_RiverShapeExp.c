@@ -4,7 +4,7 @@ GHAAS Water Balance/Transport Model
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-MDRiverShapeExp.c
+MDRouting_RiverShapeExp.c
 
 bfekete@gc.cuny.edu
 
@@ -66,19 +66,20 @@ static void _MDRiverShapeExponent (int itemID) {
 	MFVarSetFloat (_MDOutRiverShapeExponentID,     itemID, 2.0);
 }
 
-enum { MDinput, MDindependent, MDdependent };
+enum { MDhelp, MDinput, MDindependent, MDdependent };
 
 int MDRouting_RiverShapeExponentDef () {
-	int  optID = MFUnset;
-	const char *optStr, *optName = MDOptRouting_Riverbed;
-	const char *options [] = { MDInputStr, "slope-independent", "slope-dependent", (char *) NULL };
+	int  optID = MDinput;
+	const char *optStr;
+	const char *options [] = { MFhelpStr, MFinputStr, "slope-independent", "slope-dependent", (char *) NULL };
 
 	if (_MDOutRiverShapeExponentID != MFUnset) return (_MDOutRiverShapeExponentID);
 
 	MFDefEntering ("River Shape Exponent");
-	if ((optStr = MFOptionGet (optName)) != (char *) NULL) optID = CMoptLookup (options,optStr,true);
-
+	if ((optStr = MFOptionGet (MDOptRouting_Riverbed)) != (char *) NULL) optID = CMoptLookup (options,optStr,true);
 	switch (optID) {
+		default:      MFOptionMessage (MDOptRouting_Riverbed, optStr, options); return (CMfailed);
+		case MDhelp:  MFOptionMessage (MDOptRouting_Riverbed, optStr, options);
 		case MDinput:
 			if (((_MDOutRiverAvgDepthMeanID  = MFVarGetID (MDVarRouting_RiverAvgDepthMean, "m", MFInput, MFState, MFBoundary)) == CMfailed) ||
                 ((_MDOutRiverWidthMeanID     = MFVarGetID (MDVarRouting_RiverWidthMean, "m", MFInput, MFState, MFBoundary)) == CMfailed) ||
@@ -97,7 +98,6 @@ int MDRouting_RiverShapeExponentDef () {
                 ((_MDOutRiverShapeExponentID = MFVarGetID (MDVarRouting_RiverShapeExponent, MFNoUnit, MFOutput, MFState, MFBoundary)) == CMfailed) ||
                 (MFModelAddFunction (_MDRiverShapeExponent) == CMfailed)) return (CMfailed);
 			break;
-		default: MFOptionMessage (optName, optStr, options); return (CMfailed);
 	}
 	MFDefLeaving ("River Shape Exponent");
 	return (_MDOutRiverShapeExponentID);
