@@ -187,7 +187,7 @@ MFMapper_t *MFMapperRead (FILE *);
 int  MFMapperWrite (MFMapper_t *, FILE *);
 void MFMapperFree  (MFMapper_t *);
 
-int  MFDateCompare (const char *, const char *);
+int   MFDateCompare (const char *, const char *);
 char *MFDateGetCurrent ();
 bool  MFDateSetCurrent (char *);
 char *MFDateGetNext ();
