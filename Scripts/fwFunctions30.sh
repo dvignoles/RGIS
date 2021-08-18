@@ -71,14 +71,7 @@ function FwArguments () {
 		case ${1} in
 			(-C|--cleanup)
 				shift
-				case ${1} in
-					(on|off)
-						_fwCLEANUP=${1}
-					;;
-					(*)
-						echo "Invalid --cleanup argument [${1}]"
-					;;
-				esac
+				_fwCLEANUP=${1}
 			;;
 			(-D|--dailyoutput)
 				shift
@@ -178,7 +171,7 @@ function FwArguments () {
 			(-h|--help)
 				_fwPROGNAME="${0##*/}" # I don't know how this one works.
 				echo "${_fwPROGNAME} [-s on|off] [-f on|off] [-p on|off] -W on|off -T -V"
-				echo"            -C|--cleanup       on|off"
+				echo"            -C|--cleanup       on|off|<destination directory>"
 				echo "           -D, --dailyoutput  on|off"
 				echo "           -f, --finalrun     on|off"
 				echo "           -l, --lengthcorrection [value]"
@@ -543,13 +536,22 @@ function _fwPostprocess () {
 	do
 		local fwVARIABLE="${_fwOutputARRAY[${fwI}]}"
 		local fwGDSFileNAME="$(FwGDSFilename "${fwVARIABLE}" "Output" "${fwExperiment}" "${fwYEAR}" "d")"
-		if [ "${_fwCLEANUP}" == "on" ]
-		then
-			[ -e "${fwGDSFileNAME}" ] && rm "${fwGDSFileNAME}"   &
-		else
-			[ -e "${fwGDSFileNAME}.gz" ] && rm "${fwGDSFileNAME}.gz"
-			[ -e "${fwGDSFileNAME}" ]    && gzip "${fwGDSFileNAME}" &
-		fi
+		case "${_fwCLEANUP}" in
+			("on")
+				[ -e "${fwGDSFileNAME}" ] && rm "${fwGDSFileNAME}" &
+			;;
+			("off")
+				[ -e "${fwGDSFileNAME}.gz" ] && rm "${fwGDSFileNAME}.gz"
+				[ -e "${fwGDSFileNAME}" ]    && gzip "${fwGDSFileNAME}" &
+			(*)
+				[ -e "${_fwCLEANUP}" ] || mkdir "${_fwCLEANUP}"
+				if [ -e "${_fwCLEANUP}" ]
+				then
+					gzip "${fwGDSFileNAME}" && mv "${fwGDSFileNAME}.gz" "${_fwCLEANUP}" &
+				else
+					rm "${fwGDSFileNAME}" &
+				fi
+		esac
 	done
 	wait
 	[ "${_fwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"; }
