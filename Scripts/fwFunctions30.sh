@@ -543,11 +543,13 @@ function _fwPostprocess () {
 			("off")
 				[ -e "${fwGDSFileNAME}.gz" ] && rm "${fwGDSFileNAME}.gz"
 				[ -e "${fwGDSFileNAME}" ]    && gzip "${fwGDSFileNAME}" &
+			;;
 			(*)
-				[ -e "${_fwCLEANUP}" ] && mkdir -p "${_fwCLEANUP}"
+				echo "Moving datastream"
+				[ -e "${_fwCLEANUP}" ] || mkdir -p "${_fwCLEANUP}" || echo "Invalid directory ${_fwCLEANUP}"
 				if [ -e "${_fwCLEANUP}" ]
 				then
-					gzip "${fwGDSFileNAME}" && mv "${fwGDSFileNAME}.gz" "${_fwCLEANUP}/" &
+					(gzip "${fwGDSFileNAME}" && mv "${fwGDSFileNAME}.gz" "${_fwCLEANUP}/") &
 				else
 					rm "${fwGDSFileNAME}" &
 				fi
