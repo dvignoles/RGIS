@@ -546,7 +546,6 @@ function _fwPostprocess () {
 			;;
 			(*)
 				local dstDir=$(echo ${_fwGDSDomainDIR} | sed "s:${_fwGDSWorkDIR}:${_fwCLEANUP}:")/${fwExperiment}
-				echo "${dstDir}"
 				[ -e "${dstDir}" ] || mkdir -p "${dstDir}"
 				if [ -e "${dstDir}" ]
 				then
