@@ -545,10 +545,12 @@ function _fwPostprocess () {
 				[ -e "${fwGDSFileNAME}" ]    && gzip "${fwGDSFileNAME}" &
 			;;
 			(*)
-				[ -e "${_fwCLEANUP}" ] || mkdir -p "${_fwCLEANUP}"
-				if [ -e "${_fwCLEANUP}" ]
+				local dstDir=$(echo ${_fwGDSDomainDIR} | sed "s:${_fwGDSWorkDIR}:${_fwCLEANUP}:")/${fwExperiment}
+				echo "${dstDir}"
+				[ -e "${dstDir}" ] || mkdir -p "${dstDir}"
+				if [ -e "${dstDir}" ]
 				then
-					(gzip "${fwGDSFileNAME}" && mv "${fwGDSFileNAME}.gz" "${_fwCLEANUP}/") &
+					(gzip "${fwGDSFileNAME}" && mv "${fwGDSFileNAME}.gz" "${dstDir}/") &
 				else
 					rm "${fwGDSFileNAME}" &
 				fi
