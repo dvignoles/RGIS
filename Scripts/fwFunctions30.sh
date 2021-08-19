@@ -549,7 +549,7 @@ function _fwPostprocess () {
 				[ -e "${dstDir}" ] || mkdir -p "${dstDir}"
 				if [ -e "${dstDir}" ]
 				then
-					(gzip "${fwGDSFileNAME}" && mv "${fwGDSFileNAME}.gz" "${dstDir}/") &
+					(gzip "${fwGDSFileNAME}" && mv -f "${fwGDSFileNAME}.gz" "${dstDir}/") &
 				else
 					rm "${fwGDSFileNAME}" &
 				fi
