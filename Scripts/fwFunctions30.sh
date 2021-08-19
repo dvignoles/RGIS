@@ -545,8 +545,7 @@ function _fwPostprocess () {
 				[ -e "${fwGDSFileNAME}" ]    && gzip "${fwGDSFileNAME}" &
 			;;
 			(*)
-				echo "Moving datastream"
-				[ -e "${_fwCLEANUP}" ] || mkdir -p "${_fwCLEANUP}" || echo "Invalid directory ${_fwCLEANUP}"
+				[ -e "${_fwCLEANUP}" ] || mkdir -p "${_fwCLEANUP}"
 				if [ -e "${_fwCLEANUP}" ]
 				then
 					(gzip "${fwGDSFileNAME}" && mv "${fwGDSFileNAME}.gz" "${_fwCLEANUP}/") &
