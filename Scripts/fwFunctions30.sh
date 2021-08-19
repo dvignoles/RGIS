@@ -206,10 +206,10 @@ function FwInit () {
 
 	    _fwDomainTYPE="${_fwRGISDomainFILE%.gz}"
 	    _fwDomainTYPE="${_fwDomainTYPE##*.}"
-			FwDomainRES="${_fwRGISDomainFILE%.gz}"
-         FwDomainRES="${FwDomainRES%.*}"
-         FwDomainRES="${FwDomainRES%_*}"
-         FwDomainRES="${FwDomainRES##*_}"
+		  FwDomainRES="${_fwRGISDomainFILE%.gz}"
+          FwDomainRES="${FwDomainRES%.*}"
+          FwDomainRES="${FwDomainRES%_*}"
+          FwDomainRES="${FwDomainRES##*_}"
 
  	[ "${_fwRGISDomainFILE}" == "${FwDomainRES}" ] && FwDomainRES="unset"
 	case ${_fwDomainTYPE} in
