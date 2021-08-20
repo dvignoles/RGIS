@@ -550,7 +550,7 @@ function _fwPostprocess () {
 				if [ -e "${dstDir}" ]
 				then
 					[ -e "${fwGDSFileNAME}.gz" ] && rm "${fwGDSFileNAME}.gz" # removing possible gzip residures from broken runs.
-					(gzip "${fwGDSFileNAME}" && mv f "${fwGDSFileNAME}.gz" "${dstDir}/") &
+					(gzip "${fwGDSFileNAME}" && mv -f "${fwGDSFileNAME}.gz" "${dstDir}/") &
 				else
 					rm "${fwGDSFileNAME}" &
 				fi
