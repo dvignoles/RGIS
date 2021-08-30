@@ -245,7 +245,7 @@ function FwInit () {
 			fi
 			_fwLENGTHCORRECTION="$(printf "%.3f" ${_fwLENGTHCORRECTION})"
 		fi
-		_fwGDSDomainFILE="${_fwGDSDomainDIR}/${_fwDomainNAME}${_fwDomainTYPE}${_fwLENGTHCORRECTION}_${FwDomainRES}.ds"
+		_fwGDSDomainFILE="${_fwGDSDomainDIR}/${_fwDomainNAME}${_fwDomainTYPE}${$(echo "_fwLENGTHCORRECTION" | sed "s:\.:p:")}_${FwDomainRES}.ds"
 		export _fwLENGTHCORRECTION="-l ${_fwLENGTHCORRECTION}"
 	else
 		_fwGDSDomainFILE="${_fwGDSDomainDIR}/${_fwDomainNAME}${_fwDomainTYPE}_${FwDomainRES}.ds"
