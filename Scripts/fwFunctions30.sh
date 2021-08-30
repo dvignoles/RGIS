@@ -234,7 +234,7 @@ function FwInit () {
 	 _fwGDSDomainDIR="${_fwGDSWorkDIR}/${_fwDomainNAME}/${_fwDomainTYPE}_${FwDomainRES}"
 	if [[ "${_fwDomainTYPE}" == "Network" && "${_fwLENGTHCORRECTION}" != "" ]]
 	then
-		if [[ "${FwDomainRES}" == "30sec" ]]
+		if (( $(RGISgeoResolutionInSecond "30sec") >= $(RGISgeoResolutionInSecond "${FwDomainRES}" ) ))
 		then
 			_fwLENGTHCORRECTION="1.000"
 		else
