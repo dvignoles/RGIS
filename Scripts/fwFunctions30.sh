@@ -102,7 +102,7 @@ function FwArguments () {
 						_fwLENGTHCORRECTION="-l ${1}"
 					;;
 					(auto)
-						_fwLENGTHCORRECTION="${1}"
+						_fwLENGTHCORRECTION="auto"
 					;;
 					(*)
 						echo "Invalid lenght correction option [${2}]"	
