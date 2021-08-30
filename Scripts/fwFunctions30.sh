@@ -236,7 +236,7 @@ function FwInit () {
 	esac
 	 _fwGDSDomainDIR="${_fwGDSWorkDIR}/${_fwDomainNAME}/${_fwDomainTYPE}_${FwDomainRES}"
 	_fwGDSDomainFILE="${_fwGDSDomainDIR}/${_fwDomainNAME}${_fwDomainTYPE}_${FwDomainRES}.ds"
-	if [[ "${_fwDomainTYPE}" == "Network"] && [ "${_fwLENGTHCORRECTION}" == "auto" ]]
+	if [[ "${_fwDomainTYPE}" == "Network" && "${_fwLENGTHCORRECTION}" == "auto" ]]
 	then
 		if [[ "${FwDomainRES}" == "30sec" ]]
 		then
