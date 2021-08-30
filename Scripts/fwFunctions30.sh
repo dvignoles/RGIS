@@ -243,7 +243,7 @@ function FwInit () {
 				_fwCellSizeRatio=$(echo "$(RGISgeoResolutionInSecond ${FwDomainRES}) / $(RGISgeoResolutionInSecond "30sec")" | bc -l)
 				_fwLENGTHCORRECTION="$(echo "1.024 + 0.077 * l("${_fwCellSizeRatio}")" | bc -l)"
 			fi
-			_fwLENGTHCORRECTION="$(prinf "%.3f" ${_fwLENGTHCORRECTION})"
+			_fwLENGTHCORRECTION="$(printf "%.3f" ${_fwLENGTHCORRECTION})"
 		fi
 		_fwGDSDomainFILE="${_fwGDSDomainDIR}/${_fwDomainNAME}${_fwDomainTYPE}${_fwLENGTHCORRECTION}_${FwDomainRES}.ds"
 		export _fwLENGTHCORRECTION="-l ${_fwLENGTHCORRECTION}"
