@@ -96,19 +96,13 @@ function FwArguments () {
 				esac
 			;;
 			(-l|--lengthcorrection)
+				shift
 				case ${1} in
-					(on)
-						shift
-						_fwLENGTHCORRECTION="-l ${1}"
-					;;
 					(off)
 						_fwLENGTHCORRECTION=""
 					;;
-					(auto)
-						_fwLENGTHCORRECTION="auto"
-					;;
 					(*)
-						echo "Invalid lenght correction option [${2}]"	
+						_fwLENGTHCORRECTION="${1}"
 					;;
 				esac
 			;;
@@ -182,12 +176,12 @@ function FwArguments () {
 				esac
 			;;
 			(-h|--help)
-				_fwPROGNAME="${0##*/}" # I don't know how this one works.
-				echo "${_fwPROGNAME} [-s on|off] [-f on|off] [-p on|off] -W on|off -T -V"
+				_fwPROGNAME="${0##*/}"
+				echo "${_fwPROGNAME} [options]"
 				echo"            -C|--cleanup       on|off|<destination directory>"
 				echo "           -D, --dailyoutput  on|off"
 				echo "           -f, --finalrun     on|off"
-				echo "           -l, --lengthcorrection [value]"
+				echo "           -l, --lengthcorrection [<value>|auto]"
 				echo "           -m, --outputformat [rgis|netcdf]"
 				echo "           -n, --passnum      [num]"
 				echo "           -O, --optionsprint"
@@ -238,14 +232,18 @@ function FwInit () {
 		;;
 	esac
 	 _fwGDSDomainDIR="${_fwGDSWorkDIR}/${_fwDomainNAME}/${_fwDomainTYPE}_${FwDomainRES}"
-	if [[ "${_fwDomainTYPE}" == "Network" && "${_fwLENGTHCORRECTION}" == "auto" ]]
+	if [[ "${_fwDomainTYPE}" == "Network" && "${_fwLENGTHCORRECTION}" != "" ]]
 	then
 		if [[ "${FwDomainRES}" == "30sec" ]]
 		then
 			_fwLENGTHCORRECTION="1.000"
 		else
-			_fwCellSizeRatio=$(echo "$(RGISgeoResolutionInSecond ${FwDomainRES}) / $(RGISgeoResolutionInSecond "30sec")" | bc -l)
-			_fwLENGTHCORRECTION="$(prinf "%.3f" $(echo "1.024 + 0.077 * l("${_fwCellSizeRatio}")" | bc -l))"
+			if [ ${_fwLENGTHCORRECTION} == "auto" ]
+			then
+				_fwCellSizeRatio=$(echo "$(RGISgeoResolutionInSecond ${FwDomainRES}) / $(RGISgeoResolutionInSecond "30sec")" | bc -l)
+				_fwLENGTHCORRECTION="$(echo "1.024 + 0.077 * l("${_fwCellSizeRatio}")" | bc -l)"
+			fi
+			_fwLENGTHCORRECTION="$(prinf "%.3f" ${_fwLENGTHCORRECTION})"
 		fi
 		_fwGDSDomainFILE="${_fwGDSDomainDIR}/${_fwDomainNAME}${_fwDomainTYPE}${_fwLENGTHCORRECTION}_${FwDomainRES}.ds"
 		export _fwLENGTHCORRECTION="-l ${_fwLENGTHCORRECTION}"
