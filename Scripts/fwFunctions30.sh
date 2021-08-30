@@ -240,8 +240,8 @@ function FwInit () {
 		else
 			if [ ${_fwLENGTHCORRECTION} == "auto" ]
 			then
-				_fwCellSizeRatio=$(echo "$(RGISgeoResolutionInSecond ${FwDomainRES}) / $(RGISgeoResolutionInSecond "30sec")" | bc -l)
-				_fwLENGTHCORRECTION="$(echo "1.024 + 0.077 * l("${_fwCellSizeRatio}")" | bc -l)"
+				_fwCellSizeRatio=$(echo "$(RGISgeoResolutionInSecond "30sec") / $(RGISgeoResolutionInSecond ${FwDomainRES})" | bc -l)
+				_fwLENGTHCORRECTION="$(echo "1.024 - 0.077 * l("${_fwCellSizeRatio}")" | bc -l)"
 			fi
 			_fwLENGTHCORRECTION="$(printf "%.3f" ${_fwLENGTHCORRECTION})"
 		fi
