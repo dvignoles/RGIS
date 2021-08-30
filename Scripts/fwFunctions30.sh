@@ -97,9 +97,12 @@ function FwArguments () {
 			;;
 			(-l|--lengthcorrection)
 				case ${1} in
-					(on|off|auto)
+					(on)
 						shift
 						_fwLENGTHCORRECTION="-l ${1}"
+					;;
+					(off)
+						_fwLENGTHCORRECTION=""
 					;;
 					(auto)
 						_fwLENGTHCORRECTION="auto"
@@ -235,16 +238,19 @@ function FwInit () {
 		;;
 	esac
 	 _fwGDSDomainDIR="${_fwGDSWorkDIR}/${_fwDomainNAME}/${_fwDomainTYPE}_${FwDomainRES}"
-	_fwGDSDomainFILE="${_fwGDSDomainDIR}/${_fwDomainNAME}${_fwDomainTYPE}_${FwDomainRES}.ds"
 	if [[ "${_fwDomainTYPE}" == "Network" && "${_fwLENGTHCORRECTION}" == "auto" ]]
 	then
 		if [[ "${FwDomainRES}" == "30sec" ]]
 		then
-			_fwLENGTHCORRECTION="-l 1.0"
+			_fwLENGTHCORRECTION="1.000"
 		else
 			_fwCellSizeRatio=$(echo "$(RGISgeoResolutionInSecond ${FwDomainRES}) / $(RGISgeoResolutionInSecond "30sec")" | bc -l)
-			export _fwLENGTHCORRECTION="-l $(echo "1.024 + 0.077 * l("${_fwCellSizeRatio}")" | bc -l)"
+			_fwLENGTHCORRECTION="$(prinf "%.3f" $(echo "1.024 + 0.077 * l("${_fwCellSizeRatio}")" | bc -l))"
 		fi
+		_fwGDSDomainFILE="${_fwGDSDomainDIR}/${_fwDomainNAME}${_fwDomainTYPE}${_fwLENGTHCORRECTION}_${FwDomainRES}.ds"
+		export _fwLENGTHCORRECTION="-l ${_fwLENGTHCORRECTION}"
+	else
+		_fwGDSDomainFILE="${_fwGDSDomainDIR}/${_fwDomainNAME}${_fwDomainTYPE}_${FwDomainRES}.ds"
 	fi
 }
 
