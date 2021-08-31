@@ -234,14 +234,15 @@ function FwInit () {
 	 _fwGDSDomainDIR="${_fwGDSWorkDIR}/${_fwDomainNAME}/${_fwDomainTYPE}_${FwDomainRES}"
 	if [[ "${_fwDomainTYPE}" == "Network" && "${_fwLENGTHCORRECTION}" != "" ]]
 	then
-		if (( $(RGISgeoResolutionInSecond "30sec") >= $(RGISgeoResolutionInSecond "${FwDomainRES}" ) ))
+		if (( $(RGISgeoResolutionInSecond "30sec") >= $(RGISgeoResolutionInSecond "${FwDomainRES}") ))
 		then
 			_fwLENGTHCORRECTION="1.000"
 		else
 			if [ ${_fwLENGTHCORRECTION} == "auto" ]
 			then
 				_fwCellSizeRatio=$(echo "$(RGISgeoResolutionInSecond "30sec") / $(RGISgeoResolutionInSecond ${FwDomainRES})" | bc -l)
-				_fwLENGTHCORRECTION="$(echo "1.024 - 0.077 * l("${_fwCellSizeRatio}")" | bc -l)"
+				# Modified from Fekete et al. 2001 to go through 1.0 when the cell ratio is 1.0
+				_fwLENGTHCORRECTION="$(echo "1.0 - 0.084 * l("${_fwCellSizeRatio}")" | bc -l)"
 			fi
 			_fwLENGTHCORRECTION="$(printf "%.3f" ${_fwLENGTHCORRECTION})"
 		fi
