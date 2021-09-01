@@ -26,7 +26,7 @@ bfekete@gc.cuny.edu
 #define RGlibInterStation   ((char *) "STNInterStationArea")
 #define RGlibNextStation    ((char *) "NextStation")
 
-#define RGlibMinSLOPE 0.01
+#define RGlibMinSLOPE 0.00001
 
 typedef enum {RGlibSQLCaseSensitive = 0, RGlibSQLCaseLower = 1, RGlibSQLCaseUpper = 2 } RGlibSQLCase;
 
