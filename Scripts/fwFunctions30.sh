@@ -583,6 +583,7 @@ function _fwPostprocess () {
 		esac
 	done
 	wait
+	[[ "${dstDir}" != "" &&  -e "${dstDir}" ]] && mv ${_fwGDSDomainDIR}/${fwExperiment}/*.log "${dstDir}/"
 	[ "${_fwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"; }
 	return 0
 }
