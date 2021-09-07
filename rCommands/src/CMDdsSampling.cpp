@@ -48,8 +48,8 @@ int main(int argc, char *argv[]) {
     char *title  = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     DBDate date;
-    MFDomain_p  domainPTR;
-    MFMapper_p mapperPTR;
+    MFDomain_p domainPTR = (MFDomain_p) NULL;
+    MFMapper_p mapperPTR = (MFMapper_p) NULL;
     MFdsHeader_t header;
     MFMapperStats_p mapperStats;
     DBObjData  *data;
@@ -141,11 +141,6 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
             return (CMfailed);
         }
         argPos++;
-    }
-    if (argNum > 3) {
-        CMmsgPrint(CMmsgUsrError, "Extra arguments!");
-        _CMDprintUsage (argv[0]);
-        return(CMfailed);
     }
 
     if (domainFileName == (char *) NULL) {
@@ -395,8 +390,8 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
         default: break;
     }
 Stop:
-    MFDomainFree  (domainPTR);
-    MFMapperFree (mapperPTR);
+    if (domainPTR != (MFDomain_p) NULL) MFDomainFree (domainPTR);
+    if (mapperPTR != (MFMapper_p) NULL) MFMapperFree (mapperPTR);
     if (outFileName != (char *) NULL) data->Write (outFileName); else data->Write(stdout);
     delete data;
     if (inFile != stdin) { if (compressed) pclose (inFile); else fclose (inFile); }
