@@ -183,9 +183,9 @@ typedef struct MFMapper_s {
     int *SampleIDs;
 } MFMapper_t, *MFMapper_p;
 
-MFMapper_t *MFMapperRead (FILE *);
-int  MFMapperWrite (MFMapper_t *, FILE *);
-void MFMapperFree  (MFMapper_t *);
+MFMapper_p MFMapperRead (FILE *);
+int  MFMapperWrite (MFMapper_p, FILE *);
+void MFMapperFree  (MFMapper_p);
 
 int   MFDateCompare (const char *, const char *);
 char *MFDateGetCurrent ();
