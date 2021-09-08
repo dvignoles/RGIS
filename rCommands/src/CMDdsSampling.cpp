@@ -394,6 +394,6 @@ Stop:
     if (mapperPTR != (MFMapper_p) NULL) MFMapperFree (mapperPTR);
     if (outFileName != (char *) NULL) data->Write (outFileName); else data->Write(stdout);
     delete data;
-    if (inFile != stdin) { if (compressed) pclose (inFile); else fclose (inFile); }
+    if ((inFile != (FILE *) NULL) && (inFile != stdin)) { if (compressed) pclose (inFile); else fclose (inFile); }
     return (ret);
 }
