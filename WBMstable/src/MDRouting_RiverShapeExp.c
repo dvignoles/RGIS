@@ -32,8 +32,8 @@ static void _MDRiverShapeExponent (int itemID) {
 	float wMean;     // River width at mean discharge [m]
 // Local
 	float dL;        // Reach length [m]
-//	float eta = 0.25, nu = 0.4,  tau = 8.0,  phi = 0.58;    //old
-//	float eta = 0.36, nu = 0.37, tau = 3.55, phi = 0.51;	//new based on Knighton (avg)
+//	float eta = 0.25, nu = 0.4,  tau = 8.0,  phi = 0.58;    // old
+//	float eta = 0.36, nu = 0.37, tau = 3.55, phi = 0.51;	// new based on Knighton (avg)
 	float eta = 0.33, nu = 0.35, tau = 3.67, phi = 0.45;	// Hey and Thorn (1986)
 
 	if (MFVarTestMissingVal (_MDInAux_MeanDischargeID, itemID)) {
@@ -56,7 +56,7 @@ static void _MDRiverShapeExponent (int itemID) {
 		return;	
 	}
 	// Slope dependent riverbed geometry
-	slope     = MFVarGetFloat(_MDInRiverSlopeID,      itemID, 0.01) / 1000.0;
+	slope = MFVarGetFloat(_MDInRiverSlopeID,      itemID, 0.01) / 1000.0;
 
 	yMean = eta * pow (discharge, nu);
 	wMean = tau * pow (discharge, phi);
