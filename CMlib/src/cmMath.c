@@ -15,6 +15,8 @@ bfekete@gc.cuny.edu
 #include <cm.h>
 
 bool CMmathEqualValues (double var0,double var1) {
+	if (isnan(var0) && isnan (var1)) return (true);
+	if (isnan(var0) || isnan (var1)) return (false);
 	if (fabs (var0) + fabs (var1) == (double) 0.0) return (true);
 	return (fabs (var0 - var1) / (fabs (var0) + fabs (var1)) < CMmathEpsilon);
 }
