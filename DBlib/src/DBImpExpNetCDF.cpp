@@ -1502,7 +1502,7 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
     double scaleFactor, dataOffset;
     DBCoordinate cellSize;
     DBPosition pos;
-    DBFloat cellArea, value, sumWeight = 0.0, minimum = DBHugeVal, maximum = -DBHugeVal, average = 0.0, stdDev = 0.0;
+    DBFloat cellArea, value, sumWeight = 0.0, minimum, maximum, average, stdDev;
     DBRegion extent;
     DBObjRecord *itemRec, *layerRec, *dataRec;
     DBObjTable *itemTable = data->Table(DBrNItems);
@@ -2053,6 +2053,10 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
         (data->Arrays())->Add(dataRec);
 
         sumWeight = 0.0;
+        average   = 0.0;
+        minimum   =  DBHugeVal;
+        maximum   = -DBHugeVal;
+        stdDev    = 0.0;
         for (pos.Row = 0; pos.Row < rowNum; pos.Row++) {
             start[latidx] = latitudes[0] < latitudes[1] ? rowNum - pos.Row - 1 : pos.Row;
             if ((status = nc_get_vara_double(ncid, varid, start, count, vector)) != NC_NOERR) {
