@@ -18,7 +18,7 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input network> <output network>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -e,--elevation     [elevation coverage]");
+    CMmsgPrint(CMmsgInfo, "     -e,--elevation     <elevation coverage>");
     CMmsgPrint(CMmsgInfo, "     -c,--climb         [climb coefficient]");
     CMmsgPrint(CMmsgInfo, "     -m,--maximum_basin [maxmum basin size]");
     CMmsgPrint(CMmsgInfo, "     -P, --planet       [Earth|Mars|Venus|radius]");
@@ -38,6 +38,8 @@ int main(int argc, char *argv[]) {
     char *elevName = (char *) NULL;
     bool save = false;
     DBObjData *grdData, *netData;
+
+    if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-e", "--elevation")) {
@@ -150,7 +152,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

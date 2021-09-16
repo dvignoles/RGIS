@@ -160,8 +160,8 @@ int _CMDnetTransfer(DBObjData *netData,
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgUsrError, "%s [options] <input grid> <output grid>",CMfileName(arg0));
-    CMmsgPrint(CMmsgUsrError, "     -n, --network     [network coverage]");
-    CMmsgPrint(CMmsgUsrError, "     -w, --weight      [weight grid]");
+    CMmsgPrint(CMmsgUsrError, "     -n, --network     <network coverage>");
+    CMmsgPrint(CMmsgUsrError, "     -w, --weight      <weight grid>");
     CMmsgPrint(CMmsgUsrError, "     -f, --coefficient [coefficient]");
     CMmsgPrint(CMmsgUsrError, "     -k, --transfer    [coefficient grid]");
     CMmsgPrint(CMmsgUsrError, "     -q, --discharge   [discharge grid - m/s]");
@@ -188,6 +188,8 @@ int main(int argc, char *argv[]) {
     DBInt shadeSet = DBFault, areaMult = true, coeffSet = false;
 /*	float umax = false, ksat = false;*/
     DBObjData *data, *netData, *weightData, *coeffData, *grdData, *QData, *HLData;
+
+    if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-n", "--network")) {
@@ -349,7 +351,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
            return (DBSuccess);
         }

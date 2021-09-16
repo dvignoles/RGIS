@@ -16,7 +16,7 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input grid> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -n,--network   [network]");
+    CMmsgPrint(CMmsgInfo, "     -n,--network   <network>");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
     CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
@@ -35,6 +35,8 @@ int main(int argc, char *argv[]) {
     bool setShadeSet = false;
     DBObjData *netData, *grdData;
 
+    if (argNum < 2) goto Help;
+ 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-n", "--network")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
@@ -107,7 +109,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

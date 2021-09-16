@@ -32,6 +32,8 @@ int main(int argc, char *argv[]) {
     char *output = (char *) NULL, **dataList = (char **) NULL;
     DBObjData *grdData, *appData;
 
+    if (argNum < 2) goto Help;
+
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-o", "--output")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
@@ -83,7 +85,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage (argv[0]);
             return (DBSuccess);
         }
@@ -94,11 +96,6 @@ int main(int argc, char *argv[]) {
         argPos++;
     }
 
-    if (argNum < 2) {
-        CMmsgPrint(CMmsgUsrError, "Nothing to append");
-        _CMDprintUsage (argv[0]);
-        return (DBFault);
-    }
     dataNum = argNum - 1;
     if ((dataList = (char **) realloc(dataList, dataNum * sizeof(char *))) == (char **) NULL) {
         CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);

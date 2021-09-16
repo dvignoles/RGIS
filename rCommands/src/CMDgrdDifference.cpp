@@ -16,7 +16,7 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input grid> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -g,--grid       [continuous grid coverage]");
+    CMmsgPrint(CMmsgInfo, "     -g,--grid       <continuous grid coverage>");
     CMmsgPrint(CMmsgInfo, "     -i,--difference	[absolute|relative]");
     CMmsgPrint(CMmsgInfo, "     -t,--title      [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject    [subject]");

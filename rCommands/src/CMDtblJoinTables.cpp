@@ -16,7 +16,7 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -a,--dataset   [join dataset]");
+    CMmsgPrint(CMmsgInfo, "     -a,--dataset   <join dataset>");
     CMmsgPrint(CMmsgInfo, "     -e,--relate    [relate table]");
     CMmsgPrint(CMmsgInfo, "     -o,--join      [join table]");
     CMmsgPrint(CMmsgInfo, "     -r,--rfield    [relate field]");
@@ -39,6 +39,8 @@ int main(int argc, char *argv[]) {
     char *relateFieldName = (char *) NULL, *joinFieldName = (char *) NULL;
     DBObjTable *relateTable, *joinTable;
     DBObjTableField *relateField, *joinField;
+
+    if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-a", "--dataset")) {
@@ -127,7 +129,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

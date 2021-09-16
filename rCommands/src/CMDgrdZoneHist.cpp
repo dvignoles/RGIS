@@ -16,7 +16,7 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input grid> <output table>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -z,--zonegrid  [discrete grid coverage]");
+    CMmsgPrint(CMmsgInfo, "     -z,--zonegrid  <discrete grid coverage>");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
     CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
@@ -32,6 +32,8 @@ int main(int argc, char *argv[]) {
     char *zoneGridName = (char *) NULL;
     DBObjData *data, *zGrdData, *cGrdData;
 
+    if (argNum < 2) goto Help;
+ 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-z", "--zonegrid")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
@@ -83,7 +85,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

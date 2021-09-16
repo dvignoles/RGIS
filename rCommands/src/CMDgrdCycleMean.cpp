@@ -35,6 +35,8 @@ int main(int argc, char *argv[]) {
     DBInt stepNum = DBFault, offset = 0;
     DBObjData *tsData, *data;
 
+    if (argNum < 2) goto Help;
+
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-n", "--number")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
@@ -121,7 +123,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

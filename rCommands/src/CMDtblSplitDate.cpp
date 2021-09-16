@@ -20,11 +20,11 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
     CMmsgPrint(CMmsgInfo, "     -a,--table     [table name]");
     CMmsgPrint(CMmsgInfo, "     -f,--field     [field name]");
-    CMmsgPrint(CMmsgInfo, "     -y,--year      [year field]");
-    CMmsgPrint(CMmsgInfo, "     -m,--month     [month field]");
-    CMmsgPrint(CMmsgInfo, "     -d,--day       [day field]");
-    CMmsgPrint(CMmsgInfo, "     -o,--hour      [hour field]");
-    CMmsgPrint(CMmsgInfo, "     -i,--minute    [minute field]");
+    CMmsgPrint(CMmsgInfo, "     -Y,--year      [year field]");
+    CMmsgPrint(CMmsgInfo, "     -M,--month     [month field]");
+    CMmsgPrint(CMmsgInfo, "     -D,--day       [day field]");
+    CMmsgPrint(CMmsgInfo, "     -H,--hour      [hour field]");
+    CMmsgPrint(CMmsgInfo, "     -I,--minute    [minute field]");
     CMmsgPrint(CMmsgInfo, "     -p,--padding");
     CMmsgPrint(CMmsgInfo, "     -V,--verbose");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
@@ -55,6 +55,8 @@ int main(int argc, char *argv[]) {
     DBDate date;
     DBObjRecord *record;
 
+    if (argNum < 2) goto Help;
+
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-a", "--table")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
@@ -74,7 +76,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-y", "--year")) {
+        if (CMargTest (argv[argPos], "-Y", "--year")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing year field name!");
                 return (CMfailed);
@@ -83,7 +85,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-m", "--month")) {
+        if (CMargTest (argv[argPos], "-M", "--month")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing month field name!");
                 return (CMfailed);
@@ -92,7 +94,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-d", "--day")) {
+        if (CMargTest (argv[argPos], "-D", "--day")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing day field name!");
                 return (CMfailed);
@@ -101,7 +103,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-o", "--hour")) {
+        if (CMargTest (argv[argPos], "-H", "--hour")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing hour field name!");
                 return (CMfailed);
@@ -110,7 +112,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-i", "--minute")) {
+        if (CMargTest (argv[argPos], "-I", "--minute")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing minute field name!");
                 return (CMfailed);
@@ -131,7 +133,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

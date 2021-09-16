@@ -6,7 +6,7 @@ Copyright 1994-2021, UNH - ASRC/CUNY
 
 CMDgetHeader.cpp
 
-andras@ob.sr.unh.edu
+andras@drfekete.net
 
 *******************************************************************************/
 

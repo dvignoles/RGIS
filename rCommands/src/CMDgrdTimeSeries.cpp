@@ -16,7 +16,7 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input table> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -g,--grid      [discrete grid coverage]");
+    CMmsgPrint(CMmsgInfo, "     -g,--grid      <discrete grid coverage>");
     CMmsgPrint(CMmsgInfo, "     -r,--relate    [relate field]");
     CMmsgPrint(CMmsgInfo, "     -j,--join      [join field]");
     CMmsgPrint(CMmsgInfo, "     -i,--variable  [variable field]");
@@ -41,6 +41,8 @@ int main(int argc, char *argv[]) {
     char *dateName = (char *) NULL;
     DBObjData *grdData, *tabData, *outData;
 
+    if (argNum < 2) goto Help;
+ 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-g", "--grid")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
@@ -148,7 +150,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

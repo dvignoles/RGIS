@@ -16,7 +16,7 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input netcdf> <output datastream>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -m,--template     [template coverage]");
+    CMmsgPrint(CMmsgInfo, "     -m,--template     <template coverage>");
     CMmsgPrint(CMmsgInfo, "     -f,--field        [fieldname]");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
@@ -27,6 +27,8 @@ int main(int argc, char *argv[]) {
     FILE *outFile;
     char *tmplName = (char *) NULL, *fieldName = (char *) NULL;
     DBObjData *grdData, *tmplData = (DBObjData *) NULL;
+
+    if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-m", "--template")) {
@@ -47,7 +49,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

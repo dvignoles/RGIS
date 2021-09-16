@@ -16,7 +16,7 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input point> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -e,--template  [grid or network coverage]");
+    CMmsgPrint(CMmsgInfo, "     -e,--template  <grid or network coverage>");
     CMmsgPrint(CMmsgInfo, "     -m,--mode      [dist|ids]");
     CMmsgPrint(CMmsgInfo, "     -f,--factor    [value]");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
@@ -35,6 +35,8 @@ int main(int argc, char *argv[]) {
     int mode = true;
     DBFloat factor = 1.0;
     DBObjData *data, *pntData, *tmplData;
+
+    if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-e", "--template")) {
@@ -115,7 +117,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

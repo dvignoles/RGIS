@@ -29,13 +29,15 @@ static void _CMDprintUsage (const char *arg0) {
 
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
-    char *title = (char *) NULL, *subject = (char *) NULL;
+    char *title  = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     DBInt timeStep;
     DBInt aggregate = RGlibAggrAverage;
     int shadeSet = DBFault;
     DBObjData *tsData, *data;
 
+    if (argNum < 2) goto Help;
+ 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-a", "--aggregate")) {
             const char *sumStrs[] = {"avg", "min", "max", "sum", (char *) NULL};
@@ -130,7 +132,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

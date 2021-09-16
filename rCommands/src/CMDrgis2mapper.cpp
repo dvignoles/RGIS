@@ -4,7 +4,7 @@ GHAAS RiverGIS Utilities V3.0
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-CMDrgis2domain.cpp
+CMDrgis2mapper.cpp
 
 bfekete@gc.cuny.edu
 
@@ -17,7 +17,7 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <sampling data> <output mapper>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -d,--domain");
+    CMmsgPrint(CMmsgInfo, "     -d,--domain <rgis domain file>");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
 
@@ -32,6 +32,8 @@ int main(int argc, char *argv[]) {
     DBNetworkIF *netIF;
     DBObjRecord *cellRec;
 
+    if (argNum < 2) goto Help;
+
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-d", "--domain")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
@@ -42,7 +44,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

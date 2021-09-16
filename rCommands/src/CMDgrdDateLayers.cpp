@@ -75,16 +75,16 @@ static DBInt modifyDate(DBObjData *dbData, int timeStep,
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input grid> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -y,--year      [beginning year]");
-    CMmsgPrint(CMmsgInfo, "     -m,--month     [beginning month]");
-    CMmsgPrint(CMmsgInfo, "     -d,--day       [beginning day]");
-    CMmsgPrint(CMmsgInfo, "     -r,--hour      [beginning hour]");
-    CMmsgPrint(CMmsgInfo, "     -i,--minute    [beginning minute]");
+    CMmsgPrint(CMmsgInfo, "     -Y,--year      [beginning year]");
+    CMmsgPrint(CMmsgInfo, "     -M,--month     [beginning month]");
+    CMmsgPrint(CMmsgInfo, "     -D,--day       [beginning day]");
+    CMmsgPrint(CMmsgInfo, "     -H,--hour      [beginning hour]");
+    CMmsgPrint(CMmsgInfo, "     -I,--minute    [beginning minute]");
     CMmsgPrint(CMmsgInfo, "     -e,--step      [year|month|day|hour|minute]");
     CMmsgPrint(CMmsgInfo, "     -n,--number    [number of intervals]");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-    CMmsgPrint(CMmsgInfo, "        --domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -d --domain    [domain]");
     CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
     CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
     CMmsgPrint(CMmsgInfo, "     -V,--verbose");
@@ -93,19 +93,21 @@ static void _CMDprintUsage (const char *arg0) {
 
 int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
-    int startYear = DBDefaultMissingIntVal;
-    int startMonth = DBDefaultMissingIntVal;
-    int startDay = DBDefaultMissingIntVal;
-    int startHour = DBDefaultMissingIntVal;
-    int startMinute = DBDefaultMissingIntVal;
+    int startYear    = DBDefaultMissingIntVal;
+    int startMonth   = DBDefaultMissingIntVal;
+    int startDay     = DBDefaultMissingIntVal;
+    int startHour    = DBDefaultMissingIntVal;
+    int startMinute  = DBDefaultMissingIntVal;
     int timeInterval = 1; // this is defined by the -n field
     int shadeSet = DBDataFlagDispModeContGreyScale;
-    char *title = (char *) NULL, *subject = (char *) NULL;
+    char *title  = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     bool changeShadeSet = false;
     DBObjData *dbData;
     DBInt timeStep = DBFault;
 
+    if (argNum < 2) goto Help;
+ 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-e", "--step")) {
             const char *timeStepStr[] = {"year", "month", "day", "hour", "minute", (char *) NULL};
@@ -126,7 +128,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-y", "--year")) {
+        if (CMargTest (argv[argPos], "-Y", "--year")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing Year!");
                 return (CMfailed);
@@ -138,7 +140,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-m", "--month")) {
+        if (CMargTest (argv[argPos], "-M", "--month")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing Month!");
                 return (CMfailed);
@@ -151,7 +153,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-d", "--day")) {
+        if (CMargTest (argv[argPos], "-D", "--day")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing Day!");
                 return (CMfailed);
@@ -164,7 +166,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-r", "--hour")) {
+        if (CMargTest (argv[argPos], "-H", "--hour")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing Hour!");
                 return (CMfailed);
@@ -176,7 +178,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-i", "--minute")) {
+        if (CMargTest (argv[argPos], "-I", "--minute")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing Minute!");
                 return (CMfailed);
@@ -257,7 +259,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }
@@ -275,11 +277,11 @@ int main(int argc, char *argv[]) {
         case DBTimeStepMinute:
             if (startMinute == DBDefaultMissingIntVal) startMinute = 0;
         case DBTimeStepHour:
-            if (startHour == DBDefaultMissingIntVal) startHour = 0;
+            if (startHour   == DBDefaultMissingIntVal) startHour = 0;
         case DBTimeStepDay:
-            if (startDay == DBDefaultMissingIntVal) startDay = 0;
+            if (startDay    == DBDefaultMissingIntVal) startDay = 0;
         case DBTimeStepMonth:
-            if (startMonth == DBDefaultMissingIntVal) startMonth = 0;
+            if (startMonth  == DBDefaultMissingIntVal) startMonth = 0;
         default:
             break;
     }

@@ -80,7 +80,7 @@ int _CMDnetErosion(DBObjData *netData, DBObjData *inData, DBObjData *weightData,
             if (outIF->Value(outLayerRec, netIF->CellPosition(cellRec), &inValue) == false) continue;
             if (outIF->Value(outLayerRec, netIF->CellPosition(toCell), &outValue) == false) continue;
 
-            sumWeights[toCell->RowID()] = sumWeights[toCell->RowID()] + weight;
+            sumWeights[toCell->RowID()] = sumWeights[toCell->RowID()] + weight; // TODO weights needs to be updated insider the cell loop.
             outIF->Value(outLayerRec, netIF->CellPosition(toCell), outValue + inValue);
         }
         outIF->RecalcStats(outLayerRec);
@@ -97,7 +97,7 @@ int _CMDnetErosion(DBObjData *netData, DBObjData *inData, DBObjData *weightData,
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input network> <output network>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -e,--elevation     [elevation coverage]");
+    CMmsgPrint(CMmsgInfo, "     -e,--elevation     <elevation coverage>");
     CMmsgPrint(CMmsgInfo, "     -c,--climb         [climb coefficient]");
     CMmsgPrint(CMmsgInfo, "     -m,--maximum_basin [maxmum basin size]");
     CMmsgPrint(CMmsgInfo, "     -P, --planet       [Earth|Mars|Venus|radius]");
@@ -117,6 +117,8 @@ int main(int argc, char *argv[]) {
     char *netName = (char *) NULL, *weightName = (char *) NULL;
     DBInt shadeSet = DBFault, areaMult = true, coeffSet = false;
     DBObjData *data, *netData, *weightData, *grdData;
+
+    if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-n", "--network")) {
@@ -227,7 +229,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

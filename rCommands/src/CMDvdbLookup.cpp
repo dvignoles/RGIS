@@ -36,6 +36,8 @@ int main(int argc, char *argv[]) {
     const char *aggreg = (const char *) NULL;
     VDBversion version = VDBversion2;
 
+    if (argNum < 2) goto Help;
+
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-c", "--cfname")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
@@ -109,7 +111,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage (argv[0]);
             return (CMsucceeded);
         }

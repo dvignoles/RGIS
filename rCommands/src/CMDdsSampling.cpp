@@ -18,10 +18,10 @@ bfekete@gc.cuny.edu
 #include <string.h>
 
 static void _CMDprintUsage (const char *arg0) {
-    CMmsgPrint(CMmsgInfo, "%s [options] <datastream 1> <datastream 2> ... <datastream N>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "  -D, --domainfile [filename]");
-    CMmsgPrint(CMmsgInfo, "  -M, --mapper     [filename]");
-    CMmsgPrint(CMmsgInfo, "  -o, --output     [filename]");
+    CMmsgPrint(CMmsgInfo, "%s [options] <datastream1> <datastream2> ... <datastreamN>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "  -D, --domainfile <filename>");
+    CMmsgPrint(CMmsgInfo, "  -M, --mapper     <filename>");
+    CMmsgPrint(CMmsgInfo, "  -o, --output     <filename>");
     CMmsgPrint(CMmsgInfo, "  -t,--title       [dataset title]");
     CMmsgPrint(CMmsgInfo, "  -u,--subject     [subject]");
     CMmsgPrint(CMmsgInfo, "  -d,--domain      [domain]");

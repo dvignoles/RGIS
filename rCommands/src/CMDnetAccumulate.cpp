@@ -16,9 +16,9 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input grid> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -n,--network     [network coverage]");
-    CMmsgPrint(CMmsgInfo, "     -a,--stations    [station coverage]");
-    CMmsgPrint(CMmsgInfo, "     -i,--timeseries  [time series data]");
+    CMmsgPrint(CMmsgInfo, "     -n,--network     <network coverage>");
+    CMmsgPrint(CMmsgInfo, "     -a,--stations    <station coverage>");
+    CMmsgPrint(CMmsgInfo, "     -i,--timeseries  <time series data>");
     CMmsgPrint(CMmsgInfo, "     -r,--relate      [relate field]");
     CMmsgPrint(CMmsgInfo, "     -j,--join        [join field]");
     CMmsgPrint(CMmsgInfo, "     -e,--date        [date field]");
@@ -49,6 +49,8 @@ int main(int argc, char *argv[]) {
     int areaMult = true, correction = false, allowNegative = true;
     DBObjData *data, *netData, *grdData, *stnData = (DBObjData *) NULL, *tsData = (DBObjData *) NULL;
 
+    if (argNum < 2) goto Help;
+ 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-n", "--network")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
@@ -243,7 +245,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

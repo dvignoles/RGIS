@@ -6,7 +6,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include
 		            ${CMAKE_CURRENT_SOURCE_DIR}/../RGlib/include
 		            ${CMAKE_CURRENT_SOURCE_DIR}/../MFlib/include)
 
-foreach(loop_var ds2rgis dsAggregate dsDuration dsSampling getHeader grdAppendLayers grdBoxAggr grdCalculate grdCellStats grdCreateNetwork
+foreach(loop_var ds2rgis dsAggregate dsClimatology dsDuration dsSampling getHeader grdAppendLayers grdBoxAggr grdCalculate grdCellStats grdCreateNetwork
 grdCycleMean grdDateLayers grdDifference grdExtractLayers grdHeatIndex grdImport grdMerge grdMinMax grdNetFilter grdNoNeg grdOperation grdReclassDisc  grdRemovePits grdRenameLayers grdRunningMean
 grdSeasonAggr grdSeasonMean grdTimeSeries grdTSAggr grdZoneHist grdZoneStats netAccumulate netBasinDistrib netBasinHist netBasinProf netBasinStats netBuild
 netcdf2ds netcdf2rgis netCells2Grid netCellSearch netCellSlopes netConfluence netCreatePnts netDefragment netErosion netImportASCII netInvAccum netStreamlines netSubset netTransfer

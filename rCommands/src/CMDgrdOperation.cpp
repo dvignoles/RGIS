@@ -17,7 +17,7 @@ bfekete@gc.cuny.edu
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <continuous grid>", CMfileName(arg0));
     CMmsgPrint(CMmsgInfo, "     -o,--operation [+|-|*|/|^]");
-    CMmsgPrint(CMmsgInfo, "     -g,--grid      [grid name]");
+    CMmsgPrint(CMmsgInfo, "     -g,--grid      <grid name>");
     CMmsgPrint(CMmsgInfo, "     -c,--constant  [constant value]");
     CMmsgPrint(CMmsgInfo, "     -m,--merge     [true|false]");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
@@ -38,6 +38,8 @@ int main(int argc, char *argv[]) {
     char *gridName = (char *) NULL;
     float constant;
     DBObjData *data, *gridData;
+
+    if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-o", "--operation")) {
@@ -158,7 +160,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

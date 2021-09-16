@@ -46,7 +46,7 @@ static DBFloat _CMDheatIndex (DBFloat airT, DBFloat dewT) {
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <air temperature grid> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -e,--dewpoint  [dewpoint temperature grid]");
+    CMmsgPrint(CMmsgInfo, "     -e,--dewpoint  <dewpoint temperature grid>");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
     CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
@@ -68,7 +68,9 @@ int main(int argc, char *argv[]) {
     DBObjRecord *airLayerRec, *dewLayerRec, *outLayerRec;
     DBPosition pos;
     DBFloat airT, dewT, hi;
-
+ 
+    if (argNum < 2) goto Help;
+ 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-e", "--dewpoint")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
@@ -140,7 +142,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }

@@ -4,7 +4,7 @@ GHAAS RiverGIS Utilities V3.0
 Global Hydrological Archive and Analysis System
 Copyright 1994-2021, UNH - ASRC/CUNY
 
-CMDdsAggregate.c
+CMDdsClimatology.c
 
 bfekete@gc.cuny.edu
 
@@ -16,9 +16,9 @@ bfekete@gc.cuny.edu
 #include <string.h>
 
 static void _CMDprintUsage (const char *arg0) {
-    CMmsgPrint(CMmsgUsrError, "%s [options] <in datastream> <out datastream>", CMfileName(arg0));
-    CMmsgPrint(CMmsgUsrError, "  -e, --step [year|month|day]");
+    CMmsgPrint(CMmsgUsrError, "%s [options] <datastream1> <datastream2> ... <datastreamN>", CMfileName(arg0));
     CMmsgPrint(CMmsgUsrError, "  -a, --aggregate [avg|sum]");
+    CMmsgPrint(CMmsgUsrError, "  -o, --output <datastream filename>");
     CMmsgPrint(CMmsgUsrError, "  -h,--help");
 }
 
@@ -27,8 +27,9 @@ enum { AVG = 1, SUM = 2 };
 
 int main(int argc, char *argv[]) {
     int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemNum, itemRet, i, recordNum = 0, step = CMfailed, mode = CMfailed;
-    FILE *inFile = stdin, *outFile = stdout;
     char date[MFDateStringLength];
+    char *outFileName = (char *) NULL;
+    FILE *inFile = stdin, *outFile = stdout;
     MFdsHeader_t header, outHeader;
     void *items = (void *) NULL;
     double *array = (double *) NULL;
@@ -39,21 +40,6 @@ int main(int argc, char *argv[]) {
     date[0] = '\0';
 
     for (argPos = 1; argPos < argNum;) {
-        if (CMargTest(argv[argPos], "-e", "--step")) {
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            if (step != CMfailed) CMmsgPrint(CMmsgUsrError, "Skipping aggregate step that is previously set!");
-            else {
-                const char *options[] = {"year", "month", "day", (char *) NULL};
-                int codes[] = {YEAR, MONTH, DAY}, code;
-
-                if ((code = CMoptLookup(options, argv[argPos], false)) == CMfailed) {
-                    CMmsgPrint(CMmsgWarning, "Ignoring illformed step option [%s]!", argv[argPos]);
-                }
-                else step = codes[code];
-            }
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
         if (CMargTest(argv[argPos], "-a", "--aggregate")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             if (mode != CMfailed) CMmsgPrint(CMmsgUsrError, "Skipping aggregate mode that is previously set!");
@@ -69,8 +55,16 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        Help:
-        if (CMargTest(argv[argPos], "-h", "--help")) {
+        if (CMargTest(argv[argPos], "-o", "--output")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing output file!");
+                return (CMfailed);
+            }
+            outFileName = argv[argPos];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) < argPos) break;
             _CMDprintUsage (argv[0]);
             ret = CMsucceeded;

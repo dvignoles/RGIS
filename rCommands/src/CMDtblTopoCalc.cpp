@@ -29,11 +29,13 @@ int main(int argc, char *argv[]) {
     int argPos, argNum = argc, ret, verbose = false;
     DBInt oper = DBMathOperatorAdd;
     char *tableName = (char *) NULL;
-    char *srcFieldName = (char *) NULL;
-    char *dstFieldName = (char *) NULL;
+    char *srcFieldName  = (char *) NULL;
+    char *dstFieldName  = (char *) NULL;
     char *nextFieldName = (char *) NULL;
     DBObjData *data;
     DBObjTable *table;
+
+    if (argNum < 2) goto Help;
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-a", "--table")) {
@@ -93,7 +95,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-h", "--help")) {
+Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
         }
