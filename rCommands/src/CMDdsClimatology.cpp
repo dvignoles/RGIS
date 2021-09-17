@@ -187,7 +187,7 @@ Next:   if (inFile != (FILE *) NULL) { if (inCompress) pclose (inFile); else fcl
     else {
         if (strncmp(CMfileExtension(outFileName), "gz", 2) == 0) {
             char pCommand[strlen(outFileName) + 16];
-            sprintf(pCommand, "gunzip -c %s", outFileName);
+            sprintf(pCommand, "gzip > %s", outFileName);
             outFile = popen(pCommand, "w");
             outCompress = true;
         }
