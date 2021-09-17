@@ -73,99 +73,110 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
             inFile = fopen(argv[argPos], "r");
             inCompress  = false;
         }
+        if (inFile == (FILE *) NULL) {
+            CMmsgPrint (CMmsgUsrError, "Skipping file: %s",argv[argPos]);
+            goto Next;
+        }
         recordID = 0;
         while (MFdsHeaderRead(&header, inFile) == CMsucceeded) {
-            if ((strlen (header.Date) > 4) && (strcmp(header.Date + 4,"-02-29") == 0)) goto Next; // Skipping leap year
-            if (0 == recordNum) {
-                itemNum  = header.ItemNum;
-                itemType = header.Type;
-                itemSize = MFVarItemSize(header.Type);
-                if ((items = (void *) calloc(header.ItemNum, itemSize)) == (void *) NULL) {
-                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+            if ((strlen (header.Date) > 4) && (strcmp(header.Date + 4,"-02-29") != 0)) { // Skipping February 29th
+                if (recordNum == 0) {
+                    itemNum  = header.ItemNum;
+                    itemType = header.Type;
+                    itemSize = MFVarItemSize(header.Type);
+                    if ((items = (void *) calloc(header.ItemNum, itemSize)) == (void *) NULL) {
+                        CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
+                }
+                else {
+                    if ((itemNum != header.ItemNum) || (itemType != header.Type)) {
+                        CMmsgPrint (CMmsgUsrError,"Skipping inconsistent datastream file: %s", argv[argPos]);
+                        goto Next;
+                    }
+                }
+                if (recordID >= recordNum) {
+                    recordNum = recordID + 1;
+                    if ((arrays = (float **) realloc (arrays,recordNum * sizeof(float *))) == (float **) NULL) {
+                        CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
+                    if ((arrays[recordID] = (float *) calloc (itemNum,sizeof(float))) == (float *) NULL) {
+                        CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
+                    if ((dates = (char **) realloc (dates,recordNum * sizeof(char *))) == (char **) NULL) {
+                        CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
+                    if ((dates[recordID] = (char *) malloc (MFDateStringLength)) == (char *) NULL) {
+                        CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
+                    if ((obsNums = (int **) realloc (obsNums,recordNum * sizeof(int *))) == (int **) NULL) {
+                        CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
+                    if ((obsNums[recordID] = (int *) calloc (itemNum,sizeof(int))) == (int *) NULL) {
+                        CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
+                    if (strlen (header.Date) == 4) sprintf (dates[recordID],"XXXX"); else sprintf (dates[recordID],"XXXX-%s",header.Date + 4); 
+                    for (i = 0; i < itemNum; ++i) { arrays[recordID][i] = 0.0; obsNums[recordID][i] = 0; }
+                }
+                if (fread(((char *) items), itemSize, itemNum, inFile) != itemNum) {
+                    CMmsgPrint (CMmsgSysError,"File reading error: %s",argv[argPos]);
                     goto Stop;
                 }
+                for (i = 0; i < itemNum; i++) {
+                    switch (itemType) {
+                        case MFByte:
+                            if (((char *) items)[i] != header.Missing.Int) {
+                                 arrays[recordID][i] += (float) (((char *) items)[i]);
+                                obsNums[recordID][i] += 1;
+                            }
+                            break;
+                        case MFShort:
+                            if (header.Swap != 1) MFSwapHalfWord(((short *) items) + i);
+                            if (((short *) items)[i] != header.Missing.Int) {
+                                 arrays[recordID][i] += (float) (((short *) items)[i]);
+                                obsNums[recordID][i] += 1;
+                            }
+                            break;
+                        case MFInt:
+                            if (header.Swap != 1) MFSwapWord(((int *) items) + i);
+                            if (((int *) items)[i] != header.Missing.Int) {
+                                 arrays[recordID][i] += (float) (((int *) items)[i]);
+                                obsNums[recordID][i] += 1;
+                            }
+                            break;
+                        case MFFloat:
+                            if (header.Swap != 1) MFSwapWord(((float *) items) + i);
+                            if ((isnan(((float *) items)[i]) == false) && (CMmathEqualValues(((float *) items)[i], header.Missing.Float) == false)) {
+                                 arrays[recordID][i] += ((float *) items)[i];
+                                obsNums[recordID][i] += 1;
+                            }
+                            break;
+                        case MFDouble:
+                            if (header.Swap != 1) MFSwapLongWord(((double *) items) + i);
+                            if ((isnan (((double *) items)[i]) == false) && (CMmathEqualValues(((double *) items)[i], header.Missing.Float) == false)) {
+                                 arrays[recordID][i] += (float) (((double *) items)[i]);
+                                obsNums[recordID][i] += 1;
+                            }
+                            break;
+                    }
+                }
+                if (feof(inFile) != 0) goto Next;
+                recordID++;
             }
             else {
-                if ((itemNum != header.ItemNum) || (itemType != MFVarItemSize(header.Type))) {
-                    CMmsgPrint (CMmsgUsrError,"Skipping inconsistent datastream file: %s", argv[argPos]);
-                    goto Next;
+                if (fread(((char *) items), itemSize, itemNum, inFile) != itemNum) {
+                    CMmsgPrint (CMmsgSysError,"File reading error: %s",argv[argPos]);
+                    goto Stop;
                 }
             }
-            if (recordID >= recordNum) {
-                recordNum = recordID + 1;
-                if ((arrays = (float **) realloc (arrays,recordNum * sizeof(float *))) == (float **) NULL) {
-                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
-                    goto Stop;
-                }
-                if ((arrays[recordID] = (float *) calloc (itemNum,sizeof(float))) == (float *) NULL) {
-                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
-                    goto Stop;
-                }
-                if ((dates = (char **) realloc (dates,recordNum * sizeof(char *))) == (char **) NULL) {
-                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
-                    goto Stop;
-                }
-                if ((dates[recordID] = (char *) malloc (MFDateStringLength)) == (char *) NULL) {
-                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
-                    goto Stop;
-                }
-                if ((obsNums = (int **) realloc (obsNums,recordNum * sizeof(int *))) == (int **) NULL) {
-                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
-                    goto Stop;
-                }
-                if ((obsNums[recordID] = (int *) calloc (itemNum,sizeof(int))) == (int *) NULL) {
-                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
-                    goto Stop;
-                }
-                if (strlen (header.Date) == 4) sprintf (dates[recordID],"XXXX"); else sprintf (dates[recordID],"XXXX-%s",header.Date + 4); 
-                for (i = 0; i < itemNum; ++i) { arrays[recordID][i] = 0.0; obsNums[recordID][i] = 0.0; }
-            }
-            if (fread(((char *) items) + itemNum * itemSize, itemSize, header.ItemNum - itemNum, inFile) != header.ItemNum) {
-                CMmsgPrint (CMmsgSysError,"File reading error: %s",argv[argPos]);
-                goto Stop;
-            }
-            for (i = 0; i < header.ItemNum; i++) {
-                switch (itemType) {
-                    case MFByte:
-                        if (((char *) items)[i] != header.Missing.Int) {
-                             arrays[recordID][i] += (float) ((char *) items)[i];
-                            obsNums[recordID][i] += 1;
-                        }
-                        break;
-                    case MFShort:
-                        if (header.Swap != 1) MFSwapHalfWord(((short *) items) + i);
-                        if (((short *) items)[i] != header.Missing.Int) {
-                             arrays[recordID][i] += (float) ((short *) items)[i];
-                            obsNums[recordID][i] += 1;
-                        }
-                        break;
-                    case MFInt:
-                        if (header.Swap != 1) MFSwapWord(((int *) items) + i);
-                        if (((int *) items)[i] != header.Missing.Int) {
-                             arrays[recordID][i] += (float) ((int *) items)[i];
-                            obsNums[recordID][i] += 1;
-                        }
-                        break;
-                    case MFFloat:
-                        if (header.Swap != 1) MFSwapWord(((float *) items) + i);
-                        if ((isnan(((float *) items)[i]) == false) && (CMmathEqualValues(((float *) items)[i], header.Missing.Float) == false)) {
-                             arrays[recordID][i] += ((float *) items)[i];
-                            obsNums[recordID][i] += 1;
-                        }
-                        break;
-                    case MFDouble:
-                        if (header.Swap != 1) MFSwapLongWord(((double *) items) + i);
-                        if ((isnan (((double *) items)[i]) == false) && (CMmathEqualValues(((double *) items)[i], header.Missing.Float) == false)) {
-                             arrays[recordID][i] += (float) ((double *) items)[i];
-                            obsNums[recordID][i] += 1;
-                        }
-                        break;
-                }
-            }
-            if (feof(inFile) != 0) goto Next;
-            recordID++;
         }
-Next:   if (inCompress) pclose (inFile); else fclose (inFile);
+Next:   if (inFile != (FILE *) NULL) { if (inCompress) pclose (inFile); else fclose (inFile); }
         recordID = 0;
     }
     outHeader.Swap = 1;
@@ -177,17 +188,17 @@ Next:   if (inCompress) pclose (inFile); else fclose (inFile);
         if (strncmp(CMfileExtension(outFileName), "gz", 2) == 0) {
             char pCommand[strlen(outFileName) + 16];
             sprintf(pCommand, "gunzip -c %s", outFileName);
-            outFile = popen(pCommand, "r");
+            outFile = popen(pCommand, "w");
             outCompress = true;
         }
         else {
-            outFile = fopen(outFileName, "r");
+            outFile = fopen(outFileName, "w");
             outCompress  = false;
         }
-    }
-    if (outFile == (FILE *) NULL) {
-        CMmsgPrint (CMmsgUsrError,"Output file opening error");
-        goto Stop;
+        if (outFile == (FILE *) NULL) {
+            CMmsgPrint (CMmsgUsrError,"Output file opening error: %s",outFileName);
+            goto Stop;
+        }
     }
     for (recordID = 0; recordID < recordNum; ++recordID) {
         strcpy(outHeader.Date, dates[recordID]);
