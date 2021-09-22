@@ -1,7 +1,8 @@
-project(WBMstable)
+cmake_minimum_required(VERSION 3.10)
+project(WBM20)
 
-set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g")
 
 if(${GHAASDIR})
     include_directories(${GHAASDIR}/include)
@@ -12,13 +13,13 @@ else(${GHAASDIR})
 endif(${GHAASDIR})
 
 FILE(GLOB sources src/*.c)
-add_executable(WBMstable ${sources})
+add_executable(WBM20 ${sources})
 
 if(${CMAKE_HOST_APPLE})
-    target_link_libraries(WBMstable MF30 CM30 m)
+    target_link_libraries(WBM20 MF30 CM30 m)
 else(${CMAKE_HOST_APPLE})
-    target_link_libraries(WBMstable MF30 CM30 m -pthread)
+    target_link_libraries(WBM20 MF30 CM30 m -pthread)
 endif(${CMAKE_HOST_APPLE})
 
-target_include_directories(WBMstable PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-install (TARGETS WBMstable RUNTIME DESTINATION ghaas/bin)
+target_include_directories(WBM20 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+install (TARGETS WBM20 RUNTIME DESTINATION ghaas/bin)

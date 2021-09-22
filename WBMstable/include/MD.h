@@ -45,6 +45,7 @@ extern "C" {
 #define MDParSoilMoistALPHA                     "SoilMoistureALPHA"
 #define	MDParSnowFallThreshold				    "SnowFallThreshold"
 #define MDParSnowMeltThreshold                  "SnowMeltThreshold"
+#define MDParRiverUptakeFraction                "RiverUptakeFraction"
 
 // Auxiliary variables
 #define MDVarAux_AccBalance                     "AccumBalance"
@@ -155,6 +156,7 @@ extern "C" {
 #define MDVarIrrigation_SoilMoistChange         "IrrSoilMoistureChange"
 #define MDVarIrrigation_UptakeBalance           "IrrUptakeBalance"
 #define MDVarIrrigation_UptakeExternal          "IrrUptakeExternal"
+#define MDVarIrrigation_AccumUptakeExternal     "IrrAccumUptakeExternal"
 #define MDVarIrrigation_UptakeExcess            "IrrUptakeExcess"
 #define MDVarIrrigation_UptakeGrdWater          "IrrUptakeGroundWater"
 #define MDVarIrrigation_UptakeRiver             "IrrUptakeRiver"
@@ -171,9 +173,30 @@ extern "C" {
 #define MDVarReservoir_FarmPontUptake           "SmallReservoirUptake"
 #define MDVarReservoir_FarmPondEvaporation      "SmallReservoirEvaporation"
 #define MDVarReservoir_Capacity                 "ReservoirCapacity"
+#define MDVarReservoir_Inflow                   "ReservoirInflow"
+#define MDVarReservoir_NatInflow                "ReservoirNatInflow"
+#define MDVarReservoir_NatDMeanInflow           "ReservoirNatDMeanInflow"
+#define MDVarReservoir_NatAMeanInflow           "ReservoirNatAMeanInflow"
 #define MDVarReservoir_Release                  "ReservoirRelease"
+#define MDVarReservoir_ExtractableRelease       "ReservoirExtractableRelease"
+#define MDVarReservoir_Uptake                   "ReservoirUptake"
+#define MDVarReservoir_NonIrrDemand             "ReservoirNonIrrDemand"
+#define MDVarReservoir_NonIrrDailyMeanDemand    "ReservoirNonIrrDMeanDemand"
+#define MDVarReservoir_NonIrrAnnualMeanDemand   "ReservoirNonIrrAMeanDemand"
+#define MDVarReservoir_IrrDemand                "ReservoirIrrDemand"
+#define MDVarReservoir_IrrDailyMeanDemand       "ReservoirIrrDMeanDemand"
+#define MDVarReservoir_IrrAnnualMeanDemand      "ReservoirIrrAMeanDemand"
+#define MDVarReservoir_InitStorage              "ReservoirInitStorage"
 #define MDVarReservoir_Storage                  "ReservoirStorage"
 #define MDVarReservoir_StorageChange            "ReservoirStorageChange"
+#define MDVarReservoir_Deficit                  "ReservoirDeficit"
+#define MDVarReservoir_Surplus                  "ReservoirSurplus"
+#define MDVarReservoir_AccumDeficit             "ReservoirAccumDeficit"
+#define MDVarReservoir_AccumSurplus             "ReservoirAccumSurplus"
+#define MDVarReservoir_MaxAccumDeficit          "ReservoirMaxAccumDeficit"
+#define MDVarReservoir_MaxAccumSurplus          "ReservoirMaxAccumSurplus"
+#define MDVarReservoir_TargetLowFlow            "ReservoirTargetLowFlow"
+#define MDVarReservoir_TargetHighFlow           "ReservoirTargetHighFlow"
 
 // Routing variables
 #define MDVarRouting_BankfullQ                  "BankfullQ"
@@ -364,7 +387,6 @@ extern "C" {
 #define MDVarTP2M_StorageMixing_QxT             "QxT_StorageMixing"
 #define MDVarTP2M_DeltaStorageMixing_QxT        "QxT_DeltaStorageMixing"
 #define MDVarTP2M_WTempMixing_QxT               "QxT_WaterTempMixing"
-#define MDOptTP2M_ThermalInputs					"ThermalInputs3"
 
 // Varying Parameters
 #define MDVarParam_Albedo                       "Albedo"
@@ -417,7 +439,9 @@ int MDAux_AccumPrecipDef ();
 int MDAux_AccumRunoffDef ();
 int MDAux_AccumSMoistChgDef ();
 int MDAux_AvgNStepsDef ();
-int MDAux_MeanDiscargehDef ();
+int MDAux_MeanDischargeDef ();
+int MDAux_MinimumDischargeDef ();
+int MDAux_MaximumDischargeDef ();
 int MDAux_MeanRunoffDef ();
 
 int MDCommon_AirTemperatureDef ();
@@ -491,13 +515,17 @@ int MDRouting_DischargeInChannelAccumulateDef ();
 int MDRouting_DischargeInChannelCascadeDef ();
 int MDRouting_DischargeInChannelMuskingumDef ();
 int MDRouting_DischargeInChannelMuskingumCoeffDef ();
-int MDRouting_DischargeReleaseDef ();
-int MDRouting_DischargeUptake ();
+int MDRouting_DischargeUptakeDef ();
 int MDRouting_RiverShapeExponentDef ();
 int MDRouting_RiverWidthDef ();
 
 int MDReservoir_OperationDef ();
-int MDReservoir_FarmPondReleaseDef ();
+int MDReservoir_ReleaseDef ();
+int MDReservoir_TargetLowFlowDef ();
+int MDReservoir_TargetHighFlowDef ();
+int MDReservoir_ExtractableReleaseDef ();
+int MDReservoir_UptakeDef    ();
+int MDReservoir_FarmPondReleaseDef  ();
 int MDReservoir_FarmPondCapacityDef ();
 
 int MDSediment_BQARTpreprocessDef ();
