@@ -26,7 +26,7 @@ static int _MDOutRelSoilMoistID     = MFUnset;
 
 static void _MDSoilMoistChg (int itemID) {	
 // Input
-	float sMoist;        // Non-irrigated soil moisture [mm/dt]
+	float sMoist;        // Non-irrigated soil moisture [mm]
 	float sMoistChg;     // Non-irrigated soil moisture change [mm/dt]
 	float soilAvailWaterCap; // Available water capacity [mm]
 	
