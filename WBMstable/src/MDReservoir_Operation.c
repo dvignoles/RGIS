@@ -65,7 +65,7 @@ static void _MDReservoirWisser (int itemID) {
 	discharge     = MFVarGetFloat (_MDInRouting_DischargeID,      itemID, 0.0);
 	resExtRelease = MFVarGetFloat (_MDOutResExtractableReleaseID, itemID, 0.0);
 
-	if ((resCapacity = MFVarGetFloat (_MDInResCapacityID, itemID, 0.0)) > 0.0) { 
+	if ((resCapacity = MFVarGetFloat (_MDInResCapacityID, itemID, 0.0)) > 0.0001) { // TODO Arbitrary limit!!!!
 		            dt = MFModelGet_dt ();
 		 meanDischarge = MFVarGetFloat (_MDInAux_MeanDischargeID,      itemID, discharge);
 		prevResStorage = MFVarGetFloat(_MDOutResStorageID, itemID, 0.0);
@@ -128,7 +128,7 @@ static void _MDReservoirSNL (int itemID) {
 	discharge      = MFVarGetFloat (_MDInRouting_DischargeID,      itemID, 0.0);
 	resExtRelease  = MFVarGetFloat (_MDOutResExtractableReleaseID, itemID, 0.0);
 
-	if ((resCapacity = MFVarGetFloat (_MDInResCapacityID, itemID, 0.0)) > 0.0) {
+	if ((resCapacity = MFVarGetFloat (_MDInResCapacityID, itemID, 0.0)) > 0.0001) { // TODO Arbitrary limit!!!!
 		            dt = MFModelGet_dt ();
 		prevResStorage = MFVarGetFloat (_MDOutResStorageID,            itemID, 0.0);
 		natDMeanInflow = MFVarGetFloat (_MDInResNatDMeanInflowID,      itemID, 0.0);
