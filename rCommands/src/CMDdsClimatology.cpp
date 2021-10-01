@@ -121,7 +121,7 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
                         CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
                         goto Stop;
                     }
-                    if (strlen (header.Date) == 4) sprintf (dates[recordID],"XXXX"); else sprintf (dates[recordID],"XXXX-%s",header.Date + 4); 
+                    if (strlen (header.Date) == 4) sprintf (dates[recordID],"XXXX"); else sprintf (dates[recordID],"XXXX%s",header.Date + 4); 
                     for (i = 0; i < itemNum; ++i) { arrays[recordID][i] = 0.0; obsNums[recordID][i] = 0; }
                 }
                 if (fread(((char *) items), itemSize, itemNum, inFile) != itemNum) {
