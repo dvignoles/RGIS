@@ -72,7 +72,7 @@ char *CMbufStripChar(char *, char);
 #define CMbufStripDQuotes(buffer) (CMbufStripChar (buffer,'\"'))
 #define CMbufStripSQuotes(buffer) (CMbufStripChar (buffer,'\''))
 
-#define CMmathEpsilon 0.01
+#define CMmathEpsilon 0.00001
 
 bool CMmathEqualValues(double, double);
 
