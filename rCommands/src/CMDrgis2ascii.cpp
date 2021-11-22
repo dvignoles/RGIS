@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
         case DBTypeVectorPoint: ret = DBExportARCGenPoint (data,outFile); break;
         case DBTypeVectorLine:  ret = DBExportARCGenLine  (data,outFile); break;
         case DBTypeVectorPolygon: break;
-        case DBTypeNetwork: ret = DBNetworkExportASCIIGridDir (data, outFile); break;
+        case DBTypeNetwork:     ret = DBNetworkExportASCIIGridDir (data, outFile); break;
     }
 
     if (argNum > 2) fclose(outFile);
