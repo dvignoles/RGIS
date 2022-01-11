@@ -2092,7 +2092,7 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
             else {
                 for (pos.Col = colNum - 1; pos.Col >= 0; pos.Col--) {
                     value = vector[pos.Col];
-                    if (CMmathEqualValues(value, fillValue)) value = missingValue;
+                    if (isnan (value) || CMmathEqualValues(value, fillValue)) value = missingValue;
                     else {
                         value = scaleFactor * value + dataOffset;
                         sumWeight += cellArea;
