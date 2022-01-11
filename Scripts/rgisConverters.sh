@@ -108,7 +108,7 @@ function rgisFile2gpkg {
 		    ogr2ogr -update -overwrite -nln "${schema}_${tblName}" -nlt "POLYGON" -dialect "sqlite" -sql "@${tmpFile}.sql" "${gpkgFile}" "${tmpFile}.gpkg"
 	    	rm "${tmpFile}".*
 	    ;;
-	    (gdbc|gdbc.gznc)
+	    (gdbc|gdbc.gz|.nc)
     	    [ -e "${gpkgFile}" ] && [ "${mode}" == "append" ] && (echo "DROP TABLE IF EXISTS \"${schema}_${tblName}\"" | sqlite3  "${gpkgFile}")
             rgis2netcdf "${rgisFile}" "${tmpFile}.nc"
             gdal_translate -a_srs "EPSG:4326" -of Rasterlite "${tmpFile}.nc" RASTERLITE:"${gpkgFile}",table="${schema}_${tblName}"
