@@ -360,7 +360,7 @@ DBInt DBGridIF::Value(DBObjRecord *layerRec, DBPosition pos, DBFloat *value) con
                     *value = (DBFloat) ((DBFloat  *) (dataRec->Data()))[j];
                     break;
             }
-            retVal = CMmathEqualValues(*value, missingFloat) ? false : true;
+            retVal = isnan (*value) || CMmathEqualValues(*value, missingFloat) ? false : true;
             break;
         case DBTableFieldInt:
             missingInt = MissingValueFLD->Int(ItemTable->Item(layerRec->RowID()));
