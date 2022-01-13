@@ -2,7 +2,7 @@
 
 GHAAS User Interface library V2.1
 Global Hydrological Archive and Analysis System
-Copyright 1994-2021, UNH - ASRC/CUNY
+Copyright 1994-2022, UNH - ASRC/CUNY
 
 UIInit.cpp
 
@@ -17,7 +17,7 @@ bfekete@gc.cuny.edu
 #include <Xm/DrawingA.h>
 #include <UI.hpp>
 
-#define UICopyRightText "[Copyright 1994-2021, UNH - ASRC/CUNY]"
+#define UICopyRightText "[Copyright 1994-2022, UNH - ASRC/CUNY]"
 
 static Widget _UITopLevel;
 static UIMenuItem *_UIMainMenu;

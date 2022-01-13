@@ -2,7 +2,7 @@
 
 GHAAS Variable Database library V2.1
 Global Hydrological Archive and Analysis System
-Copyright 1994-2021, UNH - ASRC/CUNY
+Copyright 1994-2022, UNH - ASRC/CUNY
 
 vdb.h
 

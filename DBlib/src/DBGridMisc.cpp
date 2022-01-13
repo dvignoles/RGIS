@@ -2,7 +2,7 @@
 
 GHAAS Database library V3.0
 Global Hydrological Archive and Analysis System
-Copyright 1994-2021, UNH - ASRC/CUNY
+Copyright 1994-2022, UNH - ASRC/CUNY
 
 DBGridMisc.cpp
 
@@ -360,7 +360,7 @@ DBInt DBGridIF::Value(DBObjRecord *layerRec, DBPosition pos, DBFloat *value) con
                     *value = (DBFloat) ((DBFloat  *) (dataRec->Data()))[j];
                     break;
             }
-            retVal = CMmathEqualValues(*value, missingFloat) ? false : true;
+            retVal = isnan (*value) || CMmathEqualValues(*value, missingFloat) ? false : true;
             break;
         case DBTableFieldInt:
             missingInt = MissingValueFLD->Int(ItemTable->Item(layerRec->RowID()));

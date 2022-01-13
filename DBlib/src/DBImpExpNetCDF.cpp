@@ -2,7 +2,7 @@
 
 GHAAS Database library V3.0
 Global Hydrological Archive and Analysis System
-Copyright 1994-2021, UNH - ASRC/CUNY
+Copyright 1994-2022, UNH - ASRC/CUNY
 
 DBImpExpNetCDF.cpp
 
@@ -2077,7 +2077,7 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
             if (longitudes[0] < longitudes[1]) {
                 for (pos.Col = 0; pos.Col < colNum; pos.Col++) {
                     value = vector[pos.Col];
-                    if (CMmathEqualValues(value, fillValue)) value = missingValue;
+                    if (isnan (value) || CMmathEqualValues(value, fillValue)) value = missingValue;
                     else {
                         value = scaleFactor * value + dataOffset;
                         sumWeight += cellArea;
@@ -2092,7 +2092,7 @@ DBInt DBImportNetCDF(DBObjData *data, const char *filename) {
             else {
                 for (pos.Col = colNum - 1; pos.Col >= 0; pos.Col--) {
                     value = vector[pos.Col];
-                    if (CMmathEqualValues(value, fillValue)) value = missingValue;
+                    if (isnan (value) || CMmathEqualValues(value, fillValue)) value = missingValue;
                     else {
                         value = scaleFactor * value + dataOffset;
                         sumWeight += cellArea;
