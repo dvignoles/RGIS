@@ -79,7 +79,6 @@ float MDPETlibZPDisplacement (float height,float lai,float sai,float z0g) {
 	xx = pow (-1.0 + exp(0.909 - 3.03 * z0c / height),4.0) / (MDConstLPC + MDConstCS * height) * (lai + sai);
 	//printf("Height %f Discpl %f \n",height,dispc);
 	return (1.1 * height * log (1.0 + pow (xx,0.25)));
- 
 }
 
 float MDPETlibCanopySurfResistance (float airTmin,float solRad,float dd,
@@ -197,7 +196,7 @@ float MDPETlibVPressSat (float airT) {
 /* calculates saturated vp from airt temperature Murray (1967)
  * airT      - air temperature [degree C] */
 	return ((airT >= 0.0) ? 0.61078 * exp (17.26939 * airT / (airT + 237.3)) :
-   							   0.61078 * exp (21.87456 * airT / (airT + 265.5)));
+   							0.61078 * exp (21.87456 * airT / (airT + 265.5)));
 }
 
 float MDPETlibVPressDelta (float airT) {
@@ -265,7 +264,7 @@ float MDPETlibShuttleworthWallace (float rss,float aa,float asubs,float dd,float
  * rsc       - canopy surface resistance [s/m]
  * delta     - dEsat/dTair [kPa/K] */
 	float rs, rc, ra, ccs, ccc, pms, pmc;
-  float output;  
+	float output;  
   //printf ("Hier\n");
 
    rs = (delta + MDConstPSGAMMA) * ras + MDConstPSGAMMA * rss; 

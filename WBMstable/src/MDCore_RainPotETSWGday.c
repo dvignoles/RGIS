@@ -80,23 +80,23 @@ static void _MDRainPotETSWGday (int itemID) {
 	float pet;
 
 	if (MFVarTestMissingVal (_MDInDayLengthID,    itemID) ||
-		 MFVarTestMissingVal (_MDInI0HDayID,       itemID) ||
-		 MFVarTestMissingVal (_MDInCParamAlbedoID, itemID) ||
-		 MFVarTestMissingVal (_MDInCParamCHeightID,itemID) ||
-		 MFVarTestMissingVal (_MDInCParamLWidthID, itemID) ||
-		 MFVarTestMissingVal (_MDInCParamRSSID,    itemID) ||
-		 MFVarTestMissingVal (_MDInCParamR5ID,     itemID) ||
-		 MFVarTestMissingVal (_MDInCParamCDID,     itemID) ||
-		 MFVarTestMissingVal (_MDInCParamCRID,     itemID) ||
-		 MFVarTestMissingVal (_MDInCParamGLMaxID,  itemID) ||
-		 MFVarTestMissingVal (_MDInCParamZ0gID,    itemID) ||
-		 MFVarTestMissingVal (_MDInLeafAreaIndexID,itemID) ||
-		 MFVarTestMissingVal (_MDInStemAreaIndexID,itemID) ||
-		 MFVarTestMissingVal (_MDInCommon_AtMeanID,       itemID) ||
-		 MFVarTestMissingVal (_MDInAtMinID,        itemID) ||
-		 MFVarTestMissingVal (_MDInSolRadID,       itemID) ||
-		 MFVarTestMissingVal (_MDInVPressID,       itemID) ||
-		 MFVarTestMissingVal (_MDInWSpeedID,       itemID)) { MFVarSetMissingVal (_MDOutPetID,itemID); return; }
+		MFVarTestMissingVal (_MDInI0HDayID,       itemID) ||
+		MFVarTestMissingVal (_MDInCParamAlbedoID, itemID) ||
+		MFVarTestMissingVal (_MDInCParamCHeightID,itemID) ||
+		MFVarTestMissingVal (_MDInCParamLWidthID, itemID) ||
+		MFVarTestMissingVal (_MDInCParamRSSID,    itemID) ||
+		MFVarTestMissingVal (_MDInCParamR5ID,     itemID) ||
+		MFVarTestMissingVal (_MDInCParamCDID,     itemID) ||
+		MFVarTestMissingVal (_MDInCParamCRID,     itemID) ||
+		MFVarTestMissingVal (_MDInCParamGLMaxID,  itemID) ||
+		MFVarTestMissingVal (_MDInCParamZ0gID,    itemID) ||
+		MFVarTestMissingVal (_MDInLeafAreaIndexID,itemID) ||
+		MFVarTestMissingVal (_MDInStemAreaIndexID,itemID) ||
+		MFVarTestMissingVal (_MDInCommon_AtMeanID,itemID) ||
+		MFVarTestMissingVal (_MDInAtMinID,        itemID) ||
+		MFVarTestMissingVal (_MDInSolRadID,       itemID) ||
+		MFVarTestMissingVal (_MDInVPressID,       itemID) ||
+		MFVarTestMissingVal (_MDInWSpeedID,       itemID)) { MFVarSetMissingVal (_MDOutPetID,itemID); return; }
 
 	dayLen  = MFVarGetFloat (_MDInDayLengthID,     itemID, 0.1);
 	i0hDay  = MFVarGetFloat (_MDInI0HDayID,        itemID,  0.0);
