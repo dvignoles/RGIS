@@ -15,7 +15,7 @@ ENV PATH="${PATH}:/usr/local/share/ghaas/bin:/usr/local/share/ghaas/f"
 FROM base AS compute
 RUN apt-get install -y --no-install-recommends dialog apt-utils apt-transport-https dnsutils psmisc \
             vim rsync screen tmux bc curl nfs-common python python-numpy python-psutil gnuplot imagemagick \
-            netcdf-bin nco cdo libudunits2-0 libudunits2-data gdal-bin python-gdal python3-gdal \
+            netcdf-bin nco cdo libudunits2-0 libudunits2-data gdal-bin \
             postgresql-client-common libexpat1 libmotif-common libxss1 && rm -rf /var/lib/apt/lists/*
    COPY --from=rgis /usr/local/share/ghaas /usr/local/share/ghaas
    ENV PATH=\"${PATH}:/usr/local/share/ghaas/bin:/usr/local/share/ghaas/f\"
