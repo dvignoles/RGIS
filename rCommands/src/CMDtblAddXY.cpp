@@ -26,7 +26,7 @@ static void _CMDprintUsage (const char *arg0) {
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret = CMfailed, verbose = false;
     DBInt recID;
     DBObjData *data;
     char *tableName = (char *) NULL;
@@ -125,6 +125,7 @@ int main(int argc, char *argv[]) {
                     fieldX->Float(record,coord.X);
                     fieldY->Float(record,coord.Y);
                 }
+                ret = CMsucceeded;
             } else {
                 CMmsgPrint(CMmsgUsrError, "Invalid tablename (this cannot happen): %s!", tableName);
                 ret = CMfailed;

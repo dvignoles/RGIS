@@ -20,7 +20,8 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -f,--field     [source field]");
     CMmsgPrint(CMmsgInfo, "     -c,--cfield    [compare field]");
     CMmsgPrint(CMmsgInfo, "     -T,--tolerance [error tolerance in percent]");
-    CMmsgPrint(CMmsgInfo, "     -R,--radius   [radius]");
+    CMmsgPrint(CMmsgInfo, "     -R,--radius    [radius]");
+    CMmsgPrint(CMmsgInfo, "     -M,--mode      [adaptive|fixed]");
     CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
     CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
     CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
@@ -35,6 +36,7 @@ int main(int argc, char *argv[]) {
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *networkName = (char *) NULL;
+    bool adaptive = true;
     DBFloat radius    = 10.0;
     DBFloat tolerance = 10.0;
     DBObjData *data, *netData;
@@ -91,6 +93,24 @@ int main(int argc, char *argv[]) {
             if (sscanf (argv[argPos],"%lf", &radius) != 1) {
                 CMmsgPrint(CMmsgUsrError, "Invalid pixel radius!");
                 return (CMfailed);
+            }
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
+        if (CMargTest(argv[argPos], "-M", "--method")) {
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing radius method!");
+                return (CMfailed);
+            }
+            else {
+                const char *options[] = {"adaptive", "fixed", (char *) NULL};
+                bool methods[] = { true, false};
+                DBInt code;
+
+                if ((code = CMoptLookup(options, argv[argPos], false)) == CMfailed) {
+                    CMmsgPrint(CMmsgWarning, "Ignoring illformed radius method [%s]!", argv[argPos]);
+                }
+                else adaptive = methods[code];
             }
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
@@ -187,7 +207,7 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     data->LinkedData(netData);
     pField = pFieldName != (char *) NULL ? pTable->Field(pFieldName) : (DBObjTableField *) NULL;
     cField = cTable->Field(cFieldName);
-    if ((ret = RGlibPointSTNCoordinates (data, pField, cField, tolerance / 100.0, radius)) == DBSuccess)
+    if ((ret = RGlibPointSTNCoordinates (data, pField, cField, tolerance / 100.0, radius, adaptive)) == DBSuccess)
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
 
     delete netData;
