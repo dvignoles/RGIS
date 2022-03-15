@@ -29,7 +29,7 @@ static void _MDCommon_GrossRadianceStd (int itemID) {
 	int   hour;
 	double eta,sigma,sinphi,sp,sbb;
 
-	day    = MFDateGetDayOfYear ();
+	day   = MFDateGetDayOfYear ();
    lambda = MFModelGetLatitude (itemID) * DTOR;
 
 	sp = 1360.0 * 3600.0 * 24.0 * 0.041841 / 41860.0; // FBM  0.041841 conversion from cal/cm2 to MJ/m2

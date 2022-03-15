@@ -524,7 +524,7 @@ function _fwPostprocess () {
 	local files=""
 	for (( fwI = 0; fwI < ${#_fwOutputARRAY[@]} ; ++fwI ))
 	do
-		if (( ${procNum} < ${_fwMAXPROC} ))
+		if (( ${procNum} < $(( ${_fwMAXPROC} / 4 )) )) # Limiting data stream conversions
     	then
 			local procNum=$((${procNum} + 1))
 		else
@@ -575,7 +575,7 @@ function _fwPostprocess () {
 				if [ -e "${dstDir}" ]
 				then
 					[ -e "${fwGDSFileNAME}.gz" ] && rm "${fwGDSFileNAME}.gz" # removing possible gzip residures from broken runs.
-					(gzip "${fwGDSFileNAME}" && mv -f "${fwGDSFileNAME}.gz" "${dstDir}/") &
+					(gzip "${fwGDSFileNAME}"     && mv -f "${fwGDSFileNAME}.gz" "${dstDir}/") &
 				else
 					rm "${fwGDSFileNAME}" &
 				fi
