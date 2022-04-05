@@ -108,7 +108,7 @@ static void _MDReservoirSNL (int itemID) {
 	float irrDemandDailyMean;     // irrigational long-term mean daily water demand [m3/s]
 	float irrDemandAnnualMean;    // irrigational long-term mean annual water demand [m3/s]
 	float resCapacity;            // Reservoir capacity [km3]
-	float resInitStorage;         // Reference storage dictatink actual release ratio [km3]
+	float resInitStorage;         // Reference storage dictating actual release ratio [km3]
 // Output
 	float resStorage    = 0.0;    // Reservoir storage [km3]
 	float resStorageChg = 0.0;    // Reservoir storage change [km3/dt]
@@ -154,7 +154,7 @@ nonIrrDemandAnnualMean = MFVarGetFloat (_MDInNonIrrDemandAnnualMean,   itemID, 0
 		releaseTarget = irrDemandAnnualMean <= 0.0 ? /* Non-irrigaitonal reservoirs */ natInflowAnnualMean :
 		/* Irrigational reservoirs */ (waterDemandDailyMean < 0.5 * natInflowAnnualMean ? natInflowAnnualMean + waterDemandDailyMean - waterDemandAnnualMean :
 						  	          (natInflowDailyMean + 9.0 * natInflowAnnualMean * waterDemandDailyMean / waterDemandAnnualMean) / 10.0); 
-		c = natInflowAnnualMean > 0.0 ? resCapacity / (natInflowAnnualMean * dt / 1e9) : 1.0;
+		c = natInflowAnnualMean > 0.0 ? resCapacity / (natInflowAnnualMean * 365 * dt / 1e9) : 1.0; // c is residency time that needs to be calculated from annual flow
 		krls = resInitStorage / (alpha * resCapacity);
  
 		resRelease = c < 0.5 ? pow (c / 0.5,2.0) * krls * releaseTarget + (1.0 - pow(c / 0.5,2.0)) * natInflowDailyMean : krls * releaseTarget; 
