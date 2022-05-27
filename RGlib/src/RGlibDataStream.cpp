@@ -15,528 +15,279 @@ bfekete@gc.cuny.edu
 #include<DBif.hpp>
 #include<MF.h>
 
-DBInt RGlibRGIS2DataStream(DBObjData *grdData, DBObjData *tmplData, char *fieldName, FILE *outFile) {
-    DBInt layerID, ret = DBSuccess, itemSize, itemID;
-    DBInt intValue;
-    DBFloat floatValue;
-    void *data;
-    MFdsHeader_t dsHeader;
-    DBObjRecord *layerRec, *gridRec;
-    DBObjTableField *fieldPTR = (DBObjTableField *) NULL;
-    DBGridIF *gridIF;
-    DBGridSampler *sampler = (DBGridSampler *) NULL;
-    DBVPointIF *tmplPntIF = (DBVPointIF *) NULL;
-    DBGridIF *tmplGrdIF = (DBGridIF *) NULL;
-    DBNetworkIF *tmplNetIF = (DBNetworkIF *) NULL;
+static void _RGlibRGIS2DataStreamPointFunc   (size_t threadId, size_t objectId, void *commonPtr);
+static void _RGlibRGIS2DataStreamGridFunc    (size_t threadId, size_t objectId, void *commonPtr);
+static void _RGlibRGIS2DataStreamNetworkFunc (size_t threadId, size_t objectId, void *commonPtr);
 
-    gridIF = new DBGridIF(grdData);
-
-    dsHeader.Swap = 1;
-    if (grdData->Type() == DBTypeGridDiscrete) {
-        DBObjTable *itemTable = grdData->Table(DBrNItems);
-
-        if (fieldName == (char *) NULL) fieldName = DBrNGridValue;
-        if ((fieldPTR = itemTable->Field(fieldName)) == (DBObjTableField *) NULL) {
-            CMmsgPrint(CMmsgAppError, "Error: Invalid field [%s] in: %s %d", fieldName, __FILE__, __LINE__);
-            return (DBFault);
-        }
-        itemSize = fieldPTR->Length();
-        switch (fieldPTR->Type()) {
-            case DBTableFieldInt:
-                switch (itemSize) {
-                   case sizeof(DBByte):
-                        dsHeader.Type = MFByte;
-                        break;
-                    case sizeof(DBShort):
-                        dsHeader.Type = MFShort;
-                        break;
-                    case sizeof(DBInt):
-                        dsHeader.Type = MFInt;
-                        break;
-                    default:
-                        CMmsgPrint(CMmsgAppError, "Error: Invalid field size in: %s %d", __FILE__, __LINE__);
-                        return (DBFault);
-                }
-                dsHeader.Missing.Int = fieldPTR->IntNoData();
-                break;
-            case DBTableFieldFloat:
-                switch (itemSize) {
-                    case sizeof(DBFloat4):
-                        dsHeader.Type = MFFloat;
-                        break;
-                    case sizeof(DBFloat):
-                        dsHeader.Type = MFDouble;
-                        break;
-                    default:
-                        CMmsgPrint(CMmsgAppError, "Error: Invalid field size in: %s %d", __FILE__, __LINE__);
-                        return (DBFault);
-                }
-                dsHeader.Missing.Float = fieldPTR->FloatNoData();
-                break;
-            default:
-                CMmsgPrint(CMmsgAppError, "Error: Invalid field type in: %s %d", __FILE__, __LINE__);
-                return (DBFault);
-        }
-    }
-    else {
-        if (fieldName != (char *) NULL) CMmsgPrint(CMmsgUsrError, "Warning: Fieldname ignored for continuous grid!");
-        itemSize = gridIF->ValueSize();
-        switch (gridIF->ValueType()) {
-            case DBVariableInt:
-                switch (itemSize) {
-                    case 1:
-                        dsHeader.Type = MFByte;
-                        break;
-                    case 2:
-                        dsHeader.Type = MFShort;
-                        break;
-                    case 4:
-                        dsHeader.Type = MFInt;
-                        break;
-                    default:
-                        CMmsgPrint(CMmsgAppError, "Error: Invalid field size in: %s %d", __FILE__, __LINE__);
-                        return (DBFault);
-                }
-                dsHeader.Missing.Int = (int) gridIF->MissingValue();
-                break;
-            case DBVariableFloat:
-                switch (itemSize) {
-                    case 4:
-                        dsHeader.Type = MFFloat;
-                        break;
-                    case 8:
-                        dsHeader.Type = MFDouble;
-                        break;
-                    default:
-                        CMmsgPrint(CMmsgAppError, "Error: Invalid field size in: %s %d", __FILE__, __LINE__);
-                        return (DBFault);
-                }
-                dsHeader.Missing.Float = gridIF->MissingValue();
-                break;
-            default:
-                CMmsgPrint(CMmsgAppError, "Error: Invalid field type in: %s %d", __FILE__, __LINE__);
-                return (DBFault);
-        }
-    }
-
-    if (tmplData == (DBObjData *) NULL) {
-        tmplGrdIF = gridIF;
-        dsHeader.ItemNum = gridIF->RowNum() * gridIF->ColNum();
-    }
-    else {
-        switch (tmplData->Type()) {
-            case DBTypeVectorPoint:
-                tmplPntIF = new DBVPointIF(tmplData);
-                dsHeader.ItemNum = tmplPntIF->ItemNum();
-                break;
-            case DBTypeGridContinuous:
-            case DBTypeGridDiscrete:
-                tmplGrdIF = new DBGridIF(tmplData);
-                dsHeader.ItemNum = gridIF->RowNum() * gridIF->ColNum();
-                break;
-            case DBTypeNetwork:
-                tmplNetIF = new DBNetworkIF(tmplData);
-                dsHeader.ItemNum = tmplNetIF->CellNum();
-                break;
-            default:
-                delete gridIF;
-                return (DBFault);
-        }
-    }
-    if ((data = calloc((size_t) (dsHeader.ItemNum), (size_t) itemSize)) == (void *) NULL) {
-        CMmsgPrint(CMmsgSysError, "Error! Allocating %d items of %d size in: %s %d", dsHeader.ItemNum, itemSize,
-                   __FILE__, __LINE__);
-        return (DBFault);
-    }
-
-/**************************************************************
-*                                                             *
-* Point template                                              *
-*                                                             *
-**************************************************************/
-
-    if (tmplPntIF != (DBVPointIF *) NULL) {
-        DBObjRecord *pntRec;
-
-        if ((fieldPTR == (DBObjTableField *) NULL) && ((dsHeader.Type == MFFloat) || (dsHeader.Type == MFDouble))) {
-            if ((sampler = (DBGridSampler *) calloc(sizeof(DBGridSampler), (size_t) tmplPntIF->ItemNum())) ==
-                (DBGridSampler *) NULL) {
-                CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
-                return (DBFault);
-            }
-            for (itemID = 0; itemID < tmplPntIF->ItemNum(); ++itemID) {
-                pntRec = tmplPntIF->Item(itemID);
-                gridIF->Coord2Sampler(tmplPntIF->Coordinate(pntRec), sampler[itemID]);
-            }
-        }
-
-        if (fieldPTR == (DBObjTableField *) NULL) {
-            for (layerID = 0; layerID < gridIF->LayerNum(); ++layerID) {
-                layerRec = gridIF->Layer(layerID);
-                strncpy(dsHeader.Date, layerRec->Name(), MFDateStringLength - 1);
-                for (itemID = 0; itemID < dsHeader.ItemNum; ++itemID) {
-                    pntRec = tmplPntIF->Item(itemID);
-                    if ((dsHeader.Type == MFByte) || (dsHeader.Type == MFShort) ||
-                        (dsHeader.Type == MFInt)) {
-                        if (gridIF->Value(layerRec, tmplPntIF->Coordinate(pntRec), &intValue) == false)
-                            intValue = dsHeader.Missing.Int;
-                        switch (dsHeader.Type) {
-                            case MFByte:
-                                ((char *) data)[itemID] = (char) intValue;
-                                break;
-                            case MFShort:
-                                ((short *) data)[itemID] = (short) intValue;
-                                break;
-                            case MFInt:
-                                ((int *) data)[itemID] = (short) intValue;
-                                break;
-                            default:
-                                CMmsgPrint(CMmsgAppError, "Error: Invalid data type in: %s %d", __FILE__, __LINE__);
-                                return (DBFault);
+class RGlibRGIS2DataStreamThreadData {
+    private:
+        DBInt ItemSize;
+        void *Data;
+        MFdsHeader_t DSHeader;
+        DBGridIF *GridIF;
+        DBGridSampler *Sampler;
+        DBObjRecord *LayerRec;
+        bool TeamInitialized;
+        CMthreadTeam_t Team;
+ 	    CMthreadJob_p  Job;
+        union {
+                void        *Any;
+                DBVPointIF  *PointIF;
+                DBGridIF    *GridIF;
+                DBNetworkIF *NetIF;
+        } Interface;
+    public:
+        DBInt Init (DBObjData *tmplData, DBObjData *grdData) {
+            Data = (void *) NULL;
+            Interface.Any = (void *) NULL;
+            Sampler = (DBGridSampler *) NULL;
+            DSHeader.Swap = 1;
+            GridIF = new DBGridIF(grdData);
+            ItemSize = GridIF->ValueSize();
+            DBObjRecord *LayerRec = (DBObjRecord *) NULL;
+            TeamInitialized = false;
+            Job = (CMthreadJob_p) NULL;
+            switch (GridIF->ValueType()) {
+                case DBVariableInt:
+                    switch (ItemSize) {
+                        case 1: DSHeader.Type = MFByte;  break;
+                        case 2: DSHeader.Type = MFShort; break;
+                        case 4: DSHeader.Type = MFInt;   break;
+                        default: CMmsgPrint(CMmsgAppError, "Error: Invalid field size in: %s %d", __FILE__, __LINE__); return (DBFault);
                         }
+                    DSHeader.Missing.Int = (int) GridIF->MissingValue();
+                    break;
+                case DBVariableFloat:
+                    switch (ItemSize) {
+                        case 4: DSHeader.Type = MFFloat;  break;
+                        case 8: DSHeader.Type = MFDouble; break;
+                        default: CMmsgPrint(CMmsgAppError, "Error: Invalid field size in: %s %d", __FILE__, __LINE__); return (DBFault);
+                        }
+                    DSHeader.Missing.Float = GridIF->MissingValue();
+                    break;
+                default: CMmsgPrint(CMmsgAppError, "Error: Invalid field type in: %s %d", __FILE__, __LINE__); return (DBFault);
+            }
+            TeamInitialized = true;
+            switch (tmplData != (DBObjData *) NULL ? tmplData->Type () : grdData->Type ()) {
+                case DBTypeVectorPoint:
+                    Interface.PointIF = new DBVPointIF(tmplData);
+                    DSHeader.ItemNum = Interface.PointIF->ItemNum();
+                    if ((DSHeader.Type == MFFloat) || (DSHeader.Type == MFDouble)) { // Using sampler
+                        DBInt itemID;
+                        DBObjRecord *pntRec;
+                        if ((Sampler = (DBGridSampler *) calloc(sizeof(DBGridSampler), (size_t) DSHeader.ItemNum)) == (DBGridSampler *) NULL) {
+                            CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
+                            return (DBFault);
+                            }
+                        for (itemID = 0; itemID < DSHeader.ItemNum; ++itemID) {
+                            pntRec = Interface.PointIF->Item(itemID);
+                            GridIF->Coord2Sampler(Interface.PointIF->Coordinate(pntRec), Sampler[itemID]);
+                        }
+                    } else Sampler = (DBGridSampler *) NULL; // Not using sampler
+                    if ((Job = CMthreadJobCreate(DSHeader.ItemNum, _RGlibRGIS2DataStreamPointFunc, (void *) this)) == (CMthreadJob_p) NULL) {
+                        CMmsgPrint(CMmsgAppError, "Job creation error in %s:%d", __FILE__, __LINE__);
+                        return (DBFault);
+                    }
+                    break;
+                case DBTypeGridContinuous: 
+                case DBTypeGridDiscrete:
+                    Interface.GridIF = tmplData != (DBObjData *) NULL ? new DBGridIF(tmplData) : GridIF;
+                    DSHeader.ItemNum = Interface.GridIF->RowNum() * Interface.GridIF->ColNum();
+                    if ((Interface.GridIF != GridIF) && ((DSHeader.Type == MFFloat) || (DSHeader.Type == MFDouble))) { // Using sampler
+                        DBInt itemID;
+                        DBPosition pos;
+                        DBCoordinate coord;
+                        if ((Sampler = (DBGridSampler *) calloc(sizeof(DBGridSampler), (size_t) DSHeader.ItemNum)) == (DBGridSampler *) NULL) {
+                            CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
+                            return (DBFault);
+                        }
+                        for (pos.Row = 0; pos.Row < Interface.GridIF->RowNum(); ++pos.Row) {
+                            for (pos.Col = 0; pos.Col < Interface.GridIF->ColNum(); ++pos.Col) {
+                                itemID = pos.Row * Interface.GridIF->ColNum() + pos.Col;
+                                Interface.GridIF->Pos2Coord(pos, coord);
+                                GridIF->Coord2Sampler(coord, Sampler[itemID]);
+                            }
+                        }
+                    } else Sampler = (DBGridSampler *) NULL; // Not using sampler
+                    if ((Job = CMthreadJobCreate(DSHeader.ItemNum, _RGlibRGIS2DataStreamGridFunc, (void *) this)) == (CMthreadJob_p) NULL) {
+                        CMmsgPrint(CMmsgAppError, "Job creation error in %s:%d", __FILE__, __LINE__);
+                        return (DBFault);
+                    }
+                    break;
+                case DBTypeNetwork:
+                    Interface.NetIF = new DBNetworkIF(tmplData);
+                    DSHeader.ItemNum = Interface.NetIF->CellNum();
+                    if ((DSHeader.Type == MFFloat) || (DSHeader.Type == MFDouble)) { // Using sampler
+                        DBInt itemID;
+                        DBObjRecord *cellRec;
+                        if ((Sampler = (DBGridSampler *) calloc (sizeof(DBGridSampler), (size_t) DSHeader.ItemNum)) == (DBGridSampler *) NULL) {
+                            CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
+                            return (DBFault);
+                        }
+                        for (itemID = 0; itemID < Interface.NetIF->CellNum(); ++itemID) {
+                            cellRec = Interface.NetIF->Cell(itemID);
+                            GridIF->Coord2Sampler(Interface.NetIF->Center(cellRec), Sampler[itemID]);
+                        }
+                    } else Sampler = (DBGridSampler *) NULL; // Not using sampler
+                    if ((Job = CMthreadJobCreate(DSHeader.ItemNum, _RGlibRGIS2DataStreamNetworkFunc, (void *) this)) == (CMthreadJob_p) NULL) {
+                        CMmsgPrint(CMmsgAppError, "Job creation error in %s:%d", __FILE__, __LINE__);
+                        return (DBFault);
+                    }
+                    break;
+            }
+            if ((Data = calloc((size_t) (DSHeader.ItemNum), (size_t) ItemSize)) == (void *) NULL) {
+                CMmsgPrint(CMmsgSysError, "Error! Allocating %d items of %d size in: %s %d", DSHeader.ItemNum, ItemSize, __FILE__, __LINE__);
+                return (DBFault);
+            }
+            if (CMthreadTeamInitialize (&Team,CMthreadProcessorNum (),DSHeader.ItemNum) == (CMthreadTeam_p) NULL) {
+                CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
+                return (DBFault);
+            }
+            return (DBSuccess);
+        }
+
+        void ComputePoint (DBInt itemID) {
+            DBInt intValue;
+            DBFloat floatValue;
+            if (Sampler == (DBGridSampler *) NULL) {
+                DBObjRecord *pntRec;
+
+                pntRec = Interface.PointIF->Item(itemID);
+                if (DSHeader.Type == MFFloat || DSHeader.Type == MFDouble) {
+                    if (GridIF->Value(LayerRec, Interface.PointIF->Coordinate(pntRec), &floatValue) == false) floatValue = DSHeader.Missing.Float;
+                } else {
+                    if (GridIF->Value(LayerRec, Interface.PointIF->Coordinate(pntRec), &intValue)   == false) intValue   = DSHeader.Missing.Int;
+                }
+            }
+            else {
+                if (GridIF->Value(LayerRec, Sampler [itemID], &floatValue) == false) floatValue = DSHeader.Missing.Float;
+            }
+            switch (DSHeader.Type) {
+                case MFByte:   ((char *)   Data) [itemID] = (char)   intValue;   break;
+                case MFShort:  ((short *)  Data) [itemID] = (short)  intValue;   break;
+                case MFInt:    ((int *)    Data) [itemID] = (short)  intValue;   break;
+                case MFFloat:  ((float *)  Data) [itemID] = (float)  floatValue; break;
+                case MFDouble: ((double *) Data) [itemID] = (double) floatValue; break;
+            }
+        }
+        void ComputeGrid (DBInt itemID) {
+            DBInt intValue;
+            DBFloat floatValue;
+
+            if (Sampler == (DBGridSampler *) NULL) {
+                DBPosition pos;
+        
+                pos.Row = itemID / Interface.GridIF->ColNum ();
+                pos.Col = itemID % Interface.GridIF->ColNum ();
+                if (Interface.GridIF != GridIF) {
+                    DBCoordinate coord;
+                    Interface.GridIF->Pos2Coord(pos, coord);
+                    if (DSHeader.Type == MFFloat || DSHeader.Type == MFDouble) {
+                        if (GridIF->Value(LayerRec, coord, &floatValue) == false) floatValue = DSHeader.Missing.Float;
+                    } else {
+                        if (GridIF->Value(LayerRec, coord, &intValue)   == false) intValue   = DSHeader.Missing.Int;
+                    }
+                } else {
+                    if (DSHeader.Type == MFFloat || DSHeader.Type == MFDouble) {
+                        if (GridIF->Value(LayerRec, pos,   &floatValue) == false) floatValue = DSHeader.Missing.Float;
                     }
                     else {
-                        if (gridIF->Value(layerRec, sampler [pntRec->RowID()], &floatValue) == false)
-                            floatValue = dsHeader.Missing.Float;
-                        switch (dsHeader.Type) {
-                            case MFFloat:
-                                ((float *) data)[itemID] = (float) floatValue;
-                                break;
-                            case MFDouble:
-                                ((double *) data)[itemID] = (double) floatValue;
-                                break;
-                            default:
-                                CMmsgPrint(CMmsgAppError, "Error: Invalid data type in: %s %d", __FILE__, __LINE__);
-                                return (DBFault);
-                        }
+                        if (GridIF->Value(LayerRec, pos,   &intValue)   == false) intValue   = DSHeader.Missing.Int;
                     }
                 }
-                if ((DBInt) fwrite(&dsHeader, sizeof(MFdsHeader_t), 1, outFile) != 1) {
+            } else {
+                if (GridIF->Value(LayerRec, Sampler [itemID], &floatValue) == false) floatValue = DSHeader.Missing.Float;
+            }
+            switch (DSHeader.Type) {
+                case MFByte:   ((char *)   Data)[itemID] = (char)   intValue;   break;
+                case MFShort:  ((short *)  Data)[itemID] = (short)  intValue;   break;
+                case MFInt:    ((int *)    Data)[itemID] = (int)    intValue;   break;
+                case MFFloat:  ((float *)  Data)[itemID] = (float)  floatValue; break;
+                case MFDouble: ((double *) Data)[itemID] = (double) floatValue; break;
+            }
+        }
+        void ComputeNetwork (DBInt itemID) {
+            DBInt   intValue;
+            DBFloat floatValue;
+
+            if (Sampler == (DBGridSampler *) NULL) {
+                DBObjRecord *cellRec;
+                cellRec = Interface.NetIF->Cell(itemID);
+                if (DSHeader.Type == MFFloat || DSHeader.Type == MFDouble) {
+                    if (GridIF->Value(LayerRec, Interface.NetIF->Center(cellRec), &floatValue) == false) floatValue = DSHeader.Missing.Float;    
+                }
+                else {
+                    if (GridIF->Value(LayerRec, Interface.NetIF->Center(cellRec), &intValue)   == false) intValue   = DSHeader.Missing.Int;
+                }
+            }
+            else {
+                if (GridIF->Value(LayerRec, Sampler[itemID], &floatValue) == false) floatValue = DSHeader.Missing.Float;
+            }
+            switch (DSHeader.Type) {
+                case MFByte:   ((char *)   Data) [itemID] = (char)   intValue;   break;
+                case MFShort:  ((short *)  Data) [itemID] = (short)  intValue;   break;
+                case MFInt:    ((int *)    Data) [itemID] = (int)    intValue;   break;
+                case MFFloat:  ((float *)  Data) [itemID] = (float)  floatValue; break;
+                case MFDouble: ((double *) Data) [itemID] = (double) floatValue; break;
+            }
+        }
+        DBInt Run (FILE *outFile) {
+            DBInt layerID;
+
+            for (layerID = 0; layerID < GridIF->LayerNum(); ++layerID) {
+                LayerRec = GridIF->Layer(layerID);
+                CMthreadJobExecute(&Team, Job);
+                strncpy(DSHeader.Date, LayerRec->Name(), MFDateStringLength - 1);
+                if ((DBInt) fwrite(&DSHeader, sizeof(MFdsHeader_t), 1, outFile) != 1) {
                     CMmsgPrint(CMmsgSysError, "Error: Writing record header in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
+                    return (DBFault);
                 }
-                if ((DBInt) fwrite(data, (size_t) itemSize, (size_t) (dsHeader.ItemNum), outFile) != dsHeader.ItemNum) {
+                if ((DBInt) fwrite(Data, (size_t) ItemSize, (size_t) (DSHeader.ItemNum), outFile) != DSHeader.ItemNum) {
                     CMmsgPrint(CMmsgSysError, "Error: Writing data in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
+                    return (DBFault);
                 }
             }
+            return (DBSuccess);
         }
-        else {
-            for (layerID = 0; layerID < gridIF->LayerNum(); ++layerID) {
-                layerRec = gridIF->Layer(layerID);
-                strncpy(dsHeader.Date, layerRec->Name(), MFDateStringLength - 1);
-                for (itemID = 0; itemID < dsHeader.ItemNum; ++itemID) {
-                    pntRec = tmplPntIF->Item(itemID);
-                    gridRec = gridIF->GridItem(layerRec, tmplPntIF->Coordinate(pntRec));
-                    switch (dsHeader.Type) {
-                        case MFByte:
-                            ((char *) data)[itemID] =
-                                    gridRec != (DBObjRecord *) NULL ? (char) fieldPTR->Int(gridRec) : (char) fieldPTR->IntNoData();
-                            break;
-                        case MFShort:
-                            ((short *) data)[itemID] =
-                                    gridRec != (DBObjRecord *) NULL ? (short) fieldPTR->Int(gridRec) : (short) fieldPTR->IntNoData();
-                            break;
-                        case MFInt:
-                            ((int *) data)[itemID] =
-                                    gridRec != (DBObjRecord *) NULL ? fieldPTR->Int(gridRec) : fieldPTR->IntNoData();
-                            break;
-                        case MFFloat:
-                            ((float *) data)[itemID] =
-                                    gridRec != (DBObjRecord *) NULL ? (float) fieldPTR->Float(gridRec) : (float) fieldPTR->FloatNoData();
-                            break;
-                        case MFDouble:
-                            ((double *) data)[itemID] =
-                                    gridRec != (DBObjRecord *) NULL ? (double) fieldPTR->Float(gridRec) : (double) fieldPTR->FloatNoData();
-                            break;
-                        default:
-                            CMmsgPrint(CMmsgAppError, "Error: Invalid data type in: %s %d", __FILE__, __LINE__);
-                            return (DBFault);
-                    }
-                }
-                if ((DBInt) fwrite(&dsHeader, sizeof(MFdsHeader_t), 1, outFile) != 1) {
-                    CMmsgPrint(CMmsgSysError, "Error: Writing record header in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
-                }
-                if ((DBInt) fwrite(data, (size_t) itemSize, (size_t) (dsHeader.ItemNum), outFile) != dsHeader.ItemNum) {
-                    CMmsgPrint(CMmsgSysError, "Error: Writing data in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
+        void  Finalize (DBObjData *tmplData) {
+            if (TeamInitialized) CMthreadTeamDestroy(&Team);
+            if (Job != (CMthreadJob_p) NULL) CMthreadJobDestroy  (Job);
+            if ((tmplData != (DBObjData *) NULL) && (Interface.Any != (void *) NULL)) {
+                switch (tmplData->Type ()) {
+                    case DBTypeVectorPoint:    delete Interface.PointIF; break;
+                    case DBTypeGridContinuous: 
+                    case DBTypeGridDiscrete:   delete Interface.GridIF;  break;
+                    case DBTypeNetwork:        delete Interface.NetIF;   break;
                 }
             }
+            if (Sampler != (DBGridSampler *) NULL) free (Sampler);
+            if (Data    != (void *) NULL)          free (Data);
+            delete GridIF;
         }
-        delete tmplPntIF;
-    }
+};
 
-/**************************************************************
-*                                                             *
-* Grid Template (default when no template coverage is given.  *
-*                                                             *
-**************************************************************/
-    else if (tmplGrdIF != (DBGridIF *) NULL) {
-        DBPosition pos;
-        DBCoordinate coord;
+static void _RGlibRGIS2DataStreamPointFunc (size_t threadId, size_t objectId, void *commonPtr) {
+	RGlibRGIS2DataStreamThreadData *threadData = (RGlibRGIS2DataStreamThreadData *) commonPtr;
+	threadData->ComputePoint (objectId); 
+}
 
-        if ((tmplGrdIF != gridIF) && (fieldPTR == (DBObjTableField *) NULL) && ((dsHeader.Type == MFFloat) || (dsHeader.Type == MFDouble))) {
-            if ((sampler = (DBGridSampler *) calloc(sizeof(DBGridSampler),
-                                                    (size_t) tmplGrdIF->RowNum() * (size_t) tmplGrdIF->ColNum())) ==
-                (DBGridSampler *) NULL) {
-                CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
-                return (DBFault);
-            }
-            for (pos.Row = 0; pos.Row < tmplGrdIF->RowNum(); ++pos.Row)
-                for (pos.Col = 0; pos.Col < tmplGrdIF->ColNum(); ++pos.Col) {
-                    tmplGrdIF->Pos2Coord(pos, coord);
-                    gridIF->Coord2Sampler(coord, sampler[pos.Row * tmplGrdIF->RowNum() + pos.Col]);
-                }
-        }
+static void _RGlibRGIS2DataStreamGridFunc (size_t threadId, size_t objectId, void *commonPtr) {
+	RGlibRGIS2DataStreamThreadData *threadData = (RGlibRGIS2DataStreamThreadData *) commonPtr;
+	threadData->ComputeGrid (objectId); 
+}
 
-        if (fieldPTR == (DBObjTableField *) NULL) {
-            for (layerID = 0; layerID < gridIF->LayerNum(); ++layerID) {
-                layerRec = gridIF->Layer(layerID);
-                strncpy(dsHeader.Date, layerRec->Name(), MFDateStringLength - 1);
-                for (pos.Row = 0; pos.Row < tmplGrdIF->RowNum(); ++pos.Row)
-                    for (pos.Col = 0; pos.Col < tmplGrdIF->ColNum(); ++pos.Col) {
-                        itemID = pos.Row * tmplGrdIF->ColNum() + pos.Col;
-                        if ((dsHeader.Type == MFByte) || (dsHeader.Type == MFShort) ||
-                            (dsHeader.Type == MFInt)) {
-                            if (tmplGrdIF != gridIF) {
-                                tmplGrdIF->Pos2Coord(pos, coord);
-                                if (gridIF->Value(layerRec, coord, &intValue) == false)
-                                    intValue = dsHeader.Missing.Int;
-                            }
-                            else {
-                                if (gridIF->Value(layerRec, pos, &intValue) == false) intValue = dsHeader.Missing.Int;
-                            }
-                            switch (dsHeader.Type) {
-                                case MFByte:
-                                    ((char *) data)[itemID] = (char) intValue;
-                                    break;
-                                case MFShort:
-                                    ((short *) data)[itemID] = (short) intValue;
-                                    break;
-                                case MFInt:
-                                    ((int *) data)[itemID] = (short) intValue;
-                                    break;
-                                default:
-                                    CMmsgPrint(CMmsgAppError, "Error: Invalid data type in: %s %d", __FILE__, __LINE__);
-                                    return (DBFault);
-                            }
-                        }
-                        else {
-                            if (tmplGrdIF != gridIF) {
-                                if (gridIF->Value(layerRec, sampler[pos.Row * tmplGrdIF->RowNum() + pos.Col], &floatValue) == false)
-                                    floatValue = dsHeader.Missing.Float;
-                            }
-                            else {
-                                if (gridIF->Value(layerRec, pos, &floatValue) == false)
-                                    floatValue = dsHeader.Missing.Float;
-                            }
-                            switch (dsHeader.Type) {
-                                case MFFloat:
-                                    ((float *) data)[itemID] = (float) floatValue;
-                                    break;
-                                case MFDouble:
-                                    ((double *) data)[itemID] = (double) floatValue;
-                                    break;
-                                default:
-                                    CMmsgPrint(CMmsgAppError, "Error: Invalid data type in: %s %d", __FILE__, __LINE__);
-                                    return (DBFault);
-                            }
-                        }
-                    }
-                if ((DBInt) fwrite(&dsHeader, sizeof(MFdsHeader_t), 1, outFile) != 1) {
-                    CMmsgPrint(CMmsgSysError, "Error: Writing record header in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
-                }
-                if ((DBInt) fwrite(data, (size_t) itemSize, (size_t) (dsHeader.ItemNum), outFile) != dsHeader.ItemNum) {
-                    CMmsgPrint(CMmsgSysError, "Error: Writing data in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
-                }
-            }
-        }
-        else {
-            for (layerID = 0; layerID < gridIF->LayerNum(); ++layerID) {
-                layerRec = gridIF->Layer(layerID);
-                strncpy(dsHeader.Date, layerRec->Name(), MFDateStringLength - 1);
-                for (pos.Row = 0; pos.Row < tmplGrdIF->RowNum(); ++pos.Row)
-                    for (pos.Col = 0; pos.Col < tmplGrdIF->ColNum(); ++pos.Col) {
-                        itemID = pos.Row * tmplGrdIF->ColNum() + pos.Col;
-                        if (tmplGrdIF != gridIF) {
-                            tmplGrdIF->Pos2Coord(pos, coord);
-                            gridRec = gridIF->GridItem(layerRec, coord);
-                        }
-                        else gridRec = gridIF->GridItem(layerRec, pos);
-                        switch (dsHeader.Type) {
-                            case MFByte:
-                                ((char *) data)[itemID] = gridRec != (DBObjRecord *) NULL ? (char) fieldPTR->Int(gridRec)
-                                                                                          : (char) fieldPTR->IntNoData();
-                                break;
-                            case MFShort:
-                                ((short *) data)[itemID] = gridRec != (DBObjRecord *) NULL ? (short) fieldPTR->Int(gridRec)
-                                                                                           : (short) fieldPTR->IntNoData();
-                                break;
-                            case MFInt:
-                                ((int *) data)[itemID] = gridRec != (DBObjRecord *) NULL ? fieldPTR->Int(gridRec)
-                                                                                         : fieldPTR->IntNoData();
-                                break;
-                            case MFFloat:
-                                ((float *) data)[itemID] = gridRec != (DBObjRecord *) NULL ? (float) fieldPTR->Float(gridRec)
-                                                                                           : (float) fieldPTR->FloatNoData();
-                                break;
-                            case MFDouble:
-                                ((double *) data)[itemID] = gridRec != (DBObjRecord *) NULL ? (double) fieldPTR->Float(gridRec)
-                                                                                            : (double) fieldPTR->FloatNoData();
-                                break;
-                            default:
-                                CMmsgPrint(CMmsgAppError, "Error: Invalid data type in: %s %d", __FILE__, __LINE__);
-                                return (DBFault);
-                        }
-                    }
-                if ((DBInt) fwrite(&dsHeader, sizeof(MFdsHeader_t), 1, outFile) != 1) {
-                    CMmsgPrint(CMmsgSysError, "Error: Writing record header in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
-                }
-                if ((DBInt) fwrite(data, (size_t) itemSize, (size_t) (dsHeader.ItemNum), outFile) != dsHeader.ItemNum) {
-                    CMmsgPrint(CMmsgSysError, "Error: Writing data in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
-                }
-            }
-        }
-        if (tmplGrdIF != gridIF) delete tmplGrdIF;
-    }
+static void _RGlibRGIS2DataStreamNetworkFunc (size_t threadId, size_t objectId, void *commonPtr) {
+	RGlibRGIS2DataStreamThreadData *threadData = (RGlibRGIS2DataStreamThreadData *) commonPtr;
+	threadData->ComputeNetwork (objectId); 
+}
 
-/**************************************************************
-*                                                             *
-* Network Template                                            *
-*                                                             *
-**************************************************************/
-    else if (tmplNetIF != (DBNetworkIF *) NULL) {
-        DBObjRecord *cellRec;
+DBInt RGlibRGIS2DataStream(DBObjData *grdData, DBObjData *tmplData, FILE *outFile) {
+    RGlibRGIS2DataStreamThreadData dataStreamData;
 
-        if ((fieldPTR == (DBObjTableField *) NULL) && ((dsHeader.Type == MFFloat) || (dsHeader.Type == MFDouble))) {
-            if ((sampler = (DBGridSampler *) calloc(sizeof(DBGridSampler), (size_t) tmplNetIF->CellNum())) ==
-                (DBGridSampler *) NULL) {
-                CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
-                return (DBFault);
-            }
-            for (itemID = 0; itemID < tmplNetIF->CellNum(); ++itemID) {
-                cellRec = tmplNetIF->Cell(itemID);
-                gridIF->Coord2Sampler(tmplNetIF->Center(cellRec), sampler[itemID]);
-            }
-        }
-
-        if (fieldPTR == (DBObjTableField *) NULL) {
-            for (layerID = 0; layerID < gridIF->LayerNum(); ++layerID) {
-                layerRec = gridIF->Layer(layerID);
-                strncpy(dsHeader.Date, layerRec->Name(), MFDateStringLength - 1);
-                for (itemID = 0; itemID < dsHeader.ItemNum; ++itemID) {
-                    cellRec = tmplNetIF->Cell(itemID);
-                    if ((dsHeader.Type == MFByte) || (dsHeader.Type == MFShort) || (dsHeader.Type == MFInt)) {
-                        if (gridIF->Value(layerRec, tmplNetIF->Center(cellRec), &intValue) == false)
-                            intValue = dsHeader.Missing.Int;
-                        switch (dsHeader.Type) {
-                            case MFByte:
-                                ((char *) data)[itemID] = (char) intValue;
-                                break;
-                            case MFShort:
-                                ((short *) data)[itemID] = (short) intValue;
-                                break;
-                            case MFInt:
-                                ((int *) data)[itemID] = (short) intValue;
-                                break;
-                            default:
-                                CMmsgPrint(CMmsgAppError, "Error: Invalid data type in: %s %d", __FILE__, __LINE__);
-                                return (DBFault);
-                        }
-                    }
-                    else {
-                        if (gridIF->Value(layerRec, sampler[itemID], &floatValue) == false)
-                            floatValue = dsHeader.Missing.Float;
-                        switch (dsHeader.Type) {
-                            case MFFloat:
-                                ((float *) data)[itemID] = (float) floatValue;
-                                break;
-                            case MFDouble:
-                                ((double *) data)[itemID] = (double) floatValue;
-                                break;
-                            default:
-                                CMmsgPrint(CMmsgAppError, "Error: Invalid data type in: %s %d", __FILE__, __LINE__);
-                                return (DBFault);
-                        }
-                    }
-                }
-                if ((DBInt) fwrite(&dsHeader, sizeof(MFdsHeader_t), 1, outFile) != 1) {
-                    CMmsgPrint(CMmsgSysError, "Error: Writing record header in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
-                }
-                if ((DBInt) fwrite(data, (size_t) itemSize, (size_t) (dsHeader.ItemNum), outFile) != dsHeader.ItemNum) {
-                    CMmsgPrint(CMmsgSysError, "Error: Writing data in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
-                }
-            }
-        }
-        else {
-            for (layerID = 0; layerID < gridIF->LayerNum(); ++layerID) {
-                layerRec = gridIF->Layer(layerID);
-                strncpy(dsHeader.Date, layerRec->Name(), MFDateStringLength - 1);
-                for (itemID = 0; itemID < dsHeader.ItemNum; ++itemID) {
-                    cellRec = tmplNetIF->Cell(itemID);
-                    gridRec = gridIF->GridItem(layerRec, tmplNetIF->Center(cellRec));
-                    switch (dsHeader.Type) {
-                        case MFByte:
-                            ((char *) data)[itemID] =
-                                    gridRec != (DBObjRecord *) NULL ? (char) fieldPTR->Int(gridRec) : (char) fieldPTR->IntNoData();
-                            break;
-                        case MFShort:
-                            ((short *) data)[itemID] =
-                                    gridRec != (DBObjRecord *) NULL ? (short) fieldPTR->Int(gridRec) : (short) fieldPTR->IntNoData();
-                            break;
-                        case MFInt:
-                            ((int *) data)[itemID] =
-                                    gridRec != (DBObjRecord *) NULL ? fieldPTR->Int(gridRec) : fieldPTR->IntNoData();
-                            break;
-                        case MFFloat:
-                            ((float *) data)[itemID] = gridRec != (DBObjRecord *) NULL ? (float) fieldPTR->Float(gridRec)
-                                                                                       : (float) fieldPTR->FloatNoData();
-                            break;
-                        case MFDouble:
-                            ((double *) data)[itemID] = gridRec != (DBObjRecord *) NULL ? fieldPTR->Float(gridRec)
-                                                                                        : fieldPTR->FloatNoData();
-                            break;
-                        default:
-                            CMmsgPrint(CMmsgAppError, "Error: Invalid data type in: %s %d", __FILE__, __LINE__);
-                            return (DBFault);
-                    }
-                }
-                if ((DBInt) fwrite(&dsHeader, sizeof(MFdsHeader_t), 1, outFile) != 1) {
-                    CMmsgPrint(CMmsgSysError, "Error: Writing record header in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
-                }
-                if ((DBInt) fwrite(data, (size_t) itemSize, (size_t) (dsHeader.ItemNum), outFile) != dsHeader.ItemNum) {
-                    CMmsgPrint(CMmsgSysError, "Error: Writing data in: %s %d", __FILE__, __LINE__);
-                    ret = DBFault;
-                    break;
-                }
-            }
-        }
-        delete tmplNetIF;
-    }
-
-    free(data);
-    if (sampler != (DBGridSampler *) NULL) free (sampler);
-    delete gridIF;
-    return (ret);
+    if (dataStreamData.Init (tmplData, grdData) != DBSuccess) { dataStreamData.Finalize (tmplData); return (DBFault); }
+    if (dataStreamData.Run  (outFile) != DBSuccess)           { dataStreamData.Finalize (tmplData); return (DBFault); }
+    dataStreamData.Finalize (tmplData);
+    return (DBSuccess);
 }
 
 DBInt RGlibDataStream2RGIS(DBObjData *outData, DBObjData *tmplData, FILE *inFile) {
@@ -546,7 +297,6 @@ DBInt RGlibDataStream2RGIS(DBObjData *outData, DBObjData *tmplData, FILE *inFile
     void *data = (void *) NULL;
     MFdsHeader_t header;
     DBObjRecord *record;
-
 
     switch (tmplData->Type()) {
         case DBTypeVectorPoint: {

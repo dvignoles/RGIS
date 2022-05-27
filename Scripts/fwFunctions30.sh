@@ -475,7 +475,7 @@ function _fwPreprocess () {
             then
 				[ -e "${_fwGDSDomainDIR}/${fwSOURCE[2]}" ] || mkdir -p "${_fwGDSDomainDIR}/${fwSOURCE[2]}"
 				local fwFILENAME="$(FwGDSFilename "${fwInputITEM}" "Input" "${fwSOURCE[2]}" "${fwInYEAR}" "d")"
-            	rgis2ds -m "${_fwRGISDomainFILE}" "${fwSOURCE[4]}" "${fwFILENAME}" &
+            	rgis2ds -m "${_fwRGISDomainFILE}" "${fwSOURCE[4]}" "${fwFILENAME}"
 			else
             	echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
         	fi
@@ -500,7 +500,7 @@ function _fwPreprocess () {
             	then
 					[ -e "${_fwGDSDomainDIR}/${fwSOURCE[2]}" ] || mkdir -p "${_fwGDSDomainDIR}/${fwSOURCE[2]}"
 					local fwFILENAME="$(FwGDSFilename "${fwInputITEM}" "State" "${fwSOURCE[2]}" "${fwInYEAR}" "d")"
-	            	rgis2ds -m "${_fwRGISDomainFILE}" "${fwSOURCE[4]}" "${fwFILENAME}" &
+	            	rgis2ds -m "${_fwRGISDomainFILE}" "${fwSOURCE[4]}" "${fwFILENAME}"
 				else
             			echo "  ${fwInputITEM} datafile [${fwSOURCE[4]}] is missing!"
         		fi
@@ -508,7 +508,6 @@ function _fwPreprocess () {
 		done
 		_fwSTART="FALSE"
 	fi
-	wait
 	[ "${_fwVERBOSE}" == "on"  ] && echo "      Preprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"
 	return 0
 }

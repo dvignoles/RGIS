@@ -18,7 +18,7 @@ bfekete@gc.cuny.edu
 #include <MF.h>
 #include <time.h>
 
-static MFDomain_p _MFDomain    = (MFDomain_p) NULL;
+static MFDomain_p _MFDomain     = (MFDomain_p) NULL;
 static MFFunction *_MFFunctions = (MFFunction *) NULL;
 static int _MFFunctionNum = 0;
 
@@ -381,7 +381,6 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
     void *buffer, *status;
 	MFVariable_p var;
 	time_t sec;
-	size_t threadsNum = CMthreadProcessorNum ();
 	CMthreadTeam_t team;
  	CMthreadJob_p  job;
     pthread_attr_t thread_attr;
@@ -402,7 +401,7 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
 		return (CMfailed);
 	}
 	if ((_MFDomain = MFDomainRead (inFile)) == (MFDomain_p) NULL)	return (CMfailed);
-    if (CMthreadTeamInitialize (&team,threadsNum,_MFDomain->ObjNum) == (CMthreadTeam_p) NULL) {
+    if (CMthreadTeamInitialize (&team,CMthreadProcessorNum (),_MFDomain->ObjNum) == (CMthreadTeam_p) NULL) {
         CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
         return (CMfailed);
     }

@@ -17,7 +17,6 @@ bfekete@gc.cuny.edu
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input netcdf> <output datastream>", CMfileName(arg0));
     CMmsgPrint(CMmsgInfo, "     -m,--template     <template coverage>");
-    CMmsgPrint(CMmsgInfo, "     -f,--field        [fieldname]");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
 
@@ -37,15 +36,6 @@ int main(int argc, char *argv[]) {
                 return (CMfailed);
             }
             tmplName = argv[argPos];
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
-        if (CMargTest (argv[argPos], "-f", "--field")) {
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
-                CMmsgPrint(CMmsgUsrError, "Missing fieldname!");
-                return (CMfailed);
-            }
-            fieldName = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
@@ -97,7 +87,7 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         }
     }
 
-    ret = RGlibRGIS2DataStream(grdData, tmplData, fieldName, outFile);
+    ret = RGlibRGIS2DataStream(grdData, tmplData, outFile);
     if (tmplData != (DBObjData *) NULL) delete tmplData;
     delete grdData;
     if (outFile != stdout) fclose(outFile);

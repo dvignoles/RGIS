@@ -17,14 +17,13 @@ bfekete@gc.cuny.edu
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input grid> <output datastream>", CMfileName(arg0));
     CMmsgPrint(CMmsgInfo, "     -m,--template     <template coverage>");
-    CMmsgPrint(CMmsgInfo, "     -f,--field        [fieldname]");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
 
 int main(int argc, char *argv[]) {
     FILE *outFile;
     DBInt argPos, argNum = argc, ret;
-    char *tmplName = (char *) NULL, *fieldName = (char *) NULL;
+    char *tmplName = (char *) NULL;
     DBObjData *grdData, *tmplData = (DBObjData *) NULL;
 
     if (argNum < 2) goto Help;
@@ -36,15 +35,6 @@ int main(int argc, char *argv[]) {
                 return (CMfailed);
             }
             tmplName = argv[argPos];
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
-        if (CMargTest (argv[argPos], "-f", "--field")) {
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
-                CMmsgPrint(CMmsgUsrError, "Missing fieldname!");
-                return (CMfailed);
-            }
-            fieldName = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
@@ -73,7 +63,7 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
 
     grdData = new DBObjData();
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? grdData->Read(argv[1]) : grdData->Read(stdin);
-    if ((ret == DBFault) || ((grdData->Type() & DBTypeGrid) != DBTypeGrid)) {
+    if ((ret == DBFault) || (grdData->Type () != DBTypeGridContinuous)) {
         delete grdData;
         if (outFile != stdout) fclose(outFile);
         return (CMfailed);
@@ -89,7 +79,7 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         }
     }
 
-    ret = RGlibRGIS2DataStream(grdData, tmplData, fieldName, outFile);
+    ret = RGlibRGIS2DataStream(grdData, tmplData, outFile);
     if (tmplData != (DBObjData *) NULL) delete tmplData;
     delete grdData;
     if (outFile != stdout) fclose(outFile);
