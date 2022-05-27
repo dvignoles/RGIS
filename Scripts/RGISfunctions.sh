@@ -292,7 +292,7 @@ function RGISgeoResolutionMultiplier () { # Destination resolution is devided by
     if [[ "${srcRes}" == "" || "${dstRes}" == "" ]]
     then
         echo "Invalid resolutions: ${srcRes}, ${dstRes}" > /dev/stderr
-        echo "Usage: Destination resolution is devided by source resolution. Decimals ar chapped off." > /dev/stderr
+        echo "Usage: Destination resolution is devided by source resolution. Decimals are chapped off." > /dev/stderr
         return 1
     else
         echo "${dstRes} / ${srcRes}" | bc -l | sed "s:\([0-9]*\).*:\1:"

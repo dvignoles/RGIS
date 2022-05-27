@@ -108,14 +108,14 @@ int MDCore_SnowPackChgDef () {
 		if (strcmp(optStr,MFhelpStr) == 0) CMmsgPrint (CMmsgInfo,"%s = %f", MDParSnowFallThreshold, _MDFallThreshold);
 		_MDFallThreshold = sscanf (optStr,"%f",&par) == 1 ? par : _MDFallThreshold;
 	}
-	if (((_MDInCommon_PrecipID       = MDCommon_PrecipitationDef ())  == CMfailed) ||
-        ((_MDInCommon_AtMeanID       = MDCommon_AirTemperatureDef ()) == CMfailed) ||
-        ((_MDOutSnowFallID    = MFVarGetID (MDVarCommon_SnowFall,     "mm", MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
-        ((_MDOutSnowMeltID    = MFVarGetID (MDVarCore_SnowMelt,       "mm", MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
-        ((_MDOutSnowDensityID = MFVarGetID (MDVarCommon_SnowDensity,  "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
-        ((_MDOutSnowDepthID   = MFVarGetID (MDVarCommon_SnowDepth,    "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
-        ((_MDOutSnowPackID    = MFVarGetID (MDVarCore_SnowPack,       "mm", MFOutput, MFState, MFInitial))  == CMfailed) ||
-        ((_MDOutSPackChgID    = MFVarGetID (MDVarCore_SnowPackChange, "mm", MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
+	if (((_MDInCommon_PrecipID = MDCommon_PrecipitationDef ())  == CMfailed) ||
+        ((_MDInCommon_AtMeanID = MDCommon_AirTemperatureDef ()) == CMfailed) ||
+        ((_MDOutSnowFallID     = MFVarGetID (MDVarCommon_SnowFall,     "mm", MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
+        ((_MDOutSnowMeltID     = MFVarGetID (MDVarCore_SnowMelt,       "mm", MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
+        ((_MDOutSnowDensityID  = MFVarGetID (MDVarCommon_SnowDensity,  "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
+        ((_MDOutSnowDepthID    = MFVarGetID (MDVarCommon_SnowDepth,    "mm", MFOutput, MFState, MFBoundary)) == CMfailed) ||
+        ((_MDOutSnowPackID     = MFVarGetID (MDVarCore_SnowPack,       "mm", MFOutput, MFState, MFInitial))  == CMfailed) ||
+        ((_MDOutSPackChgID     = MFVarGetID (MDVarCore_SnowPackChange, "mm", MFOutput, MFFlux,  MFBoundary)) == CMfailed) ||
         (MFModelAddFunction (_MDSPackChg) == CMfailed)) return (CMfailed);
 	MFDefLeaving ("Snow Pack Change");
 	return (_MDOutSPackChgID);
