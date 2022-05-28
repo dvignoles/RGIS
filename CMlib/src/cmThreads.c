@@ -14,6 +14,7 @@ bfekete@gc.cuny.edu
 #include <math.h>
 #include <sys/time.h>
 #include <signal.h>
+#include <unistd.h>
 #include <cm.h>
 
 size_t CMthreadProcessorNum () {
@@ -315,6 +316,7 @@ CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum, si
         }
         for (threadId = 0; threadId < team->ThreadNum; ++threadId)
             while (pthread_kill(team->Threads[threadId].Thread,0) != 0); // TODO this might turn out to be sloppy
+        sleep ((unsigned int) 2);
         pthread_attr_destroy(&thread_attr);
         pthread_mutex_lock (&(team->MMutex));
     }
