@@ -28,7 +28,7 @@ class RGlibRGIS2DataStreamThreadData {
         DBGridSampler *Sampler;
         DBObjRecord *LayerRec;
         bool TeamInitialized;
-        CMthreadTeam_t Team;
+        CMthreadTeam_t *Team;
  	    CMthreadJob_p  Job;
         union {
                 void        *Any;
@@ -37,7 +37,7 @@ class RGlibRGIS2DataStreamThreadData {
                 DBNetworkIF *NetIF;
         } Interface;
     public:
-        DBInt Init (DBObjData *tmplData, DBObjData *grdData) {
+        DBInt Initialize (DBObjData *tmplData, DBObjData *grdData) {
             Data = (void *) NULL;
             Interface.Any = (void *) NULL;
             Sampler = (DBGridSampler *) NULL;
@@ -139,10 +139,6 @@ class RGlibRGIS2DataStreamThreadData {
                 CMmsgPrint(CMmsgSysError, "Error! Allocating %d items of %d size in: %s %d", DSHeader.ItemNum, ItemSize, __FILE__, __LINE__);
                 return (DBFault);
             }
-            if (CMthreadTeamInitialize (&Team,CMthreadProcessorNum (),DSHeader.ItemNum) == (CMthreadTeam_p) NULL) {
-                CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
-                return (DBFault);
-            }
             return (DBSuccess);
         }
 
@@ -236,7 +232,7 @@ class RGlibRGIS2DataStreamThreadData {
 
             for (layerID = 0; layerID < GridIF->LayerNum(); ++layerID) {
                 LayerRec = GridIF->Layer(layerID);
-                CMthreadJobExecute(&Team, Job);
+                CMthreadJobExecute(Team, Job);
                 strncpy(DSHeader.Date, LayerRec->Name(), MFDateStringLength - 1);
                 if ((DBInt) fwrite(&DSHeader, sizeof(MFdsHeader_t), 1, outFile) != 1) {
                     CMmsgPrint(CMmsgSysError, "Error: Writing record header in: %s %d", __FILE__, __LINE__);
@@ -250,7 +246,6 @@ class RGlibRGIS2DataStreamThreadData {
             return (DBSuccess);
         }
         void  Finalize (DBObjData *tmplData) {
-            if (TeamInitialized) CMthreadTeamDestroy(&Team);
             if (Job != (CMthreadJob_p) NULL) CMthreadJobDestroy  (Job);
             if ((tmplData != (DBObjData *) NULL) && (Interface.Any != (void *) NULL)) {
                 switch (tmplData->Type ()) {
@@ -281,10 +276,10 @@ static void _RGlibRGIS2DataStreamNetworkFunc (size_t threadId, size_t objectId, 
 	threadData->ComputeNetwork (objectId); 
 }
 
-DBInt RGlibRGIS2DataStream(DBObjData *grdData, DBObjData *tmplData, FILE *outFile) {
+DBInt RGlibRGIS2DataStream(DBObjData *grdData, DBObjData *tmplData, FILE *outFile, CMthreadTeam_p team) {
     RGlibRGIS2DataStreamThreadData dataStreamData;
 
-    if (dataStreamData.Init (tmplData, grdData) != DBSuccess) { dataStreamData.Finalize (tmplData); return (DBFault); }
+    if (dataStreamData.Initialize (tmplData, grdData) != DBSuccess) { dataStreamData.Finalize (tmplData); return (DBFault); }
     if (dataStreamData.Run  (outFile) != DBSuccess)           { dataStreamData.Finalize (tmplData); return (DBFault); }
     dataStreamData.Finalize (tmplData);
     return (DBSuccess);

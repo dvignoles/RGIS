@@ -314,7 +314,7 @@ public:
         return (CMsucceeded);
     }
 
-    DBObjData *Compute(char *title, CMthreadUserExecFunc userFunc) {
+    DBObjData *Compute(char *title, CMthreadUserExecFunc userFunc, CMthreadTeam_p team) {
         DBInt i, layerID, dataLayerID;
         size_t threadId;
         DBPosition pos;
@@ -322,25 +322,18 @@ public:
         char *layerName;
         DBObjData *data;
         DBObjRecord *record;
-        size_t threadsNum = CMthreadProcessorNum(), taskNum;
-        CMthreadTeam_t team;
+        size_t taskNum;
+        
         CMthreadJob_p job = (CMthreadJob_p) NULL;
 
         if ((data = DBGridCreate(title, Extent, CellSize)) == (DBObjData *) NULL) return ((DBObjData *) NULL);
         data->Projection(GrdVar[0]->Projection()); // Taking projection from first grid variable
         GridIF = new DBGridIF(data);
         taskNum = GridIF->RowNum() * (size_t) GridIF->ColNum();
-        if (CMthreadTeamInitialize(&team, threadsNum, taskNum) == (CMthreadTeam_p) NULL) {
-            CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
-            delete GridIF;
-            delete data;
-            return ((DBObjData *) NULL);
-        }
-        if (team.ThreadNum > 1) { job = CMthreadJobCreate(taskNum, userFunc, (void *) this); }
+        if (team->ThreadNum > 1) { job = CMthreadJobCreate(taskNum, userFunc, (void *) this); }
         if (job != (CMthreadJob_p) NULL) {
-            for (threadId = 0; threadId < team.ThreadNum; ++threadId) {
+            for (threadId = 0; threadId < team->ThreadNum; ++threadId) {
                 if (Table->Add("TEMPRecord") == (DBObjRecord *) NULL) {
-                    CMthreadTeamDestroy(&team);
                     return ((DBObjData *) NULL);
                 }
             }
@@ -362,7 +355,7 @@ public:
             LayerRec = GridIF->Layer(layerID);
             GridIF->RenameLayer(LayerRec, layerName);
 
-            if (job != (CMthreadJob_p) NULL) CMthreadJobExecute(&team, job);
+            if (job != (CMthreadJob_p) NULL) CMthreadJobExecute(team, job);
             else {
                 for (pos.Row = 0; pos.Row < GridIF->RowNum(); ++pos.Row)
                     for (pos.Col = 0; pos.Col < GridIF->ColNum(); ++pos.Col) {
@@ -375,7 +368,6 @@ public:
             GridIF->RecalcStats(LayerRec);
         }
         delete GridIF;
-        CMthreadTeamDestroy(&team);
         return (data);
     }
 
@@ -414,6 +406,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -v,--version     [version]");
     CMmsgPrint(CMmsgInfo, "     -s,--shadeset    [standard|grey|blue|blue-to-red|elevation]");
     CMmsgPrint(CMmsgInfo, "     -V,--verbose");
+    CMmsgPrint(CMmsgInfo, "     -P,--processor   [number]");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
 
@@ -426,6 +419,7 @@ int main(int argc, char *argv[]) {
     bool shrink = true, flat = false;
     DBObjData *data = (DBObjData *) NULL;
     CMDgrdThreadData *threadData = new CMDgrdThreadData();
+    CMthreadTeam_p team = (CMthreadTeam_p) NULL;
 
     if (argNum < 2) goto Help;
 
@@ -433,13 +427,11 @@ int main(int argc, char *argv[]) {
         if (CMargTest (argv[argPos], "-c", "--calculate")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing expression!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             if (expStr != (char *) NULL) {
                 CMmsgPrint(CMmsgUsrError, "Expression is already specified!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             expStr = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
@@ -449,19 +441,16 @@ int main(int argc, char *argv[]) {
             char *varName;
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing variable name!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             varName = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing expression!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             if (threadData->AddExpression(varName, argv[argPos]) == CMfailed) {
                 CMmsgPrint(CMmsgUsrError, "Invalid Expression!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
@@ -472,16 +461,14 @@ int main(int argc, char *argv[]) {
 
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing extent mode!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             if ((ret = CMoptLookup(names, argv[argPos], true)) == CMfailed) {
                 shrink = false;
                 data = new DBObjData();
                 if (data->Read (argv[argPos]) != DBSuccess) {
                     CMmsgPrint(CMmsgUsrError, "Invalid template coverage [%s]!",argv[argPos]);
-                    delete threadData;
-                    return (CMfailed);
+                    goto Stop;
                 }
             }
             else shrink = codes[ret];
@@ -494,13 +481,11 @@ int main(int argc, char *argv[]) {
 
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing interpolation mode!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             if ((ret = CMoptLookup(names, argv[argPos], true)) == CMfailed) {
                 CMmsgPrint(CMmsgUsrError, "Invalid interpolation mode!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             flat = codes[ret];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
@@ -509,8 +494,7 @@ int main(int argc, char *argv[]) {
         if (CMargTest (argv[argPos], "-t", "--title")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing title!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             title = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
@@ -519,8 +503,7 @@ int main(int argc, char *argv[]) {
         if (CMargTest (argv[argPos], "-u", "--subject")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing subject!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             subject = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
@@ -529,8 +512,7 @@ int main(int argc, char *argv[]) {
         if (CMargTest (argv[argPos], "-d", "--domain")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing domain!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             domain = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
@@ -539,8 +521,7 @@ int main(int argc, char *argv[]) {
         if (CMargTest (argv[argPos], "-v", "--version")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing version!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             version = argv[argPos];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
@@ -556,13 +537,11 @@ int main(int argc, char *argv[]) {
 
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing shadeset!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             if ((shadeSet = CMoptLookup(shadeSets, argv[argPos], true)) == CMfailed) {
                 CMmsgPrint(CMmsgUsrError, "Invalid shadeset!");
-                delete threadData;
-                return (CMfailed);
+                goto Stop;
             }
             shadeSet = shadeCodes[shadeSet];
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
@@ -573,14 +552,31 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
+        if (CMargTest (argv[argPos], "-P", "--processor")) {
+            DBInt procNum;
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing processor number!");
+                goto Stop;
+            }
+            if (sscanf (argv[argPos],"%d",&procNum) != 1) {
+                 CMmsgPrint(CMmsgUsrError, "Invalid processor number!");
+                goto Stop;             
+            }
+            if ((team = CMthreadTeamCreate (procNum)) == (CMthreadTeam_p) NULL) {
+                CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
+                goto Stop;
+            }
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
-            return (DBSuccess);
+            ret = DBSuccess;
+            goto Stop;
         }
         if ((argv[argPos][0] == '-') && ((int) strlen(argv[argPos]) > 1)) {
             CMmsgPrint(CMmsgUsrError, "Unknown option: %s!", argv[argPos]);
-            delete threadData;
-            return (CMfailed);
+            goto Stop;
         }
         argPos++;
     }
@@ -588,43 +584,39 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     if (expStr == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Missing expression!");
         _CMDprintUsage (argv[0]);
-        delete threadData;
-        return (CMfailed);
+        goto Stop;
     }
 
     if (argNum > 2) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
         _CMDprintUsage (argv[0]);
-        delete threadData;
-        return (CMfailed);
+        goto Stop;
     }
     if (verbose) RGlibPauseOpen(argv[0]);
-
-    if (threadData->Configure(data, shrink, flat, expStr) == CMfailed) {
-        delete threadData;
-        return (CMfailed);
+    if ((team == (CMthreadTeam_p) NULL) && ((team = CMthreadTeamCreate (CMthreadProcessorNum ())) == (CMthreadTeam_p) NULL)) {
+        CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
+        goto Stop;
     }
-    if (data != (DBObjData *) NULL) delete data;
+    if (threadData->Configure(data, shrink, flat, expStr) == CMfailed) goto Stop;
 
-    if (title == (char *) NULL) title = (char *) "Grid Calculate Result";
-    if (subject == (char *) NULL) subject = (char *) "GridCalc";
-    if (domain == (char *) NULL) domain = (char *) "Non-specified";
-    if (version == (char *) NULL) version = (char *) "0.01pre";
+    if (title    == (char *) NULL) title   = (char *) "Grid Calculate Result";
+    if (subject  == (char *) NULL) subject = (char *) "GridCalc";
+    if (domain   == (char *) NULL) domain  = (char *) "Non-specified";
+    if (version  == (char *) NULL) version = (char *) "0.01pre";
     if (shadeSet == DBFault) shadeSet = DBDataFlagDispModeContGreyScale;
 
-    if ((data = threadData->Compute(title, _CMDgrdCalculateUserFunc)) == (DBObjData *) NULL) {
-        delete threadData;
-        return (CMfailed);
-    }
-    delete threadData;
-    data->Document(DBDocSubject, subject);
+    if ((data = threadData->Compute(title, _CMDgrdCalculateUserFunc, team)) == (DBObjData *) NULL) goto Stop;
+    data->Document(DBDocSubject,   subject);
     data->Document(DBDocGeoDomain, domain);
-    data->Document(DBDocVersion, version);
+    data->Document(DBDocVersion,   version);
     data->Flags(DBDataFlagDispModeContShadeSets, DBClear);
     data->Flags(shadeSet, DBSet);
 
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Write(argv[1]) : data->Write(stdout);
-
     if (verbose) RGlibPauseClose();
+Stop:
+    delete threadData;
+    if (data != (DBObjData *) NULL) delete data;
+    if (team != (CMthreadTeam_p) NULL) CMthreadTeamDelete (team);
     return (ret);
 }

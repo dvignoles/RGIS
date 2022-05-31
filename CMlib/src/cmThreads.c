@@ -269,16 +269,18 @@ CMreturn CMthreadJobExecute (CMthreadTeam_p team, CMthreadJob_p job) {
 	return (CMsucceeded);
 }
 
-CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum, size_t taskNum) {
+CMthreadTeam_p CMthreadTeamCreate (size_t threadNum) {
     int ret;
 	size_t threadId;
     pthread_attr_t thread_attr;
     struct timeval  tValue;
     struct timezone tZone;
+    CMthreadTeam_p team;
 
-    if ((taskNum >> 0xAL) <= 1) threadNum = 1;
-    else threadNum = (taskNum >> 0xAL) < threadNum ? (taskNum >> 0xAL) : threadNum;
-
+    if ((team = (CMthreadTeam_p) malloc (sizeof (CMthreadTeam_t))) == (CMthreadTeam_p) NULL) {
+        CMmsgPrint (CMmsgSysError,"Memory Allocation error in %s:%d",__FILE__,__LINE__);
+        return ((CMthreadTeam_p) NULL);
+    }
     gettimeofday(&tValue, &tZone);
     team->TotTime = tValue.tv_sec * 1000000 + tValue.tv_usec;
 	team->ThreadNum      = threadNum;
@@ -291,7 +293,6 @@ CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum, si
     if (team->ThreadNum > 1) {
         if ((team->Threads = (CMthreadData_p) calloc (threadNum, sizeof(CMthreadData_t))) == (CMthreadData_p) NULL) {
             CMmsgPrint (CMmsgSysError,"Memory Allocation error in %s:%d",__FILE__,__LINE__);
-            free (team);
             return ((CMthreadTeam_p) NULL);
         }
         pthread_attr_init (&thread_attr);
@@ -315,19 +316,29 @@ CMthreadTeam_p CMthreadTeamInitialize (CMthreadTeam_p team, size_t threadNum, si
             }
         }
         for (threadId = 0; threadId < team->ThreadNum; ++threadId)
-            while (pthread_kill(team->Threads[threadId].Thread,0) != 0); // TODO this might turn out to be sloppy
-        sleep ((unsigned int) 2);
+            while (pthread_kill(team->Threads[threadId].Thread,0) != 0); // Signal 0 just checks if the thread is up without sending any signal 
         pthread_attr_destroy(&thread_attr);
         pthread_mutex_lock (&(team->MMutex));
     }
 	return (team);
 }
 
-void CMthreadTeamDestroy (CMthreadTeam_p team) { // Does not free the team pointer so
-    size_t threadId;
-    void *status;
+void CMthreadTeamPrintReport (CMmsgType msgType, CMthreadTeam_p team) {
     struct timeval  tValue;
     struct timezone tZone;
+
+    gettimeofday(&tValue, &tZone);
+    team->TotTime = tValue.tv_sec * 1000000 + tValue.tv_usec - team->TotTime;
+    CMmsgPrint (msgType,"Total Time: %.1f, Execute Time: %.1f, Average Thread Time %.1f, Master Time %.1f",
+                (float) team->TotTime    / 1000000.0,
+                (float) team->ExecTime   / 1000000.0,
+                (float) team->ThreadTime / (team->ThreadNum > 0 ? (float) team->ThreadNum : 1.0) / 1000000.0,
+                (float) team->Time       / 1000000.0);
+}
+
+void CMthreadTeamDelete (CMthreadTeam_p team) {
+    size_t threadId;
+    void *status;
 
     if (team->ThreadNum > 1) {
         team->JobPtr = (CMthreadJob_p) NULL;
@@ -344,6 +355,5 @@ void CMthreadTeamDestroy (CMthreadTeam_p team) { // Does not free the team point
         pthread_cond_destroy (&(team->SCond));
         free(team->Threads);
     }
-    gettimeofday(&tValue, &tZone);
-    team->TotTime = tValue.tv_sec * 1000000 + tValue.tv_usec - team->TotTime;
+    free (team);
 }

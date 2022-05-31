@@ -144,7 +144,7 @@ typedef enum {RGlibSQLpostgres, RGlibSQLite} RGlibSQLdialect;
 
 DBInt RGlibTableToSQL (DBObjTable *, const char *, const char *, RGlibTableAction, bool, RGlibSQLdialect, DBInt, FILE *);
 
-DBInt RGlibRGIS2DataStream(DBObjData *, DBObjData *, FILE *);
+DBInt RGlibRGIS2DataStream(DBObjData *, DBObjData *, FILE *, CMthreadTeam_p);
 
 DBInt RGlibDataStream2RGIS(DBObjData *, DBObjData *, FILE *);
 
