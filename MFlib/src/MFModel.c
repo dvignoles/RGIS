@@ -342,7 +342,6 @@ Stop:
 	}
 	if (argNum < 2) { CMmsgPrint (CMmsgUsrError,"Missing Template Coverage!"); return ((CMthreadTeam_p) NULL); }
 	if (*testOnly)  { _MFModelVarPrintOut ("Source"); return ((CMthreadTeam_p) NULL); }
-
 	*domainFile = argv [1];
 	return (resolved ? CMthreadTeamCreate (procNum) : (CMthreadTeam_p) NULL);
 }
