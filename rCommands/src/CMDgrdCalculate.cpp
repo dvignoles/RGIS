@@ -407,13 +407,14 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "     -s,--shadeset    [standard|grey|blue|blue-to-red|elevation]");
     CMmsgPrint(CMmsgInfo, "     -V,--verbose");
     CMmsgPrint(CMmsgInfo, "     -P,--processor   [number]");
+    CMmsgPrint(CMmsgInfo, "     -R,--report      [off|on]");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret, verbose = false, report = false;
     char *expStr = (char *) NULL;
-    char *title = (char *) NULL, *subject = (char *) NULL;
+    char *title  = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     int shadeSet = DBDataFlagDispModeContGreyScale;
     bool shrink = true, flat = false;
@@ -569,6 +570,22 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
+        if (CMargTest (argv[argPos], "-R", "--report")) {
+            bool opsCodes[] = {false, true};
+            const char *opsStrs[] = {"off", "on", (char *) NULL};
+
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing aggregation method!");
+                return (CMfailed);
+            }
+            if ((report = CMoptLookup(opsStrs, argv[argPos], true)) == DBFault) {
+                CMmsgPrint(CMmsgUsrError, "Invalid aggregation method!");
+                return (CMfailed);
+            }
+            report = opsCodes[report];
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
+            continue;
+        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             ret = DBSuccess;
@@ -617,6 +634,9 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
 Stop:
     delete threadData;
     if (data != (DBObjData *) NULL) delete data;
-    if (team != (CMthreadTeam_p) NULL) CMthreadTeamDelete (team);
+    if (team != (CMthreadTeam_p) NULL) {
+        if (report) CMthreadTeamPrintReport (CMmsgInfo, team);
+        CMthreadTeamDelete (team);
+    }
     return (ret);
 }

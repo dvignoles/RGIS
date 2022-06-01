@@ -257,15 +257,16 @@ static CMthreadTeam_p _MFModelParse (int argc, char *argv [],int argNum, int (*m
         }
 		if (CMargTest (argv [argPos],"-h","--help")) {
 			CMmsgPrint (CMmsgInfo,"%s [options] <domain>",CMfileName (argv [0]));
-			CMmsgPrint (CMmsgInfo,"     -s,  --start      [start date in the form of \"yyyy-mm-dd\"]");
-			CMmsgPrint (CMmsgInfo,"     -n,  --end        [end date in the form of \"yyyy-mm-dd\"]");
-			CMmsgPrint (CMmsgInfo,"     -i,  --input      [variable=source]");
-			CMmsgPrint (CMmsgInfo,"     -o,  --output     [variable=destination]");
-			CMmsgPrint (CMmsgInfo,"     -t,  --state      [variable=statefile]");
-			CMmsgPrint (CMmsgInfo,"     -p,  --option     [option=content]");
-			CMmsgPrint (CMmsgInfo,"     -T,  --testonly");
-			CMmsgPrint (CMmsgInfo,"     -m,  --message    [sys_error|app_error|usr_error|debug|warning|info]=[on|off|file=<filename>]");
-			CMmsgPrint (CMmsgInfo,"     -h,  --help");
+			CMmsgPrint (CMmsgInfo,"     -s, --start      [start date in the form of \"yyyy-mm-dd\"]");
+			CMmsgPrint (CMmsgInfo,"     -n, --end        [end date in the form of \"yyyy-mm-dd\"]");
+			CMmsgPrint (CMmsgInfo,"     -i, --input      [variable=source]");
+			CMmsgPrint (CMmsgInfo,"     -o, --output     [variable=destination]");
+			CMmsgPrint (CMmsgInfo,"     -t, --state      [variable=statefile]");
+			CMmsgPrint (CMmsgInfo,"     -p, --option     [option=content]");
+			CMmsgPrint (CMmsgInfo,"     -T, --testonly");
+			CMmsgPrint (CMmsgInfo,"     -m, --message    [sys_error|app_error|usr_error|debug|warning|info]=[on|off|file=<filename>]");
+		    CMmsgPrint (CMmsgInfo,"     -P, --processor  [number]");
+			CMmsgPrint (CMmsgInfo,"     -h, --help");
 			goto Stop;
 		}
 		if ((argv [argPos][0] == '-') && (strlen (argv [argPos]) > 1)) {
