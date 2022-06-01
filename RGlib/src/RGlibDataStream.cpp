@@ -27,8 +27,6 @@ class RGlibRGIS2DataStreamThreadData {
         DBGridIF *GridIF;
         DBGridSampler *Sampler;
         DBObjRecord *LayerRec;
-        bool TeamInitialized;
-        CMthreadTeam_t *Team;
  	    CMthreadJob_p  Job;
         union {
                 void        *Any;
@@ -45,7 +43,6 @@ class RGlibRGIS2DataStreamThreadData {
             GridIF = new DBGridIF(grdData);
             ItemSize = GridIF->ValueSize();
             DBObjRecord *LayerRec = (DBObjRecord *) NULL;
-            TeamInitialized = false;
             Job = (CMthreadJob_p) NULL;
             switch (GridIF->ValueType()) {
                 case DBVariableInt:
@@ -67,7 +64,6 @@ class RGlibRGIS2DataStreamThreadData {
                     break;
                 default: CMmsgPrint(CMmsgAppError, "Error: Invalid field type in: %s %d", __FILE__, __LINE__); return (DBFault);
             }
-            TeamInitialized = true;
             switch (tmplData != (DBObjData *) NULL ? tmplData->Type () : grdData->Type ()) {
                 case DBTypeVectorPoint:
                     Interface.PointIF = new DBVPointIF(tmplData);
@@ -227,12 +223,12 @@ class RGlibRGIS2DataStreamThreadData {
                 case MFDouble: ((double *) Data) [itemID] = (double) floatValue; break;
             }
         }
-        DBInt Run (FILE *outFile) {
+        DBInt Run (CMthreadTeam_p team, FILE *outFile) {
             DBInt layerID;
 
             for (layerID = 0; layerID < GridIF->LayerNum(); ++layerID) {
                 LayerRec = GridIF->Layer(layerID);
-                CMthreadJobExecute(Team, Job);
+                CMthreadJobExecute(team, Job);
                 strncpy(DSHeader.Date, LayerRec->Name(), MFDateStringLength - 1);
                 if ((DBInt) fwrite(&DSHeader, sizeof(MFdsHeader_t), 1, outFile) != 1) {
                     CMmsgPrint(CMmsgSysError, "Error: Writing record header in: %s %d", __FILE__, __LINE__);
@@ -280,7 +276,7 @@ DBInt RGlibRGIS2DataStream(DBObjData *grdData, DBObjData *tmplData, FILE *outFil
     RGlibRGIS2DataStreamThreadData dataStreamData;
 
     if (dataStreamData.Initialize (tmplData, grdData) != DBSuccess) { dataStreamData.Finalize (tmplData); return (DBFault); }
-    if (dataStreamData.Run  (outFile) != DBSuccess)           { dataStreamData.Finalize (tmplData); return (DBFault); }
+    if (dataStreamData.Run  (team, outFile) != DBSuccess)           { dataStreamData.Finalize (tmplData); return (DBFault); }
     dataStreamData.Finalize (tmplData);
     return (DBSuccess);
 }

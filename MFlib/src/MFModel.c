@@ -131,8 +131,8 @@ static void _MFModelVarPrintOut (const char *label) {
 }
 
 static CMthreadTeam_p _MFModelParse (int argc, char *argv [],int argNum, int (*mainDefFunc) (), char **domainFile, char **startDate, char **endDate, bool *testOnly) {
-	bool resolved = true;
-	int argPos, ret = CMsucceeded, help = false, procNum;
+	bool resolved = false;
+	int argPos, procNum;
 	int i, varID;
 	varEntry_p inputVars  = (varEntry_p) NULL;
 	varEntry_p outputVars = (varEntry_p) NULL;
@@ -148,55 +148,55 @@ static CMthreadTeam_p _MFModelParse (int argc, char *argv [],int argNum, int (*m
 		if (CMargTest (argv [argPos],"-i","--input")) {
 			if ((argNum = CMargShiftLeft (argPos,argv,argNum)) < 1) {
 				CMmsgPrint (CMmsgUsrError,"Missing input argument!");
-				return ((CMthreadTeam_p) NULL);
+				goto Stop;
 			}
 			for (i = 0;i < (int) strlen (argv[argPos]);++i) if (argv [argPos][i] == '=') break;
 			if (i == (int) strlen (argv [argPos])) {
 				CMmsgPrint  (CMmsgUsrError,"Illformed input variable [%s] in: %s:%d",argv [argPos],__FILE__,__LINE__);
-				return ((CMthreadTeam_p) NULL);
+				goto Stop;
 			}
 			argv [argPos][i] = '\0';
             inputVars = _MFModelVarEntryNew (inputVars, inputVarNum, argv [argPos],argv [argPos] + i + 1);
-            if (inputVars == (varEntry_p) NULL) return ((CMthreadTeam_p) NULL); else inputVarNum++;
+            if (inputVars == (varEntry_p) NULL) goto Stop; else inputVarNum++;
             if ((argNum = CMargShiftLeft(argPos,argv,argNum)) <= argPos) break;
 			continue;
 		}
 		if (CMargTest (argv [argPos],"-o","--output")) {
 			if ((argNum = CMargShiftLeft (argPos,argv,argNum)) < 1) {
 				CMmsgPrint (CMmsgUsrError,"Missing _MFModelOutput argument!\n");
-				return ((CMthreadTeam_p) NULL);
+				goto Stop;
 			}
 			for (i = 0;i < (int) strlen (argv[argPos]);++i) if (argv [argPos][i] == '=') break;
 			if (i == (int) strlen (argv [argPos])) {
 				CMmsgPrint (CMmsgUsrError,"Illformed _MFModelOutput variable [%s]!",argv [argPos]);
-				return ((CMthreadTeam_p) NULL);
+				goto Stop;
 			}
 			argv [argPos][i] = '\0';
 			outputVars = _MFModelVarEntryNew (outputVars, outputVarNum, argv [argPos],argv [argPos] + i + 1);
-			if (outputVars == (varEntry_p) NULL) return ((CMthreadTeam_p) NULL); else outputVarNum++;
+			if (outputVars == (varEntry_p) NULL) goto Stop; else outputVarNum++;
 			if ((argNum = CMargShiftLeft(argPos,argv,argNum)) <= argPos) break;
 			continue;
 	 	}
 		if (CMargTest (argv [argPos],"-t","--state")) {
 			if ((argNum = CMargShiftLeft (argPos,argv,argNum)) < 1) {
 				CMmsgPrint (CMmsgUsrError,"Missing _MFModelOutput argument!\n");
-				return ((CMthreadTeam_p) NULL);
+				goto Stop;
 			}
 			for (i = 0;i < (int) strlen (argv[argPos]);++i) if (argv [argPos][i] == '=') break;
 			if (i == (int) strlen (argv [argPos])) {
 				CMmsgPrint (CMmsgUsrError,"Illformed _MFModelOutput variable [%s]!",argv [argPos]);
-				return ((CMthreadTeam_p) NULL);
+				goto Stop;
 			}
 			argv [argPos][i] = '\0';
 			stateVars = _MFModelVarEntryNew (stateVars, stateVarNum, argv [argPos],argv [argPos] + i + 1);
-			if (stateVars == (varEntry_p) NULL) return ((CMthreadTeam_p) NULL); else stateVarNum++;
+			if (stateVars == (varEntry_p) NULL) goto Stop; else stateVarNum++;
 			if ((argNum = CMargShiftLeft(argPos,argv,argNum)) <= argPos) break;
 			continue;
 	 	}
 		if (CMargTest (argv [argPos],"-s","--start")) {
 			if ((argNum = CMargShiftLeft (argPos,argv,argNum)) < 1) {
 				CMmsgPrint (CMmsgUsrError,"Missing start time!");
-				return ((CMthreadTeam_p) NULL);
+				goto Stop;
 			}
 			*startDate = argv [argPos];
 			if ((argNum = CMargShiftLeft(argPos,argv,argNum)) <= argPos) break;
@@ -205,7 +205,7 @@ static CMthreadTeam_p _MFModelParse (int argc, char *argv [],int argNum, int (*m
 		if (CMargTest (argv [argPos],"-n","--end")) {
 			if ((argNum = CMargShiftLeft (argPos,argv,argNum)) < 1) {
 				CMmsgPrint (CMmsgUsrError,"Missing end time!");
-				return ((CMthreadTeam_p) NULL);
+				goto Stop;
 			}
 			*endDate = argv [argPos];
 			if ((argNum = CMargShiftLeft(argPos,argv,argNum)) <= argPos) break;
@@ -224,7 +224,7 @@ static CMthreadTeam_p _MFModelParse (int argc, char *argv [],int argNum, int (*m
 
 			if ((argNum = CMargShiftLeft (argPos,argv,argNum)) < 1) {
 				CMmsgPrint (CMmsgUsrError,"Missing message argument!");
-				return ((CMthreadTeam_p) NULL);
+				goto Stop;
 			}
 
 			if ((type = CMoptLookup (types,argv [argPos],false)) == CMfailed) {
@@ -246,16 +246,16 @@ static CMthreadTeam_p _MFModelParse (int argc, char *argv [],int argNum, int (*m
         if (CMargTest (argv[argPos], "-P", "--processor")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missing processor number!");
-                return ((CMthreadTeam_p) NULL);
+                goto Stop;
             }
             if (sscanf (argv[argPos],"%d", &procNum) != 1) {
                  CMmsgPrint(CMmsgUsrError, "Invalid processor number!");
-                return ((CMthreadTeam_p) NULL);             
+                goto Stop;
             }
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
-        }		if (CMargTest (argv [argPos],"-h","--help")) {
-			help = true;
+        }
+		if (CMargTest (argv [argPos],"-h","--help")) {
 			CMmsgPrint (CMmsgInfo,"%s [options] <domain>",CMfileName (argv [0]));
 			CMmsgPrint (CMmsgInfo,"     -s,  --start      [start date in the form of \"yyyy-mm-dd\"]");
 			CMmsgPrint (CMmsgInfo,"     -n,  --end        [end date in the form of \"yyyy-mm-dd\"]");
@@ -266,38 +266,22 @@ static CMthreadTeam_p _MFModelParse (int argc, char *argv [],int argNum, int (*m
 			CMmsgPrint (CMmsgInfo,"     -T,  --testonly");
 			CMmsgPrint (CMmsgInfo,"     -m,  --message    [sys_error|app_error|usr_error|debug|warning|info]=[on|off|file=<filename>]");
 			CMmsgPrint (CMmsgInfo,"     -h,  --help");
-			break;
+			goto Stop;
 		}
 		if ((argv [argPos][0] == '-') && (strlen (argv [argPos]) > 1)) {
 			CMmsgPrint (CMmsgUsrError,"Unknown option [%s]!",argv [argPos]);
-			_MFModelVarEntriesFree(inputVars,  inputVarNum);
-			_MFModelVarEntriesFree(outputVars, outputVarNum);
-			_MFModelVarEntriesFree(stateVars,  stateVarNum);
-			return ((CMthreadTeam_p) NULL);
+			goto Stop;
 		}
 		argPos++;
 	}
-
 	if (*startDate == (char *) NULL) *startDate = "XXXX-01-01";
 	if (*endDate   == (char *) NULL) *endDate   = "XXXX-12-31";
 
-    if (!MFDateSetCurrent (*startDate)) { CMmsgPrint (CMmsgUsrError,"Error: Invalid start date!"); ret = CMfailed; }
-    if (!MFDateSetCurrent (*endDate))   { CMmsgPrint (CMmsgAppError,"Error: Invalid end date!");   ret = CMfailed; }
-	if (ret == CMfailed) {
-		_MFModelVarEntriesFree(inputVars,  inputVarNum);
-		_MFModelVarEntriesFree(outputVars, outputVarNum);
-		_MFModelVarEntriesFree(stateVars,  stateVarNum);
-		return ((CMthreadTeam_p) NULL);
-	}
+    if (!MFDateSetCurrent (*startDate)) { CMmsgPrint (CMmsgUsrError,"Error: Invalid start date!"); goto Stop; }
+    if (!MFDateSetCurrent (*endDate))   { CMmsgPrint (CMmsgAppError,"Error: Invalid end date!");   goto Stop; }
 
-	ret = mainDefFunc ();
+	if (mainDefFunc () != CMfailed) resolved = true; else goto Stop;
 	MFOptionPrintList ();
-	if ((ret == CMfailed) || (help)) {	
-		_MFModelVarEntriesFree(inputVars,  inputVarNum);
-		_MFModelVarEntriesFree(outputVars, outputVarNum);
-		_MFModelVarEntriesFree(stateVars,  stateVarNum);
-		return ((CMthreadTeam_p) NULL);
-	}
 
 	for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID)) {
 		if ((varEntry = _MFModelVarEntryFind (inputVars,  inputVarNum,  var->Name))  != (varEntry_p) NULL) {
@@ -318,8 +302,7 @@ static CMthreadTeam_p _MFModelParse (int argc, char *argv [],int argNum, int (*m
         }
         else if (var->Set) strcpy (var->InDate,"Computed");
         else {
-            if (!testOnly) CMmsgPrint (CMmsgInfo,"Unresolved variable: %s", var->Name);
-            resolved = false;
+            if (!testOnly) CMmsgPrint (CMmsgInfo,"Unresolved variable: %s", var->Name); resolved = false;
 		}
 		if ((varEntry = _MFModelVarEntryFind (outputVars, outputVarNum, var->Name)) != (varEntry_p) NULL) {
 			varEntry->InUse = true;
@@ -346,18 +329,19 @@ static CMthreadTeam_p _MFModelParse (int argc, char *argv [],int argNum, int (*m
 		if (outputVars [i].InUse == false) CMmsgPrint(CMmsgInfo,"Unused output variable : %s", outputVars [i].Name);
 	for (i = 0; i < stateVarNum;  ++i)
 		if (stateVars [i].InUse  == false) CMmsgPrint(CMmsgInfo,"Unused state variable : %s",  stateVars [i].Name);
+Stop:
     _MFModelVarEntriesFree(inputVars,  inputVarNum);
 	_MFModelVarEntriesFree(outputVars, outputVarNum);
 	_MFModelVarEntriesFree(stateVars,  stateVarNum);
 
-	if ((argNum) > 2) {
-		for (i = 1; i < argNum; ++i) CMmsgPrint (CMmsgUsrError,"Argument: %s",argv[i]);
+	if (argNum > 2) {
 		CMmsgPrint (CMmsgUsrError,"Extra arguments!");
+		for (i = 2; i < argNum; ++i) CMmsgPrint (CMmsgUsrError,"Argument: %s",argv[i]);
 		return ((CMthreadTeam_p) NULL);
 	}
-	if (*testOnly) { _MFModelVarPrintOut ("Source"); return ((CMthreadTeam_p) NULL); }
+	if (argNum < 2) { CMmsgPrint (CMmsgUsrError,"Missing Template Coverage!"); return ((CMthreadTeam_p) NULL); }
+	if (*testOnly)  { _MFModelVarPrintOut ("Source"); return ((CMthreadTeam_p) NULL); }
 
-	if ((argNum) < 2) { CMmsgPrint (CMmsgUsrError,"Missing Template Coverage!"); return ((CMthreadTeam_p) NULL); }
 	*domainFile = argv [1];
 	return (resolved ? CMthreadTeamCreate (procNum) : (CMthreadTeam_p) NULL);
 }
@@ -413,9 +397,9 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
 		CMmsgPrint (CMmsgAppError,"%s: Template Coverage [%s] Opening error!",CMfileName (argv [0]),argv [1]);
 		goto Stop;
 	}
-	if ((_MFDomain = MFDomainRead (inFile)) == (MFDomain_p) NULL) { ret = CMfailed; goto Stop; }
+	if ((_MFDomain = MFDomainRead (inFile)) == (MFDomain_p) NULL) { goto Stop; }
    if ((bifurFileName = MFOptionGet(MFBifurcationOpt)) != (char *) NULL) {
-        if (MFDomainSetBifurcations(_MFDomain, bifurFileName) == CMfailed) { ret = CMfailed; goto Stop; }
+        if (MFDomainSetBifurcations(_MFDomain, bifurFileName) == CMfailed) { goto Stop; }
     }
 
 	for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID)) {
@@ -439,8 +423,7 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
             var->TStep = (short) timeStep;
             switch (var->Type) {
                 case MFInput:
-                    CMmsgPrint (CMmsgAppError, "Error: Unresolved variable (%s [%s] %s)!",var->Name,var->Unit, MFVarTypeString (var->Type));
-                    ret = CMfailed;
+                    CMmsgPrint (CMmsgAppError, "Error: Unresolved variable (%s [%s] %s)!",var->Name,var->Unit, MFVarTypeString (var->Type));;
                     break;
                 case MFRoute:
                 case MFOutput:
@@ -456,11 +439,10 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
         }
         if (var->Flux) sprintf (var->Unit + strlen(var->Unit), "/%s", MFDateTimeStepUnit(var->TStep));
         if (var->OutputPath != (char *) NULL) {
-            if ((var->OutStream = MFDataStreamOpen(var->OutputPath,"w")) == (MFDataStream_p) NULL) { ret = CMfailed; goto Stop; }
+            if ((var->OutStream = MFDataStreamOpen(var->OutputPath,"w")) == (MFDataStream_p) NULL) { goto Stop; }
         }
 	}
     _MFModelVarPrintOut ("Start date");
-	if (ret == CMfailed) goto Stop;
 
     if ((job = CMthreadJobCreate(_MFDomain->ObjNum, _MFUserFunc, (void *) NULL)) == (CMthreadJob_p) NULL) {
         CMmsgPrint(CMmsgAppError, "Job creation error in %s:%d", __FILE__, __LINE__);
@@ -493,7 +475,7 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
             if (var->InStream != (MFDataStream_p) NULL) {
                 if ((MFDateCompare(startDate, dateNext) < 0) && (MFDateCompare(dateNext,endDate) <= 0)) {
                     strcpy (var->InDate, dateNext);
-                    if ((ret = MFdsRecordRead(var)) == CMfailed) {
+                    if (MFdsRecordRead(var) == CMfailed) {
                         CMmsgPrint(CMmsgAppError, "Variable (%s) Reading error!", var->Name);
                         goto Stop;
                     }
