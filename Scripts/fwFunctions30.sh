@@ -508,7 +508,7 @@ function _fwPreprocess () {
 		done
 		_fwSTART="FALSE"
 	fi
-	[ "${_fwVERBOSE}" == "on"  ] && echo "      Preprocessing ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"
+	[ "${_fwVERBOSE}" == "on"  ] && echo "      Preprocessing  ${fwYEAR} finished: $(date '+%Y-%m-%d %H:%M:%S')"
 	return 0
 }
 
@@ -517,7 +517,7 @@ function _fwPostprocess () {
 	local       fwYEAR="${1}"; shift
 
 	if [ "${fwYEAR}" == "" ]; then local fwSUFFIX="LT"; else local fwSUFFIX="TS${fwYEAR}"; fi
-	[ "${_fwVERBOSE}" == "on" ] && { echo "      Postprocessing ${fwYEAR} started:  $(date '+%Y-%m-%d %H:%M:%S')"; }
+	[ "${_fwVERBOSE}" == "on" ] && { echo "      Postprocessing  ${fwYEAR} started: $(date '+%Y-%m-%d %H:%M:%S')"; }
 
 	local procNum=0
 	local files=""
