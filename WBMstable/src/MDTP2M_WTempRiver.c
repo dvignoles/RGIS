@@ -31,10 +31,10 @@ static void _MDWTempRiver (int itemID) {
 	float GrdWaterRO;
 	float TemperatureRO;
 
-	SurfaceRO          = MFVarGetFloat (_MDInSurfCore_RunoffID,          itemID, 0.0);
-	GrdWaterRO         = MFVarGetFloat (_MDInBaseFlowID,            itemID, 0.0);
-	RechargeT          = MFVarGetFloat (_MDInWTempSurfCore_RunoffID,     itemID, 0.0);
-	GrdWaterT          = MFVarGetFloat (_MDInWTempGrdWaterID,       itemID, 0.0);
+	SurfaceRO          = MFVarGetFloat (_MDInSurfCore_RunoffID,      itemID, 0.0);
+	GrdWaterRO         = MFVarGetFloat (_MDInBaseFlowID,             itemID, 0.0);
+	RechargeT          = MFVarGetFloat (_MDInWTempSurfCore_RunoffID, itemID, 0.0);
+	GrdWaterT          = MFVarGetFloat (_MDInWTempGrdWaterID,        itemID, 0.0);
 
 	SurfaceRO  = MDMaximum(0, SurfaceRO);
 	GrdWaterRO = MDMaximum(0, GrdWaterRO);

@@ -17,16 +17,15 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgUsrError, "%s [options] <in datastream> <out datastream>", CMfileName(arg0));
-    CMmsgPrint(CMmsgUsrError, "  -e, --step [year|month|day]");
+    CMmsgPrint(CMmsgUsrError, "  -e, --step [day|month|year]");
     CMmsgPrint(CMmsgUsrError, "  -a, --aggregate [avg|sum]");
     CMmsgPrint(CMmsgUsrError, "  -h,--help");
 }
 
 enum { DAY = 10, MONTH = 7, YEAR = 4 };
-enum { AVG = 1, SUM = 2 };
 
 int main(int argc, char *argv[]) {
-    int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemNum, itemRet, i, recordNum = 0, step = CMfailed, mode = CMfailed;
+    int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemNum, itemRet, i, recordNum = 0, step = DAY, average = true;
     FILE *inFile = stdin, *outFile = stdout;
     char date[MFDateStringLength];
     MFdsHeader_t header, outHeader;
@@ -40,11 +39,13 @@ int main(int argc, char *argv[]) {
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest(argv[argPos], "-e", "--step")) {
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            if (step != CMfailed) CMmsgPrint(CMmsgUsrError, "Skipping aggregate step that is previously set!");
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing time step!");
+                break;
+            }
             else {
-                const char *options[] = {"year", "month", "day", (char *) NULL};
-                int codes[] = {YEAR, MONTH, DAY}, code;
+                const char *options[] = {"day", "month", "year", (char *) NULL};
+                int codes[] = {DAY, MONTH, YEAR}, code;
 
                 if ((code = CMoptLookup(options, argv[argPos], false)) == CMfailed) {
                     CMmsgPrint(CMmsgWarning, "Ignoring illformed step option [%s]!", argv[argPos]);
@@ -55,16 +56,18 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if (CMargTest(argv[argPos], "-a", "--aggregate")) {
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            if (mode != CMfailed) CMmsgPrint(CMmsgUsrError, "Skipping aggregate mode that is previously set!");
+            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
+                CMmsgPrint(CMmsgUsrError, "Missing aggregate option!");
+                break;
+            }
             else {
                 const char *options[] = {"avg", "sum", (char *) NULL};
-                int codes[] = {AVG, SUM}, code;
+                int codes[] = {true, false}, code;
 
                 if ((code = CMoptLookup(options, argv[argPos], false)) == CMfailed) {
                     CMmsgPrint(CMmsgWarning, "Ignoring illformed step option [%s]!", argv[argPos]);
                 }
-                else mode = codes[code];
+                else average = codes[code];
             }
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
@@ -87,9 +90,6 @@ int main(int argc, char *argv[]) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-
-    if (mode == CMfailed) mode = AVG;
-    if (step == CMfailed) mode = DAY;
 
     if ((inFile = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? fopen(argv[1], "r") : stdin) == (FILE *) NULL) {
         CMmsgPrint(CMmsgSysError, "Input file opening error in: %s %d", __FILE__, __LINE__);
@@ -132,17 +132,13 @@ int main(int argc, char *argv[]) {
                 maxObs = 0;
             }
             else {
-                switch (mode) {
-                    default:
-                    case AVG:
-                        for (i = 0; i < header.ItemNum; i++)
-                            record[i] = obsNum[i] > 0 ? array[i] / obsNum[i] : outHeader.Missing.Float;
-                        break;
-                    case SUM:
-                        for (i = 0; i < header.ItemNum; i++)
-                            record[i] = obsNum[i] > 0 ? array[i] * ((double) maxObs / (double) obsNum[i])
-                                                      : outHeader.Missing.Float;
-                        break;
+                if (average) {
+                    for (i = 0; i < header.ItemNum; i++)
+                        record[i] = obsNum[i] > 0 ? array[i] / obsNum[i] : outHeader.Missing.Float;
+                }
+                else {
+                    for (i = 0; i < header.ItemNum; i++)
+                        record[i] = obsNum[i] > 0 ? array[i] * ((double) maxObs / (double) obsNum[i]) : outHeader.Missing.Float;
                 }
                 strncpy(outHeader.Date, date, step);
                 outHeader.Date[step] = '\0';

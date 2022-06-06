@@ -144,15 +144,15 @@ static void _MDWTempRiverRoute (int itemID) {
     	QxTnew_mix = QxT_mix + QxT_input + StorexT_mix;									//RJS 071511
 
     	if (Q_incoming > 0.000001) {
-    		Q_WTemp = QxTnew / ((Q_incoming) * 86400 + (waterStorage - waterStorageChange)); 			//RJS 071511					//degC
+    		Q_WTemp     = QxTnew     / ((Q_incoming) * 86400 + (waterStorage - waterStorageChange));    //RJS 071511					//degC
     		Q_WTemp_mix = QxTnew_mix / ((Q_incoming) * 86400 + (waterStorage - waterStorageChange));	//RJS 071511					//degC
     	} else {
     		if (waterStorage > 0) {
-    			Q_WTemp	 = StorexT / waterStorage;		// RJS 071511	//degC
+    			Q_WTemp	    = StorexT / waterStorage;		// RJS 071511	//degC
     			Q_WTemp_mix = StorexT_mix / waterStorage;	// RJS 071511	//degC
     		} else {
-				Q_WTemp 	= 0.0;			//RJS 071511
-				Q_WTemp_mix = 0.0;			//RJS 071511
+				Q_WTemp 	= Tair;			//RJS 071511
+				Q_WTemp_mix = Tair;			//RJS 071511
 			}
     	}
 
