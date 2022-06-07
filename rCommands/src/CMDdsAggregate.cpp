@@ -25,7 +25,7 @@ static void _CMDprintUsage (const char *arg0) {
 enum { DAY = 10, MONTH = 7, YEAR = 4 };
 
 int main(int argc, char *argv[]) {
-    int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemNum, itemRet, i, recordNum = 0, step = DAY, average = true;
+    int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemRet, i, recordNum = 0, step = DAY, average = true;
     FILE *inFile = stdin, *outFile = stdout;
     char date[MFDateStringLength];
     MFdsHeader_t header, outHeader;
@@ -101,139 +101,123 @@ int main(int argc, char *argv[]) {
     }
 
     while (MFdsHeaderRead(&header, inFile) == CMsucceeded) {
-        recordNum++;
-        if (strncmp(date, header.Date, step) != 0) {
-            if (items == (void *) NULL) {
-                itemSize = MFVarItemSize(header.Type);
-                if ((items = (void *) calloc(header.ItemNum, itemSize)) == (void *) NULL) {
-                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
-                    goto Stop;
-                }
-                if ((array = (double *) calloc(header.ItemNum, sizeof(double))) == (double *) NULL) {
-                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
-                    goto Stop;
-                }
-                if ((record = (float *) calloc(header.ItemNum, sizeof(float))) == (float *) NULL) {
-                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
-                    goto Stop;
-                }
-                if ((obsNum = (int *) calloc(header.ItemNum, sizeof(int))) == (int *) NULL) {
-                    CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
-                    goto Stop;
-                }
-                outHeader.Swap = 1;
-                outHeader.Type = MFFloat;
-                outHeader.ItemNum = header.ItemNum;
-                outHeader.Missing.Float =
-                        (header.Type == MFFloat) || (header.Type == MFDouble) ? header.Missing.Float
-                                                                                      : MFDefaultMissingFloat;
-                for (i = 0; i < header.ItemNum; i++) obsNum[i] = 0;
-                for (i = 0; i < header.ItemNum; i++) array[i] = 0.0;
-                maxObs = 0;
+        if (items == (void *) NULL) {
+            itemSize = MFVarItemSize(header.Type);
+            if ((items = (void *) calloc(header.ItemNum, itemSize)) == (void *) NULL) {
+                CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                goto Stop;
             }
-            else {
-                if (average) {
-                    for (i = 0; i < header.ItemNum; i++)
-                        record[i] = obsNum[i] > 0 ? array[i] / obsNum[i] : outHeader.Missing.Float;
-                }
-                else {
-                    for (i = 0; i < header.ItemNum; i++)
-                        record[i] = obsNum[i] > 0 ? array[i] * ((double) maxObs / (double) obsNum[i]) : outHeader.Missing.Float;
-                }
-                strncpy(outHeader.Date, date, step);
-                outHeader.Date[step] = '\0';
-                if (MFdsHeaderWrite(&outHeader, outFile) == CMsucceeded) {
-                    if ((int) fwrite(record, sizeof(float), outHeader.ItemNum, outFile) != outHeader.ItemNum) {
-                        CMmsgPrint(CMmsgSysError, "Output writing error in: %s:%d", __FILE__, __LINE__);
-                        goto Stop;
-                    }
-                }
-                for (i = 0; i < header.ItemNum; i++) obsNum[i] = 0;
-                for (i = 0; i < header.ItemNum; i++) array[i] = 0.0;
-                maxObs = 0;
+            if ((array = (double *) calloc(header.ItemNum, sizeof(double))) == (double *) NULL) {
+                CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                goto Stop;
             }
-            strncpy(date, header.Date, step);
-            date[step] = '\0';
+            if ((record = (float *) calloc(header.ItemNum, sizeof(float))) == (float *) NULL) {
+                CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                goto Stop;
+            }
+            if ((obsNum = (int *) calloc(header.ItemNum, sizeof(int))) == (int *) NULL) {
+                CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s:%d", __FILE__, __LINE__);
+                goto Stop;
+            }
+            for (i = 0; i < header.ItemNum; i++) obsNum[i] = 0;
+            for (i = 0; i < header.ItemNum; i++) array[i] = 0.0;
+            maxObs = 0;
+            outHeader.Swap = 1;
+            outHeader.Type = MFFloat;
+            outHeader.ItemNum = header.ItemNum;
+            outHeader.Missing.Float = (header.Type == MFFloat) || (header.Type == MFDouble) ? header.Missing.Float : MFDefaultMissingFloat;
         }
-        itemNum = 0;
-        while ((feof(inFile) == 0) && (itemNum < header.ItemNum))
-            itemNum += fread(((char *) items) + itemNum * itemSize, itemSize, header.ItemNum - itemNum, inFile);
-
-        if (itemNum != header.ItemNum) {
+        if (fread(items, itemSize, header.ItemNum, inFile) != header.ItemNum) {
             CMmsgPrint(CMmsgSysError, "Input reading error in: %s:%d", __FILE__, __LINE__);
             goto Stop;
         }
+        if (recordNum == 0) strncpy (date, header.Date, step);
+        else {
+            if (strncmp (date, header.Date, step) != 0) {
+                strcpy(outHeader.Date, date);
+                if (MFdsHeaderWrite (&outHeader, outFile) == CMfailed)  {
+                    CMmsgPrint(CMmsgSysError, "Output header writing error in: %s:%d", __FILE__, __LINE__);
+                    goto Stop;
+                }
+                if (average)
+                    for (i = 0; i < header.ItemNum; i++) record[i] = obsNum[i] > 0 ? array[i] / (double) obsNum[i] : outHeader.Missing.Float;
+                else 
+                    for (i = 0; i < header.ItemNum; i++) record[i] = obsNum[i] > 0 ? array[i] * ((double) maxObs / (double) obsNum[i]) : outHeader.Missing.Float;
+                if ((int) fwrite(record, sizeof(float), outHeader.ItemNum, outFile) != outHeader.ItemNum) {
+                    CMmsgPrint(CMmsgSysError, "Output writing error in: %s:%d", __FILE__, __LINE__);
+                    goto Stop;
+                }
+                for (i = 0; i < header.ItemNum; i++) obsNum[i] = 0;
+                for (i = 0; i < header.ItemNum; i++) array[i]  = 0.0;
+                maxObs = 0;
+                strncpy (date, header.Date, step);
+            }
+        } 
         for (i = 0; i < header.ItemNum; i++) {
             switch (header.Type) {
                 case MFByte:
                     if (((char *) items)[i] != header.Missing.Int) {
-                        array[i] += ((char *) items)[i];
-                        obsNum[i] += 1;
+                        array  [i] += ((char *) items)[i];
+                        obsNum [i] += 1;
                         if (obsNum[i] > maxObs) maxObs = obsNum[i];
                     }
                     break;
                 case MFShort:
                     if (header.Swap != 1) MFSwapHalfWord(((short *) items) + i);
                     if (((short *) items)[i] != header.Missing.Int) {
-                        array[i] += ((short *) items)[i];
-                        obsNum[i] += 1;
+                        array  [i] += ((short *) items)[i];
+                        obsNum [i] += 1;
                         if (obsNum[i] > maxObs) maxObs = obsNum[i];
                     }
                     break;
                 case MFInt:
                     if (header.Swap != 1) MFSwapWord(((int *) items) + i);
                     if (((int *) items)[i] != header.Missing.Int) {
-                        array[i] += ((int *) items)[i];
-                        obsNum[i] += 1;
+                        array  [i] += ((int *) items)[i];
+                        obsNum [i] += 1;
                         if (obsNum[i] > maxObs) maxObs = obsNum[i];
                     }
                     break;
                 case MFFloat:
                     if (header.Swap != 1) MFSwapWord(((float *) items) + i);
                     if (CMmathEqualValues(((float *) items)[i], header.Missing.Float) == false) {
-                        array[i] += ((float *) items)[i];
-                        obsNum[i] += 1;
+                        array  [i] += ((float *) items)[i];
+                        obsNum [i] += 1;
                         if (obsNum[i] > maxObs) maxObs = obsNum[i];
                     }
                     break;
                 case MFDouble:
                     if (header.Swap != 1) MFSwapLongWord(((double *) items) + i);
                     if (CMmathEqualValues(((double *) items)[i], header.Missing.Float) == false) {
-                        array[i] += ((double *) items)[i];
-                        obsNum[i] += 1;
+                        array  [i] += ((double *) items)[i];
+                        obsNum [i] += 1;
                         if (obsNum[i] > maxObs) maxObs = obsNum[i];
                     }
                     break;
             }
         }
+        recordNum++;
     }
     if (recordNum > 0) {
-        switch (mode) {
-            default:
-            case AVG:
-                for (i = 0; i < header.ItemNum; i++)
-                    record[i] = obsNum[i] > 0 ? array[i] / obsNum[i] : outHeader.Missing.Float;
-                break;
-            case SUM:
-                for (i = 0; i < header.ItemNum; i++)
-                    record[i] = obsNum[i] > 0 ? array[i] * ((double) maxObs / (double) obsNum[i]) : outHeader.Missing.Float;
-                break;
+        strcpy(outHeader.Date, date);
+        if (MFdsHeaderWrite (&outHeader, outFile) == CMfailed)  {
+            CMmsgPrint(CMmsgSysError, "Output header writing error in: %s:%d", __FILE__, __LINE__);
+            goto Stop;
         }
-        strncpy(outHeader.Date, header.Date, step);
-        outHeader.Date[step] = '\0';
-        if (MFdsHeaderWrite(&outHeader, outFile) == CMsucceeded) {
-            if ((int) fwrite(record, sizeof(float), outHeader.ItemNum, outFile) != outHeader.ItemNum) {
-                CMmsgPrint(CMmsgSysError, "Output writing error in: %s:%d", __FILE__, __LINE__);
-                goto Stop;
-            }
+        if (average)
+            for (i = 0; i < header.ItemNum; i++) record[i] = obsNum[i] > 0 ? array[i] / obsNum[i] : outHeader.Missing.Float;
+        else
+            for (i = 0; i < header.ItemNum; i++) record[i] = obsNum[i] > 0 ? array[i] * ((double) maxObs / (double) obsNum[i]) : outHeader.Missing.Float;
+        if ((int) fwrite(record, sizeof(float), outHeader.ItemNum, outFile) != outHeader.ItemNum) {
+            CMmsgPrint(CMmsgSysError, "Output writing error in: %s:%d", __FILE__, __LINE__);
+            goto Stop;
         }
+        ret = CMsucceeded;
     }
-    ret = CMsucceeded;
-
 Stop:
-    if (items != (void *)   NULL) free(items);
-    if (array != (double *) NULL) free(array);
-    if (obsNum != (int *)   NULL) free(obsNum);
+    if (items   != (void *)   NULL) free(items);
+    if (array   != (double *) NULL) free(array);
+    if (obsNum  != (int *)    NULL) free(obsNum);
     if (inFile  != stdin)  fclose(inFile);
     if (outFile != stdout) fclose(outFile);
     return (ret);
