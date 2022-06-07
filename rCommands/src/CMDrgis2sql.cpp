@@ -16,14 +16,14 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <rgis file> <sqlfile>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -a,--rgistable  [rgis table]");
-    CMmsgPrint(CMmsgInfo, "     -c,--case       [sensitive|lower|upper");
-    CMmsgPrint(CMmsgInfo, "     -s,--schema     [sql schema]");
-    CMmsgPrint(CMmsgInfo, "     -q,--sqltable   [sql table]");
-    CMmsgPrint(CMmsgInfo, "     -d,--dialect    [postgres|sqlite]");
-    CMmsgPrint(CMmsgInfo, "     -m,--mode       [copy|append|replace|blank]");
-    CMmsgPrint(CMmsgInfo, "     -r,--recordname [on|off]");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -a, --rgistable  [rgis table]");
+    CMmsgPrint(CMmsgInfo, "     -c, --case       [sensitive|lower|upper");
+    CMmsgPrint(CMmsgInfo, "     -s, --schema     [sql schema]");
+    CMmsgPrint(CMmsgInfo, "     -q, --sqltable   [sql table]");
+    CMmsgPrint(CMmsgInfo, "     -d, --dialect    [postgres|sqlite]");
+    CMmsgPrint(CMmsgInfo, "     -m, --mode       [copy|append|replace|blank]");
+    CMmsgPrint(CMmsgInfo, "     -r, --recordname [on|off]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {

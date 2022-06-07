@@ -15,12 +15,13 @@ bfekete@gc.cuny.edu
 #include <RG.hpp>
 
 static void _CMDprintUsage (const char *arg0) {
-    CMmsgPrint(CMmsgInfo, "%s -m [metadb file] <rgis data file> ... <rgis data file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
+    CMmsgPrint(CMmsgInfo, "%s [options] <rgis data file> ... <rgis data file>", CMfileName(arg0));
+    CMmsgPrint(CMmsgInfo, "     -m, --MetaDB [metadb file]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int i, verbose = false;
+    int i;
     char *ghaasMetaDB = (char *) NULL, metaFileName[DBDataFileNameLen];
     DBObjData *dbData;
     DBDataset *dbDataset;
@@ -37,7 +38,6 @@ int main(int argc, char *argv[]) {
             _CMDprintUsage(argv[0]);
             return (0);
         }
-        else if ((strcmp(argv[i], "-V") == 0) || (strcmp(argv[i], "--verbose") == 0)) verbose = true;
         else if (((strcmp(argv[i], "-m") == 0) || (strcmp(argv[i], "--MetaDB") == 0)) && (argc > i + 1)) {
             if (++i < argc) {
                 ghaasMetaDB = argv[i];
@@ -49,7 +49,6 @@ int main(int argc, char *argv[]) {
         }
     }
     if (i == argc) i = 0;
-    if (verbose) RGlibPauseOpen(argv[0]);
 
     if (ghaasMetaDB == (char *) NULL) {
         sprintf(metaFileName, "%s/GHAASMetadb", getenv("GHAAS_DIR") == NULL ? getenv("HOME") : getenv("GHAAS_DIR"));
@@ -71,6 +70,5 @@ int main(int argc, char *argv[]) {
         delete dbData;
     }
     delete dbDataset;
-    if (verbose) RGlibPauseClose();
     return (0);
 }

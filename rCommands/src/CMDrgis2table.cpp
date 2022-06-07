@@ -16,13 +16,12 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <rgis file> <ascii table>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -a,--table");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -a, --table");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     char *tableName = (char *) NULL;
     DBObjData *data;
     DBObjTable *table;
@@ -34,11 +33,6 @@ int main(int argc, char *argv[]) {
                 return (CMfailed);
             }
             tableName = argv[argPos];
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
@@ -58,8 +52,6 @@ int main(int argc, char *argv[]) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     data = new DBObjData();
     if (((argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Read(argv[1]) : data->Read(stdin)) == DBFault) {
         delete data;
@@ -78,6 +70,5 @@ int main(int argc, char *argv[]) {
           DBExportASCIITable(table, stdout);
 
     delete data;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

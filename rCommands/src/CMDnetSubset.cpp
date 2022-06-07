@@ -17,16 +17,15 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input network> <output network>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -p,--points      <point coverage>");
-    CMmsgPrint(CMmsgInfo, "     -t,--title       [dataset title]");
-    CMmsgPrint(CMmsgInfo, "     -d,--domain      [domain]");
-    CMmsgPrint(CMmsgInfo, "     -v,--version     [version]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -p, --points      <point coverage>");
+    CMmsgPrint(CMmsgInfo, "     -t, --title       [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -d, --domain      [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v, --version     [version]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     char *title = (char *) NULL, *domain = (char *) NULL, *version = (char *) NULL;
     char *pointName = (char *) NULL;
     DBInt cellID, pntID;
@@ -76,11 +75,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
@@ -102,8 +96,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     pntData = new DBObjData ();
     if ((pntData->Read(pointName) == CMfailed) || (pntData->Type () != DBTypeVectorPoint)) {
         CMmsgPrint(CMmsgUsrError, "Invalid point coverage [%s]", pointName);
@@ -163,6 +155,5 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     delete netIF;
     delete pntData;
     delete netData;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

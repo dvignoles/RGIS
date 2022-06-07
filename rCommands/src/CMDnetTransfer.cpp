@@ -174,12 +174,11 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgUsrError, "     -d, --domain      [domain]");
     CMmsgPrint(CMmsgUsrError, "     -v, --version     [version]");
     CMmsgPrint(CMmsgUsrError, "     -s, --shadeset    [standard|grey|blue|blue-to-red|elevation");
-    CMmsgPrint(CMmsgUsrError, "     -V, --verbose");
     CMmsgPrint(CMmsgUsrError, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     float coeff, umax, ksat;
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
@@ -346,11 +345,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
            return (DBSuccess);
@@ -367,8 +361,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     if (netName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Network is not specified");
         _CMDprintUsage (argv[0]);
@@ -448,6 +440,5 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     delete data;
     delete netData;
     delete grdData;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

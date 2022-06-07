@@ -30,33 +30,33 @@ static void doHelp(bool extended, const char *progName) {
     if (extended) {
         CMmsgPrint(CMmsgInfo, "%s [options] [field] ... <input file> ...", progName);
         CMmsgPrint(CMmsgInfo,
-                   "  -b,--table   [inTableName] [outTableName] => Set the name of the table to use.\t(If either is set to NULL, then default table will be used)");
-        CMmsgPrint(CMmsgInfo, "  -d,--domain  [domain]                     => Specify domain of output table.");
-        CMmsgPrint(CMmsgInfo, "  -m,--match   [inFieldName] [outFieldName] => Which fields to match");
+                   "  -b, --table   [inTableName] [outTableName] => Set the name of the table to use.\t(If either is set to NULL, then default table will be used)");
+        CMmsgPrint(CMmsgInfo, "  -d, --domain  [domain]                     => Specify domain of output table.");
+        CMmsgPrint(CMmsgInfo, "  -m, --match   [inFieldName] [outFieldName] => Which fields to match");
         CMmsgPrint(CMmsgInfo,
                    "  -o,--output  [filename]                   => Specify output filename, else use STDOUT");
-        CMmsgPrint(CMmsgInfo, "  -a,--dataset [filename]                   => Join dataset");
-        CMmsgPrint(CMmsgInfo, "  -s,--subject [subject]                    => Specify subject of output table.");
-        CMmsgPrint(CMmsgInfo, "  -t,--title   [title]                      => Specify title of output table.");
-        CMmsgPrint(CMmsgInfo, "  -v,--version [version]                    => Specify version of output table.");
+        CMmsgPrint(CMmsgInfo, "  -a, --dataset [filename]                   => Join dataset");
+        CMmsgPrint(CMmsgInfo, "  -s, --subject [subject]                    => Specify subject of output table.");
+        CMmsgPrint(CMmsgInfo, "  -t, --title   [title]                      => Specify title of output table.");
+        CMmsgPrint(CMmsgInfo, "  -v, --version [version]                    => Specify version of output table.");
         CMmsgPrint(CMmsgInfo,
                    "  -V,--verbose                              => Output all debuging statements to STDERR (Must be first flag)");
-        CMmsgPrint(CMmsgInfo, "  -c,--ascii                                => Output file in ascii format.");
-        CMmsgPrint(CMmsgInfo, "  -h,--help                                 => Print this usage information.");
+        CMmsgPrint(CMmsgInfo, "  -c, --ascii                                => Output file in ascii format.");
+        CMmsgPrint(CMmsgInfo, "  -h, --help                                 => Print this usage information.");
     }
     else {
         CMmsgPrint(CMmsgInfo, "%s [options] [field] ... <input file> ...", progName);
-        CMmsgPrint(CMmsgInfo, "  -b,--table   [inTableName] [outTableName]");
-        CMmsgPrint(CMmsgInfo, "  -d,--domain  [domain]");
-        CMmsgPrint(CMmsgInfo, "  -m,--match   [inFieldName] [outFieldName]");
-        CMmsgPrint(CMmsgInfo, "  -o,--output  [filename]");
-        CMmsgPrint(CMmsgInfo, "  -a,--dataset [filename]");
-        CMmsgPrint(CMmsgInfo, "  -s,--subject [subject]");
-        CMmsgPrint(CMmsgInfo, "  -t,--title   [title]");
-        CMmsgPrint(CMmsgInfo, "  -v,--version [version]");
-        CMmsgPrint(CMmsgInfo, "  -V,--verbose");
-        CMmsgPrint(CMmsgInfo, "  -c,--ascii");
-        CMmsgPrint(CMmsgInfo, "  -h,--help    => For more help type -h e, or --help extend.");
+        CMmsgPrint(CMmsgInfo, "  -b, --table   [inTableName] [outTableName]");
+        CMmsgPrint(CMmsgInfo, "  -d, --domain  [domain]");
+        CMmsgPrint(CMmsgInfo, "  -m, --match   [inFieldName] [outFieldName]");
+        CMmsgPrint(CMmsgInfo, "  -o, --output  [filename]");
+        CMmsgPrint(CMmsgInfo, "  -a, --dataset [filename]");
+        CMmsgPrint(CMmsgInfo, "  -s, --subject [subject]");
+        CMmsgPrint(CMmsgInfo, "  -t, --title   [title]");
+        CMmsgPrint(CMmsgInfo, "  -v, --version [version]");
+        CMmsgPrint(CMmsgInfo, "  -V, --verbose");
+        CMmsgPrint(CMmsgInfo, "  -c, --ascii");
+        CMmsgPrint(CMmsgInfo, "  -h, --help    => For more help type -h e, or --help extend.");
     }
 }
 

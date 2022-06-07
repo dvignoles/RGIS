@@ -16,19 +16,18 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <data stream file> <rgis file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -m,--template  [template coverage]");
-    CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
-    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
-    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
-    CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -m, --template  [template coverage]");
+    CMmsgPrint(CMmsgInfo, "     -t, --title     [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u, --subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d, --domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v, --version   [version]");
+    CMmsgPrint(CMmsgInfo, "     -s, --shadeset  [standard|grey|blue|blue-to-red|elevation]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
     FILE *inFile;
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     char *title   = (char *) NULL, *subject = (char *) NULL;
     char *domain  = (char *) NULL, *version = (char *) NULL;
     char *tmpName = (char *) NULL;
@@ -103,11 +102,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage (argv[0]);
             return (DBSuccess);
@@ -129,7 +123,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (DBFault);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
 
     inFile = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? fopen(argv[1], "r") : stdin;
     if (inFile == (FILE *) NULL) {
@@ -188,6 +181,5 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     delete tmpData;
     delete outData;
     if (inFile != stdin) fclose(inFile);
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

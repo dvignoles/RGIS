@@ -22,13 +22,13 @@ extern "C" {
 #include <cm.h>
 
 enum {
-    MFStop = false,
+    MFStop     = false,
     MFContinue = true,
-    MFState = false,
-    MFFlux = true,
+    MFState    = false,
+    MFFlux     = true,
     MFBoundary = false,
-    MFInitial = true,
-    MFUnset = -2
+    MFInitial  = true,
+    MFUnset    = -2
 };
 
 #define MFDefaultMissingFloat -9999.0

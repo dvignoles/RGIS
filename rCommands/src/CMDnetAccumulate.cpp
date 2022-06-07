@@ -16,29 +16,28 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input grid> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -n,--network     <network coverage>");
-    CMmsgPrint(CMmsgInfo, "     -a,--stations    <station coverage>");
-    CMmsgPrint(CMmsgInfo, "     -i,--timeseries  <time series data>");
-    CMmsgPrint(CMmsgInfo, "     -r,--relate      [relate field]");
-    CMmsgPrint(CMmsgInfo, "     -j,--join        [join field]");
-    CMmsgPrint(CMmsgInfo, "     -e,--date        [date field]");
-    CMmsgPrint(CMmsgInfo, "     -x,--nextstation [next station field]");
-    CMmsgPrint(CMmsgInfo, "     -g,--discharge   [discharge field]");
-    CMmsgPrint(CMmsgInfo, "     -c,--correction  [on|off (default is off)]");
-    CMmsgPrint(CMmsgInfo, "     -m,--mode        [rate|volume]");
-    CMmsgPrint(CMmsgInfo, "     -f,--coefficient [conversion coefficient]");
-    CMmsgPrint(CMmsgInfo, "     -l,--negative    [allow|eliminate]");
-    CMmsgPrint(CMmsgInfo, "     -t,--title       [dataset title]");
-    CMmsgPrint(CMmsgInfo, "     -u,--subject     [subject]");
-    CMmsgPrint(CMmsgInfo, "     -d,--domain      [domain]");
-    CMmsgPrint(CMmsgInfo, "     -v,--version     [version]");
-    CMmsgPrint(CMmsgInfo, "     -s,--shadeset    [standard|grey|blue|blue-to-red|elevation]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -n, --network     <network coverage>");
+    CMmsgPrint(CMmsgInfo, "     -a, --stations    <station coverage>");
+    CMmsgPrint(CMmsgInfo, "     -i, --timeseries  <time series data>");
+    CMmsgPrint(CMmsgInfo, "     -r, --relate      [relate field]");
+    CMmsgPrint(CMmsgInfo, "     -j, --join        [join field]");
+    CMmsgPrint(CMmsgInfo, "     -e, --date        [date field]");
+    CMmsgPrint(CMmsgInfo, "     -x, --nextstation [next station field]");
+    CMmsgPrint(CMmsgInfo, "     -g, --discharge   [discharge field]");
+    CMmsgPrint(CMmsgInfo, "     -c, --correction  [on|off (default is off)]");
+    CMmsgPrint(CMmsgInfo, "     -m, --mode        [rate|volume]");
+    CMmsgPrint(CMmsgInfo, "     -f, --coefficient [conversion coefficient]");
+    CMmsgPrint(CMmsgInfo, "     -l, --negative    [allow|eliminate]");
+    CMmsgPrint(CMmsgInfo, "     -t, --title       [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u, --subject     [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d, --domain      [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v, --version     [version]");
+    CMmsgPrint(CMmsgInfo, "     -s, --shadeset    [standard|grey|blue|blue-to-red|elevation]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     float coeff = 0.000001;
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
@@ -240,11 +239,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
@@ -261,8 +255,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     if (netName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Network is not specified");
         _CMDprintUsage (argv[0]);
@@ -333,6 +325,5 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     delete data;
     delete netData;
     delete grdData;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

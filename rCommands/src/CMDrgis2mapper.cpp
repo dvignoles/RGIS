@@ -17,8 +17,8 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <sampling data> <output mapper>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -d,--domain <rgis domain file>");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -d, --domain <rgis domain file>");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {

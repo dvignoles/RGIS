@@ -140,11 +140,10 @@ static void doHelp(bool extended, char *arg0) {
     if (extended) {
         CMmsgPrint(CMmsgInfo, "%s [options] [field] ... <input file> ...", CMfileName(arg0));
         CMmsgPrint(CMmsgInfo, "**fieldnames must match fieldnames in first line of datafile.**Valid flags:");
-        CMmsgPrint(CMmsgInfo, "  -a,--table   [name]              => Set the name of the table to use.");
-        CMmsgPrint(CMmsgInfo, "  -c,--ascii                       => Output as ASCII");
-        CMmsgPrint(CMmsgInfo, "  -d,--domain  [domain]            => Specify domain of output table.");
-        CMmsgPrint(CMmsgInfo,
-                   "  -f,--field   [operation] [field] => Perform 'operation' on field values, where operation");
+        CMmsgPrint(CMmsgInfo, "  -a, --table   [name]              => Set the name of the table to use.");
+        CMmsgPrint(CMmsgInfo, "  -c, --ascii                       => Output as ASCII");
+        CMmsgPrint(CMmsgInfo, "  -d, --domain  [domain]            => Specify domain of output table.");
+        CMmsgPrint(CMmsgInfo, "  -f, --field   [operation] [field] => Perform 'operation' on field values, where operation");
         CMmsgPrint(CMmsgInfo, "     is one of the following:");
         CMmsgPrint(CMmsgInfo, "       num                  = Output number of rows inside group.");
         CMmsgPrint(CMmsgInfo, "       nonnull field        = Number of non-NULL field values inside group.");
@@ -158,30 +157,29 @@ static void doHelp(bool extended, char *arg0) {
         CMmsgPrint(CMmsgInfo, "       mod field            = Output the mode of values in given field.");
         CMmsgPrint(CMmsgInfo, "       dev field            = Output standard deviation of values in given field.");
         CMmsgPrint(CMmsgInfo, "     Field values are assumed to be numeric.");
-        CMmsgPrint(CMmsgInfo,
-                   "  -g,--group  [field]              => Perform selected operations on data groups, selected");
+        CMmsgPrint(CMmsgInfo, "  -g, --group  [field]      => Perform selected operations on data groups, selected");
         CMmsgPrint(CMmsgInfo, "     by having the same value in the group field.  Process whole input if no group is");
         CMmsgPrint(CMmsgInfo, "     given.  Select groups based on groups of fields if multiple groups are given.");
-        CMmsgPrint(CMmsgInfo, "  -h,--help                        => Print this usage information.");
-        CMmsgPrint(CMmsgInfo, "  -o,--output  [filename]          => Specify output filename, else use STDOUT");
-        CMmsgPrint(CMmsgInfo, "  -r,--rename  [name]              => Set the name of the operation column.");
-        CMmsgPrint(CMmsgInfo, "  -u,--subject [subject]           => Specify subject of output table.");
-        CMmsgPrint(CMmsgInfo, "  -t,--title   [title]             => Specify title of output table.");
-        CMmsgPrint(CMmsgInfo, "  -v,--version [version]           => Specify version of output table.");
+        CMmsgPrint(CMmsgInfo, "  -o, --output  [filename]  => Specify output filename, else use STDOUT");
+        CMmsgPrint(CMmsgInfo, "  -r, --rename  [name]      => Set the name of the operation column.");
+        CMmsgPrint(CMmsgInfo, "  -u, --subject [subject]   => Specify subject of output table.");
+        CMmsgPrint(CMmsgInfo, "  -t, --title   [title]     => Specify title of output table.");
+        CMmsgPrint(CMmsgInfo, "  -v, --version [version]   => Specify version of output table.");
+        CMmsgPrint(CMmsgInfo, "  -h, --help                => Print this usage information.");
     }
     else {
         CMmsgPrint(CMmsgInfo, "%s [options] [field] ... <input file> ...", CMfileName(arg0));
-        CMmsgPrint(CMmsgInfo, "  -a,--table   [name]");
-        CMmsgPrint(CMmsgInfo, "  -c,--ascii");
-        CMmsgPrint(CMmsgInfo, "  -d,--domain  [domain]");
-        CMmsgPrint(CMmsgInfo, "  -f,--field   [operation] [field]");
-        CMmsgPrint(CMmsgInfo, "  -g,--group   [field]");
-        CMmsgPrint(CMmsgInfo, "  -h,--help    => for more help type -h e, or --help extend.");
-        CMmsgPrint(CMmsgInfo, "  -o,--output  [filename]");
-        CMmsgPrint(CMmsgInfo, "  -r,--rename  [name]");
-        CMmsgPrint(CMmsgInfo, "  -u,--subject [subject]");
-        CMmsgPrint(CMmsgInfo, "  -t,--title   [title]");
-        CMmsgPrint(CMmsgInfo, "  -v,--version [version]");
+        CMmsgPrint(CMmsgInfo, "  -a, --table   [name]");
+        CMmsgPrint(CMmsgInfo, "  -c, --ascii");
+        CMmsgPrint(CMmsgInfo, "  -d, --domain  [domain]");
+        CMmsgPrint(CMmsgInfo, "  -f, --field   [operation] [field]");
+        CMmsgPrint(CMmsgInfo, "  -g, --group   [field]");
+        CMmsgPrint(CMmsgInfo, "  -o, --output  [filename]");
+        CMmsgPrint(CMmsgInfo, "  -r, --rename  [name]");
+        CMmsgPrint(CMmsgInfo, "  -u, --subject [subject]");
+        CMmsgPrint(CMmsgInfo, "  -t, --title   [title]");
+        CMmsgPrint(CMmsgInfo, "  -v, --version [version]");
+        CMmsgPrint(CMmsgInfo, "  -h, --help    => for more help type -h e, or --help extend.");
     }
     exit(1);
 }

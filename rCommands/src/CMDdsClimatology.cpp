@@ -20,7 +20,7 @@ bfekete@gc.cuny.edu
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgUsrError, "%s [options] <datastream1> <datastream2> ... <datastreamN>", CMfileName(arg0));
     CMmsgPrint(CMmsgUsrError, "  -o, --output <datastream filename>");
-    CMmsgPrint(CMmsgUsrError, "  -h,--help");
+    CMmsgPrint(CMmsgUsrError, "  -h, --help");
 }
 
 enum { DAY = 10, MONTH = 7, YEAR = 4 };

@@ -16,16 +16,15 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -a,--table     [ table name ]");
-    CMmsgPrint(CMmsgInfo, "     -c,--condition [ fieldname expression ]");
-    CMmsgPrint(CMmsgInfo, "     -f,--from      [ [all] | selection ]");
-    CMmsgPrint(CMmsgInfo, "     -m,--mode      [ [select] | unselect ]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
+    CMmsgPrint(CMmsgInfo, "     -a, --table     [table name]");
+    CMmsgPrint(CMmsgInfo, "     -c, --condition [fieldname expression]");
+    CMmsgPrint(CMmsgInfo, "     -f, --from      [all|selection]");
+    CMmsgPrint(CMmsgInfo, "     -m, --mode      [select|unselect]");
     CMmsgPrint(CMmsgInfo, "     -h,--help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     DBInt fromSelection = false, selectMode = true, recID;
     char *tableName = (char *) NULL;
     char *expr = (char *) NULL;
@@ -92,11 +91,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
@@ -113,8 +107,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     if (expr != (char *) NULL) {
         operand = new DBMathOperand(expr);
         if (operand->Expand(variables) == DBFault) return (CMfailed);
@@ -166,6 +158,5 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     if (expr != (char *) NULL) delete operand;
     delete data;
     delete variables;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

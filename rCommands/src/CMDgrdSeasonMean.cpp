@@ -16,19 +16,18 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgSysError, "%s [options] <input grid> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgSysError, "     -a,--aggregate [avg|sum]");
-    CMmsgPrint(CMmsgSysError, "     -o,--offset    [offset]");
-    CMmsgPrint(CMmsgSysError, "     -e,--step      [number of steps]");
-    CMmsgPrint(CMmsgSysError, "     -t,--title     [dataset title]");
-    CMmsgPrint(CMmsgSysError, "     -u,--subject   [subject]");
-    CMmsgPrint(CMmsgSysError, "     -d,--domain    [domain]");
-    CMmsgPrint(CMmsgSysError, "     -v,--version   [version]");
-    CMmsgPrint(CMmsgSysError, "     -V,--verbose");
-    CMmsgPrint(CMmsgSysError, "     -h,--help");
+    CMmsgPrint(CMmsgSysError, "     -a, --aggregate [avg|sum]");
+    CMmsgPrint(CMmsgSysError, "     -o, --offset    [offset]");
+    CMmsgPrint(CMmsgSysError, "     -e, --step      [number of steps]");
+    CMmsgPrint(CMmsgSysError, "     -t, --title     [dataset title]");
+    CMmsgPrint(CMmsgSysError, "     -u, --subject   [subject]");
+    CMmsgPrint(CMmsgSysError, "     -d, --domain    [domain]");
+    CMmsgPrint(CMmsgSysError, "     -v, --version   [version]");
+    CMmsgPrint(CMmsgSysError, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     DBInt stepNum = 0, offset = 0, doSum = false;
@@ -113,11 +112,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
@@ -134,8 +128,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     tsData = new DBObjData();
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? tsData->Read(argv[1]) : tsData->Read(stdin);
     if ((ret == DBFault) || (tsData->Type() != DBTypeGridContinuous)) {
@@ -159,6 +151,5 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
 
     delete tsData;
     delete data;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

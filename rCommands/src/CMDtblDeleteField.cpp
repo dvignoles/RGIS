@@ -16,14 +16,13 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -a,--table     [table name]");
-    CMmsgPrint(CMmsgInfo, "     -f,--field     [field name]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -a, --table     [table name]");
+    CMmsgPrint(CMmsgInfo, "     -f, --field     [field name]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, i, fieldNum = 0, verbose = false;
+    int argPos, argNum = argc, ret, i, fieldNum = 0;
     DBObjData *data;
     char *tableName = (char *) NULL, **fieldNames;
     DBObjTable *table;
@@ -56,11 +55,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
@@ -77,8 +71,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     if (tableName == (char *) NULL) tableName = DBrNItems;
     if (fieldNum < 1) {
         CMmsgPrint(CMmsgUsrError, "Missing field name!");
@@ -114,6 +106,5 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
 
     free(fieldNames);
     delete data;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

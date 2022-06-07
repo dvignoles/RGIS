@@ -18,18 +18,17 @@ andras@drfekete.net
 static void _CMDprintUsage (char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <RiverGIS file>", CMfileName(arg0));
     CMmsgPrint(CMmsgInfo, "       => Gets RiverGIS file header informations.");
-    CMmsgPrint(CMmsgInfo, "       -a,--all");
-    CMmsgPrint(CMmsgInfo, "       -c,--comment");
-    CMmsgPrint(CMmsgInfo, "       -C,--citation");
-    CMmsgPrint(CMmsgInfo, "       -d,--domain");
-    CMmsgPrint(CMmsgInfo, "       -i,--institute");
-    CMmsgPrint(CMmsgInfo, "       -p,--person");
-    CMmsgPrint(CMmsgInfo, "       -s,--subject");
-    CMmsgPrint(CMmsgInfo, "       -S,--source");
-    CMmsgPrint(CMmsgInfo, "       -t,--title");
-    CMmsgPrint(CMmsgInfo, "       -v,--version");
-    CMmsgPrint(CMmsgInfo, "       -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "       -h,--help");
+    CMmsgPrint(CMmsgInfo, "       -a, --all");
+    CMmsgPrint(CMmsgInfo, "       -c, --comment");
+    CMmsgPrint(CMmsgInfo, "       -C, --citation");
+    CMmsgPrint(CMmsgInfo, "       -d, --domain");
+    CMmsgPrint(CMmsgInfo, "       -i, --institute");
+    CMmsgPrint(CMmsgInfo, "       -p, --person");
+    CMmsgPrint(CMmsgInfo, "       -s, --subject");
+    CMmsgPrint(CMmsgInfo, "       -S, --source");
+    CMmsgPrint(CMmsgInfo, "       -t, --title");
+    CMmsgPrint(CMmsgInfo, "       -v, --version");
+    CMmsgPrint(CMmsgInfo, "       -h, --help");
 }
 
 int main(int argc, char *argv[]) {
@@ -37,7 +36,7 @@ int main(int argc, char *argv[]) {
     char *title = (char *) NULL, *subject = (char *) NULL, *domain = (char *) NULL, *version = (char *) NULL;
     char *citation = (char *) NULL, *institute = (char *) NULL, *source = (char *) NULL, *person = (char *) NULL;
     char *comment = (char *) NULL, *type = (char *) NULL, ch = 'x';
-    int argPos, argNum = argc, verbose = false;
+    int argPos, argNum = argc;
     FILE *file = (FILE *) NULL;
     DBObjData *dbData = new DBObjData();
     DBDataHeader header;
@@ -47,11 +46,6 @@ int main(int argc, char *argv[]) {
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest (argv[argPos], "-a", "--all")) {
             All_Fields = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
@@ -167,8 +161,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         CMmsgPrint(CMmsgUsrError, "Extra arguments!");
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
 
     if (title == &ch) printf("Title: N/A\n"); else if (title != (char *) NULL) printf("Title: %s\n", title);
     if (domain == &ch) printf("Domain: N/A\n"); else if (domain != (char *) NULL) printf("Domain: %s\n", domain);
@@ -183,6 +175,5 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     if (source == &ch) printf("Source: N/A\n"); else if (source != (char *) NULL) printf("Source: %s\n", source);
     if (comment == &ch) printf("Comment: N/A\n"); else if (comment != (char *) NULL) printf("Comment: %s\n", comment);
 
-    if (verbose) RGlibPauseClose();
     return (0);
 }

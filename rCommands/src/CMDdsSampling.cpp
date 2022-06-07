@@ -22,11 +22,11 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "  -D, --domainfile <filename>");
     CMmsgPrint(CMmsgInfo, "  -M, --mapper     <filename>");
     CMmsgPrint(CMmsgInfo, "  -o, --output     <filename>");
-    CMmsgPrint(CMmsgInfo, "  -t,--title       [dataset title]");
-    CMmsgPrint(CMmsgInfo, "  -u,--subject     [subject]");
-    CMmsgPrint(CMmsgInfo, "  -d,--domain      [domain]");
-    CMmsgPrint(CMmsgInfo, "  -v,--version     [version]");
-    CMmsgPrint(CMmsgUsrError, "  -h,--help");
+    CMmsgPrint(CMmsgInfo, "  -t, --title       [dataset title]");
+    CMmsgPrint(CMmsgInfo, "  -u, --subject     [subject]");
+    CMmsgPrint(CMmsgInfo, "  -d, --domain      [domain]");
+    CMmsgPrint(CMmsgInfo, "  -v, --version     [version]");
+    CMmsgPrint(CMmsgUsrError, "  -h, --help");
 }
 
 typedef struct MFMapperStats_s {

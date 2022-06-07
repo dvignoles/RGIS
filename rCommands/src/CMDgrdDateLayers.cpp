@@ -75,24 +75,23 @@ static DBInt modifyDate(DBObjData *dbData, int timeStep,
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input grid> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -Y,--year      [beginning year]");
-    CMmsgPrint(CMmsgInfo, "     -M,--month     [beginning month]");
-    CMmsgPrint(CMmsgInfo, "     -D,--day       [beginning day]");
-    CMmsgPrint(CMmsgInfo, "     -H,--hour      [beginning hour]");
-    CMmsgPrint(CMmsgInfo, "     -I,--minute    [beginning minute]");
-    CMmsgPrint(CMmsgInfo, "     -e,--step      [year|month|day|hour|minute]");
-    CMmsgPrint(CMmsgInfo, "     -n,--number    [number of intervals]");
-    CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
-    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-    CMmsgPrint(CMmsgInfo, "     -d --domain    [domain]");
-    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
-    CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -Y, --year      [beginning year]");
+    CMmsgPrint(CMmsgInfo, "     -M, --month     [beginning month]");
+    CMmsgPrint(CMmsgInfo, "     -D, --day       [beginning day]");
+    CMmsgPrint(CMmsgInfo, "     -H, --hour      [beginning hour]");
+    CMmsgPrint(CMmsgInfo, "     -I, --minute    [beginning minute]");
+    CMmsgPrint(CMmsgInfo, "     -e, --step      [year|month|day|hour|minute]");
+    CMmsgPrint(CMmsgInfo, "     -n, --number    [number of intervals]");
+    CMmsgPrint(CMmsgInfo, "     -t, --title     [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u, --subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d, --domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v, --version   [version]");
+    CMmsgPrint(CMmsgInfo, "     -s, --shadeset  [standard|grey|blue|blue-to-red|elevation]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     int startYear    = DBDefaultMissingIntVal;
     int startMonth   = DBDefaultMissingIntVal;
     int startDay     = DBDefaultMissingIntVal;
@@ -291,8 +290,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     dbData = new DBObjData();
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? dbData->Read(argv[1]) : dbData->Read(stdin);
     if ((ret == DBFault) ||
@@ -315,6 +312,5 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? dbData->Write(argv[2]) : dbData->Write(stdout);
 
     delete dbData;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

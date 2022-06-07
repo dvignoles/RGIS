@@ -20,9 +20,9 @@ static bool _CMDnetCellSearchPrintID(DBNetworkIF *netIF, DBObjRecord *cellRec, v
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input network> <output list>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -c,--coordinates");
-    CMmsgPrint(CMmsgInfo, "     -d,--direction [upstream|downstream]");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -c, --coordinates");
+    CMmsgPrint(CMmsgInfo, "     -d, --direction [upstream|downstream]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {

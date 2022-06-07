@@ -46,18 +46,17 @@ static DBFloat _CMDheatIndex (DBFloat airT, DBFloat dewT) {
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <air temperature grid> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -e,--dewpoint  <dewpoint temperature grid>");
-    CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
-    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
-    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
-    CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -e, --dewpoint  <dewpoint temperature grid>");
+    CMmsgPrint(CMmsgInfo, "     -t, --title     [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u, --subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d, --domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v, --version   [version]");
+    CMmsgPrint(CMmsgInfo, "     -s, --shadeset  [standard|grey|blue|blue-to-red|elevation]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     char *title  = (char *) NULL,  *subject = (char *) NULL;
     char *domain = (char *) NULL,  *version = (char *) NULL;
     char  *dewpT = (char *) NULL;
@@ -137,11 +136,6 @@ int main(int argc, char *argv[]) {
             shadeSet = shadeCodes[shadeSet];
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
@@ -159,8 +153,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         return (CMfailed);
     }
     if (dewpT == (char *) NULL)  { CMmsgPrint(CMmsgUsrError, "Dewpoint temperature is missing!"); return (CMfailed);  }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     airData = new DBObjData();
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? airData->Read(argv[1]) : airData->Read(stdin);
     if ((ret == DBFault) || (airData->Type() != DBTypeGridContinuous)) { delete airData; return (CMfailed); }
@@ -226,6 +218,5 @@ Stop:
     delete airData;
     delete dewData;
     delete outData;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

@@ -17,25 +17,24 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "       -c,--comment");
-    CMmsgPrint(CMmsgInfo, "       -i,--citation");
-    CMmsgPrint(CMmsgInfo, "       -d,--domain");
-    CMmsgPrint(CMmsgInfo, "       -n,--institute");
-    CMmsgPrint(CMmsgInfo, "       -p,--person");
-    CMmsgPrint(CMmsgInfo, "       -u,--subject");
-    CMmsgPrint(CMmsgInfo, "       -o,--source");
-    CMmsgPrint(CMmsgInfo, "       -t,--title");
-    CMmsgPrint(CMmsgInfo, "       -y,--display [on|off]");
-    CMmsgPrint(CMmsgInfo, "       -v,--version");
-    CMmsgPrint(CMmsgInfo, "       -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "       -h,--help");
+    CMmsgPrint(CMmsgInfo, "       -c, --comment");
+    CMmsgPrint(CMmsgInfo, "       -i, --citation");
+    CMmsgPrint(CMmsgInfo, "       -d, --domain");
+    CMmsgPrint(CMmsgInfo, "       -n, --institute");
+    CMmsgPrint(CMmsgInfo, "       -p, --person");
+    CMmsgPrint(CMmsgInfo, "       -u, --subject");
+    CMmsgPrint(CMmsgInfo, "       -o, --source");
+    CMmsgPrint(CMmsgInfo, "       -t, --title");
+    CMmsgPrint(CMmsgInfo, "       -y, --display [on|off]");
+    CMmsgPrint(CMmsgInfo, "       -v, --version");
+    CMmsgPrint(CMmsgInfo, "       -h, --help");
 }
 
 int main(int argc, char *argv[]) {
     char *title = (char *) NULL, *subject = (char *) NULL, *domain = (char *) NULL, *version = (char *) NULL;
     char *citation = (char *) NULL, *institute = (char *) NULL, *source = (char *) NULL, *person = (char *) NULL;
     char *comment = (char *) NULL;
-    int argPos, argNum = argc, verbose = false, ret;
+    int argPos, argNum = argc, ret;
     int shadeSet = DBFault, display = DBFault;
     DBObjData *dbData = new DBObjData();
 
@@ -171,11 +170,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
         if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return 0;
@@ -191,9 +185,6 @@ int main(int argc, char *argv[]) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     if (((argNum > 1) && (strcmp(argv[1], "-") != 0) ? dbData->Read(argv[1]) : dbData->Read(stdin)) == DBFault) {
         delete dbData;
         return (CMfailed);
@@ -212,6 +203,5 @@ int main(int argc, char *argv[]) {
     if (display   != DBFault)       dbData->Flags(DBDataFlagDisplay,display);
 
     ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? dbData->Write(argv[2]) : dbData->Write(stdout);
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

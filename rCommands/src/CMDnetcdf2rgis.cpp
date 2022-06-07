@@ -15,12 +15,12 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input netcdf> <output data>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
-    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
-    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
-    CMmsgPrint(CMmsgInfo, "     -s,--shadeset  [standard|grey|blue|blue-to-red|elevation]");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -t, --title     [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u, --subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d, --domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v, --version   [version]");
+    CMmsgPrint(CMmsgInfo, "     -s, --shadeset  [standard|grey|blue|blue-to-red|elevation]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {

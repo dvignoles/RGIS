@@ -17,19 +17,18 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -a,--table     [table name]");
-    CMmsgPrint(CMmsgInfo, "     -f,--field     [fieldname] [expression]");
-    CMmsgPrint(CMmsgInfo, "     -e,--ephemeral [fieldname] [expression]");
-    CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
-    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
-    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -a, --table     [table name]");
+    CMmsgPrint(CMmsgInfo, "     -f, --field     [fieldname] [expression]");
+    CMmsgPrint(CMmsgInfo, "     -e, --ephemeral [fieldname] [expression]");
+    CMmsgPrint(CMmsgInfo, "     -t, --title     [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u, --subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d, --domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v, --version   [version]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     DBInt expr, expNum = 0, tmpVar;
     char *tableName = (char *) NULL;
     char *fieldName = (char *) NULL;
@@ -116,11 +115,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) < argPos) break;
-            continue;
-        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
@@ -137,8 +131,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     data = new DBObjData();
     if (((argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Read(argv[1]) : data->Read(stdin)) == DBFault) {
         delete data;
@@ -175,6 +167,5 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     free(expressions);
     delete data;
     delete variables;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

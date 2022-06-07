@@ -19,7 +19,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgUsrError, "%s [options] <in datastream> <out datastream>", CMfileName(arg0));
     CMmsgPrint(CMmsgUsrError, "  -e, --step [day|month|year]");
     CMmsgPrint(CMmsgUsrError, "  -a, --aggregate [avg|sum]");
-    CMmsgPrint(CMmsgUsrError, "  -h,--help");
+    CMmsgPrint(CMmsgUsrError, "  -h, --help");
 }
 
 enum { DAY = 10, MONTH = 7, YEAR = 4 };

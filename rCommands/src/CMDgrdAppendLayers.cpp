@@ -16,17 +16,16 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <append grid0> ..... <append gridN>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -o,--output    [ouptput grid]");
-    CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
-    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
-    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -o, --output    [ouptput grid]");
+    CMmsgPrint(CMmsgInfo, "     -t, --title     [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u, --subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d, --domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v, --version   [version]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, data, dataNum = 0, verbose = false;
+    int argPos, argNum = argc, ret, data, dataNum = 0;
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *output = (char *) NULL, **dataList = (char **) NULL;
@@ -80,11 +79,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage (argv[0]);
             return (DBSuccess);
@@ -104,8 +98,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     for (data = 0; data < dataNum; ++data) {
         dataList[data] = argv[data + 1];
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     grdData = new DBObjData();
     ret = (strcmp(dataList[0], "-") != 0) ? grdData->Read(dataList[0]) : grdData->Read(stdin);
     if ((ret == DBFault) || ((grdData->Type() & DBTypeGrid) != DBTypeGrid)) {
@@ -136,6 +128,5 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     ret = (output != (char *) NULL) && (strcmp(argv[2], "-") != 0) ? grdData->Write(output) : grdData->Write(stdout);
 
     delete grdData;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }

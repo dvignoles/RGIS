@@ -16,10 +16,10 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input netcdf> <output datastream>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -m,--template     <template coverage>");
-    CMmsgPrint(CMmsgInfo, "     -P,--processor [number]");
-    CMmsgPrint(CMmsgInfo, "     -R,--report    [off|on]");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -m, --template     <template coverage>");
+    CMmsgPrint(CMmsgInfo, "     -P, --processor [number]");
+    CMmsgPrint(CMmsgInfo, "     -R, --report    [off|on]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {

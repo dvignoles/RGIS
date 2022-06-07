@@ -21,7 +21,7 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgUsrError, "  -i, --input [input datastream]");
     CMmsgPrint(CMmsgUsrError, "  -b, --bins  [# of bins]");
     CMmsgPrint(CMmsgUsrError, "  -m, --mode  [percent|value]");
-    CMmsgPrint(CMmsgUsrError, "  -h,--help");
+    CMmsgPrint(CMmsgUsrError, "  -h, --help");
 }
 
 int main(int argc, char *argv[]) {

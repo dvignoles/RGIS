@@ -396,23 +396,22 @@ static void _CMDgrdCalculateUserFunc(size_t threadId, size_t taskId, void *commo
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <output file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -c,--calculate   [expression]");
-    CMmsgPrint(CMmsgInfo, "     -r,--variable    [variable expression]");
-    CMmsgPrint(CMmsgInfo, "     -n,--interpolate [surface|flat]");
-    CMmsgPrint(CMmsgInfo, "     -x,--extent      [maximum|minimum|<coverage>]");
-    CMmsgPrint(CMmsgInfo, "     -t,--title       [dataset title]");
-    CMmsgPrint(CMmsgInfo, "     -u,--subject     [subject]");
-    CMmsgPrint(CMmsgInfo, "     -d,--domain      [domain]");
-    CMmsgPrint(CMmsgInfo, "     -v,--version     [version]");
-    CMmsgPrint(CMmsgInfo, "     -s,--shadeset    [standard|grey|blue|blue-to-red|elevation]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -P,--processor   [number]");
-    CMmsgPrint(CMmsgInfo, "     -R,--report      [off|on]");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -c, --calculate   [expression]");
+    CMmsgPrint(CMmsgInfo, "     -r, --variable    [variable expression]");
+    CMmsgPrint(CMmsgInfo, "     -n, --interpolate [surface|flat]");
+    CMmsgPrint(CMmsgInfo, "     -x, --extent      [maximum|minimum|<coverage>]");
+    CMmsgPrint(CMmsgInfo, "     -t, --title       [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u, --subject     [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d, --domain      [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v, --version     [version]");
+    CMmsgPrint(CMmsgInfo, "     -s, --shadeset    [standard|grey|blue|blue-to-red|elevation]");
+    CMmsgPrint(CMmsgInfo, "     -P, --processor   [number]");
+    CMmsgPrint(CMmsgInfo, "     -R, --report      [off|on]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false, report = false;
+    int argPos, argNum = argc, ret, report = false;
     char *expStr = (char *) NULL;
     char *title  = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
@@ -548,11 +547,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
         if (CMargTest (argv[argPos], "-P", "--processor")) {
             DBInt procNum;
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
@@ -609,7 +603,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         goto Stop;
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
     if ((team == (CMthreadTeam_p) NULL) && ((team = CMthreadTeamCreate (CMthreadProcessorNum ())) == (CMthreadTeam_p) NULL)) {
         CMmsgPrint (CMmsgUsrError,"Team initialization error %s, %d",__FILE__,__LINE__);
         goto Stop;
@@ -630,7 +623,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     data->Flags(shadeSet, DBSet);
 
     ret = (argNum > 1) && (strcmp(argv[1], "-") != 0) ? data->Write(argv[1]) : data->Write(stdout);
-    if (verbose) RGlibPauseClose();
 Stop:
     delete threadData;
     if (data != (DBObjData *) NULL) delete data;

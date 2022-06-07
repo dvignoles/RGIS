@@ -17,8 +17,8 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input rgisdata> <output domain>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -l,--lengthcorrection");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -l, --lengthcorrection");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {

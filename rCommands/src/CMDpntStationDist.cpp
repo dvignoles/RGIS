@@ -16,19 +16,18 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input point> <output grid>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -e,--template  <grid or network coverage>");
-    CMmsgPrint(CMmsgInfo, "     -m,--mode      [dist|ids]");
-    CMmsgPrint(CMmsgInfo, "     -f,--factor    [value]");
-    CMmsgPrint(CMmsgInfo, "     -t,--title     [dataset title]");
-    CMmsgPrint(CMmsgInfo, "     -u,--subject   [subject]");
-    CMmsgPrint(CMmsgInfo, "     -d,--domain    [domain]");
-    CMmsgPrint(CMmsgInfo, "     -v,--version   [version]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -e, --template  <grid or network coverage>");
+    CMmsgPrint(CMmsgInfo, "     -m, --mode      [dist|ids]");
+    CMmsgPrint(CMmsgInfo, "     -f, --factor    [value]");
+    CMmsgPrint(CMmsgInfo, "     -t, --title     [dataset title]");
+    CMmsgPrint(CMmsgInfo, "     -u, --subject   [subject]");
+    CMmsgPrint(CMmsgInfo, "     -d, --domain    [domain]");
+    CMmsgPrint(CMmsgInfo, "     -v, --version   [version]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     char *title = (char *) NULL, *subject = (char *) NULL;
     char *domain = (char *) NULL, *version = (char *) NULL;
     char *tmplName = (char *) NULL;
@@ -112,11 +111,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
 Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
@@ -133,8 +127,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     if (tmplName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Template coverage is not specified");
         _CMDprintUsage (argv[0]);
@@ -177,7 +169,6 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     if ((ret = DBPointToGrid(pntData, data, factor)) == DBSuccess)
         ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
 
-    if (verbose) RGlibPauseClose();
     delete pntData;
     delete data;
     return (ret);

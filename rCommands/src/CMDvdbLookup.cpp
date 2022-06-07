@@ -16,18 +16,18 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options]",arg0);
-    CMmsgPrint(CMmsgInfo, "     -c,--cfname      [RGIS name]");
-    CMmsgPrint(CMmsgInfo, "     -g,--rgisname    [CF name]");
-    CMmsgPrint(CMmsgInfo, "     -l,--longname    [variable name]");
-    CMmsgPrint(CMmsgInfo, "     -a,--aggregation [variable name]");
-    CMmsgPrint(CMmsgInfo, "     -s,--shadeset    [variable name]");
-    CMmsgPrint(CMmsgInfo, "     -t,--datatype    [variable name]");
-    CMmsgPrint(CMmsgInfo, "     -v,--version     [vdb2|vdb3]");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -c, --cfname      [RGIS name]");
+    CMmsgPrint(CMmsgInfo, "     -g, --rgisname    [CF name]");
+    CMmsgPrint(CMmsgInfo, "     -l, --longname    [variable name]");
+    CMmsgPrint(CMmsgInfo, "     -a, --aggregation [variable name]");
+    CMmsgPrint(CMmsgInfo, "     -s, --shadeset    [variable name]");
+    CMmsgPrint(CMmsgInfo, "     -t, --datatype    [variable name]");
+    CMmsgPrint(CMmsgInfo, "     -v, --version     [vdb2|vdb3]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     const char *cfName = (const char *) NULL;
     const char *rgName = (const char *) NULL;
     const char *lgName = (const char *) NULL;

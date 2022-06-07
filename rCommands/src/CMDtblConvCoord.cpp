@@ -16,15 +16,14 @@ bfekete@gc.cuny.edu
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <input file> <output file>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo, "     -a,--table     [table name]");
-    CMmsgPrint(CMmsgInfo, "     -f,--field     [coord field name]");
-    CMmsgPrint(CMmsgInfo, "     -r,--rename    [output field]");
-    CMmsgPrint(CMmsgInfo, "     -V,--verbose");
-    CMmsgPrint(CMmsgInfo, "     -h,--help");
+    CMmsgPrint(CMmsgInfo, "     -a, --table     [table name]");
+    CMmsgPrint(CMmsgInfo, "     -f, --field     [coord field name]");
+    CMmsgPrint(CMmsgInfo, "     -r, --rename    [output field]");
+    CMmsgPrint(CMmsgInfo, "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, verbose = false;
+    int argPos, argNum = argc, ret;
     DBInt recID, i, deg, min, sec, strLen;
     DBFloat coord;
     char crdStr[DBStringLength];
@@ -66,11 +65,6 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-        if (CMargTest (argv[argPos], "-V", "--verbose")) {
-            verbose = true;
-            if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
-            continue;
-        }
         if (CMargTest (argv[argPos], "-h", "--help")) {
             _CMDprintUsage(argv[0]);
             return (DBSuccess);
@@ -87,8 +81,6 @@ int main(int argc, char *argv[]) {
         _CMDprintUsage (argv[0]);
         return (CMfailed);
     }
-    if (verbose) RGlibPauseOpen(argv[0]);
-
     if (srcFieldName == (char *) NULL) {
         CMmsgPrint(CMmsgUsrError, "Coordinate field is not set!");
         _CMDprintUsage (argv[0]);
@@ -154,6 +146,5 @@ int main(int argc, char *argv[]) {
     ret = (argNum > 2) && (strcmp(argv[2], "-") != 0) ? data->Write(argv[2]) : data->Write(stdout);
 
     delete data;
-    if (verbose) RGlibPauseClose();
     return (ret);
 }
