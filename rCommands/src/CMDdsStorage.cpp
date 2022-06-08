@@ -17,75 +17,211 @@ bfekete@gc.cuny.edu
 
 class CMDgrdStorage {
     private:
-        size_t  TargetRecordNum, TargetItemSize, ItemNum;
-        void  *Buffer;
+        size_t ItemNum, RecordNum, SrcType, TrgType;
+        void  *TrgBuffer;
+        void  *SrcBuffer;
         float *CumulSum;
         float *MaxSum;
+        MFdsHeader_p HeaderPTR = (MFdsHeader_p) NULL;
+        MFdsHeader_t Header;
     public:
-        int Initialize (char *target) {
-            size_t itemID;
-            Buffer    = (void *)  NULL;
-            CumulSum  = (float *) NULL;
-            MaxSum    = (float *) NULL;
-            TargetRecordNum = 0, TargetItemSize = 0;
-            MFDataStream_t TargetDS;
-            MFDataStream_t SourceDS;
-            MFdsHeader_p TargetHeader = (MFdsHeader_p) NULL;
-            MFdsHeader_t SourceHeader;
-            TargetDS.Type        = SourceDS.Type        = MFFile;
-            TargetDS.Handle.File = SourceDS.Handle.File = (FILE *) NULL;
+        int Initialize (char *fileName) {
+            size_t itemID, itemSize, ret = CMfailed;
+            FILE *file = (FILE *) NULL;
 
-            if ((TargetDS.Handle.File = fopen (target,"r")) == (FILE *) NULL) {
-                CMmsgPrint(CMmsgSysError, "Target file opening error: %s %d", __FILE__, __LINE__);
-                return (CMfailed);
+            TrgBuffer  = SrcBuffer = (void *)  NULL;
+            CumulSum   = MaxSum    = (float *) NULL;
+            RecordNum  = 0;
+
+            if ((file = fopen (fileName,"r")) == (FILE *) NULL) {
+                CMmsgPrint(CMmsgAppError, "Target file opening error: %s %d", __FILE__, __LINE__);
+                goto Stop;
             }
-            while (MFdsHeaderRead (&SourceHeader, TargetDS.Handle.File) == CMsucceeded) {
-                if ((TargetHeader = (MFdsHeader_p) reallocf (TargetHeader, (TargetRecordNum + 1) * sizeof (MFdsHeader_t))) == (MFdsHeader_p) NULL) {
+            while (MFdsHeaderRead (&Header, file) == CMsucceeded) {
+                if ((HeaderPTR = (MFdsHeader_p) realloc (HeaderPTR, (RecordNum + 1) * sizeof (MFdsHeader_t))) == (MFdsHeader_p) NULL) {
                     CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
-                    return (CMfailed);
+                    goto Stop;
                 }
-                if ((memcpy (TargetHeader + TargetRecordNum, &SourceHeader, sizeof (MFdsHeader_t))) != TargetHeader + TargetRecordNum) {
+                if ((memcpy (HeaderPTR + RecordNum, &Header, sizeof (MFdsHeader_t))) != HeaderPTR + RecordNum) {
                     CMmsgPrint(CMmsgSysError, "Memory copying error in: %s %d", __FILE__, __LINE__);
-                    return (CMfailed);
+                    goto Stop;
                 }
-                switch (TargetHeader[TargetRecordNum].Type) {
-                    case MFByte:   TargetItemSize = sizeof (char);   break;
-                    case MFShort:  TargetItemSize = sizeof (short);  break;
-                    case MFInt:    TargetItemSize = sizeof (int);    break;
-                    case MFFloat:  TargetItemSize = sizeof (float);  break;
-                    case MFDouble: TargetItemSize = sizeof (double); break;
+                if (RecordNum == 0) {
+                    ItemNum  = HeaderPTR[RecordNum].ItemNum;
+                    TrgType  = HeaderPTR[RecordNum].Type;
+                    switch (TrgType) {
+                        case MFByte:   itemSize = sizeof (char);   break;
+                        case MFShort:  itemSize = sizeof (short);  break;
+                        case MFInt:    itemSize = sizeof (int);    break;
+                        case MFFloat:  itemSize = sizeof (float);  break;
+                        case MFDouble: itemSize = sizeof (double); break;
+                    }
+                    if ((CumulSum = (float *) calloc (ItemNum,sizeof (float))) == (float *) NULL) {
+                        CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
+                    if ((MaxSum   = (float *) calloc (ItemNum,sizeof (float))) == (float *) NULL) {
+                        CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
+                    for (itemID = 0; itemID < ItemNum; ++itemID) CumulSum[itemID] = MaxSum[itemID] = 0.0;
+                } else {
+                    if ((ItemNum != HeaderPTR[RecordNum].ItemNum) || (TrgType != HeaderPTR[RecordNum].Type)) {
+                        CMmsgPrint(CMmsgAppError, "Inconsistent target data stream: %s %d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
                 }
-                if ((Buffer = reallocf (Buffer, (TargetRecordNum + 1) * TargetHeader[TargetRecordNum].ItemNum * TargetItemSize)) == (void *) NULL) {
+                if ((TrgBuffer = realloc (TrgBuffer, (RecordNum + 1) * ItemNum * itemSize)) == (void *) NULL) {
                     CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
-                    return (CMfailed);
+                    goto Stop;
                 }
-                if ((fread ((char *) Buffer + (TargetRecordNum) * TargetHeader[TargetRecordNum].ItemNum * TargetItemSize,
-                     TargetItemSize, TargetHeader[TargetRecordNum].ItemNum, TargetDS.Handle.File)) != TargetHeader[TargetRecordNum].ItemNum) {
-                    CMmsgPrint(CMmsgSysError, "Target file reading error: %s %d", __FILE__, __LINE__);
-                    return (CMfailed);
+                if ((fread ((char *) TrgBuffer + (RecordNum) * ItemNum * itemSize, itemSize, ItemNum, file)) != ItemNum) {
+                    CMmsgPrint(CMmsgAppError, "Target file reading error: %s %d", __FILE__, __LINE__);
+                    goto Stop;
                 }
-                TargetRecordNum++;
+                RecordNum++;
             }
-            if (TargetRecordNum == 0) {
+            if (RecordNum == 0) {
                 CMmsgPrint(CMmsgSysError, "Missing target records: %s %d", __FILE__, __LINE__);
-                return (CMfailed);
+                goto Stop;
             }
-            ItemNum = TargetHeader [0].ItemNum;
-            if ((CumulSum = (float *) calloc (ItemNum,sizeof (float))) == (float *) NULL) {
-                CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
-                return (CMfailed);
-            }
-            if ((MaxSum   = (float *) calloc (ItemNum,sizeof (float))) == (float *) NULL) {
-                CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
-                return (CMfailed);
-            }
-            for (itemID = 0; itemID < ItemNum; ++itemID) CumulSum[itemID] = MaxSum[itemID] = 0;
-            return (CMsucceeded);
+            else ret = CMsucceeded;
+Stop:       if (file != (FILE *) NULL) fclose (file);
+            return (ret);
         }
-        int Run () {
-            return (CMsucceeded);
+
+        int Run (char *fileName, bool deficit) {
+            size_t itemID, itemSize, recordID = 0, ret = CMfailed;
+            int   intVal;
+            float floatVal;
+            FILE *file = (FILE *) NULL;
+            float target, source;
+
+            if ((file = fopen (fileName,"r")) == (FILE *) NULL) {
+                CMmsgPrint(CMmsgAppError, "Source file opening error: %s %d", __FILE__, __LINE__);
+                goto Stop;
+            }
+            while (MFdsHeaderRead (&Header, file) == CMsucceeded) {
+                if (Header.ItemNum != ItemNum) {
+                    CMmsgPrint(CMmsgAppError, "Inconsistent target and source data streams: %s %d", __FILE__, __LINE__);
+                    goto Stop;
+                }
+                if (SrcBuffer != (void *) NULL) {
+                    if (SrcType != Header.Type) {
+                        CMmsgPrint(CMmsgAppError, "Inconsistent source data stream: %s %d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
+                } else {
+                    SrcType = Header.Type;
+                    switch (SrcType) {
+                        case MFByte:   itemSize = sizeof (char);   break;
+                        case MFShort:  itemSize = sizeof (short);  break;
+                        case MFInt:    itemSize = sizeof (int);    break;
+                        case MFFloat:  itemSize = sizeof (float);  break;
+                        case MFDouble: itemSize = sizeof (double); break;
+                    }
+                    if ((SrcBuffer = calloc (itemSize, ItemNum)) == (void *) NULL) {
+                        CMmsgPrint(CMmsgAppError, "Memory allocation error: %s %d", __FILE__, __LINE__);
+                        goto Stop;
+                    }
+                }
+                if ((fread ((char *) SrcBuffer, itemSize, ItemNum, file)) != ItemNum) {
+                    CMmsgPrint(CMmsgAppError, "Source file reading error: %s %d", __FILE__, __LINE__);
+                    goto Stop;
+                }
+                if (RecordNum > 1) {
+                    for ( recordID = recordID; recordID < RecordNum; recordID++)
+                        if (strncmp (HeaderPTR[recordID].Date + 5, Header.Date + 5, strlen (HeaderPTR[recordID].Date + 5)) != 0) break;
+                }
+                if (recordID >= RecordNum) {
+                    CMmsgPrint(CMmsgAppError, "Missmatching source and target layernames: %s %d", __FILE__, __LINE__);
+                    goto Stop;  
+                }
+                for (itemID = 0; itemID < ItemNum; ++itemID) {
+                    switch (TrgType) {
+                        case MFByte:
+                            intVal = (int) ((char *)   TrgBuffer) [recordID * ItemNum + itemID];
+                            if (intVal == HeaderPTR [recordID].Missing.Int) continue;
+                            else target = (float) intVal;
+                            break;
+                        case MFShort:
+                            intVal = (int) ((short *)  TrgBuffer) [recordID * ItemNum + itemID];
+                            if (intVal == HeaderPTR [recordID].Missing.Int) continue;
+                            else target = (float) intVal;
+                            break;
+                        case MFInt:
+                            intVal = (int) ((int *)    TrgBuffer) [recordID * ItemNum + itemID];
+                            if (intVal == HeaderPTR [recordID].Missing.Int) continue;
+                            else target = (float) intVal;
+                            break;
+                        case MFFloat:
+                            floatVal = (float) ((float *)  TrgBuffer) [recordID * ItemNum + itemID];
+                            if (CMmathEqualValues (floatVal, HeaderPTR [recordID].Missing.Float)) continue;
+                            else target = (float) floatVal;
+                            break;
+                        case MFDouble:
+                            floatVal = (float) ((double *) TrgBuffer) [recordID * ItemNum + itemID];
+                            if (CMmathEqualValues (floatVal, HeaderPTR [recordID].Missing.Float)) continue;
+                            else target = (float) floatVal;
+                            break;
+                    }
+                    switch (SrcType) {
+                        case MFByte:
+                            intVal = (int) ((char *)   SrcBuffer) [itemID];
+                            if (intVal == Header.Missing.Int) continue;
+                            else source = (float) intVal;
+                            break;
+                        case MFShort:
+                            intVal = (int) ((short *)  SrcBuffer) [itemID];
+                            if (intVal == Header.Missing.Int) continue;
+                            else source = (float) intVal;
+                            break;
+                        case MFInt:
+                            intVal = (int) ((int *)    SrcBuffer) [itemID];
+                            if (intVal == Header.Missing.Int) continue;
+                            else source = (float) intVal;
+                            break;
+                        case MFFloat:
+                            floatVal = (float) ((float *)  SrcBuffer) [itemID];
+                            if (CMmathEqualValues (floatVal, Header.Missing.Float)) continue;
+                            else source = (float) floatVal;
+                            break;
+                        case MFDouble:
+                            floatVal = (float) ((double *) SrcBuffer) [itemID];
+                            if (CMmathEqualValues (floatVal, Header.Missing.Float)) continue;
+                            else source = (float) floatVal;
+                            break;
+                    }
+                    CumulSum [itemID] += deficit ? target - source : source - target;
+                    if (CumulSum [itemID] < 0.0) CumulSum [itemID] = 0.0;
+                    if (CumulSum [itemID] > MaxSum [itemID]) MaxSum [itemID] = CumulSum [itemID];
+                }
+            }
+            ret = CMsucceeded;
+Stop:       if (file != (FILE *) NULL) fclose (file);
+            return (ret);
         }
-        int Finalize () {
+        int Finalize (char *fileName,int ret) {
+            FILE *file = (FILE *) NULL;
+            if (ret == CMsucceeded) {
+                ret = CMfailed;
+                strcmp (Header.Date,"XXXX");
+                if ((file = fopen (fileName, "w")) == (FILE *) NULL) {
+                    CMmsgPrint(CMmsgAppError, "Output file opening error: %s %d", __FILE__, __LINE__);
+                    goto Stop;
+                }
+                if (fwrite(MaxSum,sizeof(float),ItemNum,file) != ItemNum) {
+                    CMmsgPrint(CMmsgAppError, "Output file writing error: %s %d", __FILE__, __LINE__);
+                    goto Stop;
+                }
+                ret = CMsucceeded;
+            }
+Stop:       if (file      != (FILE *)       NULL) fclose (file);
+            if (HeaderPTR != (MFdsHeader_p) NULL) free (HeaderPTR);
+            if (TrgBuffer != (void *)       NULL) free (TrgBuffer);
+            if (SrcBuffer != (void *)       NULL) free (SrcBuffer);
+            if (CumulSum  != (float *)      NULL) free (CumulSum);
+            if (MaxSum    != (float *)      NULL) free (MaxSum);
             return (CMsucceeded);
         }
 };
@@ -95,8 +231,6 @@ static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo,     "     -T, --target    [target datastream]");
     CMmsgPrint(CMmsgUsrError, "     -m, --mode      [deficit|surplus]");
     CMmsgPrint(CMmsgInfo,     "     -o, --output    [data stream]");
-    CMmsgPrint(CMmsgInfo,     "     -P, --processor [number]");
-    CMmsgPrint(CMmsgInfo,     "     -R, --report    [off|on]");
     CMmsgPrint(CMmsgInfo,     "     -h, --help");
 }
 
@@ -120,7 +254,7 @@ int main(int argc, char *argv[]) {
         if (CMargTest(argv[argPos], "-m", "--mode")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) {
                 CMmsgPrint(CMmsgUsrError, "Missging mode option!");
-                break;
+                return (CMfailed);
             }
             else {
                 const char *options[] = {"deficit", "surplus", (char *) NULL};
@@ -128,6 +262,7 @@ int main(int argc, char *argv[]) {
 
                 if ((code = CMoptLookup(options, argv[argPos], false)) == CMfailed) {
                     CMmsgPrint(CMmsgWarning, "Ignoring illformed step option [%s]!", argv[argPos]);
+                    return (CMfailed);
                 }
                 else deficit = codes[code];
             }
@@ -157,13 +292,10 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     if (target == (char *) NULL) { CMmsgPrint(CMmsgUsrError, "Missing target data!");      return (CMfailed); }
     if (argNum < 2)              { CMmsgPrint(CMmsgUsrError, "Missing time series data!"); return (CMfailed); }
 
-    if (grdStorage.Initialize (target) == CMfailed) {
-
-    }
-    for (argPos = 2; argPos < argNum; ++argPos) {
-
-    }
-    ret = output != (char *) NULL ? CMsucceeded : CMfailed;
+    if (grdStorage.Initialize (target) == CMfailed) goto Stop;
+    for (argPos = 2; argPos < argNum; ++argPos) if (grdStorage.Run (argv[argPos],deficit) == CMfailed) goto Stop;
+    ret = CMsucceeded;
 Stop:
+    grdStorage.Finalize (output, ret);
     return (ret);
 }
