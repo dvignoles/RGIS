@@ -25,18 +25,13 @@ class CMDgrdStorage {
         MFdsHeader_p HeaderPTR = (MFdsHeader_p) NULL;
         MFdsHeader_t Header;
     public:
-        int Initialize (char *fileName) {
+        int Initialize (FILE *file) {
             size_t itemID, itemSize, ret = CMfailed;
-            FILE *file = (FILE *) NULL;
 
             TrgBuffer  = SrcBuffer = (void *)  NULL;
             CumulSum   = MaxSum    = (float *) NULL;
             RecordNum  = 0;
 
-            if ((file = fopen (fileName,"r")) == (FILE *) NULL) {
-                CMmsgPrint(CMmsgAppError, "Target file opening error: %s %d", __FILE__, __LINE__);
-                goto Stop;
-            }
             while (MFdsHeaderRead (&Header, file) == CMsucceeded) {
                 if ((HeaderPTR = (MFdsHeader_p) realloc (HeaderPTR, (RecordNum + 1) * sizeof (MFdsHeader_t))) == (MFdsHeader_p) NULL) {
                     CMmsgPrint(CMmsgSysError, "Memory allocation error in: %s %d", __FILE__, __LINE__);
@@ -86,21 +81,15 @@ class CMDgrdStorage {
                 goto Stop;
             }
             else ret = CMsucceeded;
-Stop:       if (file != (FILE *) NULL) fclose (file);
-            return (ret);
+Stop:       return (ret);
         }
 
-        int Run (char *fileName, bool deficit) {
+        int Run (FILE *file, bool deficit) {
             size_t itemID, itemSize, recordID = 0, ret = CMfailed;
             int   intVal;
             float floatVal;
-            FILE *file = (FILE *) NULL;
             float target, source;
 
-            if ((file = fopen (fileName,"r")) == (FILE *) NULL) {
-                CMmsgPrint(CMmsgAppError, "Source file opening error: %s %d", __FILE__, __LINE__);
-                goto Stop;
-            }
             while (MFdsHeaderRead (&Header, file) == CMsucceeded) {
                 if (Header.ItemNum != ItemNum) {
                     CMmsgPrint(CMmsgAppError, "Inconsistent target and source data streams: %s %d", __FILE__, __LINE__);
@@ -198,45 +187,43 @@ Stop:       if (file != (FILE *) NULL) fclose (file);
                 }
             }
             ret = CMsucceeded;
-Stop:       if (file != (FILE *) NULL) fclose (file);
-            return (ret);
+Stop:       return (ret);
         }
-        int Finalize (char *fileName,int ret) {
-            FILE *file = (FILE *) NULL;
+        int Finalize (FILE *file,int ret) {
             if (ret == CMsucceeded) {
                 ret = CMfailed;
                 strcmp (Header.Date,"XXXX");
-                if ((file = fopen (fileName, "w")) == (FILE *) NULL) {
-                    CMmsgPrint(CMmsgAppError, "Output file opening error: %s %d", __FILE__, __LINE__);
+                if (MFdsHeaderWrite (&Header,file) == CMfailed) {
+                    CMmsgPrint(CMmsgAppError, "Output file writing error: %s %d", __FILE__, __LINE__);
                     goto Stop;
-                }
+                }               
                 if (fwrite(MaxSum,sizeof(float),ItemNum,file) != ItemNum) {
                     CMmsgPrint(CMmsgAppError, "Output file writing error: %s %d", __FILE__, __LINE__);
                     goto Stop;
                 }
                 ret = CMsucceeded;
             }
-Stop:       if (file      != (FILE *)       NULL) fclose (file);
-            if (HeaderPTR != (MFdsHeader_p) NULL) free (HeaderPTR);
+Stop:       if (HeaderPTR != (MFdsHeader_p) NULL) free (HeaderPTR);
             if (TrgBuffer != (void *)       NULL) free (TrgBuffer);
             if (SrcBuffer != (void *)       NULL) free (SrcBuffer);
             if (CumulSum  != (float *)      NULL) free (CumulSum);
             if (MaxSum    != (float *)      NULL) free (MaxSum);
-            return (CMsucceeded);
+            return (ret);
         }
 };
 
 static void _CMDprintUsage (const char *arg0) {
     CMmsgPrint(CMmsgInfo, "%s [options] <data stream 0> <input datastream 1> ... <data stream N>", CMfileName(arg0));
-    CMmsgPrint(CMmsgInfo,     "     -T, --target    [target datastream]");
+    CMmsgPrint(CMmsgInfo,     "     -T, --target    [target datastream] => defaults to stdin");
     CMmsgPrint(CMmsgUsrError, "     -m, --mode      [deficit|surplus]");
-    CMmsgPrint(CMmsgInfo,     "     -o, --output    [data stream]");
+    CMmsgPrint(CMmsgInfo,     "     -o, --output    [data stream]       => defaults to stdout");
     CMmsgPrint(CMmsgInfo,     "     -h, --help");
 }
 
 int main(int argc, char *argv[]) {
-    int argPos, argNum = argc, ret, deficit = true;
+    int argPos, argNum = argc, ret, deficit = true, pipe = false;
     char *target = (char *) NULL, *output;
+    FILE *file = (FILE *) NULL;
     CMDgrdStorage grdStorage;
 
     if (argNum < 2) goto Help;
@@ -288,14 +275,61 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
         }
         argPos++;
     }
-
-    if (target == (char *) NULL) { CMmsgPrint(CMmsgUsrError, "Missing target data!");      return (CMfailed); }
     if (argNum < 2)              { CMmsgPrint(CMmsgUsrError, "Missing time series data!"); return (CMfailed); }
 
-    if (grdStorage.Initialize (target) == CMfailed) goto Stop;
-    for (argPos = 2; argPos < argNum; ++argPos) if (grdStorage.Run (argv[argPos],deficit) == CMfailed) goto Stop;
+    if (target == (char *) NULL) file = stdin;
+    else {
+        if (strcmp (target + strlen(target) - 3,".gz") == 0) {
+            char command [strlen(target) + 12];
+            sprintf (command,"gunzip -c %s",target);
+            if ((file = popen (command,"r")) == (FILE *) NULL) {
+                CMmsgPrint(CMmsgUsrError, "Target file opening error: %s!", argv[argPos]);
+                return (CMfailed);    
+            } else pipe = true;
+        } else {
+            if ((file = fopen (target,"r")) == (FILE *) NULL) {
+                CMmsgPrint(CMmsgUsrError, "Target fiel opening error: %s!", argv[argPos]);
+                return (CMfailed);
+            } else pipe = false;
+        }
+    }
+    if (grdStorage.Initialize (file) == CMfailed) goto Stop;
+    if (file != stdin) { if (pipe) pclose (file); else fclose (file); }
+    for (argPos = 2; argPos < argNum; ++argPos) {
+        if (strcmp (argv[argPos] + strlen(target) - 3,".gz") == 0) {
+            char command [strlen(target) + 12];
+            sprintf (command,"gunzip -c %s",target);
+            if ((file = popen (command,"r")) == (FILE *) NULL) {
+                CMmsgPrint(CMmsgUsrError, "Target file opening error: %s!", argv[argPos]);
+                goto Stop;    
+            } else pipe = true;
+        } else {
+            if ((file = fopen (argv[argPos],"r")) == (FILE *) NULL) {
+                CMmsgPrint(CMmsgUsrError, "Target fiel opening error: %s!", argv[argPos]);
+                goto Stop;
+            } else pipe = false;
+        }
+        if (grdStorage.Run (file,deficit) == CMfailed) goto Stop;
+    }
+    if (output == (char *) NULL) file = stdout;
+    else {
+        if (strcmp (output + strlen(target) - 3,".gz") == 0) {
+            char command [strlen(target) + 12];
+            sprintf (command,"gunzip -c %s",output);
+            if ((file = popen (command,"r")) == (FILE *) NULL) {
+                CMmsgPrint(CMmsgUsrError, "Target file opening error: %s!", argv[argPos]);
+                goto Stop; 
+            } else pipe = true;
+        } else {
+            if ((file = fopen (output,"r")) == (FILE *) NULL) {
+                CMmsgPrint(CMmsgUsrError, "Target fiel opening error: %s!", argv[argPos]);
+                goto Stop;
+            } else pipe = false;
+        }
+    }
     ret = CMsucceeded;
 Stop:
-    grdStorage.Finalize (output, ret);
+    grdStorage.Finalize (file, ret);
+    if ((file != (FILE *) NULL) && (file != stdin) && (file != stdout)) { if (pipe) pclose (file); else fclose (file); }
     return (ret);
 }
