@@ -192,7 +192,8 @@ Stop:       return (ret);
         int Finalize (FILE *file,int ret) {
             if (ret == CMsucceeded) {
                 ret = CMfailed;
-                strcmp (Header.Date,"XXXX");
+                Header.Type = MFFloat;
+                strcpy (Header.Date,"XXXX");
                 if (MFdsHeaderWrite (&Header,file) == CMfailed) {
                     CMmsgPrint(CMmsgAppError, "Output file writing error: %s %d", __FILE__, __LINE__);
                     goto Stop;
@@ -288,7 +289,7 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             } else pipe = true;
         } else {
             if ((file = fopen (target,"r")) == (FILE *) NULL) {
-                CMmsgPrint(CMmsgUsrError, "Target fiel opening error: %s!", argv[argPos]);
+                CMmsgPrint(CMmsgUsrError, "Target file opening error: %s!", argv[argPos]);
                 return (CMfailed);
             } else pipe = false;
         }
@@ -300,12 +301,12 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
             char command [strlen(target) + 12];
             sprintf (command,"gunzip -c %s",target);
             if ((file = popen (command,"r")) == (FILE *) NULL) {
-                CMmsgPrint(CMmsgUsrError, "Target file opening error: %s!", argv[argPos]);
+                CMmsgPrint(CMmsgUsrError, "Source file opening error: %s!", argv[argPos]);
                 goto Stop;    
             } else pipe = true;
         } else {
             if ((file = fopen (argv[argPos],"r")) == (FILE *) NULL) {
-                CMmsgPrint(CMmsgUsrError, "Target fiel opening error: %s!", argv[argPos]);
+                CMmsgPrint(CMmsgUsrError, "Source file opening error: %s!", argv[argPos]);
                 goto Stop;
             } else pipe = false;
         }
@@ -313,23 +314,23 @@ Help:   if (CMargTest (argv[argPos], "-h", "--help")) {
     }
     if (output == (char *) NULL) file = stdout;
     else {
-        if (strcmp (output + strlen(target) - 3,".gz") == 0) {
-            char command [strlen(target) + 12];
+        if (strcmp (output + strlen(output) - 3,".gz") == 0) {
+            char command [strlen(output) + 12];
             sprintf (command,"gunzip -c %s",output);
-            if ((file = popen (command,"r")) == (FILE *) NULL) {
-                CMmsgPrint(CMmsgUsrError, "Target file opening error: %s!", argv[argPos]);
+            if ((file = popen (command,"w")) == (FILE *) NULL) {
+                CMmsgPrint(CMmsgUsrError, "Output file opening error: %s!", argv[argPos]);
                 goto Stop; 
             } else pipe = true;
         } else {
-            if ((file = fopen (output,"r")) == (FILE *) NULL) {
-                CMmsgPrint(CMmsgUsrError, "Target fiel opening error: %s!", argv[argPos]);
+            if ((file = fopen (output,"w")) == (FILE *) NULL) {
+                CMmsgPrint(CMmsgUsrError, "Output fiel opening error: %s!", argv[argPos]);
                 goto Stop;
             } else pipe = false;
         }
     }
     ret = CMsucceeded;
 Stop:
-    grdStorage.Finalize (file, ret);
+    ret = grdStorage.Finalize (file, ret);
     if ((file != (FILE *) NULL) && (file != stdin) && (file != stdout)) { if (pipe) pclose (file); else fclose (file); }
     return (ret);
 }
