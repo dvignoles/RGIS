@@ -330,6 +330,7 @@ static VDBmasterTable_t _VDBmasterTable3 [] = {
         {"land_fraction", "land_urban_built-up",                          "LandFraction-UrbanBuiltUp",                    "Urban Built-Up Area Fraction",          VDBcontinuous, VDBgrey,          VDBavg},
         {"land_fraction", "land_water",                                   "LandFraction-Water",                           "Water Area Fraction",                   VDBcontinuous, VDBgrey,          VDBavg},
         {"land_fraction", "land_wetland",                                 "LandFraction-Wetland",                         "Wetland Area Fraction",                 VDBcontinuous, VDBgrey,          VDBavg},
+        {"radiation",     "radiation_longwave_clear_sky",                 "Radiation-LongWave-ClearSky",                  "Clear Sky Long Wave Radiation",        VDBcontinuous, VDBgrey,          VDBavg},
         {"radiation",     "radiation_longwave_downwelling",               "Radiation-LongWave-Downwelling",               "Downwelling Long Wave Radiation",       VDBcontinuous, VDBgrey,          VDBavg},
         {"radiation",     "radiation_longwave_upwelling",                 "Radiation-LongWave-Upwelling",                 "Upwelling Long Wave Radiation",         VDBcontinuous, VDBgrey,          VDBavg},
         {"radiation",     "radiation_shortwave_clear_sky",                "Radiation-ShortWave-ClearSky",                 "Clear Sky Short Wave Radiation",        VDBcontinuous, VDBgrey,          VDBavg},
