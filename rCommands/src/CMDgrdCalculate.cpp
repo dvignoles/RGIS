@@ -109,8 +109,7 @@ public:
     char *CurrentLayer(DBInt layerID) {
         if (layerID == DBFault) LayerRec = GridIF->Layer(0);
         else
-            LayerRec = layerID < GridIF->LayerNum() ? GridIF->Layer(layerID) :
-                       GridIF->Layer(layerID % GridIF->LayerNum());
+            LayerRec = layerID < GridIF->LayerNum() ? GridIF->Layer(layerID) : GridIF->Layer(layerID % GridIF->LayerNum());
         return (LayerRec->Name());
     }
 
@@ -123,9 +122,9 @@ public:
             layerRec = GridIF->Layer(layerID);
 
             name = layerRec->Name();
-            if (strncmp(name, "XXXX-", 5) == 0) {
-                i = 5;
-                if ((strlen(name) - 5) == 0) return (layerID);
+            if (strncmp(name, "XXXX", 4) == 0) {
+                i = 4;
+                if ((strlen(name) - 4) == 0) return (layerID);
             }
             if (strncmp(name + i, layerName + i, strlen(name) - i) == 0) return (layerID);
         }
@@ -137,7 +136,7 @@ public:
         DBDate date;
         layerRec = GridIF->Layer(layerID);
         date.Set(layerRec->Name());
-        if (date.Year() != DBDefaultMissingIntVal) return (true);
+        if     (date.Year()  != DBDefaultMissingIntVal) return (true);
         return (date.Month() != DBDefaultMissingIntVal ? true : false);
     }
 
