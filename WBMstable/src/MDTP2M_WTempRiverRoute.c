@@ -109,7 +109,7 @@ static void _MDWTempRiverRoute (int itemID) {
  	waterStorageChange = MFVarGetFloat (_MDInRiverStorageChgID,        itemID, 0.0);
    	waterStorage       = MFVarGetFloat (_MDInRiverStorageID,           itemID, 0.0);
    	channelWidth       = MFVarGetFloat (_MDInRiverWidthID,             itemID, 0.0);
- 	solarRad           = MFVarGetFloat (_MDInCommon_Common_SolarRadID, itemID, 0.0); //MJ/m2/d - CHECK UNITS
+ 	solarRad           = MFVarGetFloat (_MDInCommon_Common_SolarRadID, itemID, 0.0); // W/m2
  	windSpeed          = MFVarGetFloat (_MDInWindSpeedID,              itemID, 0.0);
     cloudCover         = MFVarGetFloat (_MDInCloudCoverID,             itemID, 0.0);
     Tair               = MFVarGetFloat (_MDInCommon_AirTemperatureID,  itemID, 0.0);
@@ -245,7 +245,7 @@ static void _MDWTempRiverRoute (int itemID) {
             dew_point =(243.5*log(e2/6.112))/(17.67-log(e2/6.112)); //dew point temp (C)
             dew_point = (e2 <= 0) ? Tair : dew_point;
             wind_f = 9.2+(0.46*pow(windSpeed,2)); // wind function
-            solar_KJ = solarRad * 1000; // solar radiation in KJ/m2/day
+            solar_KJ = solarRad * 86400 / 1000; // solar radiation in KJ/m2/day
 
             for (x = 0; x < 4; x++) {
 	            Tm = (dew_point + initial_riverT) / 2; // mean of rivertemp initial and dew point
