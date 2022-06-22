@@ -118,9 +118,7 @@ static void _MDWTempRiverRoute (int itemID) {
     QxT_mix            = MFVarGetFloat (_MDFluxMixing_QxTID,           itemID, 0.0);
     StorexT_mix        = MFVarGetFloat (_MDStorageMixing_QxTID,        itemID, 0.0);
 
-    waterStorage = waterStorageChange = 0.0;
-
-     if (_MDInResStorageID != MFUnset) {
+    if (_MDInResStorageID != MFUnset) {
          ResWaterStorageChange = MFVarGetFloat ( _MDInResStorageChangeID, itemID, 0.0) * pow(1000,3); // convert to m3/
          ResWaterStorage       = MFVarGetFloat ( _MDInResStorageID,       itemID, 0.0) * pow(1000,3); // convert to m3 
          resCapacity           = MFVarGetFloat ( _MDInResCapacityID,      itemID, 0.0);	//RJS 071511

@@ -368,7 +368,7 @@ static void _MFUserFunc (size_t threadId, size_t objectId, void *commonPtr) {
 
 int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
 	FILE *inFile;
-	int i, varID, ret = CMfailed, timeStep;
+	int item, varID, ret = CMfailed, timeStep;
     size_t * dlinks, taskId;
 	char *startDate = (char *) NULL, *endDate = (char *) NULL, *domainFileName = (char *) NULL;
     const char *bifurFileName = (char *) NULL;
@@ -435,7 +435,7 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
                 CMmsgPrint(CMmsgSysError, "Memory Allocation Error in: %s:%d", __FILE__, __LINE__);
                 goto Stop;
             }
-            for (i = 0; i < var->ItemNum; ++i) MFVarSetFloat(var->ID,i,0.0);
+            for (item = 0; item < var->ItemNum; ++item) MFVarSetFloat(var->ID,item,0.0);
         }
         if (var->Flux) sprintf (var->Unit + strlen(var->Unit), "/%s", MFDateTimeStepUnit(var->TStep));
         if (var->OutputPath != (char *) NULL) {
@@ -483,6 +483,8 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
             }
             else strcpy (var->CurDate,dateCur);
         }
+		for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID))
+			if (var->Route) for (item = 0; item < var->ItemNum; ++item) MFVarSetFloat(var->ID,item,0.0);
         strcpy (dateCur,  dateNext);
         MFDateSetCurrent(dateCur);
         strcpy (dateNext, MFDateGetNext ());
