@@ -50,6 +50,7 @@ extern "C" {
 // Auxiliary variables
 #define MDVarAux_AccBalance                     "AccumBalance"
 #define MDVarAux_AccEvapotranspiration          "AccumEvapotranspiration"
+#define MDVarAux_AccSnowPackChange              "AccumSoilSnowPackChange"
 #define MDVarAux_AccSoilMoistChange             "AccumSoilMoistureChange"
 #define MDVarAux_AccGroundWaterChange           "AccumGroundWaterChange"
 #define MDVarAux_AccPrecipitation               "AccumPrecipitation"
@@ -97,7 +98,6 @@ extern "C" {
 #define MDVarCore_GroundWater                   "GroundWater"
 #define MDVarCore_GroundWaterChange             "GroundWaterChange"
 #define MDVarCore_GroundWaterRecharge           "GroundWaterRecharge"
-#define MDVarCore_GroundWaterUptake             "GroundWaterUptake"
 #define MDVarCore_LandCoverSAGE                 "SAGEVegCover"
 #define MDVarCore_LandCoverTEM                  "TEMVegCover"
 #define MDVarCore_LandCoverWBM                  "WBMCover"
@@ -434,6 +434,7 @@ extern "C" {
 
 int MDAux_AccumBalanceDef ();
 int MDAux_AccumEvapDef ();
+int MDAux_AccumSnowPackChgDef ();
 int MDAux_AccumGrdWatChgDef ();
 int MDAux_AccumPrecipDef ();
 int MDAux_AccumRunoffDef ();
