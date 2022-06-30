@@ -353,7 +353,7 @@ static void _MFUserFunc (size_t threadId, size_t objectId, void *commonPtr) {
 
 	for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID))
 		if (var->Route) {
-			// I -think- all WBM routed variables are considered to be extensive. Intensive variables are
+			// WBM routed variables are considered to be extensive. Intensive variables are
 			// computed within modules I THINK!. Weighing code here assumes this.
 			value = 0.0;
 			for (link  = 0; link < _MFDomain->Objects [objectId].ULinkNum; ++link) {
@@ -483,8 +483,6 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
             }
             else strcpy (var->CurDate,dateCur);
         }
-		for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID))
-			if (var->Route) for (item = 0; item < var->ItemNum; ++item) MFVarSetFloat(var->ID,item,0.0);
         strcpy (dateCur,  dateNext);
         MFDateSetCurrent(dateCur);
         strcpy (dateNext, MFDateGetNext ());
