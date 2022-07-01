@@ -31,7 +31,7 @@ static void _MDAux_MeanDischarge (int itemID) {
 }
 
 int MDAux_MeanDischargeDef () {
-	int  optID = MFinput;
+	int  optID = MFcalculate;
 	const char *optStr;
 
 	if (_MDOutAux_MeanDischargeID != MFUnset) return (_MDOutAux_MeanDischargeID);
@@ -39,8 +39,8 @@ int MDAux_MeanDischargeDef () {
 	MFDefEntering ("Discharge Mean");
 	if ((optStr = MFOptionGet (MDVarAux_DischMean)) != (char *) NULL) optID = CMoptLookup (MFsourceOptions, optStr, true);
 	switch (optID) {
-		default:      MFOptionMessage (MDVarAux_DischMean, optStr, MFsourceOptions); return (CMfailed);
-		case MFhelp:  MFOptionMessage (MDVarAux_DischMean, optStr, MFsourceOptions);
+		default:
+		case MFhelp:  MFOptionMessage (MDVarAux_DischMean, optStr, MFsourceOptions); return (CMfailed);
 		case MFinput: _MDOutAux_MeanDischargeID = MFVarGetID (MDVarAux_DischMean, "m3/s", MFInput, MFState, MFInitial); break;
 		case MFcalculate:
 			if (((_MDInAux_AccumRunoffID    = MDAux_AccumRunoffDef()) == CMfailed) ||

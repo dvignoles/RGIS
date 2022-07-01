@@ -28,7 +28,7 @@ static void _MDRunoffVolume (int itemID) {
 }
  
 int MDCore_RunoffVolumeDef () {
-	int optID = MFinput;
+	int optID = MFcalculate;
 	const char *optStr;
 
 	if (_MDOutRunoffVolumeID != MFUnset) return (_MDOutRunoffVolumeID);
@@ -36,8 +36,8 @@ int MDCore_RunoffVolumeDef () {
 	MFDefEntering ("Runoff Volume");
 	if ((optStr = MFOptionGet (MDVarCore_RunoffVolume)) != (char *) NULL) optID = CMoptLookup (MFsourceOptions, optStr, true);
 	switch (optID) {
-		default:       MFOptionMessage (MDVarCore_RunoffVolume, optStr, MFsourceOptions); return (CMfailed);
-		case MFhelp:   MFOptionMessage (MDVarCore_RunoffVolume, optStr, MFsourceOptions); 
+		default:
+		case MFhelp:   MFOptionMessage (MDVarCore_RunoffVolume, optStr, MFsourceOptions); return (CMfailed);
 		case MFinput: _MDOutRunoffVolumeID = MFVarGetID (MDVarCore_RunoffVolume, "m3/s", MFInput, MFState, MFBoundary); break;
 		case MFcalculate:
 			if (((_MDInCore_RunoffID        = MDCore_RunoffDef()) == CMfailed) ||
