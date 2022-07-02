@@ -62,7 +62,6 @@ CMthreadJob_p CMthreadJobCreate (size_t taskNum, CMthreadUserExecFunc execFunc, 
 	for (taskId = 0;taskId < job->TaskNum; ++taskId) {
 		job->SortedTasks [taskId]        = job->Tasks + taskId;
 		job->Tasks [taskId].Id           = taskId;
-		job->Tasks [taskId].Completed    = false;
 		job->Tasks [taskId].Dependents   = (CMthreadTask_p *) NULL;
 		job->Tasks [taskId].NDependents  = 0;
 		job->Tasks [taskId].Travel       = 0;
@@ -165,7 +164,7 @@ void CMthreadJobDestroy (CMthreadJob_p job) {
 
 static void *_CMthreadWork (void *dataPtr) {
 	CMthreadData_p data = (CMthreadData_p) dataPtr;
-	size_t taskId, groupId, start, end, chunkSize, threadNum, workerNum, num, completed;
+	size_t taskId, start, end, chunkSize, threadNum, workerNum, num, completed;
 	CMthreadTeam_p team = (CMthreadTeam_p) data->TeamPtr;
 	CMthreadJob_p  job;
     struct timespec req, rem;
@@ -181,29 +180,15 @@ static void *_CMthreadWork (void *dataPtr) {
             pthread_mutex_unlock(&(team->SMutex));
             gettimeofday(&tValue, &tZone);
             startTime = tValue.tv_sec * 1000000 + tValue.tv_usec;
-            for (groupId = 0; groupId < job->GroupNum; groupId++) {
-                start = job->Groups[groupId].Start;
-                end   = job->Groups[groupId].End;
-                threadNum = end - start < team->ThreadNum ? end - start : team->ThreadNum;
-                chunkSize = (size_t) ceil ((double) (end - start) / (double) threadNum);
-                start = start + data->Id * chunkSize;
-                end   = start + chunkSize < end ? start + chunkSize : end;
-                for (taskId = start; taskId < end; ++taskId) {
-                    job->UserFunc(data->Id, job->SortedTasks[taskId]->Id, job->CommonData);
-                    job->SortedTasks[taskId]->Completed = true;
-                }
-                req.tv_sec  = 0;
-                req.tv_nsec = 1;
-                workerNum = chunkSize > 1 ? threadNum : job->Groups[groupId].End - job->Groups[groupId].Start;
-                while (true) {
-                    completed = 0;
-                    for (num = 0; num < workerNum; ++num) {
-                        taskId = start + num * chunkSize - 1 < end - 1 ? start + num * chunkSize - 1 : end - 1;
-                        if (job->SortedTasks [taskId]->Completed) completed++;
-                    }
-                    if  (completed == workerNum) break;
-                    nanosleep(&req , &rem);
-                }
+
+            start = job->Groups[job->GroupID].Start;
+            end   = job->Groups[job->GroupID].End;
+            threadNum = end - start < team->ThreadNum ? end - start : team->ThreadNum;
+            chunkSize = (size_t) ceil ((double) (end - start) / (double) threadNum);
+            start = start + data->Id * chunkSize;
+            end   = start + chunkSize < end ? start + chunkSize : end;
+            for (taskId = start; taskId < end; ++taskId) {
+                job->UserFunc(data->Id, job->SortedTasks[taskId]->Id, job->CommonData);
             }
             gettimeofday(&tValue, &tZone);
             data->Time += (tValue.tv_sec * 1000000 + tValue.tv_usec - startTime);
@@ -221,7 +206,7 @@ static void *_CMthreadWork (void *dataPtr) {
 }
 
 CMreturn CMthreadJobExecute (CMthreadTeam_p team, CMthreadJob_p job) {
-    size_t taskId, groupId, start, end;
+    size_t taskId, groupID, start, end;
     long long startTime, localStart;
     struct timeval  tValue;
     struct timezone tZone;
@@ -240,27 +225,29 @@ CMreturn CMthreadJobExecute (CMthreadTeam_p team, CMthreadJob_p job) {
     if (team->ThreadNum <= 1) {
         gettimeofday(&tValue, &tZone);
         localStart = tValue.tv_sec * 1000000 + tValue.tv_usec;
-        for (groupId = 0; groupId < job->GroupNum; groupId++) {
-            start = job->Groups[groupId].Start;
-            end   = job->Groups[groupId].End;
-            for (taskId = start; taskId < end; ++taskId)
-                job->UserFunc(0, job->SortedTasks[taskId]->Id, job->CommonData);
+        for (groupID = 0; groupID < job->GroupNum; groupID++){
+            start = job->Groups[groupID].Start;
+            end   = job->Groups[groupID].End;
+            for (taskId = start; taskId < end; ++taskId) job->UserFunc(0, job->SortedTasks[taskId]->Id, job->CommonData);
         }
         gettimeofday(&tValue, &tZone);
         team->Time += (tValue.tv_sec * 1000000 + tValue.tv_usec - localStart);
     }
     else {
-        pthread_mutex_lock     (&(team->SMutex));
-        job->Completed = 0;
-        team->JobPtr = (void *) job;
-        pthread_cond_broadcast (&(team->SCond));
-        pthread_mutex_unlock   (&(team->SMutex));
-        pthread_cond_wait (&(team->MCond), &(team->MMutex));
-        for (groupId = 0; groupId < job->GroupNum; groupId++) {
-            start = job->Groups[groupId].Start;
-            end   = job->Groups[groupId].End;
-            for (taskId = start; taskId < end; ++taskId) {
-                job->SortedTasks[taskId]->Completed = false;
+        for (groupID = 0; groupID < job->GroupNum; groupID++) {
+            start = job->Groups[groupID].Start;
+            end   = job->Groups[groupID].End;
+            if (end - start < team->ThreadNum) {
+                for (taskId = start; taskId < end; ++taskId) job->UserFunc(0, job->SortedTasks[taskId]->Id, job->CommonData);
+            }
+            else {
+                pthread_mutex_lock     (&(team->SMutex));
+                job->Completed = 0;
+                job->GroupID = groupID;
+                team->JobPtr = (void *) job;
+                pthread_cond_broadcast (&(team->SCond));
+                pthread_mutex_unlock   (&(team->SMutex));
+                pthread_cond_wait (&(team->MCond), &(team->MMutex));
             }
         }
     }

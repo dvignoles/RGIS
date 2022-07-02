@@ -463,8 +463,6 @@ int MFModelRun (int argc, char *argv [], int argNum, int (*mainDefFunc) ()) {
     do {
         CMmsgPrint(CMmsgDebug, "Computing: %s", dateCur);
 
-		for (var = MFVarGetByID (varID = 1);var != (MFVariable_p) NULL;var = MFVarGetByID (++varID))
-			if (var->Route) for (item = 0; item < var->ItemNum; ++item) MFVarSetFloat(var->ID,item,0.0);
         CMthreadJobExecute (team, job);
         for (var = MFVarGetByID(varID = 1); var != (MFVariable_p) NULL; var = MFVarGetByID(++varID)) {
             strcpy (var->OutDate, dateCur);

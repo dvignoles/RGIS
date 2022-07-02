@@ -110,7 +110,6 @@ typedef void  (*CMthreadUserExecFunc)(size_t, size_t, void *);
 typedef struct CMthreadTask_s {
     size_t Id;
     size_t Travel;
-    bool Completed;
     bool TravelSet;
     struct CMthreadTask_s **Dependents;
     size_t NDependents;
@@ -129,6 +128,7 @@ typedef struct CMthreadJob_s {
     size_t TaskNum;
     size_t GroupNum;
     size_t Completed;
+    size_t GroupID;
     CMthreadUserExecFunc UserFunc;
     void *CommonData;
 } CMthreadJob_t, *CMthreadJob_p;
