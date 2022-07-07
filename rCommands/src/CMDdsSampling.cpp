@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     bool compressed = false;
     int argPos = 0, argNum = argc, ret = CMfailed, itemSize, itemID, sampleID, maxCount;
     double val, maxVal = -HUGE_VAL;
-    FILE *inFile;
+    FILE *inFile = (FILE *) NULL;
     void *items = (void *) NULL;
     char *domainFileName = (char *) NULL, *mapperFileName = (char *) NULL, *outFileName = (char *) NULL;
     char *title  = (char *) NULL, *subject = (char *) NULL;
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
     MFMapper_p mapperPTR = (MFMapper_p) NULL;
     MFdsHeader_t header;
     MFMapperStats_p mapperStats;
-    DBObjData  *data;
+    DBObjData  *data = (DBObjData *) NULL;
     DBObjTable *table;
     DBObjTableField *sampleIDFLD;
     DBObjTableField *dateFLD;
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     DBObjTableField *stdDevFLD;
     DBObjRecord *tblRec;
 
-    if (argNum < 2) goto Help;
+    if (argNum < 2) { _CMDprintUsage (argv[0]); return (CMsucceeded); }
 
     for (argPos = 1; argPos < argNum;) {
         if (CMargTest(argv[argPos], "-D", "--domainfile")) {
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) <= argPos) break;
             continue;
         }
-Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
+       if (CMargTest(argv[argPos], "-h", "--help")) {
             if ((argNum = CMargShiftLeft(argPos, argv, argNum)) < argPos) break;
             _CMDprintUsage (argv[0]);
             ret = CMsucceeded;
@@ -389,11 +389,11 @@ Help:   if (CMargTest(argv[argPos], "-h", "--help")) {
             break;
         default: break;
     }
-Stop:
-    if (domainPTR != (MFDomain_p) NULL) MFDomainFree (domainPTR);
-    if (mapperPTR != (MFMapper_p) NULL) MFMapperFree (mapperPTR);
     if (outFileName != (char *) NULL) data->Write (outFileName); else data->Write(stdout);
-    delete data;
+Stop:
+    if (domainPTR   != (MFDomain_p) NULL) MFDomainFree (domainPTR);
+    if (mapperPTR   != (MFMapper_p) NULL) MFMapperFree (mapperPTR);
+    if (data != (DBObjData *) NULL) delete data;
     if ((inFile != (FILE *) NULL) && (inFile != stdin)) { if (compressed) pclose (inFile); else fclose (inFile); }
     return (ret);
 }
