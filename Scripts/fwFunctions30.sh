@@ -816,14 +816,13 @@ function FwRun () {
 		;;
 		(*)
 			local dstDir=$(echo ${_fwGDSDomainDIR} | sed "s:${_fwGDSWorkDIR}:${_fwCLEANUP}:")
-			[ -e "${dstDir}" ] && cp "${_fwGDSDomainFILE}" "${dstDir}"
-			local dstDir=${dstDir}/${fwExperiment}
 			if [ -e "${dstDir}" ]
 			then
+				mv "${_fwGDSDomainFILE}" "${dstDir}"
 				for fwGDSfile in ${fwGDSFileNAME}
 				do
 					[ -e "${fwGDSfile}.gz" ] && rm "${fwGDSfile}.gz" # removing possible gzip residures from broken runs.
-					(gzip "${fwGDSfile}"; mv -f "${fwGDSfile}.gz" "${dstDir}/") &
+					(gzip "${fwGDSfile}"; mv -f "${fwGDSfile}.gz" "${dstDir}/${fwExperiment}") &
 				done
 				wait
 			else
@@ -834,6 +833,7 @@ function FwRun () {
 				done
 				wait
 			fi
+			rmdir -p --ignore-fail-on-non-empty ${_fwGDSDomainDIR}/${fwExperiment}
 		;;
 	esac
 
