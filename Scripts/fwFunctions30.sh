@@ -565,8 +565,8 @@ function _fwPostprocess () {
 				[ -e "${fwGDSFileNAME}" ] && rm "${fwGDSFileNAME}" &
 			;;
 			("off")
-				[ -e "${fwGDSFileNAME}.gz" ] && rm "${fwGDSFileNAME}.gz"
-				[ -e "${fwGDSFileNAME}" ]    && gzip "${fwGDSFileNAME}" &
+				[ -e "${fwGDSFileNAME}.gz" ] && rm "${fwGDSFileNAME}.gz" # removing possible gzip residures from broken runs.
+				[ -e "${fwGDSFileNAME}"    ] && gzip "${fwGDSFileNAME}" &
 			;;
 			(*)
 				local dstDir=$(echo ${_fwGDSDomainDIR} | sed "s:${_fwGDSWorkDIR}:${_fwCLEANUP}:")/${fwExperiment}
@@ -797,5 +797,45 @@ function FwRun () {
 
 	[ "${_fwSPINUP}"   == "on" ] && [ "${_fwRESTART}" == "" ] && { _fwSpinup "${fwExperiment}"    || { echo "Spinup failed";    return 1; } }
 	[ "${_fwFINALRUN}" == "on" ] && { _fwRun    "${fwExperiment}" "${fwStartYEAR}" "${fwEndYEAR}" || { echo "Final run failed"; return 1; } }
+	local fwGDSFileNAME="$(echo $(FwGDSFilename "*" "State" "${fwExperiment}" "*" "") | sed "s:TS::")"
+	case "${_fwCLEANUP}" in
+		("on")
+			for fwGDSfile in ${fwGDSFileNAME}
+			do
+				rm "${fwGDSfile}"
+			done
+			wait
+		;;
+		("off")
+			for fwGDSfile in ${fwGDSFileNAME}
+			do
+				[[ -e ${fwGDSfile}.gz ]] && rm ${fwGDSfile}.gz
+			 	gzip ${fwGDSfile} &
+			done
+			wait
+		;;
+		(*)
+			local dstDir=$(echo ${_fwGDSDomainDIR} | sed "s:${_fwGDSWorkDIR}:${_fwCLEANUP}:")
+			[ -e "${dstDir}" ] && cp "${_fwGDSDomainFILE}" "${dstDir}"
+			local dstDir=${dstDir}/${fwExperiment}
+			if [ -e "${dstDir}" ]
+			then
+				for fwGDSfile in ${fwGDSFileNAME}
+				do
+					[ -e "${fwGDSfile}.gz" ] && rm "${fwGDSfile}.gz" # removing possible gzip residures from broken runs.
+					(gzip "${fwGDSfile}"; mv -f "${fwGDSfile}.gz" "${dstDir}/") &
+				done
+				wait
+			else
+				for fwGDSfile in ${fwGDSFileNAME}
+				do
+					[[ -e ${fwGDSfile}.gz ]] && rm ${fwGDSfile}.gz
+					[[ -e ${fwGDSfile}    ]] && rm ${fwGDSfile}
+				done
+				wait
+			fi
+		;;
+	esac
+
 	return 0
 }
